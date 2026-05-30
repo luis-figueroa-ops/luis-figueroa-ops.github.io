@@ -1,983 +1,462 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Role Revealer — Operations, Augmented</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0a0a0f;
-      --surface: #111118;
-      --surface2: #16161f;
-      --border: #1e1e2e;
-      --border-active: #3a3a5c;
-      --accent: #6c63ff;
-      --accent2: #ff6584;
-      --accent3: #43e8c8;
-      --text: #f4f4ff;
-      --text-muted: #b8b8d8;
-      --text-dim: #8080b8;
-      --mono: 'DM Mono', monospace;
-      --sans: 'Syne', sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luis Figueroa — Operations, Augmented</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 14px;
-      line-height: 1.7;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+:root {
+  --navy: #1B2A4A;
+  --navy-deep: #111d33;
+  --navy-light: #243558;
+  --gold: #B8963E;
+  --gold-light: #d4ae60;
+  --white: #F4F1EC;
+  --muted: #8a9bb5;
+  --border: rgba(184,150,62,0.2);
+}
 
-    /* Grid background */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 40px 40px;
-      opacity: 0.4;
-      pointer-events: none;
-      z-index: 0;
-    }
+html { scroll-behavior: smooth; }
 
-    /* Glow orb */
-    body::after {
-      content: '';
-      position: fixed;
-      top: -200px;
-      right: -200px;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
+body {
+  background: var(--navy-deep);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-    .page-wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 48px 24px 80px;
-    }
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.4;
+}
 
-    /* ── NAV ── */
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 64px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-brand {
-      font-family: var(--sans);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-decoration: none;
-      letter-spacing: 0.05em;
-      transition: color 0.2s;
-    }
-    .nav-brand:hover { color: var(--text); }
-    .nav-tag {
-      font-size: 11px;
-      color: var(--text-dim);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
+/* ── DIAGONAL ACCENT BAND ── */
+body::after {
+  content: '';
+  position: fixed;
+  top: -20%; left: -10%;
+  width: 55%; height: 140%;
+  background: linear-gradient(135deg, rgba(27,42,74,0.9) 0%, rgba(17,29,51,0) 70%);
+  pointer-events: none; z-index: 0;
+}
 
-    /* ── HEADER ── */
-    .header { margin-bottom: 48px; }
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  padding: 56px 64px 48px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  animation: fadeUp 0.7s ease both;
+}
 
-    .step-badge {
-      display: inline-block;
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--accent3);
-      border: 1px solid rgba(67,232,200,0.3);
-      padding: 3px 10px;
-      margin-bottom: 20px;
-      font-family: var(--mono);
-    }
+.header-left {}
 
-    h1 {
-      font-family: var(--sans);
-      font-size: clamp(32px, 6vw, 52px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-      color: var(--text);
-    }
-    h1 span {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+.eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
 
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 14px;
-      max-width: 540px;
-      line-height: 1.8;
-    }
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 6vw, 80px);
+  letter-spacing: 3px;
+  line-height: 0.95;
+  color: var(--white);
+}
 
-    /* ── PROGRESS ── */
-    .progress-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 40px;
-      align-items: center;
-    }
-    .progress-step {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      transition: color 0.3s;
-    }
-    .progress-step.active { color: var(--accent3); }
-    .progress-step.done { color: var(--text-muted); }
-    .progress-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--text-dim);
-      transition: background 0.3s;
-    }
-    .progress-step.active .progress-dot { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
-    .progress-step.done .progress-dot { background: var(--text-muted); }
-    .progress-connector {
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-      max-width: 60px;
-    }
+h1 span {
+  color: var(--gold);
+}
 
-    /* ── CARD ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 32px;
-      margin-bottom: 24px;
-      position: relative;
-      transition: border-color 0.3s;
-    }
-    .card:focus-within { border-color: var(--border-active); }
+.tagline {
+  margin-top: 14px;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--white);
+  letter-spacing: 1px;
+  max-width: 340px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
 
-    .card-label {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
+.header-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding-bottom: 6px;
+}
 
-    /* ── API KEY ── */
-    .api-row {
-      display: flex;
-      gap: 12px;
-      align-items: stretch;
-    }
-    .api-input {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 13px;
-      padding: 12px 16px;
-      outline: none;
-      transition: border-color 0.2s;
-      letter-spacing: 0.03em;
-    }
-    .api-input:focus { border-color: var(--accent); }
-    .api-input::placeholder { color: #a0a0c8; }
-    .api-note {
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-top: 8px;
-    }
-    .api-note a { color: var(--accent); text-decoration: none; }
-    .api-note a:hover { text-decoration: underline; }
+.header-links a {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--white);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
 
-    /* ── TEXTAREA ── */
-    textarea {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 13px;
-      padding: 16px;
-      resize: vertical;
-      min-height: 140px;
-      outline: none;
-      line-height: 1.7;
-      transition: border-color 0.2s;
-    }
-    textarea:focus { border-color: var(--accent); }
-    textarea::placeholder { color: #a0a0c8; line-height: 1.7; }
+.header-links a:hover {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
 
-    /* ── BUTTONS ── */
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      font-family: var(--mono);
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      padding: 14px 28px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-      text-transform: uppercase;
-    }
-    .btn-primary:hover {
-      background: #8079ff;
-      box-shadow: 0 0 24px rgba(108,99,255,0.4);
-    }
-    .btn-primary:active { transform: translateY(1px); }
-    .btn-primary:disabled {
-      background: var(--border);
-      color: var(--text-dim);
-      cursor: not-allowed;
-      box-shadow: none;
-    }
+.header-links .divider {
+  width: 1px; height: 14px;
+  background: var(--border);
+}
 
-    .btn-secondary {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      padding: 10px 20px;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .btn-secondary:hover { border-color: var(--border-active); color: var(--text); }
+/* ── INTRO BAND ── */
+.intro {
+  position: relative; z-index: 10;
+  padding: 40px 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  animation: fadeUp 0.7s 0.1s ease both;
+}
 
-    .btn-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
+.intro-bar {
+  width: 3px; height: 48px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  flex-shrink: 0;
+}
 
-    /* ── STATUS ── */
-    .status-line {
-      font-size: 11px;
-      color: var(--text-dim);
-      letter-spacing: 0.06em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .status-line.thinking { color: var(--accent3); }
-    .dot-pulse {
-      display: inline-flex;
-      gap: 3px;
-    }
-    .dot-pulse span {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--accent3);
-      animation: pulse 1.2s infinite;
-    }
-    .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
-    .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes pulse {
-      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
-      40% { opacity: 1; transform: scale(1); }
-    }
+.intro-text {
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.7;
+  max-width: 680px;
+  opacity: 0.85;
+}
 
-    /* ── INSIGHTS ── */
-    #insights-section { display: none; }
+.intro-text strong {
+  color: var(--white);
+  font-weight: 500;
+}
 
-    .insights-header {
-      margin-bottom: 24px;
-    }
-    .insights-header h2 {
-      font-family: var(--sans);
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .insights-header p {
-      color: var(--text-muted);
-      font-size: 13px;
-    }
+/* ── SECTION ── */
+.section {
+  position: relative; z-index: 10;
+  padding: 56px 64px;
+}
 
-    .insight-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      padding: 20px 24px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
-      position: relative;
-    }
-    .insight-card:hover {
-      border-left-color: var(--accent3);
-      background: #1a1a28;
-      transform: translateX(4px);
-    }
-    .insight-card.selected {
-      border-left-color: var(--accent3);
-      border-color: rgba(67,232,200,0.4);
-      background: #0f1f1e;
-    }
-    .insight-num {
-      font-size: 10px;
-      color: var(--accent);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .insight-card.selected .insight-num { color: var(--accent3); }
-    .insight-title {
-      font-family: var(--sans);
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-    .insight-body {
-      color: var(--text-muted);
-      font-size: 13px;
-      line-height: 1.7;
-    }
-    .insight-select-hint {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      font-size: 10px;
-      color: var(--text-dim);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .insight-card:hover .insight-select-hint { opacity: 1; }
-    .insight-card.selected .insight-select-hint {
-      opacity: 1;
-      color: var(--accent3);
-      content: '✓ selected';
-    }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 36px;
+}
 
-    /* ── STEP 2 ── */
-    #step2-section { display: none; }
+.section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
 
-    .step2-intro {
-      background: linear-gradient(135deg, rgba(108,99,255,0.08), rgba(255,101,132,0.05));
-      border: 1px solid rgba(108,99,255,0.2);
-      padding: 24px;
-      margin-bottom: 32px;
-    }
-    .step2-intro h2 {
-      font-family: var(--sans);
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .step2-intro p {
-      color: var(--text-muted);
-      font-size: 13px;
-      line-height: 1.7;
-    }
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
 
-    .selected-insight-pill {
-      display: inline-block;
-      background: rgba(67,232,200,0.1);
-      border: 1px solid rgba(67,232,200,0.3);
-      color: var(--accent3);
-      font-size: 12px;
-      padding: 4px 12px;
-      margin-bottom: 24px;
-      letter-spacing: 0.04em;
-    }
+/* ── TOOL CARDS ── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
 
-    .prompt-pieces { margin-bottom: 24px; }
-    .piece {
-      margin-bottom: 16px;
-    }
-    .piece-label {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .piece-hint {
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-top: 4px;
-      font-style: italic;
-    }
+.card {
+  position: relative;
+  background: rgba(27,42,74,0.5);
+  border: 1px solid var(--border);
+  padding: 32px 28px;
+  text-decoration: none;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s ease;
+  overflow: hidden;
+  animation: fadeUp 0.6s ease both;
+}
 
-    /* ── FINAL PROMPT ── */
-    #prompt-output-section { display: none; }
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--gold);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.25s ease;
+}
 
-    .prompt-output-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent3);
-      padding: 24px;
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.8;
-      color: var(--text);
-      white-space: pre-wrap;
-      word-break: break-word;
-      min-height: 120px;
-    }
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(184,150,62,0.06) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
 
-    .copy-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 12px;
-    }
-    .copy-btn:hover { border-color: var(--accent3); color: var(--accent3); }
-    .copy-btn.copied { border-color: var(--accent3); color: var(--accent3); }
+.card:hover {
+  border-color: rgba(184,150,62,0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
 
-    /* ── RESET ── */
-    .reset-link {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-decoration: none;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      border-bottom: 1px solid transparent;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .reset-link:hover { color: var(--text-muted); border-color: var(--text-muted); }
+.card:hover::before { transform: scaleY(1); }
+.card:hover::after { opacity: 1; }
 
-    /* ── FOOTER ── */
-    .footer {
-      margin-top: 80px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: gap;
-      gap: 12px;
-    }
-    .footer-left {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-    .footer-left a {
-      color: var(--text-muted);
-      text-decoration: none;
-    }
-    .footer-left a:hover { color: var(--text); }
-    .footer-right {
-      font-size: 11px;
-      color: var(--text-dim);
-      letter-spacing: 0.05em;
-    }
+.card-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
 
-    /* ── DIVIDER ── */
-    .section-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 40px 0;
-    }
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 2px;
+  line-height: 1;
+  color: var(--white);
+  transition: color 0.2s;
+}
 
-    /* ── UTIL ── */
-    .hidden { display: none !important; }
+.card:hover .card-title { color: var(--gold-light); }
 
-    @media (max-width: 520px) {
-      .card { padding: 20px 16px; }
-      .btn-row { flex-direction: column; align-items: stretch; }
-      .btn-primary, .btn-secondary { text-align: center; }
-      .api-row { flex-direction: column; }
-    }
-  </style>
+.card-desc {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.65;
+  flex: 1;
+  opacity: 0.8;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(184,150,62,0.1);
+}
+
+.card-cta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.card-cta::after {
+  content: '→';
+  transition: transform 0.2s;
+}
+
+.card:hover .card-cta::after { transform: translateX(4px); }
+
+.card-type {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* card stagger */
+.card:nth-child(1) { animation-delay: 0.15s; }
+.card:nth-child(2) { animation-delay: 0.25s; }
+.card:nth-child(3) { animation-delay: 0.35s; }
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 10;
+  padding: 32px 64px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-brand {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--white);
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links a {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--white);
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.2s, color 0.2s;
+  text-transform: uppercase;
+}
+
+.footer-links a:hover { opacity: 1; color: var(--gold); }
+
+/* ── GOLD DOT ACCENT ── */
+.gold-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  header { flex-direction: column; align-items: flex-start; gap: 24px; padding: 36px 28px 32px; }
+  .intro, .section { padding-left: 28px; padding-right: 28px; }
+  footer { flex-direction: column; gap: 16px; padding: 28px; }
+  .cards { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
 
-<div class="page-wrap">
-
-  <!-- NAV -->
-  <nav class="nav">
-    <a href="https://luis-figueroa-ops.github.io/" class="nav-brand">← Operations, Augmented</a>
-    <span class="nav-tag">Career Tools</span>
+<header>
+  <div class="header-left">
+    <div class="eyebrow">Luis Figueroa</div>
+    <h1>Operations,<br><span>Augmented</span></h1>
+    <p class="tagline">Augmenting Human Potential, One Workflow at a Time</p>
+  </div>
+  <nav class="header-links">
+    <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>
+    <div class="divider"></div>
+    <a href="https://www.luis-portfolio.com" target="_blank">Portfolio</a>
+    <div class="divider"></div>
+    <a href="https://github.com/luis-figueroa-ops" target="_blank">GitHub</a>
   </nav>
+</header>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="step-badge">Interactive Tool</div>
-    <h1>AI Role<br><span>Revealer</span></h1>
-    <p class="subtitle">
-      Describe what you actually do — not your title — and get a specific read on what AI could be doing for your role right now. Then build a working prompt to go get it.
-    </p>
-  </header>
-
-  <!-- PROGRESS -->
-  <div class="progress-bar" id="progress-bar">
-    <div class="progress-step active" id="prog-1">
-      <div class="progress-dot"></div>
-      Step 1 — Discover
-    </div>
-    <div class="progress-connector"></div>
-    <div class="progress-step" id="prog-2">
-      <div class="progress-dot"></div>
-      Step 2 — Build Prompt
-    </div>
-  </div>
-
-  <!-- ── STEP 1 ── -->
-  <div id="step1-section">
-
-    <!-- API Key -->
-    <div class="card">
-      <div class="card-label">Anthropic API Key</div>
-      <div class="api-row">
-        <input
-          type="password"
-          class="api-input"
-          id="api-key"
-          placeholder="sk-ant-api03-..."
-          autocomplete="off"
-          spellcheck="false"
-        />
-      </div>
-      <p class="api-note">
-        Your key stays in your browser — never stored or sent anywhere except directly to Anthropic.
-        Don't have one? <a href="https://console.anthropic.com" target="_blank" rel="noopener">Get a key at console.anthropic.com</a>
-      </p>
-    </div>
-
-    <!-- Role Description -->
-    <div class="card">
-      <div class="card-label">Your Role</div>
-      <textarea
-        id="role-input"
-        placeholder="Describe what you actually do — not your title. The meetings, the problems, the tasks that eat your time.
-
-For example: I manage a team of 8 sales reps across three states. Every week I'm doing pipeline reviews, coaching deals that are stuck, running a forecast call with my VP, and trying to figure out why one territory is underperforming. I also onboard new reps on a complicated product line..."
-      ></textarea>
-      <div class="btn-row">
-        <button class="btn-primary" id="analyze-btn" onclick="runStep1()">
-          Reveal What's Possible
-        </button>
-        <div class="status-line" id="status-1" style="display:none;">
-          <div class="dot-pulse"><span></span><span></span><span></span></div>
-          Analyzing your role...
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ── INSIGHTS ── -->
-  <div id="insights-section">
-    <div class="insights-header">
-      <h2>What AI can do for your role</h2>
-      <p>Click any insight to move to Step 2 and build a working prompt for it.</p>
-    </div>
-    <div id="insights-list"></div>
-    <div class="btn-row" style="margin-top: 8px;">
-      <a href="#" class="reset-link" onclick="resetTool(); return false;">← Start over</a>
-    </div>
-  </div>
-
-  <div class="section-divider" id="divider-2" style="display:none;"></div>
-
-  <!-- ── STEP 2 ── -->
-  <div id="step2-section">
-
-    <div class="step2-intro">
-      <h2>Step 2 — Build Your Prompt</h2>
-      <p>
-        You picked an insight. Now let's build the exact prompt to go get it — in whatever AI tool you already use. Fill in the six pieces below and I'll assemble a ready-to-copy prompt.
-      </p>
-    </div>
-
-    <div class="selected-insight-pill" id="selected-insight-label"></div>
-
-    <div class="prompt-pieces" id="prompt-pieces">
-
-      <div class="piece">
-        <div class="piece-label">01 — Your Role</div>
-        <textarea id="p-role" rows="2" placeholder="e.g. Regional Sales Manager at a medical device company managing 8 reps across 3 states"></textarea>
-        <div class="piece-hint">Be specific — title, company type, team size, scope.</div>
-      </div>
-
-      <div class="piece">
-        <div class="piece-label">02 — What You Need</div>
-        <textarea id="p-need" rows="2" placeholder="e.g. A pre-call brief on a stuck deal — the rep's summary of where it's at, what the objections are, and a list of questions I should ask"></textarea>
-        <div class="piece-hint">The exact output you want. What should exist when this is done?</div>
-      </div>
-
-      <div class="piece">
-        <div class="piece-label">03 — The Context</div>
-        <textarea id="p-context" rows="3" placeholder="e.g. Deal has been in late stage for 6 weeks. Hospital procurement is the blocker. Rep has met with the committee twice. Decision expected by end of quarter."></textarea>
-        <div class="piece-hint">The specific situation, data, or background AI needs to do this well.</div>
-      </div>
-
-      <div class="piece">
-        <div class="piece-label">04 — Who It's For</div>
-        <textarea id="p-audience" rows="2" placeholder="e.g. For me to use privately before the coaching call — not for the rep to see"></textarea>
-        <div class="piece-hint">Who reads or uses this output?</div>
-      </div>
-
-      <div class="piece">
-        <div class="piece-label">05 — Tone</div>
-        <textarea id="p-tone" rows="2" placeholder="e.g. Direct and tactical — no fluff. Give me the honest read, not a motivational take."></textarea>
-        <div class="piece-hint">How should the response feel? Formal, direct, analytical, conversational...</div>
-      </div>
-
-      <div class="piece">
-        <div class="piece-label">06 — Format</div>
-        <textarea id="p-format" rows="2" placeholder="e.g. Bullet points under 3 headers: Deal Summary, Key Risks, Questions to Ask the Rep"></textarea>
-        <div class="piece-hint">Headers, bullets, numbered list, table, narrative — and roughly how long?</div>
-      </div>
-
-    </div>
-
-    <div class="btn-row">
-      <button class="btn-primary" id="build-btn" onclick="buildPrompt()">
-        Build My Prompt
-      </button>
-      <div class="status-line" id="status-2" style="display:none;">
-        <div class="dot-pulse"><span></span><span></span><span></span></div>
-        Assembling your prompt...
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ── FINAL PROMPT ── -->
-  <div id="prompt-output-section">
-    <div class="section-divider"></div>
-    <div class="card-label" style="margin-bottom: 16px;">Your Ready-to-Use Prompt</div>
-    <div class="prompt-output-box" id="prompt-output-box"></div>
-    <div class="btn-row">
-      <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
-      <a href="#" class="reset-link" onclick="resetTool(); return false;">← Start over</a>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-left">
-      Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a> ·
-      <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>
-      <br>Augmenting Human Potential, One Workflow at a Time
-    </div>
-    <div class="footer-right">HTML / Claude API</div>
-  </footer>
-
+<div class="intro">
+  <div class="intro-bar"></div>
+  <p class="intro-text">
+    Sales Operations professional at the <strong>intersection of process, systems, and AI.</strong>
+    This is where I build in public - tools that solve real problems,
+    experiments that document what's possible when operations thinking meets modern AI.
+  </p>
 </div>
 
-<script>
-  let selectedInsightText = '';
-  let selectedInsightTitle = '';
+<section class="section">
+  <div class="section-header">
+    <span class="section-label">Tools &amp; Projects</span>
+    <div class="section-line"></div>
+  </div>
 
-  // ── STEP 1 ──
-  async function runStep1() {
-    const apiKey = document.getElementById('api-key').value.trim();
-    const roleText = document.getElementById('role-input').value.trim();
+  <div class="cards">
 
-    if (!apiKey) { alert('Please enter your Anthropic API key.'); return; }
-    if (roleText.length < 40) { alert('Tell me a bit more about your role — the more specific you are, the better the insights.'); return; }
+    <a class="card" href="https://luis-figueroa-ops.github.io/jd-analyzer/" target="_blank">
+      <div class="card-tag">Career Tools</div>
+      <div class="card-title">JD Analyzer</div>
+      <div class="card-desc">
+        Reads between the lines of a job description - extracting signals on role type,
+        culture fit, red flags, and whether it's worth your time to apply.
+        Bring your own Anthropic API key.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Launch Tool</span>
+        <span class="card-type">HTML / Claude API</span>
+      </div>
+    </a>
 
-    const btn = document.getElementById('analyze-btn');
-    const status = document.getElementById('status-1');
-    btn.disabled = true;
-    status.style.display = 'flex';
+    <a class="card" href="https://luis-figueroa-ops.github.io/ai-role-revealer/" target="_blank">
+      <div class="card-tag">Career Tools</div>
+      <div class="card-title">AI Role Revealer</div>
+      <div class="card-desc">
+        Describe what you actually do — not your title — and get a specific read on what
+        AI could be doing for your role right now. Then build a working prompt to go get it.
+        Bring your own Anthropic API key.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Launch Tool</span>
+        <span class="card-type">HTML / Claude API</span>
+      </div>
+    </a>
 
-    const systemPrompt = `You are the AI Role Revealer. Your job is to identify non-obvious, high-value ways AI could help someone in their specific role. 
+    <a class="card" href="./games/dodge.html" target="_blank">
+      <div class="card-tag">Side Builds</div>
+      <div class="card-title">DODGE</div>
+      <div class="card-desc">
+        A fast-paced arcade stress-break built entirely in one session with Claude.
+        Dodge obstacles, survive boss waves, collect power-ups. Score-based with a local leaderboard.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Play Now</span>
+        <span class="card-type">HTML / Web Audio / Canvas</span>
+      </div>
+    </a>
 
-Rules:
-- Give exactly 4 insights. No more, no less.
-- Each insight must be specific to what the person described — never generic.
-- Name the actual task, the actual problem it solves, and why it matters for their role.
-- Never use words like: leverage, utilize, streamline, harness, empower, transform, revolutionize.
-- Write like a smart colleague who genuinely knows their job — direct, specific, no buzzwords.
-- Make the insights non-obvious. Skip things like "use AI to write emails faster."
+  </div>
+</section>
 
-Respond ONLY in this JSON format (no markdown, no backticks, just raw JSON):
-{
-  "insights": [
-    {
-      "title": "Short action-oriented title (5-8 words)",
-      "body": "2-3 sentences: what AI does, what problem it solves, why it matters for this specific role. Be concrete."
-    }
-  ]
-}`;
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: roleText }]
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'API error');
-      }
-
-      const rawText = data.content[0].text.trim();
-      let parsed;
-      try {
-        parsed = JSON.parse(rawText);
-      } catch {
-        const match = rawText.match(/\{[\s\S]*\}/);
-        if (match) parsed = JSON.parse(match[0]);
-        else throw new Error('Could not parse response.');
-      }
-
-      renderInsights(parsed.insights);
-
-    } catch (err) {
-      alert('Something went wrong: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.style.display = 'none';
-    }
-  }
-
-  function renderInsights(insights) {
-    document.getElementById('step1-section').style.display = 'none';
-
-    const list = document.getElementById('insights-list');
-    list.innerHTML = '';
-
-    insights.forEach((insight, i) => {
-      const card = document.createElement('div');
-      card.className = 'insight-card';
-      card.innerHTML = `
-        <div class="insight-num">Insight ${String(i + 1).padStart(2, '0')}</div>
-        <div class="insight-title">${escapeHtml(insight.title)}</div>
-        <div class="insight-body">${escapeHtml(insight.body)}</div>
-        <div class="insight-select-hint">→ Select this</div>
-      `;
-      card.onclick = () => selectInsight(card, insight);
-      list.appendChild(card);
-    });
-
-    document.getElementById('insights-section').style.display = 'block';
-    updateProgress(1.5);
-
-    // After rendering, show step 2 prompt
-    setTimeout(() => {
-      const bridge = document.createElement('div');
-      bridge.style.cssText = 'margin: 32px 0 24px; padding: 20px 24px; border: 1px solid #1e1e2e; background: #111118;';
-      bridge.innerHTML = `
-        <div style="font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:#6b6b8a; margin-bottom:8px;">Step 1 Complete</div>
-        <div style="font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:6px; color:#e8e8f0;">Now you know what's possible for your role.</div>
-        <div style="font-size:13px; color:#6b6b8a; line-height:1.7;">Click any insight above to move to Step 2 — building the exact prompt to go get it.</div>
-      `;
-      list.parentNode.insertBefore(bridge, list.nextSibling.nextSibling);
-    }, 100);
-  }
-
-  function selectInsight(card, insight) {
-    document.querySelectorAll('.insight-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-
-    selectedInsightTitle = insight.title;
-    selectedInsightText = insight.body;
-
-    document.getElementById('selected-insight-label').textContent = '→ ' + insight.title;
-    document.getElementById('divider-2').style.display = 'block';
-    document.getElementById('step2-section').style.display = 'block';
-    updateProgress(2);
-
-    setTimeout(() => {
-      document.getElementById('step2-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-  }
-
-  // ── STEP 2 ──
-  async function buildPrompt() {
-    const apiKey = document.getElementById('api-key').value.trim();
-    if (!apiKey) { alert('API key is missing — scroll up and enter it.'); return; }
-
-    const pieces = {
-      role: document.getElementById('p-role').value.trim(),
-      need: document.getElementById('p-need').value.trim(),
-      context: document.getElementById('p-context').value.trim(),
-      audience: document.getElementById('p-audience').value.trim(),
-      tone: document.getElementById('p-tone').value.trim(),
-      format: document.getElementById('p-format').value.trim()
-    };
-
-    const filled = Object.values(pieces).filter(v => v.length > 0);
-    if (filled.length < 3) {
-      alert('Fill in at least 3 of the 6 pieces to build a useful prompt.');
-      return;
-    }
-
-    const btn = document.getElementById('build-btn');
-    const status = document.getElementById('status-2');
-    btn.disabled = true;
-    status.style.display = 'flex';
-
-    const systemPrompt = `You are an expert at writing AI prompts for working professionals. 
-    
-Given a selected insight and six prompt-building pieces, write a single, complete, ready-to-use prompt that the person can paste directly into any AI tool.
-
-Rules:
-- Write the prompt in second person ("You are...", "I need...", "Given...")
-- Include all six pieces naturally woven into one coherent prompt — don't use the labels as headers
-- The prompt should read as if the person wrote it themselves, not as a template
-- Make it specific and direct
-- Length: 100-200 words typically
-- No meta-commentary. Just the prompt itself. Start directly.`;
-
-    const userMessage = `Selected insight: ${selectedInsightTitle}
-Insight detail: ${selectedInsightText}
-
-Prompt pieces:
-- Role: ${pieces.role || '(not provided)'}
-- What I need: ${pieces.need || '(not provided)'}
-- Context: ${pieces.context || '(not provided)'}
-- Who it's for: ${pieces.audience || '(not provided)'}
-- Tone: ${pieces.tone || '(not provided)'}
-- Format: ${pieces.format || '(not provided)'}
-
-Write the ready-to-use prompt.`;
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: userMessage }]
-        })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || 'API error');
-
-      const promptText = data.content[0].text.trim();
-      document.getElementById('prompt-output-box').textContent = promptText;
-      document.getElementById('prompt-output-section').style.display = 'block';
-
-      setTimeout(() => {
-        document.getElementById('prompt-output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-
-    } catch (err) {
-      alert('Something went wrong: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.style.display = 'none';
-    }
-  }
-
-  // ── COPY ──
-  function copyPrompt() {
-    const text = document.getElementById('prompt-output-box').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById('copy-btn');
-      btn.textContent = '✓ Copied';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = 'Copy Prompt';
-        btn.classList.remove('copied');
-      }, 2000);
-    });
-  }
-
-  // ── PROGRESS ──
-  function updateProgress(step) {
-    const p1 = document.getElementById('prog-1');
-    const p2 = document.getElementById('prog-2');
-    if (step >= 1.5) { p1.classList.remove('active'); p1.classList.add('done'); }
-    if (step >= 2) { p2.classList.add('active'); }
-  }
-
-  // ── RESET ──
-  function resetTool() {
-    document.getElementById('role-input').value = '';
-    document.getElementById('insights-list').innerHTML = '';
-    document.getElementById('insights-section').style.display = 'none';
-    document.getElementById('step1-section').style.display = 'block';
-    document.getElementById('step2-section').style.display = 'none';
-    document.getElementById('divider-2').style.display = 'none';
-    document.getElementById('prompt-output-section').style.display = 'none';
-    document.getElementById('prog-1').classList.add('active');
-    document.getElementById('prog-1').classList.remove('done');
-    document.getElementById('prog-2').classList.remove('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // ── UTIL ──
-  function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // Enter key on API input moves focus
-  document.getElementById('api-key').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('role-input').focus();
-  });
-</script>
+<footer>
+  <span class="footer-brand"><span class="gold-dot"></span>Operations, Augmented — Luis Figueroa</span>
+  <div class="footer-links">
+    <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>
+    <a href="https://www.luis-portfolio.com" target="_blank">Portfolio</a>
+    <a href="https://github.com/luis-figueroa-ops" target="_blank">GitHub</a>
+  </div>
+</footer>
 
 </body>
 </html>
