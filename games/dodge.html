@@ -8,11 +8,11 @@
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0a0a0f; --accent: #00ffe7; --danger: #ff2d55;
+    --bg: #0d0d18; --accent: #00ffe7; --danger: #ff2d55;
     --warn: #ffcc00; --shield: #4488ff; --slow: #aa44ff; --text: #e0e0ff;
   }
   body {
-    background: var(--bg); color: var(--text);
+    background: #16162a; color: var(--text);
     font-family: 'Share Tech Mono', monospace;
     display: flex; flex-direction: column; align-items: center;
     justify-content: center; min-height: 100vh; overflow: hidden; user-select: none;
@@ -41,7 +41,7 @@
   #overlay {
     position: absolute; top: 0; left: 0; width: 480px; height: 580px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
-    background: rgba(10,10,15,0.9); backdrop-filter: blur(4px); z-index: 10;
+    background: rgba(13,13,28,0.96); backdrop-filter: blur(4px); z-index: 10;
   }
   #overlay.hidden { display: none; }
   .overlay-title {
@@ -50,12 +50,12 @@
     text-shadow: 0 0 40px var(--accent), 0 0 80px rgba(0,255,231,0.3);
     animation: pulse 2s ease-in-out infinite;
   }
-  .overlay-sub { font-size: 12px; color: #8888aa; letter-spacing: 2px; }
-  .overlay-score-label { font-family: 'Orbitron', sans-serif; font-size: 11px; color: #666; letter-spacing: 3px; margin-top: 8px; }
+  .overlay-sub { font-size: 13px; color: #aaaacc; letter-spacing: 2px; }
+  .overlay-score-label { font-family: 'Orbitron', sans-serif; font-size: 12px; color: #aaaacc; letter-spacing: 3px; margin-top: 8px; }
   .overlay-score-val { font-family: 'Orbitron', sans-serif; font-size: 46px; font-weight: 900; color: var(--warn); text-shadow: 0 0 30px var(--warn); }
-  #leaderboard { width: 300px; border-top: 1px solid #1e2240; border-bottom: 1px solid #1e2240; padding: 10px 0; margin: 0; }
-  #leaderboard-title { font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 3px; color: #555; text-align: center; margin-bottom: 8px; }
-  .lb-row { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 8px; color: #778; }
+  #leaderboard { width: 300px; border-top: 1px solid #2a2a5a; border-bottom: 1px solid #2a2a5a; padding: 10px 0; margin: 0; }
+  #leaderboard-title { font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 3px; color: #aaaacc; text-align: center; margin-bottom: 8px; }
+  .lb-row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 8px; color: #aabbd0; }
   .lb-row.gold { color: var(--warn); text-shadow: 0 0 10px var(--warn); }
   .lb-row.new-entry { color: var(--accent); animation: pulse 1s ease-in-out 3; }
   #start-btn {
@@ -66,8 +66,8 @@
     transition: all 0.15s; box-shadow: 0 0 30px rgba(0,255,231,0.4);
   }
   #start-btn:hover { background: #fff; box-shadow: 0 0 50px rgba(0,255,231,0.8); transform: scale(1.05); }
-  #tip { font-size: 10px; color: #444; letter-spacing: 1px; }
-  #tip2 { font-size: 10px; color: #333; letter-spacing: 1px; }
+  #tip { font-size: 12px; color: #aaaacc; letter-spacing: 1px; }
+  #tip2 { font-size: 12px; color: #8888aa; letter-spacing: 1px; }
   #level-flash {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900;
@@ -91,7 +91,7 @@
   }
   @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
   #name-input-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  #name-input-wrap label { font-size: 11px; color: #666; letter-spacing: 2px; }
+  #name-input-wrap label { font-size: 13px; color: #aaaacc; letter-spacing: 2px; }
   #player-name {
     font-family: 'Share Tech Mono', monospace; font-size: 16px; background: #111;
     border: 1px solid #2a2a4a; color: var(--accent); padding: 8px 14px;
@@ -132,7 +132,7 @@
       <div class="overlay-score-label" id="overlay-score-label" style="display:none">FINAL SCORE</div>
       <div class="overlay-score-val" id="overlay-score-val" style="display:none">0</div>
       <div id="name-input-wrap">
-        <label>PILOT NAME</label>
+        <label>ENTER YOUR NAME TO TRACK SCORES</label>
         <input id="player-name" maxlength="12" placeholder="PILOT" autocomplete="off" spellcheck="false"/>
       </div>
       <div id="leaderboard" style="display:none">
