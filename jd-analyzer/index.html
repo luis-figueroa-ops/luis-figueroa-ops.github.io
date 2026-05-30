@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Is This Job Worth Applying To?</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #1B2A4A;
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .container { max-width: 720px; width: 100%; }
+
+    .header { text-align: center; margin-bottom: 36px; }
+    .header h1 { font-size: 2rem; color: #B8963E; margin-bottom: 10px; line-height: 1.2; }
+    .header .tagline { font-size: 1rem; color: #ccd6f6; font-style: italic; margin-bottom: 6px; }
+    .header .sub { font-size: 0.85rem; color: #8892b0; }
+
+    .card {
+      background-color: #243554;
+      border-radius: 10px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: #B8963E;
+      margin-bottom: 8px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    input[type="password"], textarea {
+      width: 100%;
+      background-color: #1B2A4A;
+      border: 1px solid #3a4f72;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      padding: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="password"]:focus, textarea:focus { border-color: #B8963E; }
+    textarea { height: 220px; resize: vertical; line-height: 1.6; }
+
+    .hint { font-size: 0.78rem; color: #8892b0; margin-top: 8px; }
+    .hint a { color: #B8963E; text-decoration: none; }
+    .hint a:hover { text-decoration: underline; }
+
+    #analyzeBtn {
+      width: 100%;
+      padding: 14px;
+      background-color: #B8963E;
+      color: #1B2A4A;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      letter-spacing: 0.03em;
+    }
+
+    #analyzeBtn:hover:not(:disabled) { background-color: #d4a94a; }
+    #analyzeBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .output {
+      background-color: #243554;
+      border-radius: 10px;
+      padding: 28px;
+      margin-top: 20px;
+      display: none;
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+
+    .output.visible { display: block; }
+
+    .output h2 {
+      color: #B8963E;
+      font-size: 1.1rem;
+      margin: 24px 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #3a4f72;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .output h2:first-child { margin-top: 0; }
+    .output h3 { color: #ccd6f6; font-size: 0.95rem; margin: 16px 0 6px 0; }
+    .output p { color: #ccd6f6; margin-bottom: 12px; line-height: 1.8; }
+    .output ul { margin: 8px 0 16px 20px; color: #ccd6f6; }
+    .output ul li { margin-bottom: 8px; line-height: 1.7; }
+    .output strong { color: #ffffff; font-weight: 600; }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 10px 18px;
+      background-color: transparent;
+      color: #B8963E;
+      border: 1px solid #B8963E;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover { background-color: #B8963E; color: #1B2A4A; }
+    .action-btn.copied { background-color: #2a4a2a; border-color: #4caf50; color: #4caf50; }
+
+    .error {
+      background-color: #3d1f1f;
+      border: 1px solid #a94442;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #f5c6cb;
+      display: none;
+    }
+
+    .error.visible { display: block; }
+
+    .loading {
+      text-align: center;
+      color: #B8963E;
+      font-style: italic;
+      padding: 20px;
+      display: none;
+    }
+
+    .loading.visible { display: block; }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #8892b0;
+      line-height: 1.8;
+    }
+
+    .footer a { color: #B8963E; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .footer .credit-line {
+      display: block;
+      margin-top: 4px;
+      font-style: italic;
+      color: #6b7a99;
+    }
+
+    @media print {
+      body { background-color: #ffffff; color: #000000; padding: 0; }
+
+      .header, .card, #analyzeBtn, .loading,
+      .error, .action-buttons, .footer { display: none !important; }
+
+      .output {
+        display: block !important;
+        background-color: #ffffff;
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+      }
+
+      .output h2 {
+        color: #1B2A4A;
+        border-bottom: 2px solid #B8963E;
+        font-size: 1rem;
+        margin: 20px 0 8px 0;
+      }
+
+      .output p, .output ul, .output li { color: #000000; }
+      .output strong { color: #000000; }
+
+      .print-header { display: block !important; text-align: center; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 3px solid #B8963E; }
+      .print-header h1 { font-size: 1.3rem; color: #1B2A4A; margin-bottom: 4px; }
+      .print-header p { font-size: 0.75rem; color: #555; font-style: italic; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="print-header" style="display:none;">
+      <h1>Is This Job Worth Applying To?</h1>
+      <p>A structured ops analysis - luis-figueroa-ops.github.io/jd-analyzer</p>
+    </div>
+
+    <div class="header">
+      <h1>Is This Job Worth Applying To?</h1>
+      <p class="tagline">"I read process documents the way other people read between the lines."</p>
+      <p class="sub">Paste any job description. Get a structured ops read on what the role actually is, who it's really for, and what to ask in the interview.</p>
+    </div>
+
+    <div class="card">
+      <label for="apiKey">Your Anthropic API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-..." />
+      <p class="hint">
+        Your key stays in your browser and is never stored anywhere.
+        Don't have one? <a href="https://console.anthropic.com" target="_blank">Get a free key at console.anthropic.com</a>
+      </p>
+    </div>
+
+    <div class="card">
+      <label for="jdInput">Paste the Job Description</label>
+      <textarea id="jdInput" placeholder="Paste the full job description here..."></textarea>
+    </div>
+
+    <button id="analyzeBtn" disabled>Analyze This JD</button>
+
+    <div class="loading" id="loading">Reading between the lines...</div>
+    <div class="error" id="errorBox"></div>
+
+    <div class="output" id="output">
+      <div id="outputContent"></div>
+      <div class="action-buttons">
+        <button class="action-btn" id="copyBtn">Copy Analysis</button>
+        <button class="action-btn" id="printBtn">Print / Save as PDF</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a>
+      &nbsp;·&nbsp;
+      <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
+      <span class="credit-line">Augmenting Human Potential, One Workflow at a Time</span>
+      <span class="credit-line">A tool built by an ops professional who reads between the lines of every process document.</span>
+    </div>
+
+  </div>
+
+  <script>
+    const apiKeyInput = document.getElementById('apiKey');
+    const jdInput = document.getElementById('jdInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const output = document.getElementById('output');
+    const outputContent = document.getElementById('outputContent');
+    const errorBox = document.getElementById('errorBox');
+    const loading = document.getElementById('loading');
+    const copyBtn = document.getElementById('copyBtn');
+    const printBtn = document.getElementById('printBtn');
+
+    function checkInputs() {
+      const hasKey = apiKeyInput.value.trim().length > 10;
+      const hasJD = jdInput.value.trim().length > 50;
+      analyzeBtn.disabled = !(hasKey && hasJD);
+    }
+
+    apiKeyInput.addEventListener('input', checkInputs);
+    jdInput.addEventListener('input', checkInputs);
+
+    function renderMarkdown(text) {
+      return text
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>[\s\S]*?<\/li>)/g, (match) => {
+          if (!match.startsWith('<ul>')) return '<ul>' + match + '</ul>';
+          return match;
+        })
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/^(?!<[hul])(.*\S.*)$/gm, '<p>$1</p>')
+        .replace(/<p><\/p>/g, '')
+        .replace(/---/g, '<hr style="border-color:#3a4f72;margin:20px 0;">')
+        .replace(/<\/ul>\s*<ul>/g, '');
+    }
+
+    copyBtn.addEventListener('click', () => {
+      const plainText = outputContent.innerText;
+      navigator.clipboard.writeText(plainText).then(() => {
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Analysis';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+
+    printBtn.addEventListener('click', () => {
+      window.print();
+    });
+
+    const SYSTEM_PROMPT = `You are an experienced operations professional who reads job descriptions with a sharp, structured eye. Your job is to give candidates an honest, specific read on what a role actually is - cutting through vague language to identify what's really being asked for, who will actually succeed here, and what questions to ask.
+
+Always structure your response using exactly these five sections in this order:
+
+## What This Role Actually Is
+One paragraph. Cut through the title and describe what this person will spend 80% of their time doing. Be specific and direct.
+
+## Green Flags
+3-5 bullet points. Specific positive signals from the JD - things that suggest the role is well-scoped, the team knows what they need, or the opportunity is genuine.
+
+## Red Flags
+3-5 bullet points. Specific concerns - vague scope, unrealistic expectations, signs this is a band-aid hire, missing information that should be there, or language that signals dysfunction.
+
+## Who This Role Is Really For
+One paragraph. Describe the actual experience level, background, and working style this role requires - not what the title suggests, but what the JD reveals.
+
+## The One Question to Ask in the Interview
+One specific, sharp question the candidate should ask based on what is missing or unclear in this JD. Make it a question that reveals how the team actually operates.
+
+Be direct, specific, and practical. Never generic. Write like someone who has actually worked in operations and can read between the lines of a process document.`;
+
+    analyzeBtn.addEventListener('click', async () => {
+      const apiKey = apiKeyInput.value.trim();
+      const jd = jdInput.value.trim();
+
+      output.classList.remove('visible');
+      errorBox.classList.remove('visible');
+      loading.classList.add('visible');
+      analyzeBtn.disabled = true;
+
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify({
+            model: 'claude-opus-4-5',
+            max_tokens: 1500,
+            system: SYSTEM_PROMPT,
+            messages: [
+              {
+                role: 'user',
+                content: `Please analyze this job description:\n\n${jd}`
+              }
+            ]
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error?.message || 'API request failed');
+        }
+
+        const result = data.content[0].text;
+        outputContent.innerHTML = renderMarkdown(result);
+        output.classList.add('visible');
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        });
+
+      } catch (err) {
+        errorBox.textContent = `Something went wrong: ${err.message}. Check your API key and try again.`;
+        errorBox.classList.add('visible');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        });
+      } finally {
+        loading.classList.remove('visible');
+        analyzeBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
