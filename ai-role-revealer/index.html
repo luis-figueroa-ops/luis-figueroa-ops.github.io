@@ -18,8 +18,8 @@
       --accent2: #ff6584;
       --accent3: #43e8c8;
       --text: #f4f4ff;
-      --text-muted: #a0a0c0;
-      --text-dim: #6868a0;
+      --text-muted: #b8b8d8;
+      --text-dim: #8080b8;
       --mono: 'DM Mono', monospace;
       --sans: 'Syne', sans-serif;
     }
@@ -217,7 +217,7 @@
       letter-spacing: 0.03em;
     }
     .api-input:focus { border-color: var(--accent); }
-    .api-input::placeholder { color: #7878a8; }
+    .api-input::placeholder { color: #a0a0c8; }
     .api-note {
       font-size: 11px;
       color: var(--text-dim);
@@ -242,7 +242,7 @@
       transition: border-color 0.2s;
     }
     textarea:focus { border-color: var(--accent); }
-    textarea::placeholder { color: #7878a8; line-height: 1.7; }
+    textarea::placeholder { color: #a0a0c8; line-height: 1.7; }
 
     /* ── BUTTONS ── */
     .btn-primary {
@@ -760,7 +760,7 @@ Respond ONLY in this JSON format (no markdown, no backticks, just raw JSON):
           'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1000,
           system: systemPrompt,
           messages: [{ role: 'user', content: roleText }]
@@ -905,7 +905,7 @@ Write the ready-to-use prompt.`;
           'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1000,
           system: systemPrompt,
           messages: [{ role: 'user', content: userMessage }]
