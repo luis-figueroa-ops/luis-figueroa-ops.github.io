@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DODGE — Stress Break</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -149,19 +157,15 @@
 </div>
 
 <script>
-// ─── CANVAS SETUP ───────────────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
 
-// ─── AUDIO ──────────────────────────────────────────────────────────────────
 let audioCtx = null;
-
 function getAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
 }
-
 function playTone(freq, type, duration, vol, freqEnd) {
   try {
     const ac = getAudio();
@@ -176,7 +180,6 @@ function playTone(freq, type, duration, vol, freqEnd) {
     osc.start(); osc.stop(ac.currentTime + duration);
   } catch(e) {}
 }
-
 const SFX = {
   hit:      () => { playTone(200, 'sawtooth', 0.25, 0.3, 30); },
   die:      () => { playTone(300, 'sawtooth', 0.6, 0.4, 20); playTone(150, 'square', 0.4, 0.2, 40); },
@@ -188,17 +191,9 @@ const SFX = {
   dodge:    () => { if (Math.random() > 0.94) playTone(880, 'sine', 0.04, 0.05, 1200); }
 };
 
-// ─── LEADERBOARD ────────────────────────────────────────────────────────────
 const LB_KEY = 'dodge_leaderboard_v1';
-
-function loadLB() {
-  try { return JSON.parse(localStorage.getItem(LB_KEY)) || []; } catch(e) { return []; }
-}
-
-function saveLB(entries) {
-  try { localStorage.setItem(LB_KEY, JSON.stringify(entries)); } catch(e) {}
-}
-
+function loadLB() { try { return JSON.parse(localStorage.getItem(LB_KEY)) || []; } catch(e) { return []; } }
+function saveLB(entries) { try { localStorage.setItem(LB_KEY, JSON.stringify(entries)); } catch(e) {} }
 function addToLB(name, score) {
   const entries = loadLB();
   entries.push({ name: (name || 'PILOT').toUpperCase().slice(0,12), score });
@@ -207,7 +202,6 @@ function addToLB(name, score) {
   saveLB(trimmed);
   return trimmed;
 }
-
 function renderLB(entries, newScore) {
   const container = document.getElementById('lb-rows');
   container.innerHTML = '';
@@ -219,50 +213,35 @@ function renderLB(entries, newScore) {
   });
 }
 
-// ─── GAME STATE ─────────────────────────────────────────────────────────────
 let state = 'idle';
 let score = 0, lives = 3, frame = 0, animId = null;
 let lastLevel = 1;
-
-// Player
 const P = { x: W/2, y: H - 80, w: 28, h: 16, speed: 5 };
 let mx = W/2, my = H - 80;
 let keys = {};
-
-// Power-ups
 let shieldActive = false, shieldTimer = 0;
 let slowActive = false, slowTimer = 0;
-let powerups = []; // dropped pickups on field
-
-// Obstacles
+let powerups = [];
 let obstacles = [];
 let baseSpeed = 2.8;
 let spawnRate = 38;
-
-// Boss
 let bossActive = false;
 let boss = null;
 let bossHP = 0, bossMaxHP = 0;
-let bossWaveLevel = 0; // which level triggered boss
-
-// Particles
+let bossWaveLevel = 0;
 let particles = [];
-
-// Stars
 let stars = Array.from({length: 60}, () => ({
   x: Math.random()*W, y: Math.random()*H,
   r: Math.random()*1.5+0.3, s: Math.random()*0.4+0.1
 }));
 let gridOffset = 0;
 
-// ─── HELPERS ────────────────────────────────────────────────────────────────
 function getLevel() { return Math.floor(score / 250) + 1; }
 function getSpeedMult() { return slowActive ? 0.45 : 1; }
 function getObstacleSpeed() { return (baseSpeed + (getLevel()-1)*0.45) * getSpeedMult(); }
-function getSpawnRate() { return Math.max(15, spawnRate - (getLevel()-1)*3); } // always spawns, even during boss
-function isBossLevel(lvl) { return lvl >= 6 && (lvl - 6) % 4 === 0; } // boss at 6, 10, 14...
+function getSpawnRate() { return Math.max(15, spawnRate - (getLevel()-1)*3); }
+function isBossLevel(lvl) { return lvl >= 6 && (lvl - 6) % 4 === 0; }
 
-// ─── INPUT ───────────────────────────────────────────────────────────────────
 canvas.addEventListener('mousemove', e => {
   const r = canvas.getBoundingClientRect();
   mx = e.clientX - r.left; my = e.clientY - r.top;
@@ -274,7 +253,6 @@ document.getElementById('player-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') startGame();
 });
 
-// ─── START / RESET ───────────────────────────────────────────────────────────
 function startGame() {
   score = 0; lives = 3; frame = 0; lastLevel = 1;
   obstacles = []; particles = []; powerups = [];
@@ -284,7 +262,6 @@ function startGame() {
   P.x = W/2; P.y = H-80; mx = W/2;
   document.getElementById('boss-bar-wrap').classList.remove('visible');
   document.getElementById('boss-label').classList.remove('visible');
-  // Reset overlay title for next game over
   document.getElementById('overlay-title').textContent = 'DODGE';
   document.getElementById('overlay-title').style.color = 'var(--accent)';
   document.getElementById('overlay-title').style.textShadow = '0 0 40px var(--accent), 0 0 80px rgba(0,255,231,0.3)';
@@ -297,19 +274,16 @@ function startGame() {
   loop();
 }
 
-// ─── HUD ─────────────────────────────────────────────────────────────────────
 function updateHUD() {
   document.getElementById('score').textContent = score;
   ['pip1','pip2','pip3'].forEach((id,i) => {
     document.getElementById(id).classList.toggle('dead', i >= lives);
   });
 }
-
 function updatePowerupUI() {
   document.getElementById('pu-shield').classList.toggle('active', shieldActive);
   document.getElementById('pu-slow').classList.toggle('active', slowActive);
 }
-
 function showLevelFlash(text, color) {
   const el = document.getElementById('level-flash');
   el.textContent = text;
@@ -318,7 +292,6 @@ function showLevelFlash(text, color) {
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
 
-// ─── SPAWNING ────────────────────────────────────────────────────────────────
 function spawnObstacle() {
   const types = ['rect','diamond','bar'];
   const t = types[Math.floor(Math.random()*types.length)];
@@ -331,12 +304,10 @@ function spawnObstacle() {
     hue: Math.random()>0.3 ? 0 : 45
   });
 }
-
 function spawnPowerup(x, y) {
   const type = Math.random() > 0.5 ? 'shield' : 'slow';
   powerups.push({ x, y, type, vy: 1.2, life: 420, r: 14 });
 }
-
 function spawnParticles(x, y, color, n=12) {
   for (let i=0; i<n; i++) {
     const angle = (Math.PI*2*i)/n + Math.random()*0.4;
@@ -349,25 +320,17 @@ function spawnParticles(x, y, color, n=12) {
   }
 }
 
-// ─── BOSS ────────────────────────────────────────────────────────────────────
-function getBossWaveNum(level) {
-  // Boss at levels 6, 10, 14... so wave num 1, 2, 3...
-  return Math.floor((level - 6) / 4) + 1;
-}
-
+function getBossWaveNum(level) { return Math.floor((level - 6) / 4) + 1; }
 function spawnBoss(level) {
   bossActive = true;
   const waveNum = getBossWaveNum(level);
   bossHP = bossMaxHP = 6 + waveNum * 3;
   boss = {
     x: W/2 - 40, y: 60, w: 80 + waveNum * 6, h: 30 + waveNum * 4,
-    vx: 1.8 + waveNum * 0.9,
-    vy: 0,
-    phase: 0, shootTimer: 0,
-    waveNum,
+    vx: 1.8 + waveNum * 0.9, vy: 0,
+    phase: 0, shootTimer: 0, waveNum,
     projectiles: []
   };
-  // obstacles keep going - no clear
   document.getElementById('boss-bar-wrap').classList.add('visible');
   document.getElementById('boss-label').classList.add('visible');
   document.getElementById('boss-label').textContent = waveNum >= 3 ? `⚠ BOSS WAVE ${waveNum} — ELITE` : `⚠ BOSS WAVE ${waveNum}`;
@@ -379,12 +342,8 @@ function updateBoss() {
   if (!boss) return;
   boss.x += boss.vx * getSpeedMult();
   if (boss.x <= 0 || boss.x + boss.w >= W) { boss.vx *= -1; boss.x = Math.max(0, Math.min(W-boss.w, boss.x)); }
-
-  // Sine weave
   boss.phase += 0.03;
   boss.y = 60 + Math.sin(boss.phase) * 20;
-
-  // Shoot projectiles
   boss.shootTimer++;
   const waveNum = boss.waveNum || 1;
   const shootInterval = Math.max(20, 60 - waveNum * 8);
@@ -399,47 +358,32 @@ function updateBoss() {
       boss.projectiles.push({ x: cx, y: boss.y + boss.h, vx: Math.cos(a) * projSpeed * 0.4, vy: Math.sin(a) * projSpeed, r: 7 });
     });
   }
-
-  // Update projectiles
   boss.projectiles = boss.projectiles.filter(p => {
     p.x += p.vx; p.y += p.vy;
-    // Collision with player
     if (state === 'playing') {
       const dx = p.x - P.x, dy = p.y - P.y;
-      if (Math.sqrt(dx*dx+dy*dy) < p.r + 8) {
-        handlePlayerHit();
-        return false;
-      }
+      if (Math.sqrt(dx*dx+dy*dy) < p.r + 8) { handlePlayerHit(); return false; }
     }
     return p.y < H + 20;
   });
-
-  // Boss health bar
   document.getElementById('boss-bar').style.width = (bossHP/bossMaxHP*100)+'%';
-
-  // Collision boss body with player
   if (state === 'playing') {
     if (P.x+P.w/2 > boss.x && P.x-P.w/2 < boss.x+boss.w &&
-        P.y+P.h/2 > boss.y && P.y-P.h/2 < boss.y+boss.h) {
-      handlePlayerHit();
-    }
+        P.y+P.h/2 > boss.y && P.y-P.h/2 < boss.y+boss.h) { handlePlayerHit(); }
   }
 }
 
 function drawBoss() {
   if (!boss) return;
-  // Body
   const pulse = 0.75 + Math.sin(frame*0.12)*0.25;
   ctx.fillStyle = `rgba(255,45,85,${pulse})`;
   ctx.shadowColor = '#ff2d55'; ctx.shadowBlur = 20;
   ctx.fillRect(boss.x, boss.y, boss.w, boss.h);
-  // Eye
   ctx.fillStyle = '#fff'; ctx.shadowBlur = 8;
   ctx.beginPath(); ctx.arc(boss.x+boss.w/2, boss.y+boss.h/2, 8, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#ff2d55';
   ctx.beginPath(); ctx.arc(boss.x+boss.w/2, boss.y+boss.h/2, 4, 0, Math.PI*2); ctx.fill();
   ctx.shadowBlur = 0;
-  // Projectiles
   boss.projectiles.forEach(p => {
     ctx.fillStyle = '#ff8c00'; ctx.shadowColor = '#ff8c00'; ctx.shadowBlur = 12;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
@@ -463,16 +407,13 @@ function damageBoss() {
   }
 }
 
-// ─── COLLISION ───────────────────────────────────────────────────────────────
 function checkAABB(ax, ay, aw, ah, bx, by, bw, bh) {
   return ax < bx+bw && ax+aw > bx && ay < by+bh && ay+ah > by;
 }
-
 function handlePlayerHit() {
   if (shieldActive) {
     shieldActive = false; shieldTimer = 0;
-    updatePowerupUI();
-    SFX.shield();
+    updatePowerupUI(); SFX.shield();
     spawnParticles(P.x, P.y, '#4488ff', 20);
     return;
   }
@@ -481,40 +422,26 @@ function handlePlayerHit() {
   spawnParticles(P.x, P.y, '#ff2d55', 16);
   updateHUD();
   if (lives <= 0) {
-    state = 'dead';
-    SFX.die();
+    state = 'dead'; SFX.die();
     spawnParticles(P.x, P.y, '#ff2d55', 35);
     setTimeout(showGameOver, 800);
   }
 }
-
-// ─── PICKUP COLLISION ────────────────────────────────────────────────────────
 function checkPickup(pu) {
   const dx = pu.x - P.x, dy = pu.y - P.y;
   return Math.sqrt(dx*dx+dy*dy) < pu.r + 16;
 }
 
-// ─── MAIN LOOP ───────────────────────────────────────────────────────────────
 function loop() {
   animId = requestAnimationFrame(loop);
   frame++;
-
-  // Background
   ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0,0,W,H);
-
-  // Grid (speed-scrolling)
   gridOffset = (gridOffset + getObstacleSpeed()*0.3) % 40;
   ctx.strokeStyle = slowActive ? '#0e1a1a' : '#12121e';
   ctx.lineWidth = 1;
   for (let y=-40+gridOffset; y<H+40; y+=40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
   for (let x=0; x<W; x+=40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-
-  // Slow-mo tint
-  if (slowActive) {
-    ctx.fillStyle = 'rgba(80,0,180,0.06)'; ctx.fillRect(0,0,W,H);
-  }
-
-  // Stars
+  if (slowActive) { ctx.fillStyle = 'rgba(80,0,180,0.06)'; ctx.fillRect(0,0,W,H); }
   stars.forEach(s => {
     s.y += s.s * (slowActive ? 0.3 : 1);
     if (s.y > H) { s.y=-2; s.x=Math.random()*W; }
@@ -523,11 +450,8 @@ function loop() {
   });
 
   if (state === 'playing') {
-    // ── Power-up timers
     if (shieldTimer > 0) { shieldTimer--; if (shieldTimer===0) { shieldActive=false; updatePowerupUI(); } }
     if (slowTimer > 0)   { slowTimer--;   if (slowTimer===0)   { slowActive=false;   updatePowerupUI(); } }
-
-    // ── Player movement
     const dx=mx-P.x, dy=my-P.y, dist=Math.sqrt(dx*dx+dy*dy);
     if (dist>4) { P.x+=(dx/dist)*Math.min(dist,P.speed*1.4); P.y+=(dy/dist)*Math.min(dist,P.speed*1.4); }
     if (keys['ArrowLeft']||keys['a'])  P.x-=P.speed;
@@ -536,32 +460,17 @@ function loop() {
     if (keys['ArrowDown']||keys['s'])  P.y+=P.speed;
     P.x=Math.max(P.w/2,Math.min(W-P.w/2,P.x));
     P.y=Math.max(P.h/2,Math.min(H-P.h/2,P.y));
-
-    // ── Spawn (always, even during boss waves)
     if (frame%getSpawnRate()===0) spawnObstacle();
-
-    // ── Score
-    score++;
-    updateHUD();
-    SFX.dodge();
-
-    // ── Level up
+    score++; updateHUD(); SFX.dodge();
     const lvl = getLevel();
     if (lvl > lastLevel) {
       lastLevel = lvl;
-      if (isBossLevel(lvl) && !bossActive) {
-        spawnBoss(lvl);
-      } else {
-        SFX.levelup();
-        showLevelFlash(`LEVEL ${lvl}`, '#ffcc00');
-      }
+      if (isBossLevel(lvl) && !bossActive) { spawnBoss(lvl); }
+      else { SFX.levelup(); showLevelFlash(`LEVEL ${lvl}`, '#ffcc00'); }
     }
-
-    // ── Boss
     if (bossActive && boss) updateBoss();
   }
 
-  // ── Draw obstacles
   obstacles = obstacles.filter(obs => {
     obs.y += obs.speed * getSpeedMult();
     ctx.shadowBlur = 12;
@@ -572,7 +481,6 @@ function loop() {
       ctx.fillRect(-obs.w*0.35,-obs.h*0.35,obs.w*0.7,obs.h*0.7); ctx.restore();
     } else { ctx.fillRect(obs.x,obs.y,obs.w,obs.h); }
     ctx.shadowBlur=0;
-    // Collision
     const pw=P.w*0.7,ph=P.h*0.7;
     if (state==='playing' && checkAABB(P.x-pw/2,P.y-ph/2,pw,ph,obs.x,obs.y,obs.w,obs.h)) {
       handlePlayerHit(); return false;
@@ -580,10 +488,8 @@ function loop() {
     return obs.y < H+20;
   });
 
-  // ── Boss
   if (bossActive && boss) drawBoss();
 
-  // ── Powerup pickups
   powerups = powerups.filter(pu => {
     pu.y += pu.vy; pu.life--;
     const alpha = Math.min(1, pu.life/60);
@@ -596,7 +502,6 @@ function loop() {
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(pu.type==='shield' ? '🛡️' : '⏱️', pu.x, pu.y);
     ctx.globalAlpha=1; ctx.shadowBlur=0;
-    // Pickup check
     if (state==='playing' && checkPickup(pu)) {
       SFX.powerup();
       if (pu.type==='shield') { shieldActive=true; shieldTimer=600; }
@@ -609,7 +514,6 @@ function loop() {
     return pu.life > 0 && pu.y < H+20;
   });
 
-  // ── Particles
   particles = particles.filter(p => {
     p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.life-=p.decay;
     ctx.globalAlpha=p.life; ctx.fillStyle=p.color;
@@ -618,10 +522,8 @@ function loop() {
     return p.life>0;
   });
 
-  // ── Player ship
   if (state!=='dead' || frame%6<4) {
     const px=P.x, py=P.y;
-    // Shield bubble
     if (shieldActive) {
       const shieldPulse = 0.5+Math.sin(frame*0.15)*0.3;
       ctx.strokeStyle=`rgba(68,136,255,${shieldPulse})`; ctx.lineWidth=2;
@@ -650,7 +552,6 @@ function loop() {
     ctx.stroke();
   }
 
-  // ── Cursor
   if (state==='playing') {
     ctx.strokeStyle='rgba(0,255,231,0.35)'; ctx.lineWidth=1;
     ctx.beginPath(); ctx.arc(mx,my,10,0,Math.PI*2); ctx.stroke();
@@ -659,13 +560,10 @@ function loop() {
   }
 }
 
-// ─── GAME OVER ────────────────────────────────────────────────────────────────
 function showGameOver() {
   const playerName = document.getElementById('player-name').value || 'PILOT';
-  // Remember name for next session
   try { localStorage.setItem('dodge_pilot_name', playerName); } catch(e) {}
   const entries = addToLB(playerName, score);
-
   const overlay = document.getElementById('overlay');
   document.getElementById('overlay-title').textContent = 'GAME OVER';
   document.getElementById('overlay-title').style.color = '#ff2d55';
@@ -681,7 +579,6 @@ function showGameOver() {
   overlay.classList.remove('hidden');
 }
 
-// ─── IDLE LOOP ────────────────────────────────────────────────────────────────
 function idleLoop() {
   if (state !== 'idle') return;
   ctx.fillStyle='#0a0a0f'; ctx.fillRect(0,0,W,H);
@@ -697,13 +594,11 @@ function idleLoop() {
 }
 idleLoop();
 
-// Restore saved pilot name
 try {
   const savedName = localStorage.getItem('dodge_pilot_name');
   if (savedName) document.getElementById('player-name').value = savedName;
 } catch(e) {}
 
-// Show existing leaderboard on load
 const existing = loadLB();
 if (existing.length > 0) {
   document.getElementById('leaderboard').style.display='block';
