@@ -544,17 +544,37 @@
     @media print {
       body { background: #fff !important; color: #000 !important; }
       body::before, body::after { display: none !important; }
-      .nav, .header, .progress-bar, #step1-section, #insights-section,
+      .nav, .header, .progress-bar, #step1-section,
       #step2-section, .section-divider, .footer, .btn-row { display: none !important; }
-      #prompt-output-section { display: block !important; }
-      .prompt-output-box {
+
+      /* ── INSIGHTS PRINT MODE ── */
+      body.print-insights #insights-section { display: block !important; }
+      body.print-insights #prompt-output-section { display: none !important; }
+      body.print-insights .insights-header h2 { font-size: 22px; color: #000; margin-bottom: 6px; }
+      body.print-insights .insights-header p { display: none; }
+      body.print-insights .insight-card {
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        border-left: 3px solid #6c63ff !important;
+        margin-bottom: 16px !important;
+        page-break-inside: avoid;
+      }
+      body.print-insights .insight-num { color: #6c63ff !important; }
+      body.print-insights .insight-title { color: #000 !important; font-size: 16px !important; }
+      body.print-insights .insight-body { color: #333 !important; font-size: 13px !important; }
+      body.print-insights .insight-select-hint { display: none !important; }
+
+      /* ── PROMPT PRINT MODE ── */
+      body.print-prompt #insights-section { display: none !important; }
+      body.print-prompt #prompt-output-section { display: block !important; }
+      body.print-prompt .prompt-output-box {
         background: #fff !important;
         border: 1px solid #ccc !important;
         color: #000 !important;
         font-size: 13px !important;
         white-space: pre-wrap;
       }
-      .card-label { color: #333 !important; }
+      body.print-prompt .card-label { color: #333 !important; }
     }
 
     /* ── UTIL ── */
@@ -648,10 +668,11 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
   <div id="insights-section">
     <div class="insights-header">
       <h2>What AI can do for your role</h2>
-      <p>Click any insight to move to Step 2 and build a working prompt for it.</p>
+      <p>Click any insight to move to Step 2 and build a working prompt for it. Save all insights as a PDF to keep as your reference.</p>
     </div>
     <div id="insights-list"></div>
-    <div class="btn-row" style="margin-top: 8px;">
+    <div class="btn-row" style="margin-top: 20px;">
+      <button class="print-btn" onclick="printInsights()">Save Insights as PDF</button>
       <a href="#" class="reset-link" onclick="resetTool(); return false;">← Start over</a>
     </div>
   </div>
@@ -729,7 +750,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
     <div class="prompt-output-box" id="prompt-output-box"></div>
     <div class="btn-row">
       <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
-      <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+      <button class="print-btn" onclick="printPrompt()">Print / Save as PDF</button>
       <a href="#" class="reset-link" onclick="resetTool(); return false;">← Start over</a>
     </div>
   </div>
@@ -962,6 +983,22 @@ Write the ready-to-use prompt.`;
       btn.disabled = false;
       status.style.display = 'none';
     }
+  }
+
+  // ── PRINT INSIGHTS ──
+  function printInsights() {
+    document.body.classList.remove('print-prompt');
+    document.body.classList.add('print-insights');
+    window.print();
+    setTimeout(() => document.body.classList.remove('print-insights'), 1000);
+  }
+
+  // ── PRINT PROMPT ──
+  function printPrompt() {
+    document.body.classList.remove('print-insights');
+    document.body.classList.add('print-prompt');
+    window.print();
+    setTimeout(() => document.body.classList.remove('print-prompt'), 1000);
   }
 
   // ── COPY ──
