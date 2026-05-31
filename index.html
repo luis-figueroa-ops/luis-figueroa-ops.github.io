@@ -71,7 +71,7 @@ header {
 
 .eyebrow {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: 4px;
   color: var(--gold);
   margin-bottom: 10px;
@@ -92,11 +92,11 @@ h1 span {
 
 .tagline {
   margin-top: 14px;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 400;
   color: var(--white);
   letter-spacing: 1px;
-  max-width: 340px;
+  max-width: 380px;
   line-height: 1.6;
   opacity: 0.8;
 }
@@ -110,7 +110,7 @@ h1 span {
 
 .header-links a {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 2px;
   color: var(--white);
   text-decoration: none;
@@ -148,11 +148,11 @@ h1 span {
 }
 
 .intro-text {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 400;
   color: var(--white);
   line-height: 1.7;
-  max-width: 680px;
+  max-width: 720px;
   opacity: 0.85;
 }
 
@@ -176,7 +176,7 @@ h1 span {
 
 .section-label {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 4px;
   color: var(--gold);
   text-transform: uppercase;
@@ -191,20 +191,20 @@ h1 span {
 /* ── TOOL CARDS ── */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
 }
 
 .card {
   position: relative;
   background: rgba(27,42,74,0.5);
   border: 1px solid var(--border);
-  padding: 32px 28px;
+  padding: 40px 36px;
   text-decoration: none;
   color: var(--white);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   transition: all 0.25s ease;
   overflow: hidden;
   animation: fadeUp 0.6s ease both;
@@ -241,7 +241,7 @@ h1 span {
 
 .card-tag {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 3px;
   color: var(--gold);
   text-transform: uppercase;
@@ -249,7 +249,7 @@ h1 span {
 
 .card-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px;
+  font-size: 36px;
   letter-spacing: 2px;
   line-height: 1;
   color: var(--white);
@@ -259,10 +259,10 @@ h1 span {
 .card:hover .card-title { color: var(--gold-light); }
 
 .card-desc {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 400;
   color: var(--white);
-  line-height: 1.65;
+  line-height: 1.7;
   flex: 1;
   opacity: 0.8;
 }
@@ -272,13 +272,13 @@ h1 span {
   align-items: center;
   justify-content: space-between;
   margin-top: 8px;
-  padding-top: 14px;
+  padding-top: 16px;
   border-top: 1px solid rgba(184,150,62,0.1);
 }
 
 .card-cta {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 2px;
   color: var(--gold);
   text-transform: uppercase;
@@ -297,7 +297,7 @@ h1 span {
 
 .card-type {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 2px;
   color: var(--muted);
   text-transform: uppercase;
@@ -356,7 +356,7 @@ h1 span {
 }
 
 .api-body {
-  font-size: 15px;
+  font-size: 17px;
   color: var(--white);
   opacity: 0.8;
   line-height: 1.7;
@@ -378,7 +378,7 @@ h1 span {
 
 .step-num {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 2px;
   color: var(--gold);
   flex-shrink: 0;
@@ -386,7 +386,7 @@ h1 span {
 }
 
 .step-text {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--white);
   opacity: 0.85;
   line-height: 1.6;
@@ -422,7 +422,7 @@ h1 span {
 
 .api-dodge-note {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 2px;
   color: var(--white);
   opacity: 0.65;
@@ -457,7 +457,7 @@ footer {
 
 .footer-brand {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 3px;
   color: var(--white);
   opacity: 0.7;
@@ -471,7 +471,7 @@ footer {
 
 .footer-links a {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 2px;
   color: var(--white);
   text-decoration: none;
@@ -534,6 +534,58 @@ footer {
   </p>
 </div>
 
+<section class="section">
+  <div class="section-header">
+    <span class="section-label">Tools &amp; Projects</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="cards">
+
+    <a class="card" href="https://luis-figueroa-ops.github.io/jd-analyzer/" target="_blank">
+      <div class="card-tag">Career Tools</div>
+      <div class="card-title">JD Analyzer</div>
+      <div class="card-desc">
+        Reads between the lines of a job description - extracting signals on role type,
+        culture fit, red flags, and whether it's worth your time to apply.
+        Bring your own Anthropic API key.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Launch Tool</span>
+        <span class="card-type">HTML / Claude API</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://luis-figueroa-ops.github.io/ai-role-revealer/" target="_blank">
+      <div class="card-tag">Career Tools</div>
+      <div class="card-title">AI Role Revealer</div>
+      <div class="card-desc">
+        Describe what you actually do — not your title — and get a specific read on what
+        AI could be doing for your role right now. Then build a working prompt to go get it.
+        Bring your own Anthropic API key.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Launch Tool</span>
+        <span class="card-type">HTML / Claude API</span>
+      </div>
+    </a>
+
+    <a class="card" href="./games/dodge.html" target="_blank">
+      <div class="card-tag">Side Builds</div>
+      <div class="card-title">DODGE</div>
+      <div class="card-desc">
+        A fast-paced arcade stress-break built entirely in one session with Claude.
+        Dodge obstacles, survive boss waves, collect power-ups. Score-based with a local leaderboard.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Play Now</span>
+        <span class="card-type">HTML / Web Audio / Canvas</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
 <section class="section api-section">
   <div class="section-header">
     <span class="section-label">Using the Tools</span>
@@ -585,58 +637,6 @@ footer {
         <span class="gold-dot"></span>No API key needed to play <strong>Dodge</strong> — just hit Play Now and have fun.
       </div>
     </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="section-header">
-    <span class="section-label">Tools &amp; Projects</span>
-    <div class="section-line"></div>
-  </div>
-
-  <div class="cards">
-
-    <a class="card" href="https://luis-figueroa-ops.github.io/jd-analyzer/" target="_blank">
-      <div class="card-tag">Career Tools</div>
-      <div class="card-title">JD Analyzer</div>
-      <div class="card-desc">
-        Reads between the lines of a job description - extracting signals on role type,
-        culture fit, red flags, and whether it's worth your time to apply.
-        Bring your own Anthropic API key.
-      </div>
-      <div class="card-footer">
-        <span class="card-cta">Launch Tool</span>
-        <span class="card-type">HTML / Claude API</span>
-      </div>
-    </a>
-
-    <a class="card" href="https://luis-figueroa-ops.github.io/ai-role-revealer/" target="_blank">
-      <div class="card-tag">Career Tools</div>
-      <div class="card-title">AI Role Revealer</div>
-      <div class="card-desc">
-        Describe what you actually do — not your title — and get a specific read on what
-        AI could be doing for your role right now. Then build a working prompt to go get it.
-        Bring your own Anthropic API key.
-      </div>
-      <div class="card-footer">
-        <span class="card-cta">Launch Tool</span>
-        <span class="card-type">HTML / Claude API</span>
-      </div>
-    </a>
-
-    <a class="card" href="./games/dodge.html" target="_blank">
-      <div class="card-tag">Side Builds</div>
-      <div class="card-title">DODGE</div>
-      <div class="card-desc">
-        A fast-paced arcade stress-break built entirely in one session with Claude.
-        Dodge obstacles, survive boss waves, collect power-ups. Score-based with a local leaderboard.
-      </div>
-      <div class="card-footer">
-        <span class="card-cta">Play Now</span>
-        <span class="card-type">HTML / Web Audio / Canvas</span>
-      </div>
-    </a>
-
   </div>
 </section>
 
