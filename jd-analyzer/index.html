@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Is This Job Worth Applying To?</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YCMXSWXHTN');
+  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -303,9 +311,7 @@
       });
     });
 
-    printBtn.addEventListener('click', () => {
-      window.print();
-    });
+    printBtn.addEventListener('click', () => { window.print(); });
 
     const SYSTEM_PROMPT = `You are an experienced operations professional who reads job descriptions with a sharp, structured eye. Your job is to give candidates an honest, specific read on what a role actually is - cutting through vague language to identify what's really being asked for, who will actually succeed here, and what questions to ask.
 
@@ -350,20 +356,12 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
             model: 'claude-opus-4-5',
             max_tokens: 1500,
             system: SYSTEM_PROMPT,
-            messages: [
-              {
-                role: 'user',
-                content: `Please analyze this job description:\n\n${jd}`
-              }
-            ]
+            messages: [{ role: 'user', content: `Please analyze this job description:\n\n${jd}` }]
           })
         });
 
         const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error?.message || 'API request failed');
-        }
+        if (!response.ok) throw new Error(data.error?.message || 'API request failed');
 
         const result = data.content[0].text;
         outputContent.innerHTML = renderMarkdown(result);
