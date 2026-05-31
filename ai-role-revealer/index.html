@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Role Revealer — Operations, Augmented</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YCMXSWXHTN');
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -36,7 +44,6 @@
       overflow-x: hidden;
     }
 
-    /* Grid background */
     body::before {
       content: '';
       position: fixed;
@@ -50,7 +57,6 @@
       z-index: 0;
     }
 
-    /* Glow orb */
     body::after {
       content: '';
       position: fixed;
@@ -71,7 +77,6 @@
       padding: 48px 24px 80px;
     }
 
-    /* ── NAV ── */
     .nav {
       display: flex;
       justify-content: space-between;
@@ -97,7 +102,6 @@
       text-transform: uppercase;
     }
 
-    /* ── HEADER ── */
     .header { margin-bottom: 48px; }
 
     .step-badge {
@@ -135,7 +139,6 @@
       line-height: 1.8;
     }
 
-    /* ── PROGRESS ── */
     .progress-bar {
       display: flex;
       gap: 8px;
@@ -170,7 +173,6 @@
       max-width: 60px;
     }
 
-    /* ── CARD ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -198,7 +200,6 @@
       background: var(--border);
     }
 
-    /* ── API KEY ── */
     .api-row {
       display: flex;
       gap: 12px;
@@ -226,7 +227,6 @@
     .api-note a { color: var(--accent); text-decoration: none; }
     .api-note a:hover { text-decoration: underline; }
 
-    /* ── TEXTAREA ── */
     textarea {
       width: 100%;
       background: var(--bg);
@@ -244,7 +244,6 @@
     textarea:focus { border-color: var(--accent); }
     textarea::placeholder { color: #c0c0e8; line-height: 1.8; }
 
-    /* ── BUTTONS ── */
     .btn-primary {
       background: var(--accent);
       color: #fff;
@@ -257,17 +256,9 @@
       transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
       text-transform: uppercase;
     }
-    .btn-primary:hover {
-      background: #8079ff;
-      box-shadow: 0 0 24px rgba(108,99,255,0.4);
-    }
+    .btn-primary:hover { background: #8079ff; box-shadow: 0 0 24px rgba(108,99,255,0.4); }
     .btn-primary:active { transform: translateY(1px); }
-    .btn-primary:disabled {
-      background: var(--border);
-      color: var(--text-dim);
-      cursor: not-allowed;
-      box-shadow: none;
-    }
+    .btn-primary:disabled { background: var(--border); color: var(--text-dim); cursor: not-allowed; box-shadow: none; }
 
     .btn-secondary {
       background: transparent;
@@ -291,7 +282,6 @@
       margin-top: 20px;
     }
 
-    /* ── STATUS ── */
     .status-line {
       font-size: 11px;
       color: var(--text-dim);
@@ -301,14 +291,9 @@
       gap: 8px;
     }
     .status-line.thinking { color: var(--accent3); }
-    .dot-pulse {
-      display: inline-flex;
-      gap: 3px;
-    }
+    .dot-pulse { display: inline-flex; gap: 3px; }
     .dot-pulse span {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
+      width: 4px; height: 4px; border-radius: 50%;
       background: var(--accent3);
       animation: pulse 1.2s infinite;
     }
@@ -319,22 +304,11 @@
       40% { opacity: 1; transform: scale(1); }
     }
 
-    /* ── INSIGHTS ── */
     #insights-section { display: none; }
 
-    .insights-header {
-      margin-bottom: 24px;
-    }
-    .insights-header h2 {
-      font-family: var(--sans);
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .insights-header p {
-      color: var(--text-muted);
-      font-size: 13px;
-    }
+    .insights-header { margin-bottom: 24px; }
+    .insights-header h2 { font-family: var(--sans); font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .insights-header p { color: var(--text-muted); font-size: 13px; }
 
     .insight-card {
       background: var(--surface2);
@@ -346,55 +320,20 @@
       transition: border-color 0.2s, background 0.2s, transform 0.15s;
       position: relative;
     }
-    .insight-card:hover {
-      border-left-color: var(--accent3);
-      background: #1a1a28;
-      transform: translateX(4px);
-    }
-    .insight-card.selected {
-      border-left-color: var(--accent3);
-      border-color: rgba(67,232,200,0.4);
-      background: #0f1f1e;
-    }
-    .insight-num {
-      font-size: 10px;
-      color: var(--accent);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
+    .insight-card:hover { border-left-color: var(--accent3); background: #1a1a28; transform: translateX(4px); }
+    .insight-card.selected { border-left-color: var(--accent3); border-color: rgba(67,232,200,0.4); background: #0f1f1e; }
+    .insight-num { font-size: 10px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
     .insight-card.selected .insight-num { color: var(--accent3); }
-    .insight-title {
-      font-family: var(--sans);
-      font-weight: 600;
-      font-size: 18px;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-    .insight-body {
-      color: var(--text-muted);
-      font-size: 15px;
-      line-height: 1.8;
-    }
+    .insight-title { font-family: var(--sans); font-weight: 600; font-size: 18px; margin-bottom: 8px; color: var(--text); }
+    .insight-body { color: var(--text-muted); font-size: 15px; line-height: 1.8; }
     .insight-select-hint {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      font-size: 10px;
-      color: var(--text-dim);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      opacity: 0;
-      transition: opacity 0.2s;
+      position: absolute; top: 16px; right: 16px;
+      font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+      opacity: 0; transition: opacity 0.2s;
     }
     .insight-card:hover .insight-select-hint { opacity: 1; }
-    .insight-card.selected .insight-select-hint {
-      opacity: 1;
-      color: var(--accent3);
-      content: '✓ selected';
-    }
+    .insight-card.selected .insight-select-hint { opacity: 1; color: var(--accent3); }
 
-    /* ── STEP 2 ── */
     #step2-section { display: none; }
 
     .step2-intro {
@@ -403,17 +342,8 @@
       padding: 24px;
       margin-bottom: 32px;
     }
-    .step2-intro h2 {
-      font-family: var(--sans);
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .step2-intro p {
-      color: var(--text-muted);
-      font-size: 15px;
-      line-height: 1.8;
-    }
+    .step2-intro h2 { font-family: var(--sans); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .step2-intro p { color: var(--text-muted); font-size: 15px; line-height: 1.8; }
 
     .selected-insight-pill {
       display: inline-block;
@@ -427,27 +357,14 @@
     }
 
     .prompt-pieces { margin-bottom: 24px; }
-    .piece {
-      margin-bottom: 16px;
-    }
+    .piece { margin-bottom: 16px; }
     .piece-label {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .piece-hint {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      font-style: italic;
-    }
+    .piece-hint { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-style: italic; }
 
-    /* ── FINAL PROMPT ── */
     #prompt-output-section { display: none; }
 
     .prompt-output-box {
@@ -480,52 +397,31 @@
     .copy-btn:hover { border-color: var(--accent3); color: var(--accent3); }
     .copy-btn.copied { border-color: var(--accent3); color: var(--accent3); }
 
-    /* ── RESET ── */
     .reset-link {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-decoration: none;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-size: 11px; color: var(--text-dim); text-decoration: none;
+      letter-spacing: 0.08em; text-transform: uppercase;
       border-bottom: 1px solid transparent;
       transition: color 0.2s, border-color 0.2s;
     }
     .reset-link:hover { color: var(--text-muted); border-color: var(--text-muted); }
 
-    /* ── FOOTER ── */
     .footer {
-      margin-top: 80px;
-      padding-top: 24px;
+      margin-top: 80px; padding-top: 24px;
       border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: gap;
-      gap: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
     }
-    .footer-left {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-    .footer-left a {
-      color: var(--text-muted);
-      text-decoration: none;
-    }
+    .footer-left { font-size: 12px; color: var(--text-dim); }
+    .footer-left a { color: var(--text-muted); text-decoration: none; }
     .footer-left a:hover { color: var(--text); }
-    .footer-right {
-      font-size: 11px;
-      color: var(--text-dim);
-      letter-spacing: 0.05em;
-    }
+    .footer-right { font-size: 11px; color: var(--text-dim); letter-spacing: 0.05em; }
 
-    /* ── DIVIDER ── */
     .section-divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border), transparent);
       margin: 40px 0;
     }
 
-    /* ── PRINT / PDF ── */
     .print-btn {
       background: transparent;
       border: 1px solid var(--border);
@@ -547,16 +443,13 @@
       .nav, .header, .progress-bar, #step1-section,
       #step2-section, .section-divider, .footer, .btn-row { display: none !important; }
 
-      /* ── INSIGHTS PRINT MODE ── */
       body.print-insights #insights-section { display: block !important; }
       body.print-insights #prompt-output-section { display: none !important; }
       body.print-insights .insights-header h2 { font-size: 22px; color: #000; margin-bottom: 6px; }
       body.print-insights .insights-header p { display: none; }
       body.print-insights .insight-card {
-        background: #fff !important;
-        border: 1px solid #ccc !important;
-        border-left: 3px solid #6c63ff !important;
-        margin-bottom: 16px !important;
+        background: #fff !important; border: 1px solid #ccc !important;
+        border-left: 3px solid #6c63ff !important; margin-bottom: 16px !important;
         page-break-inside: avoid;
       }
       body.print-insights .insight-num { color: #6c63ff !important; }
@@ -564,20 +457,15 @@
       body.print-insights .insight-body { color: #333 !important; font-size: 13px !important; }
       body.print-insights .insight-select-hint { display: none !important; }
 
-      /* ── PROMPT PRINT MODE ── */
       body.print-prompt #insights-section { display: none !important; }
       body.print-prompt #prompt-output-section { display: block !important; }
       body.print-prompt .prompt-output-box {
-        background: #fff !important;
-        border: 1px solid #ccc !important;
-        color: #000 !important;
-        font-size: 13px !important;
-        white-space: pre-wrap;
+        background: #fff !important; border: 1px solid #ccc !important;
+        color: #000 !important; font-size: 13px !important; white-space: pre-wrap;
       }
       body.print-prompt .card-label { color: #333 !important; }
     }
 
-    /* ── UTIL ── */
     .hidden { display: none !important; }
 
     @media (max-width: 520px) {
@@ -592,13 +480,11 @@
 
 <div class="page-wrap">
 
-  <!-- NAV -->
   <nav class="nav">
     <a href="https://luis-figueroa-ops.github.io/" class="nav-brand">← Operations, Augmented</a>
     <span class="nav-tag">Career Tools</span>
   </nav>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="step-badge">Interactive Tool</div>
     <h1>AI Role<br><span>Revealer</span></h1>
@@ -607,7 +493,6 @@
     </p>
   </header>
 
-  <!-- PROGRESS -->
   <div class="progress-bar" id="progress-bar">
     <div class="progress-step active" id="prog-1">
       <div class="progress-dot"></div>
@@ -620,21 +505,11 @@
     </div>
   </div>
 
-  <!-- ── STEP 1 ── -->
   <div id="step1-section">
-
-    <!-- API Key -->
     <div class="card">
       <div class="card-label">Anthropic API Key</div>
       <div class="api-row">
-        <input
-          type="password"
-          class="api-input"
-          id="api-key"
-          placeholder="sk-ant-api03-..."
-          autocomplete="off"
-          spellcheck="false"
-        />
+        <input type="password" class="api-input" id="api-key" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" />
       </div>
       <p class="api-note">
         Your key stays in your browser — never stored or sent anywhere except directly to Anthropic.
@@ -642,29 +517,21 @@
       </p>
     </div>
 
-    <!-- Role Description -->
     <div class="card">
       <div class="card-label">Your Role</div>
-      <textarea
-        id="role-input"
-        placeholder="Describe what you actually do — not your title. The meetings, the problems, the tasks that eat your time.
+      <textarea id="role-input" placeholder="Describe what you actually do — not your title. The meetings, the problems, the tasks that eat your time.
 
-For example: I manage a team of 8 sales reps across three states. Every week I'm doing pipeline reviews, coaching deals that are stuck, running a forecast call with my VP, and trying to figure out why one territory is underperforming. I also onboard new reps on a complicated product line..."
-      ></textarea>
+For example: I manage a team of 8 sales reps across three states. Every week I'm doing pipeline reviews, coaching deals that are stuck, running a forecast call with my VP, and trying to figure out why one territory is underperforming. I also onboard new reps on a complicated product line..."></textarea>
       <div class="btn-row">
-        <button class="btn-primary" id="analyze-btn" onclick="runStep1()">
-          Reveal What's Possible
-        </button>
+        <button class="btn-primary" id="analyze-btn" onclick="runStep1()">Reveal What's Possible</button>
         <div class="status-line" id="status-1" style="display:none;">
           <div class="dot-pulse"><span></span><span></span><span></span></div>
           Analyzing your role...
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- ── INSIGHTS ── -->
   <div id="insights-section">
     <div class="insights-header">
       <h2>What AI can do for your role</h2>
@@ -679,71 +546,56 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
 
   <div class="section-divider" id="divider-2" style="display:none;"></div>
 
-  <!-- ── STEP 2 ── -->
   <div id="step2-section">
-
     <div class="step2-intro">
       <h2>Step 2 — Build Your Prompt</h2>
-      <p>
-        You picked an insight. Now let's build the exact prompt to go get it — in whatever AI tool you already use. Fill in the six pieces below and I'll assemble a ready-to-copy prompt.
-      </p>
+      <p>You picked an insight. Now let's build the exact prompt to go get it — in whatever AI tool you already use. Fill in the six pieces below and I'll assemble a ready-to-copy prompt.</p>
     </div>
 
     <div class="selected-insight-pill" id="selected-insight-label"></div>
 
     <div class="prompt-pieces" id="prompt-pieces">
-
       <div class="piece">
         <div class="piece-label">01 — Your Role</div>
         <textarea id="p-role" rows="2" placeholder="e.g. Regional Sales Manager at a medical device company managing 8 reps across 3 states"></textarea>
         <div class="piece-hint">Be specific — title, company type, team size, scope.</div>
       </div>
-
       <div class="piece">
         <div class="piece-label">02 — What You Need</div>
         <textarea id="p-need" rows="2" placeholder="e.g. A pre-call brief on a stuck deal — the rep's summary of where it's at, what the objections are, and a list of questions I should ask"></textarea>
         <div class="piece-hint">The exact output you want. What should exist when this is done?</div>
       </div>
-
       <div class="piece">
         <div class="piece-label">03 — The Context</div>
         <textarea id="p-context" rows="3" placeholder="e.g. Deal has been in late stage for 6 weeks. Hospital procurement is the blocker. Rep has met with the committee twice. Decision expected by end of quarter."></textarea>
         <div class="piece-hint">The specific situation, data, or background AI needs to do this well.</div>
       </div>
-
       <div class="piece">
         <div class="piece-label">04 — Who It's For</div>
         <textarea id="p-audience" rows="2" placeholder="e.g. For me to use privately before the coaching call — not for the rep to see"></textarea>
         <div class="piece-hint">Who reads or uses this output?</div>
       </div>
-
       <div class="piece">
         <div class="piece-label">05 — Tone</div>
         <textarea id="p-tone" rows="2" placeholder="e.g. Direct and tactical — no fluff. Give me the honest read, not a motivational take."></textarea>
         <div class="piece-hint">How should the response feel? Formal, direct, analytical, conversational...</div>
       </div>
-
       <div class="piece">
         <div class="piece-label">06 — Format</div>
         <textarea id="p-format" rows="2" placeholder="e.g. Bullet points under 3 headers: Deal Summary, Key Risks, Questions to Ask the Rep"></textarea>
         <div class="piece-hint">Headers, bullets, numbered list, table, narrative — and roughly how long?</div>
       </div>
-
     </div>
 
     <div class="btn-row">
-      <button class="btn-primary" id="build-btn" onclick="buildPrompt()">
-        Build My Prompt
-      </button>
+      <button class="btn-primary" id="build-btn" onclick="buildPrompt()">Build My Prompt</button>
       <div class="status-line" id="status-2" style="display:none;">
         <div class="dot-pulse"><span></span><span></span><span></span></div>
         Assembling your prompt...
       </div>
     </div>
-
   </div>
 
-  <!-- ── FINAL PROMPT ── -->
   <div id="prompt-output-section">
     <div class="section-divider"></div>
     <div class="card-label" style="margin-bottom: 16px;">Your Ready-to-Use Prompt</div>
@@ -755,7 +607,6 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-left">
       Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a> ·
@@ -771,21 +622,15 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
   let selectedInsightText = '';
   let selectedInsightTitle = '';
 
-  // ── STEP 1 ──
   async function runStep1() {
     const apiKey = document.getElementById('api-key').value.trim();
     const roleText = document.getElementById('role-input').value.trim();
-
     if (!apiKey) { alert('Please enter your Anthropic API key.'); return; }
     if (roleText.length < 40) { alert('Tell me a bit more about your role — the more specific you are, the better the insights.'); return; }
-
     const btn = document.getElementById('analyze-btn');
     const status = document.getElementById('status-1');
-    btn.disabled = true;
-    status.style.display = 'flex';
-
-    const systemPrompt = `You are the AI Role Revealer. Your job is to identify non-obvious, high-value ways AI could help someone in their specific role. 
-
+    btn.disabled = true; status.style.display = 'flex';
+    const systemPrompt = `You are the AI Role Revealer. Your job is to identify non-obvious, high-value ways AI could help someone in their specific role.
 Rules:
 - Give exactly 4 insights. No more, no less.
 - Each insight must be specific to what the person described — never generic.
@@ -793,17 +638,8 @@ Rules:
 - Never use words like: leverage, utilize, streamline, harness, empower, transform, revolutionize.
 - Write like a smart colleague who genuinely knows their job — direct, specific, no buzzwords.
 - Make the insights non-obvious. Skip things like "use AI to write emails faster."
-
 Respond ONLY in this JSON format (no markdown, no backticks, just raw JSON):
-{
-  "insights": [
-    {
-      "title": "Short action-oriented title (5-8 words)",
-      "body": "2-3 sentences: what AI does, what problem it solves, why it matters for this specific role. Be concrete."
-    }
-  ]
-}`;
-
+{"insights": [{"title": "Short action-oriented title (5-8 words)","body": "2-3 sentences: what AI does, what problem it solves, why it matters for this specific role. Be concrete."}]}`;
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -813,46 +649,23 @@ Respond ONLY in this JSON format (no markdown, no backticks, just raw JSON):
           'anthropic-version': '2023-06-01',
           'anthropic-dangerous-direct-browser-access': 'true'
         },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: roleText }]
-        })
+        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: roleText }] })
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'API error');
-      }
-
+      if (!response.ok) throw new Error(data.error?.message || 'API error');
       const rawText = data.content[0].text.trim();
       let parsed;
-      try {
-        parsed = JSON.parse(rawText);
-      } catch {
-        const match = rawText.match(/\{[\s\S]*\}/);
-        if (match) parsed = JSON.parse(match[0]);
-        else throw new Error('Could not parse response.');
-      }
-
+      try { parsed = JSON.parse(rawText); }
+      catch { const match = rawText.match(/\{[\s\S]*\}/); if (match) parsed = JSON.parse(match[0]); else throw new Error('Could not parse response.'); }
       renderInsights(parsed.insights);
-
-    } catch (err) {
-      alert('Something went wrong: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.style.display = 'none';
-    }
+    } catch (err) { alert('Something went wrong: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
   }
 
   function renderInsights(insights) {
     document.getElementById('step1-section').style.display = 'none';
-
     const list = document.getElementById('insights-list');
     list.innerHTML = '';
-
     insights.forEach((insight, i) => {
       const card = document.createElement('div');
       card.className = 'insight-card';
@@ -860,24 +673,19 @@ Respond ONLY in this JSON format (no markdown, no backticks, just raw JSON):
         <div class="insight-num">Insight ${String(i + 1).padStart(2, '0')}</div>
         <div class="insight-title">${escapeHtml(insight.title)}</div>
         <div class="insight-body">${escapeHtml(insight.body)}</div>
-        <div class="insight-select-hint">→ Select this</div>
-      `;
+        <div class="insight-select-hint">→ Select this</div>`;
       card.onclick = () => selectInsight(card, insight);
       list.appendChild(card);
     });
-
     document.getElementById('insights-section').style.display = 'block';
     updateProgress(1.5);
-
-    // After rendering, show step 2 prompt
     setTimeout(() => {
       const bridge = document.createElement('div');
       bridge.style.cssText = 'margin: 32px 0 24px; padding: 20px 24px; border: 1px solid #1e1e2e; background: #111118;';
       bridge.innerHTML = `
         <div style="font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:#6b6b8a; margin-bottom:8px;">Step 1 Complete</div>
         <div style="font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:6px; color:#e8e8f0;">Now you know what's possible for your role.</div>
-        <div style="font-size:13px; color:#6b6b8a; line-height:1.7;">Click any insight above to move to Step 2 — building the exact prompt to go get it.</div>
-      `;
+        <div style="font-size:13px; color:#6b6b8a; line-height:1.7;">Click any insight above to move to Step 2 — building the exact prompt to go get it.</div>`;
       list.parentNode.insertBefore(bridge, list.nextSibling.nextSibling);
     }, 100);
   }
@@ -885,25 +693,18 @@ Respond ONLY in this JSON format (no markdown, no backticks, just raw JSON):
   function selectInsight(card, insight) {
     document.querySelectorAll('.insight-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
-
     selectedInsightTitle = insight.title;
     selectedInsightText = insight.body;
-
     document.getElementById('selected-insight-label').textContent = '→ ' + insight.title;
     document.getElementById('divider-2').style.display = 'block';
     document.getElementById('step2-section').style.display = 'block';
     updateProgress(2);
-
-    setTimeout(() => {
-      document.getElementById('step2-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+    setTimeout(() => { document.getElementById('step2-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
   }
 
-  // ── STEP 2 ──
   async function buildPrompt() {
     const apiKey = document.getElementById('api-key').value.trim();
     if (!apiKey) { alert('API key is missing — scroll up and enter it.'); return; }
-
     const pieces = {
       role: document.getElementById('p-role').value.trim(),
       need: document.getElementById('p-need').value.trim(),
@@ -912,22 +713,11 @@ Respond ONLY in this JSON format (no markdown, no backticks, just raw JSON):
       tone: document.getElementById('p-tone').value.trim(),
       format: document.getElementById('p-format').value.trim()
     };
-
-    const filled = Object.values(pieces).filter(v => v.length > 0);
-    if (filled.length < 3) {
-      alert('Fill in at least 3 of the 6 pieces to build a useful prompt.');
-      return;
-    }
-
+    if (Object.values(pieces).filter(v => v.length > 0).length < 3) { alert('Fill in at least 3 of the 6 pieces to build a useful prompt.'); return; }
     const btn = document.getElementById('build-btn');
     const status = document.getElementById('status-2');
-    btn.disabled = true;
-    status.style.display = 'flex';
-
-    const systemPrompt = `You are an expert at writing AI prompts for working professionals. 
-    
-Given a selected insight and six prompt-building pieces, write a single, complete, ready-to-use prompt that the person can paste directly into any AI tool.
-
+    btn.disabled = true; status.style.display = 'flex';
+    const systemPrompt = `You are an expert at writing AI prompts for working professionals. Given a selected insight and six prompt-building pieces, write a single, complete, ready-to-use prompt that the person can paste directly into any AI tool.
 Rules:
 - Write the prompt in second person ("You are...", "I need...", "Given...")
 - Include all six pieces naturally woven into one coherent prompt — don't use the labels as headers
@@ -935,57 +725,23 @@ Rules:
 - Make it specific and direct
 - Length: 100-200 words typically
 - No meta-commentary. Just the prompt itself. Start directly.`;
-
-    const userMessage = `Selected insight: ${selectedInsightTitle}
-Insight detail: ${selectedInsightText}
-
-Prompt pieces:
-- Role: ${pieces.role || '(not provided)'}
-- What I need: ${pieces.need || '(not provided)'}
-- Context: ${pieces.context || '(not provided)'}
-- Who it's for: ${pieces.audience || '(not provided)'}
-- Tone: ${pieces.tone || '(not provided)'}
-- Format: ${pieces.format || '(not provided)'}
-
-Write the ready-to-use prompt.`;
-
+    const userMessage = `Selected insight: ${selectedInsightTitle}\nInsight detail: ${selectedInsightText}\n\nPrompt pieces:\n- Role: ${pieces.role || '(not provided)'}\n- What I need: ${pieces.need || '(not provided)'}\n- Context: ${pieces.context || '(not provided)'}\n- Who it's for: ${pieces.audience || '(not provided)'}\n- Tone: ${pieces.tone || '(not provided)'}\n- Format: ${pieces.format || '(not provided)'}\n\nWrite the ready-to-use prompt.`;
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: userMessage }]
-        })
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] })
       });
-
       const data = await response.json();
       if (!response.ok) throw new Error(data.error?.message || 'API error');
-
       const promptText = data.content[0].text.trim();
       document.getElementById('prompt-output-box').textContent = promptText;
       document.getElementById('prompt-output-section').style.display = 'block';
-
-      setTimeout(() => {
-        document.getElementById('prompt-output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-
-    } catch (err) {
-      alert('Something went wrong: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.style.display = 'none';
-    }
+      setTimeout(() => { document.getElementById('prompt-output-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+    } catch (err) { alert('Something went wrong: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
   }
 
-  // ── PRINT INSIGHTS ──
   function printInsights() {
     document.body.classList.remove('print-prompt');
     document.body.classList.add('print-insights');
@@ -993,7 +749,6 @@ Write the ready-to-use prompt.`;
     setTimeout(() => document.body.classList.remove('print-insights'), 1000);
   }
 
-  // ── PRINT PROMPT ──
   function printPrompt() {
     document.body.classList.remove('print-insights');
     document.body.classList.add('print-prompt');
@@ -1001,21 +756,16 @@ Write the ready-to-use prompt.`;
     setTimeout(() => document.body.classList.remove('print-prompt'), 1000);
   }
 
-  // ── COPY ──
   function copyPrompt() {
     const text = document.getElementById('prompt-output-box').textContent;
     navigator.clipboard.writeText(text).then(() => {
       const btn = document.getElementById('copy-btn');
       btn.textContent = '✓ Copied';
       btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = 'Copy Prompt';
-        btn.classList.remove('copied');
-      }, 2000);
+      setTimeout(() => { btn.textContent = 'Copy Prompt'; btn.classList.remove('copied'); }, 2000);
     });
   }
 
-  // ── PROGRESS ──
   function updateProgress(step) {
     const p1 = document.getElementById('prog-1');
     const p2 = document.getElementById('prog-2');
@@ -1023,7 +773,6 @@ Write the ready-to-use prompt.`;
     if (step >= 2) { p2.classList.add('active'); }
   }
 
-  // ── RESET ──
   function resetTool() {
     document.getElementById('role-input').value = '';
     document.getElementById('insights-list').innerHTML = '';
@@ -1038,16 +787,13 @@ Write the ready-to-use prompt.`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ── UTIL ──
   function escapeHtml(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // Enter key on API input moves focus
   document.getElementById('api-key').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('role-input').focus();
   });
 </script>
-
 </body>
 </html>
