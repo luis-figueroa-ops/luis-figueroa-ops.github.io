@@ -308,6 +308,143 @@ h1 span {
 .card:nth-child(2) { animation-delay: 0.25s; }
 .card:nth-child(3) { animation-delay: 0.35s; }
 
+/* ── API KEY EXPLAINER ── */
+.api-section {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 48px;
+}
+
+.api-explainer {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  background: rgba(184,150,62,0.05);
+  border: 1px solid rgba(184,150,62,0.3);
+  padding: 36px 36px 36px 32px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+
+.api-explainer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: linear-gradient(to bottom, var(--gold), rgba(184,150,62,0.2));
+}
+
+.api-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+.api-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.api-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(22px, 2.2vw, 30px);
+  letter-spacing: 2px;
+  color: var(--gold-light);
+  line-height: 1.1;
+}
+
+.api-body {
+  font-size: 15px;
+  color: var(--white);
+  opacity: 0.8;
+  line-height: 1.7;
+  max-width: 640px;
+}
+
+.api-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.api-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.step-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text {
+  font-size: 14px;
+  color: var(--white);
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+.step-text strong {
+  color: var(--white);
+  font-weight: 500;
+  opacity: 1;
+}
+
+.step-text a {
+  color: var(--gold-light);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(184,150,62,0.4);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.step-text a:hover {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.step-text code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--gold);
+  background: rgba(184,150,62,0.1);
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+
+.api-dodge-note {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--white);
+  opacity: 0.65;
+  text-transform: uppercase;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.api-dodge-note strong {
+  color: var(--gold);
+  font-weight: 400;
+}
+
+
+
+@media (max-width: 700px) {
+  .api-explainer { flex-direction: column; gap: 20px; padding: 28px 22px 28px 26px; }
+  .api-steps { grid-template-columns: 1fr; }
+}
+
 /* ── FOOTER ── */
 footer {
   position: relative; z-index: 10;
@@ -396,6 +533,60 @@ footer {
     experiments that document what's possible when operations thinking meets modern AI.
   </p>
 </div>
+
+<section class="section api-section">
+  <div class="section-header">
+    <span class="section-label">Using the Tools</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="api-explainer">
+    <div class="api-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="30" height="30" rx="4" stroke="#B8963E" stroke-width="1.5"/>
+        <path d="M10 16h12M16 10v12" stroke="#B8963E" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="5" stroke="#B8963E" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="api-content">
+      <div class="api-headline">These career tools run on your own Anthropic API key — here's how to get one free.</div>
+      <p class="api-body">
+        The JD Analyzer and AI Role Revealer call Claude directly from your browser. No data is stored, no account is required on this site —
+        you just need a free Anthropic API key to power them.
+      </p>
+      <div class="api-steps">
+        <div class="api-step">
+          <span class="step-num">01</span>
+          <div class="step-text">
+            <strong>Create a free account</strong> at
+            <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+          </div>
+        </div>
+        <div class="api-step">
+          <span class="step-num">02</span>
+          <div class="step-text">
+            <strong>Go to API Keys</strong> in the left sidebar and click <em>Create Key</em>
+          </div>
+        </div>
+        <div class="api-step">
+          <span class="step-num">03</span>
+          <div class="step-text">
+            <strong>Copy your key</strong> — it starts with <code>sk-ant-</code> — and paste it into any tool below
+          </div>
+        </div>
+        <div class="api-step">
+          <span class="step-num">04</span>
+          <div class="step-text">
+            <strong>New accounts include free credits.</strong> Most analyses cost less than a cent each.
+          </div>
+        </div>
+      </div>
+      <div class="api-dodge-note">
+        <span class="gold-dot"></span>No API key needed to play <strong>Dodge</strong> — just hit Play Now and have fun.
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="section">
   <div class="section-header">
