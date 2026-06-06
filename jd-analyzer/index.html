@@ -126,7 +126,6 @@
     .output ul li { margin-bottom: 8px; line-height: 1.7; }
     .output strong { color: #ffffff; font-weight: 600; }
 
-    /* Streaming cursor */
     .streaming-cursor::after {
       content: '|';
       color: #B8963E;
@@ -392,7 +391,7 @@
         Your key stays in your browser and is never stored anywhere.
         Don't have one? <a href="https://console.anthropic.com" target="_blank">Get a free key at console.anthropic.com</a>
       </p>
-      <p class="input-warning" id="keyWarning">API key should start with sk-ant- - double check your key.</p>
+      <p class="input-warning" id="keyWarning">API key looks incomplete. A valid key starts with sk-ant- and is about 100 characters long.</p>
     </div>
 
     <div class="card">
@@ -458,22 +457,19 @@
 
     let conversationHistory = [];
 
-    // Input validation with specific warnings
     function checkInputs() {
       const keyVal = apiKeyInput.value.trim();
       const jdVal = jdInput.value.trim();
 
-      const keyValid = keyVal.length > 10 && keyVal.startsWith('sk-ant-');
+      const keyValid = keyVal.length > 50 && keyVal.startsWith('sk-ant-');
       const jdValid = jdVal.length > 100;
 
-      // Show key warning if they typed something but it's wrong format
       if (keyVal.length > 5 && !keyValid) {
         keyWarning.classList.add('visible');
       } else {
         keyWarning.classList.remove('visible');
       }
 
-      // Show JD warning if they typed something but it's too short
       if (jdVal.length > 10 && jdVal.length <= 100) {
         jdWarning.classList.add('visible');
       } else {
@@ -504,7 +500,6 @@
         .replace(/<\/ul>\s*<ul>/g, '');
     }
 
-    // Specific, human-readable error messages
     function parseErrorMessage(err, data) {
       if (!navigator.onLine) {
         return 'No internet connection detected. Check your connection and try again.';
@@ -598,7 +593,6 @@ For ALL FOLLOW-UP messages, respond conversationally and directly. Build on the 
 
 Be direct, specific, and practical. Never generic. Write like someone who has actually worked in operations and can read between the lines of a process document.`;
 
-    // Streaming API call - text appears word by word
     async function streamClaude(apiKey, onChunk, onDone, onError) {
       let data = null;
       try {
@@ -657,7 +651,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       }
     }
 
-    // Initial JD analysis with streaming
     analyzeBtn.addEventListener('click', async () => {
       const apiKey = apiKeyInput.value.trim();
       const jd = jdInput.value.trim();
@@ -675,7 +668,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         content: `Please analyze this job description:\n\n${jd}`
       });
 
-      // Show output immediately so streaming is visible
       outputContent.innerHTML = '';
       outputContent.classList.add('streaming-cursor');
       output.classList.add('visible');
@@ -688,11 +680,9 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       streamClaude(
         apiKey,
-        // onChunk - update display as text arrives
         (text) => {
           outputContent.innerHTML = renderMarkdown(text);
         },
-        // onDone - finalize
         (fullText) => {
           conversationHistory.push({ role: 'assistant', content: fullText });
           outputContent.innerHTML = renderMarkdown(fullText);
@@ -702,7 +692,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
           loading.classList.remove('visible');
           analyzeBtn.disabled = false;
         },
-        // onError - specific message
         (err, data) => {
           const msg = parseErrorMessage(err, data);
           output.classList.remove('visible');
@@ -721,7 +710,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       );
     });
 
-    // Follow-up messages with streaming
     async function sendFollowUp() {
       const apiKey = apiKeyInput.value.trim();
       const userMessage = followUpInput.value.trim();
@@ -744,7 +732,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       conversationHistory.push({ role: 'user', content: userMessage });
       addChatBubble('user', userMessage);
 
-      // Add streaming bubble - starts as thinking, fills in as text arrives
       const streamBubble = document.createElement('div');
       streamBubble.className = 'chat-bubble assistant';
       const streamLabel = document.createElement('div');
@@ -760,12 +747,10 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       streamClaude(
         apiKey,
-        // onChunk
         (text) => {
           streamContent.innerHTML = renderMarkdown(text);
           streamBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
         },
-        // onDone
         (fullText) => {
           conversationHistory.push({ role: 'assistant', content: fullText });
           streamContent.innerHTML = renderMarkdown(fullText);
@@ -773,7 +758,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
           sendBtn.disabled = false;
           followUpInput.focus();
         },
-        // onError
         (err, data) => {
           const msg = parseErrorMessage(err, data);
           streamContent.classList.remove('streaming-cursor');
