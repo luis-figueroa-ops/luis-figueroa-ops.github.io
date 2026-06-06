@@ -294,6 +294,18 @@ h1 span { color: var(--gold); }
 
 .api-body { font-size: 17px; color: var(--white); opacity: 0.8; line-height: 1.7; max-width: 640px; }
 
+.api-why {
+  font-size: 16px;
+  color: var(--white);
+  opacity: 0.7;
+  line-height: 1.7;
+  max-width: 640px;
+  font-style: italic;
+  border-left: 2px solid rgba(184,150,62,0.3);
+  padding-left: 14px;
+  margin-top: -4px;
+}
+
 .api-steps {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -478,6 +490,9 @@ footer {
       <p class="api-body">
         The JD Analyzer and AI Role Revealer call Claude directly from your browser. No data is stored, no account is required on this site —
         you just need a free Anthropic API key to power them.
+      </p>
+      <p class="api-why">
+        The tools connect directly to Claude's API from your browser. There's no server in the middle — so you authenticate with your own key. It keeps your data private and means you only pay for what you use.
       </p>
       <div class="api-steps">
         <div class="api-step">
