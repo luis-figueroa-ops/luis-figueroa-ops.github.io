@@ -218,6 +218,7 @@ let score = 0, lives = 3, frame = 0, animId = null;
 let lastLevel = 1;
 const P = { x: W/2, y: H - 80, w: 28, h: 16, speed: 5 };
 let mx = W/2, my = H - 80;
+let mouseMoved = false;
 let keys = {};
 let shieldActive = false, shieldTimer = 0;
 let slowActive = false, slowTimer = 0;
@@ -244,10 +245,20 @@ function isBossLevel(lvl) { return lvl >= 6 && (lvl - 6) % 4 === 0; }
 
 canvas.addEventListener('mousemove', e => {
   const r = canvas.getBoundingClientRect();
-  mx = e.clientX - r.left; my = e.clientY - r.top;
+  mx = e.clientX - r.left;
+  my = e.clientY - r.top;
+  mouseMoved = true;
 });
-document.addEventListener('keydown', e => { keys[e.key] = true; });
+
+// Arrow key fix: prevent page scroll and track key state
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) {
+    e.preventDefault();
+  }
+});
 document.addEventListener('keyup', e => { keys[e.key] = false; });
+
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('player-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') startGame();
@@ -259,7 +270,9 @@ function startGame() {
   shieldActive = false; shieldTimer = 0;
   slowActive = false; slowTimer = 0;
   bossActive = false; boss = null; bossWaveLevel = 0;
-  P.x = W/2; P.y = H-80; mx = W/2;
+  P.x = W/2; P.y = H-80;
+  mx = W/2; my = H-80;
+  mouseMoved = false;
   document.getElementById('boss-bar-wrap').classList.remove('visible');
   document.getElementById('boss-label').classList.remove('visible');
   document.getElementById('overlay-title').textContent = 'DODGE';
@@ -452,15 +465,27 @@ function loop() {
   if (state === 'playing') {
     if (shieldTimer > 0) { shieldTimer--; if (shieldTimer===0) { shieldActive=false; updatePowerupUI(); } }
     if (slowTimer > 0)   { slowTimer--;   if (slowTimer===0)   { slowActive=false;   updatePowerupUI(); } }
-    const dx=mx-P.x, dy=my-P.y, dist=Math.sqrt(dx*dx+dy*dy);
-    if (dist>4) { P.x+=(dx/dist)*Math.min(dist,P.speed*1.4); P.y+=(dy/dist)*Math.min(dist,P.speed*1.4); }
-    if (keys['ArrowLeft']||keys['a'])  P.x-=P.speed;
-    if (keys['ArrowRight']||keys['d']) P.x+=P.speed;
-    if (keys['ArrowUp']||keys['w'])    P.y-=P.speed;
-    if (keys['ArrowDown']||keys['s'])  P.y+=P.speed;
-    P.x=Math.max(P.w/2,Math.min(W-P.w/2,P.x));
-    P.y=Math.max(P.h/2,Math.min(H-P.h/2,P.y));
-    if (frame%getSpawnRate()===0) spawnObstacle();
+
+    // FIX: only apply mouse movement if no arrow/wasd keys are pressed
+    const anyKey = keys['ArrowLeft'] || keys['ArrowRight'] || keys['ArrowUp'] || keys['ArrowDown']
+                || keys['a'] || keys['d'] || keys['w'] || keys['s'];
+    if (!anyKey) {
+      const dx = mx - P.x, dy = my - P.y, dist = Math.sqrt(dx*dx+dy*dy);
+      if (dist > 4) {
+        P.x += (dx/dist) * Math.min(dist, P.speed*1.4);
+        P.y += (dy/dist) * Math.min(dist, P.speed*1.4);
+      }
+    }
+
+    if (keys['ArrowLeft']  || keys['a']) P.x -= P.speed;
+    if (keys['ArrowRight'] || keys['d']) P.x += P.speed;
+    if (keys['ArrowUp']    || keys['w']) P.y -= P.speed;
+    if (keys['ArrowDown']  || keys['s']) P.y += P.speed;
+
+    P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x));
+    P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y));
+
+    if (frame % getSpawnRate() === 0) spawnObstacle();
     score++; updateHUD(); SFX.dodge();
     const lvl = getLevel();
     if (lvl > lastLevel) {
