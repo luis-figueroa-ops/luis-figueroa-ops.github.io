@@ -173,46 +173,49 @@
     }
 
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: #13131e;
+      border: 1px solid #2e2e48;
       padding: 32px;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
       position: relative;
       transition: border-color 0.3s;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.5);
     }
-    .card:focus-within { border-color: var(--border-active); }
+    .card:focus-within { border-color: #5a5aaa; }
 
     .card-label {
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 12px;
+      color: #c8c8f0;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: var(--sans);
+      font-weight: 600;
     }
     .card-label::after {
       content: '';
       flex: 1;
       height: 1px;
-      background: var(--border);
+      background: #2e2e48;
     }
 
     .api-input {
       width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
+      background: #0d0d16;
+      border: 2px solid #2e2e48;
       color: var(--text);
       font-family: var(--mono);
       font-size: 16px;
       padding: 14px 18px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s;
       letter-spacing: 0.03em;
     }
-    .api-input:focus { border-color: var(--accent); }
-    .api-input::placeholder { color: #c0c0e8; }
+    .api-input:focus { border-color: var(--accent); background: #0f0f1c; }
+    .api-input::placeholder { color: #7070aa; }
     .api-note {
       font-size: 14px;
       color: var(--text-muted);
@@ -223,8 +226,8 @@
 
     textarea {
       width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
+      background: #0d0d16;
+      border: 2px solid #2e2e48;
       color: var(--text);
       font-family: var(--mono);
       font-size: 17px;
@@ -233,10 +236,10 @@
       min-height: 150px;
       outline: none;
       line-height: 1.9;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    textarea:focus { border-color: var(--accent); }
-    textarea::placeholder { color: #8888bb; line-height: 1.9; font-size: 16px; }
+    textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,0.15); }
+    textarea::placeholder { color: #6060a0; line-height: 1.9; font-size: 16px; }
 
     .btn-primary {
       background: var(--accent);
@@ -273,10 +276,11 @@
       gap: 10px;
       align-items: center;
       flex-wrap: wrap;
-      margin-top: 24px;
-      padding: 20px 24px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
+      margin-top: 28px;
+      padding: 20px 26px;
+      background: #13131e;
+      border: 1px solid #2e2e48;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
     .action-bar-label {
       font-size: 11px;
@@ -341,17 +345,18 @@
     .insights-header p { color: var(--text-muted); font-size: 16px; }
 
     .insight-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
+      background: #13131e;
+      border: 1px solid #2e2e48;
       border-left: 4px solid var(--accent);
-      padding: 24px 28px;
-      margin-bottom: 14px;
+      padding: 26px 30px;
+      margin-bottom: 16px;
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
       position: relative;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
     }
-    .insight-card:hover { border-left-color: var(--accent3); background: #1a1a28; transform: translateX(4px); }
-    .insight-card.selected { border-left-color: var(--accent3); border-color: rgba(67,232,200,0.4); background: #0f1f1e; }
+    .insight-card:hover { border-left-color: var(--accent3); background: #1c1c2e; transform: translateX(4px); box-shadow: 0 4px 24px rgba(108,99,255,0.15); }
+    .insight-card.selected { border-left-color: var(--accent3); border-color: rgba(67,232,200,0.5); background: #0e1e1c; box-shadow: 0 4px 24px rgba(67,232,200,0.1); }
     .insight-card.has-prompt { border-left-color: var(--accent2); }
     .insight-card.has-prompt.selected { border-left-color: var(--accent3); border-color: rgba(67,232,200,0.4); }
 
@@ -388,10 +393,11 @@
     #step2-section { display: none; }
 
     .step2-intro {
-      background: linear-gradient(135deg, rgba(108,99,255,0.08), rgba(255,101,132,0.05));
-      border: 1px solid rgba(108,99,255,0.2);
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(255,101,132,0.07));
+      border: 1px solid rgba(108,99,255,0.35);
       padding: 28px;
       margin-bottom: 32px;
+      box-shadow: 0 2px 20px rgba(108,99,255,0.1);
     }
     .step2-intro h2 { font-family: var(--sans); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
     .step2-intro p { color: var(--text-muted); font-size: 16px; line-height: 1.9; }
@@ -410,10 +416,11 @@
     }
 
     .insight-switcher {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      padding: 20px 24px;
-      margin-bottom: 28px;
+      background: #13131e;
+      border: 1px solid #2e2e48;
+      padding: 22px 26px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
     }
     .insight-switcher-label {
       font-size: 14px;
@@ -455,16 +462,25 @@
 
     .fields-note {
       font-size: 15px;
-      color: var(--text-dim);
-      margin-bottom: 20px;
-      padding: 14px 18px;
-      border: 1px solid rgba(67,232,200,0.2);
-      background: rgba(67,232,200,0.04);
+      color: #c0c0e8;
+      margin-bottom: 0;
+      padding: 16px 20px;
+      border: 1px solid rgba(67,232,200,0.3);
+      border-bottom: none;
+      background: rgba(67,232,200,0.07);
       line-height: 1.8;
     }
 
     .prompt-pieces { margin-bottom: 24px; }
-    .piece { margin-bottom: 20px; }
+    .piece {
+      margin-bottom: 0;
+      padding: 24px 28px;
+      background: #13131e;
+      border: 1px solid #2e2e48;
+      border-bottom: none;
+    }
+    .piece:first-child { border-radius: 0; }
+    .piece:last-child { border-bottom: 1px solid #2e2e48; margin-bottom: 0; }
     .piece-label {
       font-size: 16px; letter-spacing: 0.06em; text-transform: uppercase;
       color: #b0aaff; margin-bottom: 10px;
@@ -487,17 +503,18 @@
     #prompt-output-section { display: none; }
 
     .prompt-output-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent3);
+      background: #0a0a14;
+      border: 2px solid #2e2e48;
+      border-left: 5px solid var(--accent3);
       padding: 28px;
       font-family: var(--mono);
       font-size: 16px;
       line-height: 2.0;
-      color: var(--text);
+      color: #e8e8ff;
       white-space: pre-wrap;
       word-break: break-word;
       min-height: 120px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(67,232,200,0.08);
     }
 
     /* Multi-prompt summary for print/save */
