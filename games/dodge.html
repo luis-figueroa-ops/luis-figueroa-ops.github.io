@@ -469,21 +469,22 @@ function loop() {
     if (shieldTimer > 0) { shieldTimer--; if (shieldTimer===0) { shieldActive=false; updatePowerupUI(); } }
     if (slowTimer > 0)   { slowTimer--;   if (slowTimer===0)   { slowActive=false;   updatePowerupUI(); } }
 
-    // Only follow mouse if it has actually entered the canvas and no keys are pressed
     const anyKey = keys['ArrowLeft'] || keys['ArrowRight'] || keys['ArrowUp'] || keys['ArrowDown']
                 || keys['a'] || keys['d'] || keys['w'] || keys['s'];
-    if (mouseMoved && !anyKey) {
+
+    if (anyKey) {
+      if (keys['ArrowLeft']  || keys['a']) P.x -= P.speed;
+      if (keys['ArrowRight'] || keys['d']) P.x += P.speed;
+      if (keys['ArrowUp']    || keys['w']) P.y -= P.speed;
+      if (keys['ArrowDown']  || keys['s']) P.y += P.speed;
+      mx = P.x; my = P.y;
+    } else if (mouseMoved) {
       const dx = mx - P.x, dy = my - P.y, dist = Math.sqrt(dx*dx+dy*dy);
       if (dist > 4) {
         P.x += (dx/dist) * Math.min(dist, P.speed*1.4);
         P.y += (dy/dist) * Math.min(dist, P.speed*1.4);
       }
     }
-
-    if (keys['ArrowLeft']  || keys['a']) P.x -= P.speed;
-    if (keys['ArrowRight'] || keys['d']) P.x += P.speed;
-    if (keys['ArrowUp']    || keys['w']) P.y -= P.speed;
-    if (keys['ArrowDown']  || keys['s']) P.y += P.speed;
 
     P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x));
     P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y));
