@@ -245,9 +245,14 @@ function isBossLevel(lvl) { return lvl >= 6 && (lvl - 6) % 4 === 0; }
 
 canvas.addEventListener('mousemove', e => {
   const r = canvas.getBoundingClientRect();
-  mx = e.clientX - r.left;
-  my = e.clientY - r.top;
-  mouseMoved = true;
+  const newMx = e.clientX - r.left;
+  const newMy = e.clientY - r.top;
+  // Only update if the mouse actually moved meaningfully
+  if (Math.abs(newMx - mx) > 1 || Math.abs(newMy - my) > 1) {
+    mx = newMx;
+    my = newMy;
+    mouseMoved = true;
+  }
 });
 canvas.addEventListener('mouseleave', () => {
   mouseMoved = false;
@@ -485,6 +490,8 @@ function loop() {
         P.y += (dy/dist) * Math.min(dist, P.speed*1.4);
       }
     }
+    // Reset each frame — mouse only moves ship while cursor is actively moving
+    mouseMoved = false;
 
     P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x));
     P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y));
