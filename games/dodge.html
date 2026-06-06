@@ -249,6 +249,9 @@ canvas.addEventListener('mousemove', e => {
   my = e.clientY - r.top;
   mouseMoved = true;
 });
+canvas.addEventListener('mouseleave', () => {
+  mouseMoved = false;
+});
 
 // Arrow key fix: prevent page scroll and track key state
 document.addEventListener('keydown', e => {
@@ -466,10 +469,10 @@ function loop() {
     if (shieldTimer > 0) { shieldTimer--; if (shieldTimer===0) { shieldActive=false; updatePowerupUI(); } }
     if (slowTimer > 0)   { slowTimer--;   if (slowTimer===0)   { slowActive=false;   updatePowerupUI(); } }
 
-    // FIX: only apply mouse movement if no arrow/wasd keys are pressed
+    // Only follow mouse if it has actually entered the canvas and no keys are pressed
     const anyKey = keys['ArrowLeft'] || keys['ArrowRight'] || keys['ArrowUp'] || keys['ArrowDown']
                 || keys['a'] || keys['d'] || keys['w'] || keys['s'];
-    if (!anyKey) {
+    if (mouseMoved && !anyKey) {
       const dx = mx - P.x, dy = my - P.y, dist = Math.sqrt(dx*dx+dy*dy);
       if (dist > 4) {
         P.x += (dx/dist) * Math.min(dist, P.speed*1.4);
