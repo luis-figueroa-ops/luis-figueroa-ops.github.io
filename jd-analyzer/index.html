@@ -225,6 +225,7 @@
     .chat-input-row {
       display: flex;
       gap: 10px;
+      margin-bottom: 16px;
     }
 
     .chat-input-row input { flex: 1; }
@@ -244,6 +245,14 @@
 
     .send-btn:hover:not(:disabled) { background-color: #d4a94a; }
     .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Bottom action buttons - sits below chat input */
+    .bottom-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
 
     .error {
       background-color: #3d1f1f;
@@ -290,7 +299,7 @@
 
       .header, .card, #analyzeBtn, .loading,
       .error, .action-buttons, .chat-input-row,
-      .chat-divider, .footer { display: none !important; }
+      .bottom-actions, .chat-divider, .footer { display: none !important; }
 
       .output {
         display: block !important;
@@ -310,7 +319,6 @@
       .output p, .output ul, .output li { color: #000000; }
       .output strong { color: #000000; }
 
-      /* Print the chat conversation too */
       .chat-section {
         display: block !important;
         margin-top: 30px;
@@ -379,8 +387,8 @@
     <div class="output" id="output">
       <div id="outputContent"></div>
       <div class="action-buttons">
-        <button class="action-btn" id="copyBtn">Copy Full Conversation</button>
-        <button class="action-btn" id="printBtn">Print / Save as PDF</button>
+        <button class="action-btn" id="copyBtnTop">Copy Full Conversation</button>
+        <button class="action-btn" id="printBtnTop">Print / Save as PDF</button>
       </div>
     </div>
 
@@ -390,6 +398,10 @@
       <div class="chat-input-row">
         <input type="text" id="followUpInput" placeholder="Ask anything about this role..." />
         <button class="send-btn" id="sendBtn">Send</button>
+      </div>
+      <div class="bottom-actions">
+        <button class="action-btn" id="copyBtnBottom">Copy Full Conversation</button>
+        <button class="action-btn" id="printBtnBottom">Print / Save as PDF</button>
       </div>
     </div>
 
@@ -411,8 +423,10 @@
     const outputContent = document.getElementById('outputContent');
     const errorBox = document.getElementById('errorBox');
     const loading = document.getElementById('loading');
-    const copyBtn = document.getElementById('copyBtn');
-    const printBtn = document.getElementById('printBtn');
+    const copyBtnTop = document.getElementById('copyBtnTop');
+    const printBtnTop = document.getElementById('printBtnTop');
+    const copyBtnBottom = document.getElementById('copyBtnBottom');
+    const printBtnBottom = document.getElementById('printBtnBottom');
     const chatSection = document.getElementById('chatSection');
     const chatMessages = document.getElementById('chatMessages');
     const followUpInput = document.getElementById('followUpInput');
@@ -462,12 +476,10 @@
       return bubble;
     }
 
-    // Copy grabs the full conversation - original analysis + all chat bubbles
-    copyBtn.addEventListener('click', () => {
+    function getFullConversationText() {
       const analysisText = outputContent.innerText;
       const chatBubbles = chatMessages.querySelectorAll('.chat-bubble:not(.thinking)');
       let fullText = 'JD ANALYSIS\n\n' + analysisText;
-
       if (chatBubbles.length > 0) {
         fullText += '\n\n--- FOLLOW-UP CONVERSATION ---\n\n';
         chatBubbles.forEach(bubble => {
@@ -476,18 +488,24 @@
           fullText += label + ':\n' + content + '\n\n';
         });
       }
+      return fullText;
+    }
 
-      navigator.clipboard.writeText(fullText).then(() => {
-        copyBtn.textContent = 'Copied!';
-        copyBtn.classList.add('copied');
+    function handleCopy(btn) {
+      navigator.clipboard.writeText(getFullConversationText()).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
         setTimeout(() => {
-          copyBtn.textContent = 'Copy Full Conversation';
-          copyBtn.classList.remove('copied');
+          btn.textContent = 'Copy Full Conversation';
+          btn.classList.remove('copied');
         }, 2000);
       });
-    });
+    }
 
-    printBtn.addEventListener('click', () => { window.print(); });
+    copyBtnTop.addEventListener('click', () => handleCopy(copyBtnTop));
+    copyBtnBottom.addEventListener('click', () => handleCopy(copyBtnBottom));
+    printBtnTop.addEventListener('click', () => window.print());
+    printBtnBottom.addEventListener('click', () => window.print());
 
     const SYSTEM_PROMPT = `You are an experienced operations professional who reads job descriptions with a sharp, structured eye. Your job is to give candidates an honest, specific read on what a role actually is - cutting through vague language to identify what's really being asked for, who will actually succeed here, and what questions to ask.
 
@@ -590,14 +608,12 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       conversationHistory.push({ role: 'user', content: userMessage });
       addChatBubble('user', userMessage);
 
-      // Show thinking indicator immediately
       const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
 
       try {
         const result = await callClaude(apiKey);
         conversationHistory.push({ role: 'assistant', content: result });
 
-        // Replace thinking bubble with real response
         thinkingBubble.className = 'chat-bubble assistant';
         thinkingBubble.querySelector('.bubble-label').textContent = 'Analysis';
         thinkingBubble.querySelector('div:last-child').innerHTML = renderMarkdown(result);
