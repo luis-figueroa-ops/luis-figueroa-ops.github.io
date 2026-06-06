@@ -523,12 +523,15 @@ function loop() {
       if(keys['ArrowDown'] ||keys['s']) P.y+=P.speed;
       mx=P.x; my=P.y;
     } else if(touchActive){
-      // Touch — move toward finger position continuously
+      // Speed scales with distance — close to finger = slow, far = full speed
+      // This makes held-down and tap-and-lift feel identical
       const dx=touchX-P.x, dy=touchY-P.y;
       const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist>3){
-        P.x+=(dx/dist)*Math.min(dist,P.speed*1.8);
-        P.y+=(dy/dist)*Math.min(dist,P.speed*1.8);
+      if(dist>2){
+        const speedScale=Math.min(dist/60,1);
+        const move=P.speed*1.8*speedScale;
+        P.x+=(dx/dist)*Math.min(dist,move);
+        P.y+=(dy/dist)*Math.min(dist,move);
       }
     } else if(mouseMoved){
       // Mouse
