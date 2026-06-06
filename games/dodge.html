@@ -274,9 +274,9 @@ const P = { x:W/2, y:H-80, w:28, h:16, speed:5 };
 // Mouse
 let mx = W/2, my = H-80, mouseMoved = false;
 
-// Touch: continuously updated finger position in game coords
+// Touch: direct drag
 let touchActive = false;
-let touchX = W/2, touchY = H-80;
+let lastTouchX = 0, lastTouchY = 0;
 
 let keys = {};
 let shieldActive=false, shieldTimer=0;
@@ -324,27 +324,40 @@ document.addEventListener('keydown', e=>{
 });
 document.addEventListener('keyup', e=>{ keys[e.key]=false; });
 
-// ─── Touch input: tap AND drag both work ──────────────────────────────────────
-function handleTouch(e) {
+// ─── Touch input: direct drag — finger movement = ship movement ───────────────
+let touchActive = false;
+let lastTouchX = 0, lastTouchY = 0;
+
+canvas.addEventListener('touchstart', e => {
   e.preventDefault();
   if (state !== 'playing') return;
-  const t = e.touches[0];
-  const p = screenToGame(t.clientX, t.clientY);
-  touchX = p.x;
-  touchY = p.y;
+  const p = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
+  lastTouchX = p.x;
+  lastTouchY = p.y;
   touchActive = true;
   mouseMoved = false;
-}
-canvas.addEventListener('touchstart', handleTouch, { passive:false });
-canvas.addEventListener('touchmove',  handleTouch, { passive:false });
-canvas.addEventListener('touchend', e=>{
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (state !== 'playing' || !touchActive) return;
+  const p = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
+  // Ship moves by the exact delta your finger moved — instant, no chasing
+  P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x + (p.x - lastTouchX)));
+  P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y + (p.y - lastTouchY)));
+  lastTouchX = p.x;
+  lastTouchY = p.y;
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
   e.preventDefault();
   touchActive = false;
-}, { passive:false });
-canvas.addEventListener('touchcancel', e=>{
+}, { passive: false });
+
+canvas.addEventListener('touchcancel', e => {
   e.preventDefault();
   touchActive = false;
-}, { passive:false });
+}, { passive: false });
 
 // ─── Buttons ──────────────────────────────────────────────────────────────────
 document.getElementById('start-btn').addEventListener('click', startGame);
@@ -359,7 +372,7 @@ function startGame() {
   bossActive=false; boss=null; bossWaveLevel=0;
   P.x=W/2; P.y=H-80;
   mx=W/2; my=H-80; mouseMoved=false;
-  touchActive=false; touchX=W/2; touchY=H-80;
+  touchActive=false; lastTouchX=0; lastTouchY=0;
   document.getElementById('boss-bar-wrap').classList.remove('visible');
   document.getElementById('boss-label').classList.remove('visible');
   document.getElementById('overlay-title').textContent='DODGE';
@@ -522,17 +535,6 @@ function loop() {
       if(keys['ArrowUp']   ||keys['w']) P.y-=P.speed;
       if(keys['ArrowDown'] ||keys['s']) P.y+=P.speed;
       mx=P.x; my=P.y;
-    } else if(touchActive){
-      // Speed scales with distance — close to finger = slow, far = full speed
-      // This makes held-down and tap-and-lift feel identical
-      const dx=touchX-P.x, dy=touchY-P.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist>2){
-        const speedScale=Math.min(dist/60,1);
-        const move=P.speed*1.8*speedScale;
-        P.x+=(dx/dist)*Math.min(dist,move);
-        P.y+=(dy/dist)*Math.min(dist,move);
-      }
     } else if(mouseMoved){
       // Mouse
       const dx=mx-P.x, dy=my-P.y, dist=Math.sqrt(dx*dx+dy*dy);
@@ -632,17 +634,8 @@ function loop() {
     ctx.stroke();
   }
 
-  // Touch target ring
-  if(state==='playing'&&touchActive){
-    ctx.strokeStyle='rgba(0,255,231,0.6)';ctx.lineWidth=2;
-    ctx.setLineDash([5,5]);
-    ctx.beginPath();ctx.arc(touchX,touchY,16,0,Math.PI*2);ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='rgba(0,255,231,0.7)';
-    ctx.beginPath();ctx.arc(touchX,touchY,3,0,Math.PI*2);ctx.fill();
-  }
   // Mouse cursor
-  if(state==='playing'&&!touchActive){
+  if(state==='playing'){
     ctx.strokeStyle='rgba(0,255,231,0.35)';ctx.lineWidth=1;
     ctx.beginPath();ctx.arc(mx,my,10,0,Math.PI*2);ctx.stroke();
     ctx.fillStyle='rgba(0,255,231,0.8)';
