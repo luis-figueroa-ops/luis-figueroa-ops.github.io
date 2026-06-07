@@ -14,13 +14,9 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #0d0d18; --accent: #00ffe7; --danger: #ff2d55;
-    --warn: #ffcc00; --text: #e0e0ff;
-  }
+  :root { --bg: #0d0d18; --accent: #00ffe7; --danger: #ff2d55; --warn: #ffcc00; --text: #e0e0ff; }
   html, body {
-    width: 100%; height: 100%;
-    background: #16162a; color: var(--text);
+    width: 100%; height: 100%; background: #16162a; color: var(--text);
     font-family: 'Share Tech Mono', monospace;
     overflow: hidden; user-select: none; touch-action: none; position: fixed;
   }
@@ -141,7 +137,7 @@
         <div id="lb-rows"></div>
       </div>
       <button id="start-btn">PLAY</button>
-      <div id="tip" id="tip">MOUSE, ARROW KEYS, or DRAG to move</div>
+      <div id="tip">MOUSE, ARROW KEYS, or DRAG to move</div>
       <div id="tip2">🛡️ SHIELD - blocks one hit &nbsp;|&nbsp; ⏱️ SLOW-MO - halves speed</div>
     </div>
     <div id="level-flash"></div>
@@ -153,8 +149,8 @@
 const GW = 480, GH = 580;
 
 // ─── Device detection ─────────────────────────────────────────────────────────
-// True if this is a touch-primary device (phone/tablet)
-const isMobile = ('ontouchstart' in window) && (window.innerWidth <= 900);
+// Use touch capability only — NOT screen width, which misdetects laptops
+const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
 // ─── Canvas setup ─────────────────────────────────────────────────────────────
 const canvas  = document.getElementById('canvas');
@@ -163,27 +159,29 @@ const wrapper = document.getElementById('game-wrapper');
 const hudEl   = document.getElementById('hud');
 const bbWrap  = document.getElementById('boss-bar-wrap');
 
-// Internal resolution is always 480x580.
-// On desktop: canvas renders at exactly 480x580 CSS px (no scaling).
-// On mobile:  canvas shrinks to fit the screen.
 canvas.width  = GW;
 canvas.height = GH;
 
+// canvasScale tracks how many CSS px = 1 game px (used for touch delta correction)
+let canvasScale = 1;
+
 function resize() {
   if (isMobile) {
+    // Mobile: shrink to fit the screen
     const availW = window.innerWidth  - 4;
     const availH = window.innerHeight - 4;
     const extraH = 70; // hud + boss bar + gaps
-    const scale  = Math.min(availW / GW, (availH - extraH) / GH);
-    const cw = Math.floor(GW * scale);
-    const ch = Math.floor(GH * scale);
+    canvasScale  = Math.min(availW / GW, (availH - extraH) / GH);
+    const cw = Math.floor(GW * canvasScale);
+    const ch = Math.floor(GH * canvasScale);
     canvas.style.width  = cw + 'px';
     canvas.style.height = ch + 'px';
     hudEl.style.width   = cw + 'px';
     bbWrap.style.width  = cw + 'px';
     wrapper.style.width = cw + 'px';
   } else {
-    // Desktop: always full native size, no scaling
+    // Desktop: always native 480x580, no scaling ever
+    canvasScale = 1;
     canvas.style.width  = GW + 'px';
     canvas.style.height = GH + 'px';
     hudEl.style.width   = GW + 'px';
@@ -194,7 +192,7 @@ function resize() {
 resize();
 window.addEventListener('resize', resize);
 
-// Convert a screen clientX/Y into internal game coordinates
+// Convert screen clientX/Y to internal game coordinates
 function screenToGame(clientX, clientY) {
   const r = canvas.getBoundingClientRect();
   return {
@@ -253,22 +251,25 @@ function renderLB(entries, newScore) {
   });
 }
 
-// ─── Game state (each variable declared exactly once) ─────────────────────────
+// ─── Game state ───────────────────────────────────────────────────────────────
 const W = GW, H = GH;
 let state    = 'idle';
 let score    = 0, lives = 3, frame = 0, animId = null, lastLevel = 1;
 const P      = { x:W/2, y:H-80, w:28, h:16, speed:5 };
 
-// Mouse input
+// Mouse
 let mx = W/2, my = H-80, mouseMoved = false;
 
-// Touch input (drag-to-move: delta-based, not target-chasing)
-let touchActive = false, lastTouchX = 0, lastTouchY = 0;
+// Touch — store raw screen coords; delta computed in screen space then divided by canvasScale
+let touchActive = false, lastTouchScreenX = 0, lastTouchScreenY = 0;
 
 let keys = {};
 let shieldActive = false, shieldTimer = 0;
 let slowActive   = false, slowTimer   = 0;
 let powerups = [], obstacles = [];
+
+// Score per level threshold — raised to 600 so each level takes ~10 seconds at 60fps
+const SCORE_PER_LEVEL = 600;
 let baseSpeed = 1.6, spawnRate = 52;
 let bossActive = false, boss = null, bossHP = 0, bossMaxHP = 0, bossWaveLevel = 0;
 let particles = [];
@@ -279,7 +280,7 @@ let stars = Array.from({length:60}, () => ({
 let gridOffset = 0;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function getLevel()         { return Math.floor(score/250)+1; }
+function getLevel()         { return Math.floor(score/SCORE_PER_LEVEL)+1; }
 function getSpeedMult()     { return slowActive ? 0.45 : 1; }
 function getObstacleSpeed() { return (baseSpeed+(getLevel()-1)*0.28)*getSpeedMult(); }
 function getSpawnRate()     { return Math.max(18, spawnRate-(getLevel()-1)*2); }
@@ -287,7 +288,7 @@ function isBossLevel(l)     { return l>=6 && (l-6)%4===0; }
 
 // ─── Mouse input ──────────────────────────────────────────────────────────────
 canvas.addEventListener('mousemove', e => {
-  if (isMobile) return; // ignore mouse events on touch devices
+  if (isMobile) return;
   const p = screenToGame(e.clientX, e.clientY);
   if (Math.abs(p.x-mx)>1 || Math.abs(p.y-my)>1) { mx=p.x; my=p.y; mouseMoved=true; }
 });
@@ -300,23 +301,31 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('keyup', e => { keys[e.key] = false; });
 
-// ─── Touch input: drag to move (delta-based, instant response) ────────────────
+// ─── Touch input ──────────────────────────────────────────────────────────────
+// Delta is computed in raw screen pixels then divided by canvasScale to get game pixels.
+// This prevents speed amplification caused by the canvas being scaled down on mobile.
 if (isMobile) {
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
     if (state !== 'playing') return;
-    const p = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
-    lastTouchX = p.x; lastTouchY = p.y;
-    touchActive = true; mouseMoved = false;
+    lastTouchScreenX = e.touches[0].clientX;
+    lastTouchScreenY = e.touches[0].clientY;
+    touchActive = true;
+    mouseMoved  = false;
   }, { passive: false });
 
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
     if (state !== 'playing' || !touchActive) return;
-    const p = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
-    P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x + (p.x - lastTouchX)));
-    P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y + (p.y - lastTouchY)));
-    lastTouchX = p.x; lastTouchY = p.y;
+    const tx = e.touches[0].clientX;
+    const ty = e.touches[0].clientY;
+    // Delta in screen pixels / canvasScale = delta in game pixels (1:1 finger-to-ship)
+    const dx = (tx - lastTouchScreenX) / canvasScale;
+    const dy = (ty - lastTouchScreenY) / canvasScale;
+    P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x + dx));
+    P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y + dy));
+    lastTouchScreenX = tx;
+    lastTouchScreenY = ty;
   }, { passive: false });
 
   canvas.addEventListener('touchend',    e => { e.preventDefault(); touchActive = false; }, { passive: false });
@@ -334,7 +343,7 @@ function startGame() {
   shieldActive=false; shieldTimer=0; slowActive=false; slowTimer=0;
   bossActive=false; boss=null; bossWaveLevel=0;
   P.x=W/2; P.y=H-80; mx=W/2; my=H-80; mouseMoved=false;
-  touchActive=false; lastTouchX=0; lastTouchY=0;
+  touchActive=false; lastTouchScreenX=0; lastTouchScreenY=0;
   document.getElementById('boss-bar-wrap').classList.remove('visible');
   document.getElementById('boss-label').classList.remove('visible');
   document.getElementById('overlay-title').textContent='DODGE';
@@ -377,7 +386,8 @@ function spawnPowerup(x, y) {
 function spawnParticles(x, y, color, n=12) {
   for (let i=0;i<n;i++) {
     const a=(Math.PI*2*i)/n+Math.random()*0.4, spd=2+Math.random()*4;
-    particles.push({ x,y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, life:1, decay:0.04+Math.random()*0.04, r:2+Math.random()*3, color });
+    particles.push({ x,y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd,
+      life:1, decay:0.04+Math.random()*0.04, r:2+Math.random()*3, color });
   }
 }
 function getBossWaveNum(l) { return Math.floor((l-6)/4)+1; }
@@ -385,7 +395,8 @@ function spawnBoss(level) {
   bossActive=true;
   const wn=getBossWaveNum(level);
   bossHP=bossMaxHP=6+wn*3;
-  boss={ x:W/2-40, y:60, w:80+wn*6, h:30+wn*4, vx:1.8+wn*0.9, vy:0, phase:0, shootTimer:0, waveNum:wn, projectiles:[] };
+  boss={ x:W/2-40,y:60,w:80+wn*6,h:30+wn*4,vx:1.8+wn*0.9,vy:0,
+         phase:0,shootTimer:0,waveNum:wn,projectiles:[] };
   document.getElementById('boss-bar-wrap').classList.add('visible');
   document.getElementById('boss-label').classList.add('visible');
   document.getElementById('boss-label').textContent = wn>=3?`⚠ BOSS WAVE ${wn} — ELITE`:`⚠ BOSS WAVE ${wn}`;
@@ -394,7 +405,7 @@ function spawnBoss(level) {
 function updateBoss() {
   if (!boss) return;
   boss.x += boss.vx*getSpeedMult();
-  if (boss.x<=0||boss.x+boss.w>=W) { boss.vx*=-1; boss.x=Math.max(0,Math.min(W-boss.w,boss.x)); }
+  if (boss.x<=0||boss.x+boss.w>=W){boss.vx*=-1;boss.x=Math.max(0,Math.min(W-boss.w,boss.x));}
   boss.phase+=0.03; boss.y=60+Math.sin(boss.phase)*20;
   boss.shootTimer++;
   const wn=boss.waveNum||1, si=Math.max(20,60-wn*8);
@@ -407,31 +418,31 @@ function updateBoss() {
   }
   boss.projectiles=boss.projectiles.filter(p=>{
     p.x+=p.vx; p.y+=p.vy;
-    if (state==='playing'){const dx=p.x-P.x,dy=p.y-P.y;if(Math.sqrt(dx*dx+dy*dy)<p.r+8){handlePlayerHit();return false;}}
+    if(state==='playing'){const dx=p.x-P.x,dy=p.y-P.y;if(Math.sqrt(dx*dx+dy*dy)<p.r+8){handlePlayerHit();return false;}}
     return p.y<H+20;
   });
   document.getElementById('boss-bar').style.width=(bossHP/bossMaxHP*100)+'%';
-  if (state==='playing'&&P.x+P.w/2>boss.x&&P.x-P.w/2<boss.x+boss.w&&P.y+P.h/2>boss.y&&P.y-P.h/2<boss.y+boss.h) handlePlayerHit();
+  if(state==='playing'&&P.x+P.w/2>boss.x&&P.x-P.w/2<boss.x+boss.w&&P.y+P.h/2>boss.y&&P.y-P.h/2<boss.y+boss.h) handlePlayerHit();
 }
 function drawBoss() {
   if (!boss) return;
   ctx.fillStyle=`rgba(255,45,85,${0.75+Math.sin(frame*0.12)*0.25})`; ctx.shadowColor='#ff2d55'; ctx.shadowBlur=20;
   ctx.fillRect(boss.x,boss.y,boss.w,boss.h);
   ctx.fillStyle='#fff'; ctx.shadowBlur=8;
-  ctx.beginPath(); ctx.arc(boss.x+boss.w/2,boss.y+boss.h/2,8,0,Math.PI*2); ctx.fill();
+  ctx.beginPath();ctx.arc(boss.x+boss.w/2,boss.y+boss.h/2,8,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#ff2d55';
-  ctx.beginPath(); ctx.arc(boss.x+boss.w/2,boss.y+boss.h/2,4,0,Math.PI*2); ctx.fill();
+  ctx.beginPath();ctx.arc(boss.x+boss.w/2,boss.y+boss.h/2,4,0,Math.PI*2);ctx.fill();
   ctx.shadowBlur=0;
   boss.projectiles.forEach(p=>{
-    ctx.fillStyle='#ff8c00'; ctx.shadowColor='#ff8c00'; ctx.shadowBlur=12;
-    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.fillStyle='#ff8c00';ctx.shadowColor='#ff8c00';ctx.shadowBlur=12;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
   });
 }
 function checkAABB(ax,ay,aw,ah,bx,by,bw,bh){return ax<bx+bw&&ax+aw>bx&&ay<by+bh&&ay+ah>by;}
 function handlePlayerHit() {
-  if (shieldActive){shieldActive=false;shieldTimer=0;updatePowerupUI();SFX.shield();spawnParticles(P.x,P.y,'#4488ff',20);return;}
+  if(shieldActive){shieldActive=false;shieldTimer=0;updatePowerupUI();SFX.shield();spawnParticles(P.x,P.y,'#4488ff',20);return;}
   lives--; SFX.hit(); spawnParticles(P.x,P.y,'#ff2d55',16); updateHUD();
-  if (lives<=0){state='dead';SFX.die();spawnParticles(P.x,P.y,'#ff2d55',35);setTimeout(showGameOver,800);}
+  if(lives<=0){state='dead';SFX.die();spawnParticles(P.x,P.y,'#ff2d55',35);setTimeout(showGameOver,800);}
 }
 function checkPickup(pu){const dx=pu.x-P.x,dy=pu.y-P.y;return Math.sqrt(dx*dx+dy*dy)<pu.r+16;}
 
@@ -455,7 +466,8 @@ function loop() {
     if(shieldTimer>0){shieldTimer--;if(shieldTimer===0){shieldActive=false;updatePowerupUI();}}
     if(slowTimer>0){slowTimer--;if(slowTimer===0){slowActive=false;updatePowerupUI();}}
 
-    const anyKey=keys['ArrowLeft']||keys['ArrowRight']||keys['ArrowUp']||keys['ArrowDown']||keys['a']||keys['d']||keys['w']||keys['s'];
+    const anyKey=keys['ArrowLeft']||keys['ArrowRight']||keys['ArrowUp']||keys['ArrowDown']
+               ||keys['a']||keys['d']||keys['w']||keys['s'];
     if (anyKey) {
       if(keys['ArrowLeft'] ||keys['a']) P.x-=P.speed;
       if(keys['ArrowRight']||keys['d']) P.x+=P.speed;
@@ -463,11 +475,10 @@ function loop() {
       if(keys['ArrowDown'] ||keys['s']) P.y+=P.speed;
       mx=P.x; my=P.y;
     } else if (!isMobile && mouseMoved) {
-      // Mouse only on desktop
       const dx=mx-P.x, dy=my-P.y, dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist>4){ P.x+=(dx/dist)*Math.min(dist,P.speed*1.4); P.y+=(dy/dist)*Math.min(dist,P.speed*1.4); }
+      if(dist>4){P.x+=(dx/dist)*Math.min(dist,P.speed*1.4);P.y+=(dy/dist)*Math.min(dist,P.speed*1.4);}
     }
-    // Touch movement is handled directly in touchmove event (delta-based)
+    // Touch movement handled directly in touchmove (delta in screen px / canvasScale)
     mouseMoved=false;
 
     P.x=Math.max(P.w/2,Math.min(W-P.w/2,P.x));
@@ -494,7 +505,7 @@ function loop() {
       ctx.fillRect(-obs.w*0.35,-obs.h*0.35,obs.w*0.7,obs.h*0.7);ctx.restore();
     } else { ctx.fillRect(obs.x,obs.y,obs.w,obs.h); }
     ctx.shadowBlur=0;
-    const pw=P.w*0.7,ph=P.h*0.7;
+    const pw=P.w*0.7, ph=P.h*0.7;
     if(state==='playing'&&checkAABB(P.x-pw/2,P.y-ph/2,pw,ph,obs.x,obs.y,obs.w,obs.h)){handlePlayerHit();return false;}
     return obs.y<H+20;
   });
@@ -543,7 +554,7 @@ function loop() {
     ctx.beginPath();ctx.moveTo(px-5,py+P.h/2);ctx.lineTo(px,py+P.h/2+6+Math.sin(frame*0.5)*4);ctx.lineTo(px+5,py+P.h/2);ctx.stroke();
   }
 
-  // Mouse cursor (desktop only)
+  // Mouse cursor — desktop only
   if(state==='playing'&&!isMobile){
     ctx.strokeStyle='rgba(0,255,231,0.35)';ctx.lineWidth=1;
     ctx.beginPath();ctx.arc(mx,my,10,0,Math.PI*2);ctx.stroke();
