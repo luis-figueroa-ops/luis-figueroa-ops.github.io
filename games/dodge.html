@@ -307,16 +307,18 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keyup', e => { keys[e.key] = false; });
 
 // ─── Touch input ──────────────────────────────────────────────────────────────
-// Direct positioning: ship goes exactly where your finger is.
-// No delta accumulation, no dependence on event frequency or canvasScale changes.
+// Finger position stored in game coords. Ship moves toward it each frame in the
+// game loop, capped at the same rate as desktop: Math.min(dist, P.speed * 1.4)
+let touchTargetX = 0, touchTargetY = 0;
+
 if (isMobile) {
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
     touchInProgress = true;
     if (state !== 'playing') return;
     const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
-    P.x = Math.max(P.w/2, Math.min(W-P.w/2, pos.x));
-    P.y = Math.max(P.h/2, Math.min(H-P.h/2, pos.y));
+    touchTargetX = pos.x;
+    touchTargetY = pos.y;
     touchActive = true;
     mouseMoved  = false;
   }, { passive: false });
@@ -325,8 +327,8 @@ if (isMobile) {
     e.preventDefault();
     if (state !== 'playing' || !touchActive) return;
     const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
-    P.x = Math.max(P.w/2, Math.min(W-P.w/2, pos.x));
-    P.y = Math.max(P.h/2, Math.min(H-P.h/2, pos.y));
+    touchTargetX = pos.x;
+    touchTargetY = pos.y;
   }, { passive: false });
 
   canvas.addEventListener('touchend', e => {
@@ -353,7 +355,7 @@ function startGame() {
   shieldActive=false; shieldTimer=0; slowActive=false; slowTimer=0;
   bossActive=false; boss=null; bossWaveLevel=0;
   P.x=W/2; P.y=H-80; mx=W/2; my=H-80; mouseMoved=false;
-  touchActive=false; touchInProgress=false;
+  touchActive=false; touchInProgress=false; touchTargetX=W/2; touchTargetY=H-80;
   document.getElementById('boss-bar-wrap').classList.remove('visible');
   document.getElementById('boss-label').classList.remove('visible');
   document.getElementById('overlay-title').textContent='DODGE';
@@ -486,6 +488,10 @@ function loop() {
       mx=P.x; my=P.y;
     } else if (!isMobile && mouseMoved) {
       const dx=mx-P.x, dy=my-P.y, dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist>4){P.x+=(dx/dist)*Math.min(dist,P.speed*1.4);P.y+=(dy/dist)*Math.min(dist,P.speed*1.4);}
+    } else if (isMobile && touchActive) {
+      // Same speed cap as desktop mouse — ship moves toward finger, never exceeds P.speed*1.4
+      const dx=touchTargetX-P.x, dy=touchTargetY-P.y, dist=Math.sqrt(dx*dx+dy*dy);
       if(dist>4){P.x+=(dx/dist)*Math.min(dist,P.speed*1.4);P.y+=(dy/dist)*Math.min(dist,P.speed*1.4);}
     }
     // Touch movement handled directly in touchmove (delta in screen px / canvasScale)
