@@ -186,23 +186,22 @@ const bossBarWrap = document.getElementById('boss-bar-wrap');
 let scale = 1; // CSS pixels per game pixel
 
 function resize() {
-  // Available space: full viewport minus a small margin
   const maxW = window.innerWidth - 8;
   const maxH = window.innerHeight - 8;
+  const hudH = 88; // hud + boss bar + gaps
+  const totalH = GH + hudH;
 
-  // HUD takes about 50px at scale=1, boss bar about 18px, gaps about 20px
-  const hudH = 50 + 18 + 20;
-
+  // Only scale down if the screen is too small — never scale up
   const scaleX = maxW / GW;
-  const scaleY = maxH / (GH + hudH);
-  scale = Math.min(scaleX, scaleY, 1); // cap at 1 on large screens
+  const scaleY = maxH / totalH;
+  scale = Math.min(scaleX, scaleY, 1);
 
   const cw = Math.floor(GW * scale);
   const ch = Math.floor(GH * scale);
 
   canvas.style.width  = cw + 'px';
   canvas.style.height = ch + 'px';
-  canvas.width  = GW;  // internal resolution always 480x580
+  canvas.width  = GW;
   canvas.height = GH;
 
   wrapper.style.width = cw + 'px';
@@ -325,9 +324,6 @@ document.addEventListener('keydown', e=>{
 document.addEventListener('keyup', e=>{ keys[e.key]=false; });
 
 // ─── Touch input: direct drag — finger movement = ship movement ───────────────
-let touchActive = false;
-let lastTouchX = 0, lastTouchY = 0;
-
 canvas.addEventListener('touchstart', e => {
   e.preventDefault();
   if (state !== 'playing') return;
