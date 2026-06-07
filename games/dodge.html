@@ -149,8 +149,7 @@
 const GW = 480, GH = 580;
 
 // ─── Device detection ─────────────────────────────────────────────────────────
-// pointer:coarse = finger/stylus (phone/tablet). pointer:fine = mouse (laptop/desktop).
-// This is the correct way to distinguish — touchscreen laptops have pointer:fine.
+// pointer:coarse = touch primary device. pointer:fine = mouse primary device.
 const isMobile = window.matchMedia('(pointer: coarse)').matches;
 
 // ─── Canvas setup ─────────────────────────────────────────────────────────────
@@ -163,35 +162,37 @@ const bbWrap  = document.getElementById('boss-bar-wrap');
 canvas.width  = GW;
 canvas.height = GH;
 
-// canvasScale tracks how many CSS px = 1 game px (used for touch delta correction)
-let canvasScale = 1;
+// cssToGame: how many game pixels per CSS pixel (inverse of visual scale)
+// Used to convert touch deltas correctly
+let cssToGame = 1;
 
 function resize() {
-  if (isMobile) {
-    // Mobile: shrink to fit the screen
-    const availW = window.innerWidth  - 4;
-    const availH = window.innerHeight - 4;
-    const extraH = 70; // hud + boss bar + gaps
-    canvasScale  = Math.min(availW / GW, (availH - extraH) / GH);
-    const cw = Math.floor(GW * canvasScale);
-    const ch = Math.floor(GH * canvasScale);
-    canvas.style.width  = cw + 'px';
-    canvas.style.height = ch + 'px';
-    hudEl.style.width   = cw + 'px';
-    bbWrap.style.width  = cw + 'px';
-    wrapper.style.width = cw + 'px';
-  } else {
-    // Desktop: always native 480x580, no scaling ever
-    canvasScale = 1;
-    canvas.style.width  = GW + 'px';
-    canvas.style.height = GH + 'px';
-    hudEl.style.width   = GW + 'px';
-    bbWrap.style.width  = GW + 'px';
-    wrapper.style.width = GW + 'px';
-  }
+  const availW = window.innerWidth  - 4;
+  const availH = window.innerHeight - 4;
+  const extraH = 70;
+
+  // Calculate what scale would be needed to fit
+  const fitScale = Math.min(availW / GW, (availH - extraH) / GH);
+
+  // Desktop (mouse): never scale below 1, never scale at all
+  // Mobile (touch): scale to fit screen
+  const scale = isMobile ? fitScale : 1;
+
+  const cw = Math.floor(GW * scale);
+  const ch = Math.floor(GH * scale);
+
+  canvas.style.width  = cw + 'px';
+  canvas.style.height = ch + 'px';
+  hudEl.style.width   = cw + 'px';
+  bbWrap.style.width  = cw + 'px';
+  wrapper.style.width = cw + 'px';
+
+  // cssToGame = game pixels per CSS pixel
+  // e.g. if scale=0.7, canvas is 336 CSS px wide for 480 game px => 480/336 = 1.43 game px per CSS px
+  cssToGame = GW / cw;
 }
 resize();
-window.addEventListener('resize', resize);
+window.addEventListener('resize', () => { if (!touchInProgress) resize(); });
 
 // Convert screen clientX/Y to internal game coordinates
 function screenToGame(clientX, clientY) {
@@ -261,8 +262,11 @@ const P      = { x:W/2, y:H-80, w:28, h:16, speed:5 };
 // Mouse
 let mx = W/2, my = H-80, mouseMoved = false;
 
-// Touch — store raw screen coords; delta computed in screen space then divided by canvasScale
-let touchActive = false, lastTouchScreenX = 0, lastTouchScreenY = 0;
+// Touch — store whether finger is down; position set directly each touchmove
+let touchActive = false;
+
+// Block resize from firing while finger is on screen (prevents canvasScale changing mid-drag)
+let touchInProgress = false;
 
 let keys = {};
 let shieldActive = false, shieldTimer = 0;
@@ -303,14 +307,16 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keyup', e => { keys[e.key] = false; });
 
 // ─── Touch input ──────────────────────────────────────────────────────────────
-// Delta is computed in raw screen pixels then divided by canvasScale to get game pixels.
-// This prevents speed amplification caused by the canvas being scaled down on mobile.
+// Direct positioning: ship goes exactly where your finger is.
+// No delta accumulation, no dependence on event frequency or canvasScale changes.
 if (isMobile) {
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
+    touchInProgress = true;
     if (state !== 'playing') return;
-    lastTouchScreenX = e.touches[0].clientX;
-    lastTouchScreenY = e.touches[0].clientY;
+    const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
+    P.x = Math.max(P.w/2, Math.min(W-P.w/2, pos.x));
+    P.y = Math.max(P.h/2, Math.min(H-P.h/2, pos.y));
     touchActive = true;
     mouseMoved  = false;
   }, { passive: false });
@@ -318,21 +324,22 @@ if (isMobile) {
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
     if (state !== 'playing' || !touchActive) return;
-    const tx = e.touches[0].clientX;
-    const ty = e.touches[0].clientY;
-    // Convert both current and last positions to game coords, then diff.
-    // screenToGame already accounts for canvas scale via getBoundingClientRect,
-    // so the delta is correct game pixels regardless of how small the canvas is.
-    const cur  = screenToGame(tx, ty);
-    const last = screenToGame(lastTouchScreenX, lastTouchScreenY);
-    P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x + (cur.x - last.x)));
-    P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y + (cur.y - last.y)));
-    lastTouchScreenX = tx;
-    lastTouchScreenY = ty;
+    const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
+    P.x = Math.max(P.w/2, Math.min(W-P.w/2, pos.x));
+    P.y = Math.max(P.h/2, Math.min(H-P.h/2, pos.y));
   }, { passive: false });
 
-  canvas.addEventListener('touchend',    e => { e.preventDefault(); touchActive = false; }, { passive: false });
-  canvas.addEventListener('touchcancel', e => { e.preventDefault(); touchActive = false; }, { passive: false });
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    touchActive = false;
+    touchInProgress = false;
+  }, { passive: false });
+
+  canvas.addEventListener('touchcancel', e => {
+    e.preventDefault();
+    touchActive = false;
+    touchInProgress = false;
+  }, { passive: false });
 }
 
 // ─── Buttons ──────────────────────────────────────────────────────────────────
@@ -346,7 +353,7 @@ function startGame() {
   shieldActive=false; shieldTimer=0; slowActive=false; slowTimer=0;
   bossActive=false; boss=null; bossWaveLevel=0;
   P.x=W/2; P.y=H-80; mx=W/2; my=H-80; mouseMoved=false;
-  touchActive=false; lastTouchScreenX=0; lastTouchScreenY=0;
+  touchActive=false; touchInProgress=false;
   document.getElementById('boss-bar-wrap').classList.remove('visible');
   document.getElementById('boss-label').classList.remove('visible');
   document.getElementById('overlay-title').textContent='DODGE';
