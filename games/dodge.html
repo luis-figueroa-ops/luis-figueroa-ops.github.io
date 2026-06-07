@@ -149,8 +149,9 @@
 const GW = 480, GH = 580;
 
 // ─── Device detection ─────────────────────────────────────────────────────────
-// Use touch capability only — NOT screen width, which misdetects laptops
-const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+// pointer:coarse = finger/stylus (phone/tablet). pointer:fine = mouse (laptop/desktop).
+// This is the correct way to distinguish — touchscreen laptops have pointer:fine.
+const isMobile = window.matchMedia('(pointer: coarse)').matches;
 
 // ─── Canvas setup ─────────────────────────────────────────────────────────────
 const canvas  = document.getElementById('canvas');
@@ -319,11 +320,13 @@ if (isMobile) {
     if (state !== 'playing' || !touchActive) return;
     const tx = e.touches[0].clientX;
     const ty = e.touches[0].clientY;
-    // Delta in screen pixels / canvasScale = delta in game pixels (1:1 finger-to-ship)
-    const dx = (tx - lastTouchScreenX) / canvasScale;
-    const dy = (ty - lastTouchScreenY) / canvasScale;
-    P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x + dx));
-    P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y + dy));
+    // Convert both current and last positions to game coords, then diff.
+    // screenToGame already accounts for canvas scale via getBoundingClientRect,
+    // so the delta is correct game pixels regardless of how small the canvas is.
+    const cur  = screenToGame(tx, ty);
+    const last = screenToGame(lastTouchScreenX, lastTouchScreenY);
+    P.x = Math.max(P.w/2, Math.min(W-P.w/2, P.x + (cur.x - last.x)));
+    P.y = Math.max(P.h/2, Math.min(H-P.h/2, P.y + (cur.y - last.y)));
     lastTouchScreenX = tx;
     lastTouchScreenY = ty;
   }, { passive: false });
