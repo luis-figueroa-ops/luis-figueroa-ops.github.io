@@ -317,6 +317,7 @@ if (isMobile) {
     touchInProgress = true;
     if (state !== 'playing') return;
     const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
+    // Only set the target — never teleport the ship directly
     touchTargetX = pos.x;
     touchTargetY = pos.y;
     touchActive = true;
@@ -490,9 +491,9 @@ function loop() {
       const dx=mx-P.x, dy=my-P.y, dist=Math.sqrt(dx*dx+dy*dy);
       if(dist>4){P.x+=(dx/dist)*Math.min(dist,P.speed*1.4);P.y+=(dy/dist)*Math.min(dist,P.speed*1.4);}
     } else if (isMobile && touchActive) {
-      // Same speed cap as desktop mouse — ship moves toward finger, never exceeds P.speed*1.4
+      // Speed cap lower than desktop to match the feel of mouse movement
       const dx=touchTargetX-P.x, dy=touchTargetY-P.y, dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist>4){P.x+=(dx/dist)*Math.min(dist,P.speed*1.4);P.y+=(dy/dist)*Math.min(dist,P.speed*1.4);}
+      if(dist>4){P.x+=(dx/dist)*Math.min(dist,P.speed*0.8);P.y+=(dy/dist)*Math.min(dist,P.speed*0.8);}
     }
     // Touch movement handled directly in touchmove (delta in screen px / canvasScale)
     mouseMoved=false;
