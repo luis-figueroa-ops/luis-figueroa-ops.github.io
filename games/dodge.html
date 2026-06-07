@@ -145,56 +145,33 @@
 </div>
 
 <script>
-// ─── Fixed internal game resolution ───────────────────────────────────────────
 const GW = 480, GH = 580;
-
-// ─── Device detection ─────────────────────────────────────────────────────────
-// pointer:coarse = touch primary device. pointer:fine = mouse primary device.
 const isMobile = window.matchMedia('(pointer: coarse)').matches;
-
-// ─── Canvas setup ─────────────────────────────────────────────────────────────
 const canvas  = document.getElementById('canvas');
 const ctx     = canvas.getContext('2d');
 const wrapper = document.getElementById('game-wrapper');
 const hudEl   = document.getElementById('hud');
 const bbWrap  = document.getElementById('boss-bar-wrap');
-
 canvas.width  = GW;
 canvas.height = GH;
-
-// cssToGame: how many game pixels per CSS pixel (inverse of visual scale)
-// Used to convert touch deltas correctly
 let cssToGame = 1;
-
 function resize() {
   const availW = window.innerWidth  - 4;
   const availH = window.innerHeight - 4;
   const extraH = 70;
-
-  // Calculate what scale would be needed to fit
   const fitScale = Math.min(availW / GW, (availH - extraH) / GH);
-
-  // Desktop (mouse): never scale below 1, never scale at all
-  // Mobile (touch): scale to fit screen
   const scale = isMobile ? fitScale : 1;
-
   const cw = Math.floor(GW * scale);
   const ch = Math.floor(GH * scale);
-
   canvas.style.width  = cw + 'px';
   canvas.style.height = ch + 'px';
   hudEl.style.width   = cw + 'px';
   bbWrap.style.width  = cw + 'px';
   wrapper.style.width = cw + 'px';
-
-  // cssToGame = game pixels per CSS pixel
-  // e.g. if scale=0.7, canvas is 336 CSS px wide for 480 game px => 480/336 = 1.43 game px per CSS px
   cssToGame = GW / cw;
 }
 resize();
 window.addEventListener('resize', () => { if (!touchInProgress) resize(); });
-
-// Convert screen clientX/Y to internal game coordinates
 function screenToGame(clientX, clientY) {
   const r = canvas.getBoundingClientRect();
   return {
@@ -202,8 +179,6 @@ function screenToGame(clientX, clientY) {
     y: (clientY - r.top)  * (GH / r.height)
   };
 }
-
-// ─── Audio ────────────────────────────────────────────────────────────────────
 let audioCtx = null;
 function getAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -231,8 +206,6 @@ const SFX = {
   bossdie: () => { playTone(500,'sawtooth',0.05,0.3); playTone(400,'sawtooth',0.05,0.3); playTone(300,'sawtooth',0.05,0.3); playTone(200,'sawtooth',0.4,0.3,50); },
   dodge:   () => { if (Math.random()>0.94) playTone(880,'sine',0.04,0.05,1200); }
 };
-
-// ─── Leaderboard ──────────────────────────────────────────────────────────────
 const LB_KEY = 'dodge_leaderboard_v1';
 function loadLB() { try { return JSON.parse(localStorage.getItem(LB_KEY))||[]; } catch(e) { return []; } }
 function saveLB(e) { try { localStorage.setItem(LB_KEY,JSON.stringify(e)); } catch(e) {} }
@@ -252,28 +225,17 @@ function renderLB(entries, newScore) {
     c.appendChild(row);
   });
 }
-
-// ─── Game state ───────────────────────────────────────────────────────────────
 const W = GW, H = GH;
 let state    = 'idle';
 let score    = 0, lives = 3, frame = 0, animId = null, lastLevel = 1;
 const P      = { x:W/2, y:H-80, w:28, h:16, speed:5 };
-
-// Mouse
 let mx = W/2, my = H-80, mouseMoved = false;
-
-// Touch — store whether finger is down; position set directly each touchmove
 let touchActive = false;
-
-// Block resize from firing while finger is on screen (prevents canvasScale changing mid-drag)
 let touchInProgress = false;
-
 let keys = {};
 let shieldActive = false, shieldTimer = 0;
 let slowActive   = false, slowTimer   = 0;
 let powerups = [], obstacles = [];
-
-// Score per level threshold — raised to 600 so each level takes ~10 seconds at 60fps
 const SCORE_PER_LEVEL = 600;
 let baseSpeed = 1.6, spawnRate = 52;
 let bossActive = false, boss = null, bossHP = 0, bossMaxHP = 0, bossWaveLevel = 0;
@@ -283,73 +245,62 @@ let stars = Array.from({length:60}, () => ({
   r:Math.random()*1.5+0.3, s:Math.random()*0.4+0.1
 }));
 let gridOffset = 0;
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function getLevel()         { return Math.floor(score/SCORE_PER_LEVEL)+1; }
 function getSpeedMult()     { return slowActive ? 0.45 : 1; }
 function getObstacleSpeed() { return (baseSpeed+(getLevel()-1)*0.28)*getSpeedMult(); }
 function getSpawnRate()     { return Math.max(18, spawnRate-(getLevel()-1)*2); }
 function isBossLevel(l)     { return l>=6 && (l-6)%4===0; }
-
-// ─── Mouse input ──────────────────────────────────────────────────────────────
 canvas.addEventListener('mousemove', e => {
   if (isMobile) return;
   const p = screenToGame(e.clientX, e.clientY);
   if (Math.abs(p.x-mx)>1 || Math.abs(p.y-my)>1) { mx=p.x; my=p.y; mouseMoved=true; }
 });
 canvas.addEventListener('mouseleave', () => { mouseMoved = false; });
-
-// ─── Keyboard input ───────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   keys[e.key] = true;
   if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault();
 });
 document.addEventListener('keyup', e => { keys[e.key] = false; });
-
-// ─── Touch input ──────────────────────────────────────────────────────────────
-// Finger position stored in game coords. Ship moves toward it each frame in the
-// game loop, capped at the same rate as desktop: Math.min(dist, P.speed * 1.4)
 let touchTargetX = 0, touchTargetY = 0;
-
 if (isMobile) {
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
     touchInProgress = true;
     if (state !== 'playing') return;
     const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
-    // Only set the target — never teleport the ship directly
     touchTargetX = pos.x;
     touchTargetY = pos.y;
     touchActive = true;
     mouseMoved  = false;
   }, { passive: false });
-
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
     if (state !== 'playing' || !touchActive) return;
-    const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
+    const raw = e.touches[0];
+    const pos = screenToGame(raw.clientX, raw.clientY);
+    const dx = pos.x - P.x, dy = pos.y - P.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const movePx = Math.min(dist, P.speed * 0.8);
+    console.log('[touch] raw=('+raw.clientX.toFixed(1)+','+raw.clientY.toFixed(1)+')'
+      +' game=('+pos.x.toFixed(1)+','+pos.y.toFixed(1)+')'
+      +' ship=('+P.x.toFixed(1)+','+P.y.toFixed(1)+')'
+      +' dist='+dist.toFixed(1)+' movePx='+movePx.toFixed(2));
     touchTargetX = pos.x;
     touchTargetY = pos.y;
   }, { passive: false });
-
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
     touchActive = false;
     touchInProgress = false;
   }, { passive: false });
-
   canvas.addEventListener('touchcancel', e => {
     e.preventDefault();
     touchActive = false;
     touchInProgress = false;
   }, { passive: false });
 }
-
-// ─── Buttons ──────────────────────────────────────────────────────────────────
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('player-name').addEventListener('keydown', e => { if(e.key==='Enter') startGame(); });
-
-// ─── Game functions ───────────────────────────────────────────────────────────
 function startGame() {
   score=0; lives=3; frame=0; lastLevel=1;
   obstacles=[]; particles=[]; powerups=[];
@@ -370,7 +321,6 @@ function startGame() {
   if (animId) cancelAnimationFrame(animId);
   loop();
 }
-
 function updateHUD() {
   document.getElementById('score').textContent = score;
   ['pip1','pip2','pip3'].forEach((id,i) => document.getElementById(id).classList.toggle('dead', i>=lives));
@@ -459,9 +409,12 @@ function handlePlayerHit() {
 }
 function checkPickup(pu){const dx=pu.x-P.x,dy=pu.y-P.y;return Math.sqrt(dx*dx+dy*dy)<pu.r+16;}
 
-// ─── Main loop ────────────────────────────────────────────────────────────────
-function loop() {
+// ── THE FIX: cap to ~60fps so 120Hz phones run at the same speed as 60Hz desktop
+let _lastLoopTs = 0;
+function loop(ts) {
   animId = requestAnimationFrame(loop);
+  if (ts - _lastLoopTs < 14) return;
+  _lastLoopTs = ts;
   frame++;
   ctx.fillStyle='#0a0a0f'; ctx.fillRect(0,0,W,H);
   gridOffset=(gridOffset+getObstacleSpeed()*0.3)%40;
@@ -474,11 +427,9 @@ function loop() {
     ctx.fillStyle=`rgba(200,200,255,${0.3+s.r*0.2})`;
     ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
   });
-
   if (state==='playing') {
     if(shieldTimer>0){shieldTimer--;if(shieldTimer===0){shieldActive=false;updatePowerupUI();}}
     if(slowTimer>0){slowTimer--;if(slowTimer===0){slowActive=false;updatePowerupUI();}}
-
     const anyKey=keys['ArrowLeft']||keys['ArrowRight']||keys['ArrowUp']||keys['ArrowDown']
                ||keys['a']||keys['d']||keys['w']||keys['s'];
     if (anyKey) {
@@ -491,16 +442,12 @@ function loop() {
       const dx=mx-P.x, dy=my-P.y, dist=Math.sqrt(dx*dx+dy*dy);
       if(dist>4){P.x+=(dx/dist)*Math.min(dist,P.speed*1.4);P.y+=(dy/dist)*Math.min(dist,P.speed*1.4);}
     } else if (isMobile && touchActive) {
-      // Speed cap lower than desktop to match the feel of mouse movement
       const dx=touchTargetX-P.x, dy=touchTargetY-P.y, dist=Math.sqrt(dx*dx+dy*dy);
       if(dist>4){P.x+=(dx/dist)*Math.min(dist,P.speed*0.8);P.y+=(dy/dist)*Math.min(dist,P.speed*0.8);}
     }
-    // Touch movement handled directly in touchmove (delta in screen px / canvasScale)
     mouseMoved=false;
-
     P.x=Math.max(P.w/2,Math.min(W-P.w/2,P.x));
     P.y=Math.max(P.h/2,Math.min(H-P.h/2,P.y));
-
     if(frame%getSpawnRate()===0) spawnObstacle();
     score++; updateHUD(); SFX.dodge();
     const lvl=getLevel();
@@ -511,7 +458,6 @@ function loop() {
     }
     if(bossActive&&boss) updateBoss();
   }
-
   obstacles=obstacles.filter(obs=>{
     obs.y+=obs.speed*getSpeedMult();
     ctx.shadowBlur=12;
@@ -527,7 +473,6 @@ function loop() {
     return obs.y<H+20;
   });
   if(bossActive&&boss) drawBoss();
-
   powerups=powerups.filter(pu=>{
     pu.y+=pu.vy; pu.life--;
     const alpha=Math.min(1,pu.life/60), col=pu.type==='shield'?'#4488ff':'#aa44ff';
@@ -544,14 +489,12 @@ function loop() {
     }
     return pu.life>0&&pu.y<H+20;
   });
-
   particles=particles.filter(p=>{
     p.x+=p.vx;p.y+=p.vy;p.vy+=0.12;p.life-=p.decay;
     ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
     ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=1; return p.life>0;
   });
-
   if(state!=='dead'||frame%6<4){
     const px=P.x,py=P.y;
     if(shieldActive){
@@ -570,8 +513,6 @@ function loop() {
     ctx.strokeStyle=`rgba(0,255,231,${0.3+Math.sin(frame*0.3)*0.2})`;ctx.lineWidth=2;
     ctx.beginPath();ctx.moveTo(px-5,py+P.h/2);ctx.lineTo(px,py+P.h/2+6+Math.sin(frame*0.5)*4);ctx.lineTo(px+5,py+P.h/2);ctx.stroke();
   }
-
-  // Mouse cursor — desktop only
   if(state==='playing'&&!isMobile){
     ctx.strokeStyle='rgba(0,255,231,0.35)';ctx.lineWidth=1;
     ctx.beginPath();ctx.arc(mx,my,10,0,Math.PI*2);ctx.stroke();
@@ -579,7 +520,6 @@ function loop() {
     ctx.beginPath();ctx.arc(mx,my,2,0,Math.PI*2);ctx.fill();
   }
 }
-
 function showGameOver() {
   const playerName=document.getElementById('player-name').value||'PILOT';
   try{localStorage.setItem('dodge_pilot_name',playerName);}catch(e){}
@@ -597,9 +537,11 @@ function showGameOver() {
   renderLB(entries,score);
   document.getElementById('overlay').classList.remove('hidden');
 }
-
-function idleLoop() {
+let _lastIdleTs = 0;
+function idleLoop(ts) {
   if(state!=='idle') return;
+  if (ts - _lastIdleTs < 14) { requestAnimationFrame(idleLoop); return; }
+  _lastIdleTs = ts;
   ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
   ctx.strokeStyle='#12121e';ctx.lineWidth=1;
   for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
@@ -612,7 +554,6 @@ function idleLoop() {
   requestAnimationFrame(idleLoop);
 }
 idleLoop();
-
 try{const s=localStorage.getItem('dodge_pilot_name');if(s)document.getElementById('player-name').value=s;}catch(e){}
 const existing=loadLB();
 if(existing.length>0){document.getElementById('leaderboard').style.display='block';renderLB(existing,-1);}
