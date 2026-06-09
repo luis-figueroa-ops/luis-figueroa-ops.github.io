@@ -338,6 +338,14 @@ h1 span { color: var(--gold); }
 
 .api-dodge-note strong { color: var(--gold); font-weight: 400; }
 
+.cards-divider {
+  grid-column: 1 / -1;
+  height: 5px;
+  background: linear-gradient(to right, var(--gold), var(--gold-light), var(--gold));
+  border-radius: 2px;
+  margin: 4px 0;
+}
+
 @media (max-width: 700px) {
   .api-explainer { flex-direction: column; gap: 20px; padding: 28px 22px 28px 26px; }
   .api-steps { grid-template-columns: 1fr; }
@@ -453,6 +461,8 @@ footer {
         <span class="card-type">HTML / Claude API</span>
       </div>
     </a>
+
+    <div class="cards-divider"></div>
 
     <a class="card" href="./games/dodge/index.html" target="_blank">
       <div class="card-tag">Side Builds</div>
