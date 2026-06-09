@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>ZAP! — Bug Zapper</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #050510;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+      touch-action: none;
+    }
+
+    canvas {
+      display: block;
+      cursor: crosshair;
+      image-rendering: pixelated;
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .screen {
+      background: rgba(5, 5, 20, 0.93);
+      border: 2px solid #00ffe7;
+      box-shadow: 0 0 40px #00ffe755, inset 0 0 40px #0a0a2055;
+      border-radius: 12px;
+      padding: 32px 40px;
+      text-align: center;
+      pointer-events: all;
+      max-width: 400px;
+      width: 88vw;
+    }
+
+    .screen h1 {
+      font-size: clamp(2.2rem, 10vw, 4rem);
+      color: #00ffe7;
+      text-shadow: 0 0 20px #00ffe7, 0 0 60px #00ffe755;
+      letter-spacing: 8px;
+      margin-bottom: 6px;
+    }
+
+    .screen .sub {
+      color: #a080ff;
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .screen .score-display {
+      font-size: 2rem;
+      color: #ffe156;
+      text-shadow: 0 0 16px #ffe15688;
+      margin: 10px 0 4px;
+    }
+
+    .screen .hi-label {
+      color: #7070a0;
+      font-size: 0.76rem;
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+
+    .screen .hi-score { color: #ff79c6; text-shadow: 0 0 10px #ff79c655; }
+
+    .btn {
+      background: transparent;
+      border: 2px solid #00ffe7;
+      color: #00ffe7;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      letter-spacing: 4px;
+      padding: 12px 36px;
+      cursor: pointer;
+      text-transform: uppercase;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+      box-shadow: 0 0 18px #00ffe733;
+    }
+
+    .btn:hover, .btn:active {
+      background: #00ffe722;
+      box-shadow: 0 0 32px #00ffe7aa;
+      transform: scale(1.04);
+    }
+
+    .controls-hint {
+      margin-top: 18px;
+      color: #404068;
+      font-size: 0.70rem;
+      letter-spacing: 1.5px;
+      line-height: 1.8;
+    }
+
+    #startScreen, #gameoverScreen { display: none; }
+    #startScreen.active, #gameoverScreen.active { display: block; }
+  </style>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YCMXSWXHTN');
+  </script>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div id="overlay">
+  <div class="screen" id="startScreen">
+    <h1>ZAP!</h1>
+    <div class="sub">Bug Zapper</div>
+    <p style="color:#8888bb; font-size:0.82rem; line-height:1.8; margin-bottom:22px;">
+      Bugs are swarming your snack table!<br>
+      <strong style="color:#00ffe7">Tap directly on a bug</strong> to zap it.<br>
+      Don't let them reach the food!
+    </p>
+    <button class="btn" id="startBtn">START GAME</button>
+    <div class="controls-hint">
+      👆 TAP a bug to fire &nbsp;·&nbsp; 🖱 CLICK a bug to fire<br>
+      🎵 Music toggle in top-right corner
+    </div>
+  </div>
+
+  <div class="screen" id="gameoverScreen">
+    <h1>ZAPPED</h1>
+    <div class="sub">Snack table overrun!</div>
+    <div class="score-display" id="finalScore">0</div>
+    <div class="hi-label">WAVE <span id="finalWave">1</span> &nbsp;|&nbsp; HIGH SCORE <span class="hi-score" id="hiScoreDisplay">0</span></div>
+    <button class="btn" id="restartBtn">PLAY AGAIN</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  ZAP! — Bug Zapper  |  Single-file HTML5 Canvas Game
+// ─────────────────────────────────────────────────────────
+
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+
+// ── Responsive canvas ────────────────────────────────────
+let W = 0, H = 0;
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ── Layout helpers (responsive) ──────────────────────────
+// Table stays a fixed margin from the right edge on any screen width
+function getTableX()  { return W - Math.max(70, Math.min(100, W * 0.10)); }
+function getTurretX() { return Math.max(50, W * 0.08); }
+
+// Usable horizontal play area between turret barrel tip and table front
+function getPlayWidth() { return Math.max(80, getTableX() - getTurretX() - 60); }
+
+// Scale UI elements for small screens
+function uiScale()    { return Math.min(1, W / 500); }
+
+// ── Bug speed scaling ─────────────────────────────────────
+// On a narrow phone the bugs cross much faster at the same px/s.
+// We scale speed down so the crossing TIME stays consistent on any screen.
+// Reference width = a comfortable desktop play area (~900px).
+// Screens wider than that get full speed; narrower screens get proportionally slower bugs.
+const REFERENCE_PLAY_WIDTH = 900; // px — calibrated for desktop
+function getBugSpeedScale() {
+  const pw = getPlayWidth();
+  return pw < REFERENCE_PLAY_WIDTH ? pw / REFERENCE_PLAY_WIDTH : 1;
+}
+
+// ── Constants ────────────────────────────────────────────
+const BOLT_SPEED  = 950;   // px/s
+const DELTA_CAP   = 0.05;  // 50ms max delta
+const MAX_HEALTH  = 5;
+
+// Tap radius scales up on narrow screens so small bugs are easier to hit
+function getTapRadius() { return W < 500 ? 54 : 42; }
+
+const BUG_DEFS = {
+  fly:      { emoji: '\u{1FAB0}', hp: 1,  speed: 90,  score: 10,  size: 24, sineAmp: 0,  sineFreq: 0   },
+  bee:      { emoji: '\u{1F41D}', hp: 2,  speed: 115, score: 35,  size: 22, sineAmp: 22, sineFreq: 2.8 },
+  mosquito: { emoji: '\u{1F99F}', hp: 1,  speed: 130, score: 25,  size: 22, sineAmp: 28, sineFreq: 2.4 },
+  beetle:   { emoji: '\u{1FAB2}', hp: 3,  speed: 70,  score: 50,  size: 28, sineAmp: 18, sineFreq: 1.2 },
+  boss:     { emoji: '\u{1F997}', hp: 10, speed: 55,  score: 200, size: 52, sineAmp: 40, sineFreq: 0.9 },
+};
+
+const TABLE_FOOD = ['🍎','🍊','🍇','🍕','🧁','🍫','🥤','🍿','🍓','🥪'];
+
+// ── Web Audio ─────────────────────────────────────────────
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// Pre-built noise buffer (reused for zap/hi-hat)
+let _noiseBuf = null;
+function getNoiseBuf() {
+  if (_noiseBuf) return _noiseBuf;
+  const ac  = getAudio();
+  _noiseBuf = ac.createBuffer(1, ac.sampleRate * 0.3, ac.sampleRate);
+  const d   = _noiseBuf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  return _noiseBuf;
+}
+
+function playNote(freq, type, startTime, duration, vol = 0.12) {
+  const ac   = getAudio();
+  const osc  = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type            = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(vol, startTime + 0.01);
+  gain.gain.setValueAtTime(vol, startTime + duration * 0.65);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+  osc.connect(gain); gain.connect(ac.destination);
+  osc.start(startTime); osc.stop(startTime + duration + 0.01);
+}
+
+// ── Sound effects ─────────────────────────────────────────
+function soundZap() {
+  const ac  = getAudio();
+  const buf = getNoiseBuf();
+  const src = ac.createBufferSource();
+  src.buffer = buf;
+  const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2000;
+  const g  = ac.createGain();
+  g.gain.setValueAtTime(0.5, ac.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.1);
+  src.connect(hp); hp.connect(g); g.connect(ac.destination);
+  src.start();
+}
+
+function soundMiss() {
+  // Quiet thud when tapping empty space
+  const ac  = getAudio();
+  const osc = ac.createOscillator();
+  const g   = ac.createGain();
+  osc.type = 'sine'; osc.frequency.value = 200;
+  osc.frequency.exponentialRampToValueAtTime(80, ac.currentTime + 0.08);
+  g.gain.setValueAtTime(0.12, ac.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.1);
+  osc.connect(g); g.connect(ac.destination);
+  osc.start(); osc.stop(ac.currentTime + 0.12);
+}
+
+function soundHit() {
+  const ac  = getAudio();
+  const osc = ac.createOscillator();
+  const g   = ac.createGain();
+  osc.type = 'sawtooth'; osc.frequency.value = 900;
+  osc.frequency.exponentialRampToValueAtTime(200, ac.currentTime + 0.08);
+  g.gain.setValueAtTime(0.25, ac.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.1);
+  osc.connect(g); g.connect(ac.destination);
+  osc.start(); osc.stop(ac.currentTime + 0.12);
+}
+
+function soundKill(isBoss) {
+  const ac  = getAudio();
+  const now = ac.currentTime;
+  const src = ac.createBufferSource();
+  src.buffer = getNoiseBuf();
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass';
+  bp.frequency.value = isBoss ? 300 : 1600; bp.Q.value = 0.7;
+  const g = ac.createGain(); g.gain.value = isBoss ? 0.8 : 0.6;
+  src.connect(bp); bp.connect(g); g.connect(ac.destination); src.start();
+  if (isBoss) {
+    const o = ac.createOscillator(); const go = ac.createGain();
+    o.type = 'square'; o.frequency.setValueAtTime(280, now);
+    o.frequency.exponentialRampToValueAtTime(55, now + 0.4);
+    go.gain.setValueAtTime(0.35, now); go.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+    o.connect(go); go.connect(ac.destination); o.start(); o.stop(now + 0.4);
+  }
+}
+
+
+function soundDamage() {
+  const ac  = getAudio();
+  const now = ac.currentTime;
+  const osc = ac.createOscillator(); const g = ac.createGain();
+  osc.type = 'sawtooth'; osc.frequency.setValueAtTime(160, now);
+  osc.frequency.exponentialRampToValueAtTime(38, now + 0.28);
+  g.gain.setValueAtTime(0.55, now); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+  osc.connect(g); g.connect(ac.destination); osc.start(); osc.stop(now + 0.3);
+}
+
+function soundWaveClear() {
+  const ac  = getAudio();
+  const now = ac.currentTime;
+  [523, 659, 784, 1047].forEach((f, i) => playNote(f, 'sine', now + i * 0.11, 0.32, 0.28));
+}
+
+function soundGameOver() {
+  const ac  = getAudio();
+  const now = ac.currentTime;
+  [392, 349, 330, 262].forEach((f, i) => playNote(f, 'triangle', now + i * 0.22, 0.42, 0.3));
+}
+
+// ── Background music ──────────────────────────────────────
+let musicOn        = true;
+let musicRunning   = false;
+let musicStopFlag  = false;
+let musicTimeout   = null;
+let nextBarStart   = 0;
+
+const BPM  = 132;
+const BEAT = 60 / BPM;
+
+// 8-beat chiptune pattern (frequencies in Hz)
+const BASS_NOTES = [
+  87.3, 87.3, 130.8, 87.3,
+  110.0, 87.3, 116.5, 87.3,
+];
+const MELODY_NOTES = [
+  523.3, 659.3, 784.0, 659.3,
+  622.3, 523.3, 440.0, 523.3,
+];
+// hi-hat pattern: 1=open, 0=skip
+const HIHAT_PAT = [1, 0, 1, 1, 1, 0, 1, 1];
+
+function scheduleBar(t0) {
+  if (musicStopFlag) return;
+  const ac = getAudio();
+  for (let i = 0; i < 8; i++) {
+    const t = t0 + i * BEAT;
+    // Bass (square, punchy)
+    playNote(BASS_NOTES[i], 'square', t, BEAT * 0.55, 0.022);
+    // Melody (triangle, softer)
+    if (i % 2 === 0) {
+      playNote(MELODY_NOTES[i >> 1], 'triangle', t + BEAT * 0.12, BEAT * 0.75, 0.017);
+    }
+    // Hi-hat (noise burst)
+    if (HIHAT_PAT[i]) {
+      const src = ac.createBufferSource();
+      src.buffer = getNoiseBuf();
+      const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
+      const g  = ac.createGain(); g.gain.setValueAtTime(0.008, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+      src.connect(hp); hp.connect(g); g.connect(ac.destination);
+      src.start(t);
+    }
+    // Kick on beat 1 and beat 5
+    if (i === 0 || i === 4) {
+      const osc = ac.createOscillator(); const g = ac.createGain();
+      osc.type = 'sine'; osc.frequency.setValueAtTime(160, t); osc.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+      g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+      osc.connect(g); g.connect(ac.destination); osc.start(t); osc.stop(t + 0.15);
+    }
+  }
+}
+
+function musicTick() {
+  if (musicStopFlag || !musicOn) return;
+  const ac  = getAudio();
+  const now = ac.currentTime;
+  // Schedule the next bar slightly ahead so audio is seamless
+  if (nextBarStart < now + 0.35) {
+    scheduleBar(Math.max(nextBarStart, now + 0.01));
+    nextBarStart = Math.max(nextBarStart, now + 0.01) + 8 * BEAT;
+  }
+  musicTimeout = setTimeout(musicTick, 150);
+}
+
+function startMusic() {
+  if (musicRunning) return;
+  musicRunning  = true;
+  musicStopFlag = false;
+  nextBarStart  = getAudio().currentTime;
+  musicTick();
+}
+
+function stopMusic() {
+  musicStopFlag = true;
+  musicRunning  = false;
+  if (musicTimeout) clearTimeout(musicTimeout);
+}
+
+function toggleMusic() {
+  musicOn = !musicOn;
+  if (musicOn) {
+    musicStopFlag = false;
+    musicRunning  = false;
+    startMusic();
+  } else {
+    stopMusic();
+  }
+}
+
+// ── Mute button hit area (canvas-space) ───────────────────
+function getMuteRect() {
+  const s  = uiScale();
+  const sz = Math.round(28 * s);
+  return { x: W - 14 - sz, y: 14, w: sz, h: sz };
+}
+
+// ── Game State ───────────────────────────────────────────
+let state = 'title';
+let score, hiScore, wave, tableHealth;
+let bugs, bolts, particles, zapTexts;
+let waveClearing, nextWaveDelay;
+let spawnTimer, spawnInterval;
+let bugsSpawned, killsThisWave, bugsNeeded;
+let bossAlive;
+// Turret aims at last tapped position (not auto-aim)
+let aimX = -1, aimY = -1;
+
+function loadHiScore() { return parseInt(localStorage.getItem('zap_hi') || '0', 10); }
+function saveHiScore(s) { localStorage.setItem('zap_hi', String(s)); }
+
+function initGame() {
+  score         = 0;
+  hiScore       = loadHiScore();
+  wave          = 1;
+  tableHealth   = MAX_HEALTH;
+  bugs          = [];
+  bolts         = [];
+  particles     = [];
+  zapTexts      = [];
+  waveClearing  = false;
+  nextWaveDelay = 2.5;
+  spawnTimer    = 0;
+  bossAlive     = false;
+  aimX = getTurretX() + 40;
+  aimY = H * 0.5;
+  startWave(1);
+}
+
+// ── Wave logic ───────────────────────────────────────────
+function startWave(w) {
+  wave          = w;
+  bugsSpawned   = 0;
+  killsThisWave = 0;
+  waveClearing  = false;
+  bugsNeeded    = 6 + (w - 1) * 3;
+  spawnInterval = Math.max(0.6, 2.2 - (w - 1) * 0.15);
+  spawnTimer    = 0.5;
+  bossAlive     = false;
+}
+
+function waveIsClear() {
+  return waveClearing && bugs.length === 0 && bolts.length === 0;
+}
+
+// ── Bug factory ──────────────────────────────────────────
+function spawnBug() {
+  if (bossAlive) return;
+  const isBossWave = wave % 3 === 0;
+  if (isBossWave && bugsSpawned === Math.floor(bugsNeeded / 2) && !bossAlive) {
+    createBug('boss'); bossAlive = true; return;
+  }
+  let pool = ['fly'];
+  if (wave >= 2) pool.push('bee');
+  if (wave >= 3) pool.push('mosquito', 'mosquito');
+  if (wave >= 5) pool.push('beetle');
+  createBug(pool[Math.floor(Math.random() * pool.length)]);
+}
+
+function createBug(type) {
+  const def    = BUG_DEFS[type];
+  const isBoss = type === 'boss';
+  const sM     = Math.min(2, 1 + (wave - 1) * 0.10);
+  const margin = isBoss ? 80 : 40;
+  const y      = margin + Math.random() * (H - margin * 2);
+  const bugObj = {
+    type,
+    x: -def.size,
+    y,
+    originY: y,
+    // Boss HP scales down on narrow screens: mobile gets 5 hits, desktop keeps 10
+    hp: (type === 'boss') ? Math.max(5, Math.round(def.hp * getBugSpeedScale())) : def.hp,
+    maxHp: (type === 'boss') ? Math.max(5, Math.round(def.hp * getBugSpeedScale())) : def.hp,
+    speed: def.speed * sM,
+    emoji: def.emoji,
+    size: def.size,
+    score: def.score,
+    sineAmp:    def.sineAmp,
+    sineFreq:   def.sineFreq,
+    erraticAmp:  wave >= 5 ? 12 + Math.random() * 18 : 0,
+    erraticFreq: 3 + Math.random() * 2,
+    t:           Math.random() * Math.PI * 2,
+    flashTimer:  0,
+  };
+  bugs.push(bugObj);
+  bugsSpawned++;
+}
+
+// ── Bolt factory ─────────────────────────────────────────
+function fireBolt(targetBug) {
+  soundZap();
+  const sx = getTurretX() + 20;
+  const sy = H * 0.5;
+  const dx = targetBug.x - sx;
+  const dy = targetBug.y - sy;
+  const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+  bolts.push({
+    x: sx, y: sy,
+    vx: (dx / dist) * BOLT_SPEED,
+    vy: (dy / dist) * BOLT_SPEED,
+    target: targetBug,
+    segments: [],
+    age: 0, hit: false,
+  });
+}
+
+// ── Input: tap directly ON a bug ─────────────────────────
+function getEventPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const src  = e.touches ? e.touches[0] : e;
+  return {
+    x: (src.clientX - rect.left) * (W / rect.width),
+    y: (src.clientY - rect.top)  * (H / rect.height),
+  };
+}
+
+function bugAtPoint(px, py) {
+  let best = null, bestD = Infinity;
+  for (const b of bugs) {
+    const d = Math.sqrt((b.x - px) ** 2 + (b.y - py) ** 2);
+    const r = Math.max(getTapRadius(), b.size * 0.65);
+    if (d < r && d < bestD) { bestD = d; best = b; }
+  }
+  return best;
+}
+
+function handleFire(e) {
+  if (state !== 'playing') return;
+  e.preventDefault();
+
+  const pos = getEventPos(e);
+
+  // Check mute button first
+  const mr = getMuteRect();
+  if (pos.x >= mr.x && pos.x <= mr.x + mr.w && pos.y >= mr.y && pos.y <= mr.y + mr.h) {
+    toggleMusic();
+    return;
+  }
+
+  // Find the bug at the tap location
+  const bug = bugAtPoint(pos.x, pos.y);
+  if (bug) {
+    aimX = bug.x;
+    aimY = bug.y;
+    fireBolt(bug);
+  } else {
+    // Missed — play small feedback, aim toward tap
+    aimX = pos.x;
+    aimY = pos.y;
+    soundMiss();
+  }
+}
+
+canvas.addEventListener('click',      handleFire, { passive: false });
+canvas.addEventListener('touchstart', handleFire, { passive: false });
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  getAudio();
+  showScreen(null);
+  initGame();
+  state = 'playing';
+  startMusic();
+});
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  showScreen(null);
+  initGame();
+  state = 'playing';
+  startMusic();
+});
+
+function showScreen(id) {
+  document.getElementById('startScreen').classList.remove('active');
+  document.getElementById('gameoverScreen').classList.remove('active');
+  if (id) document.getElementById(id).classList.add('active');
+}
+
+showScreen('startScreen');
+
+// ── Update ────────────────────────────────────────────────
+function update(dt) {
+  if (state !== 'playing') return;
+
+  // Spawn
+  if (!waveClearing) {
+    spawnTimer -= dt;
+    if (spawnTimer <= 0 && bugsSpawned < bugsNeeded) {
+      spawnBug();
+      spawnTimer = spawnInterval;
+    }
+    if (bugsSpawned >= bugsNeeded) waveClearing = true;
+  }
+
+  const tableX = getTableX();
+
+  // Bugs
+  for (let i = bugs.length - 1; i >= 0; i--) {
+    const b = bugs[i];
+    b.t += dt;
+    b.flashTimer = Math.max(0, b.flashTimer - dt);
+    b.x += b.speed * dt;
+
+    const sine    = Math.sin(b.t * b.sineFreq) * b.sineAmp;
+    const erratic = Math.sin(b.t * b.erraticFreq + 1.7) * b.erraticAmp;
+    b.y = b.originY + sine + erratic;
+    const half = b.size / 2;
+    b.y = Math.max(half + 60, Math.min(H - half - 20, b.y));
+    b.originY += (b.y - b.originY) * 0.02;
+
+    if (b.x + half >= tableX - 38) {
+      tableHealth--;
+      soundDamage();
+      spawnHitParticles(tableX - 20, b.y, '#ff4444');
+      spawnZapText(tableX - 60, b.y - 24, '🍎 STOLEN!', '#ff4444');
+      if (b.type === 'boss') bossAlive = false;
+      bugs.splice(i, 1);
+      if (tableHealth <= 0) { gameOver(); return; }
+      continue;
+    }
+  }
+
+  // Bolts
+  for (let i = bolts.length - 1; i >= 0; i--) {
+    const bolt = bolts[i];
+    bolt.age += dt;
+    if (bolt.hit) { if (bolt.age > 0.18) bolts.splice(i, 1); continue; }
+
+    // If the target bug was already killed and removed, discard this bolt
+    if (!bugs.includes(bolt.target)) { bolts.splice(i, 1); continue; }
+
+    const tx = bolt.target.x, ty = bolt.target.y;
+    const dx = tx - bolt.x, dy = ty - bolt.y;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+    // Soft homing
+    bolt.vx += (dx / dist) * BOLT_SPEED * 6 * dt;
+    bolt.vy += (dy / dist) * BOLT_SPEED * 6 * dt;
+    const v = Math.sqrt(bolt.vx ** 2 + bolt.vy ** 2) || 1;
+    bolt.vx = (bolt.vx / v) * BOLT_SPEED;
+    bolt.vy = (bolt.vy / v) * BOLT_SPEED;
+    bolt.x += bolt.vx * dt;
+    bolt.y += bolt.vy * dt;
+
+    bolt.segments = buildArcSegments(getTurretX() + 20, H * 0.5, bolt.x, bolt.y);
+
+    if (dist < (bolt.target.size / 2) + 10) {
+      hitBug(bolt.target);
+      bolt.hit = true; bolt.age = 0;
+    }
+    if (bolt.x > W + 50 || bolt.y < -50 || bolt.y > H + 50) bolts.splice(i, 1);
+  }
+
+  // Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.life -= dt;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 120 * dt;
+  }
+
+  // Zap texts
+  for (let i = zapTexts.length - 1; i >= 0; i--) {
+    const z = zapTexts[i];
+    z.life -= dt;
+    if (z.life <= 0) { zapTexts.splice(i, 1); continue; }
+    z.y += z.vy * dt;
+  }
+
+  // Wave complete
+  if (waveIsClear()) {
+    nextWaveDelay -= dt;
+    if (nextWaveDelay <= 0) {
+      score += 100;
+      if (score > hiScore) { hiScore = score; saveHiScore(hiScore); }
+      nextWaveDelay = 2.5;
+      soundWaveClear();
+      spawnZapText(W / 2, H * 0.4, `WAVE ${wave} CLEAR! +100`, '#00ffe7');
+      startWave(wave + 1);
+    }
+  }
+}
+
+function hitBug(bug) {
+  // Guard: ignore if this bug was already removed from the live array
+  if (!bugs.includes(bug)) return;
+  bug.hp--;
+  bug.flashTimer = 0.12;
+  const isBoss   = bug.type === 'boss';
+  const hitColor = isBoss ? '#ff79c6' : '#00ffe7';
+  if (bug.hp <= 0) {
+    score += bug.score;
+    killsThisWave++;
+    if (score > hiScore) { hiScore = score; saveHiScore(hiScore); }
+    soundKill(isBoss);
+    spawnHitParticles(bug.x, bug.y, hitColor);
+    spawnZapText(bug.x - 20, bug.y - 30, `ZAP! +${bug.score}`, hitColor);
+    if (isBoss) bossAlive = false;
+    bugs.splice(bugs.indexOf(bug), 1);
+  } else {
+    soundHit();
+    spawnHitParticles(bug.x, bug.y, '#ffaa00');
+  }
+}
+
+function gameOver() {
+  state = 'gameover';
+  soundGameOver();
+  stopMusic();
+  if (score > hiScore) { hiScore = score; saveHiScore(hiScore); }
+  document.getElementById('finalScore').textContent    = score.toLocaleString();
+  document.getElementById('finalWave').textContent     = wave;
+  document.getElementById('hiScoreDisplay').textContent = hiScore.toLocaleString();
+  showScreen('gameoverScreen');
+}
+
+// ── Particles / texts ─────────────────────────────────────
+function spawnHitParticles(x, y, color) {
+  for (let i = 0; i < 14; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 60 + Math.random() * 160;
+    particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+      life: 0.4 + Math.random() * 0.3, maxLife: 0.7, size: 2 + Math.random() * 4, color });
+  }
+}
+
+function spawnZapText(x, y, text, color) {
+  zapTexts.push({ x, y, text, color, life: 0.9, vy: -60 });
+}
+
+// ── Arc builder ───────────────────────────────────────────
+function buildArcSegments(x1, y1, x2, y2) {
+  const segs = [], STEPS = 8;
+  const disp = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) * 0.15;
+  const len  = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) || 1;
+  let px = x1, py = y1;
+  for (let i = 1; i <= STEPS; i++) {
+    const t    = i / STEPS;
+    const nx   = x1 + (x2 - x1) * t;
+    const ny   = y1 + (y2 - y1) * t;
+    const perp = (Math.random() - 0.5) * 2 * disp * (1 - t * 0.6);
+    const jx   = nx + (-(y2 - y1) / len) * perp;
+    const jy   = ny + ((x2 - x1) / len) * perp;
+    segs.push({ x1: px, y1: py, x2: jx, y2: jy });
+    px = jx; py = jy;
+  }
+  return segs;
+}
+
+// ── Draw ──────────────────────────────────────────────────
+let animT = 0;
+
+function draw(dt) {
+  animT += dt;
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, W, 0);
+  bg.addColorStop(0, '#05050f'); bg.addColorStop(0.7, '#07071a'); bg.addColorStop(1, '#0f0c1a');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+  // Scanlines
+  for (let y = 0; y < H; y += 4) {
+    ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(0, y, W, 2);
+  }
+
+  if (state === 'playing') {
+    drawTable();
+    drawTurret();
+    drawBugs();
+    drawBolts();
+    drawParticles();
+    drawZapTexts();
+    drawHUD();
+    drawMuteBtn();
+  }
+}
+
+// ── Snack table ───────────────────────────────────────────
+function drawTable() {
+  const x  = getTableX();
+  const y  = H * 0.5;
+  const s  = uiScale();
+  const tw = Math.round(100 * s); // table half-width
+  const th = 18;                  // table surface height
+
+  // Ambient glow
+  const grd = ctx.createRadialGradient(x, y, 8, x, y, 100 * s);
+  grd.addColorStop(0,   'rgba(180,220,80,0.16)');
+  grd.addColorStop(0.5, 'rgba(100,180,60,0.07)');
+  grd.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(x, y, 100 * s, 0, Math.PI * 2); ctx.fill();
+
+  ctx.save();
+  ctx.translate(x, y);
+  const sc = s;
+
+  // Legs
+  ctx.strokeStyle = '#4a3520'; ctx.lineWidth = 5 * sc; ctx.lineCap = 'round';
+  [[-40 * sc, -18 * sc, -48 * sc, 70 * sc],
+   [-16 * sc, -18 * sc, -20 * sc, 70 * sc],
+   [ 16 * sc, -18 * sc,  20 * sc, 70 * sc],
+   [ 40 * sc, -18 * sc,  48 * sc, 70 * sc]].forEach(([x1,y1,x2,y2]) => {
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  });
+
+  // Crossbar
+  ctx.strokeStyle = '#5a4530'; ctx.lineWidth = 3 * sc;
+  ctx.beginPath(); ctx.moveTo(-42 * sc, 48 * sc); ctx.lineTo(42 * sc, 48 * sc); ctx.stroke();
+
+  // Tablecloth
+  ctx.fillStyle = '#294a29'; ctx.strokeStyle = '#3a6a3a'; ctx.lineWidth = 2 * sc;
+  ctx.beginPath(); ctx.roundRect(-tw, -6 * sc, tw * 2, th * sc + 8, 4); ctx.fill(); ctx.stroke();
+
+  // Cloth grid
+  ctx.save(); ctx.beginPath(); ctx.roundRect(-tw, -6 * sc, tw * 2, th * sc + 8, 4); ctx.clip();
+  ctx.strokeStyle = 'rgba(80,120,80,0.3)'; ctx.lineWidth = 1;
+  for (let lx = -tw; lx < tw; lx += 12 * sc) { ctx.beginPath(); ctx.moveTo(lx, -6 * sc); ctx.lineTo(lx, th * sc + 4); ctx.stroke(); }
+  for (let ly = -6 * sc; ly < th * sc + 4; ly += 8 * sc) { ctx.beginPath(); ctx.moveTo(-tw, ly); ctx.lineTo(tw, ly); ctx.stroke(); }
+  ctx.restore();
+
+  // Table surface (wood)
+  const wg = ctx.createLinearGradient(0, -24 * sc, 0, -6 * sc);
+  wg.addColorStop(0, '#8B6914'); wg.addColorStop(1, '#5a4010');
+  ctx.fillStyle = wg; ctx.strokeStyle = '#a07820'; ctx.lineWidth = 2 * sc;
+  ctx.beginPath(); ctx.roundRect(-tw, -24 * sc, tw * 2, 18 * sc, 3); ctx.fill(); ctx.stroke();
+
+  // Wood grain
+  ctx.strokeStyle = 'rgba(0,0,0,0.18)'; ctx.lineWidth = 1;
+  for (let gx = -tw + 10; gx < tw - 10; gx += 18 * sc) {
+    ctx.beginPath(); ctx.moveTo(gx, -24 * sc); ctx.lineTo(gx + 4, -6 * sc); ctx.stroke();
+  }
+
+  // Food on surface (5 items, bobbing)
+  const foodCount  = 5;
+  const foodSpread = tw * 0.85;
+  const foodSlice  = TABLE_FOOD.slice(0, foodCount);
+  ctx.font = `${Math.round(17 * sc)}px serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  foodSlice.forEach((emoji, i) => {
+    const fx  = -foodSpread + (foodSpread * 2 / (foodCount - 1)) * i;
+    const bob = Math.sin(animT * 1.2 + i * 1.1) * 1.5;
+    ctx.fillText(emoji, fx, -36 * sc + bob);
+  });
+
+  // Health hearts
+  const hSp = 20 * sc;
+  const hOff = -(MAX_HEALTH - 1) * hSp / 2;
+  ctx.font = `${Math.round(13 * sc)}px serif`;
+  for (let i = 0; i < MAX_HEALTH; i++) {
+    ctx.globalAlpha = i < tableHealth ? 1 : 0.14;
+    ctx.fillText('❤️', hOff + i * hSp, -56 * sc);
+  }
+  ctx.globalAlpha = 1;
+
+  // Low-health damage cracks
+  if (tableHealth <= 2) {
+    ctx.strokeStyle = `rgba(255,90,40,${0.4 + Math.sin(animT * 9) * 0.2})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-28 * sc, -24 * sc); ctx.lineTo(-16 * sc, -10 * sc); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(12 * sc, -24 * sc);  ctx.lineTo(22 * sc,  -8 * sc);  ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// ── Turret (aims at last tapped position, not auto-aim) ───
+function drawTurret() {
+  const x  = getTurretX();
+  const y  = H * 0.5;
+  // Aim toward last tapped point
+  const angle = (aimX >= 0) ? Math.atan2(aimY - y, aimX - x) : 0;
+
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Glow halo
+  const grd = ctx.createRadialGradient(0, 0, 4, 0, 0, 48);
+  grd.addColorStop(0, 'rgba(0,255,231,0.28)'); grd.addColorStop(1, 'rgba(0,255,231,0)');
+  ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(0, 0, 48, 0, Math.PI * 2); ctx.fill();
+
+  // Base
+  ctx.fillStyle = '#0a1a2a'; ctx.strokeStyle = '#00ffe7'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Barrel
+  ctx.rotate(angle);
+  ctx.fillStyle = '#0a2a3a'; ctx.strokeStyle = '#00ffe7'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.rect(4, -6, 34, 12); ctx.fill(); ctx.stroke();
+
+  // Tip glow
+  ctx.fillStyle = '#00ffe7'; ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 10;
+  ctx.beginPath(); ctx.arc(38, 0, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.restore();
+}
+
+// ── Bugs — draw with tap hint rings ──────────────────────
+function drawBugs() {
+  for (const b of bugs) {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+
+    // Tap-target ring (helps player know where to tap)
+    const ringAlpha = 0.18 + Math.sin(animT * 3 + b.t) * 0.08;
+    ctx.strokeStyle = b.type === 'boss' ? '#ff79c6' : '#00ffe7';
+    ctx.lineWidth   = 1.5;
+    ctx.globalAlpha = ringAlpha;
+    ctx.beginPath();
+    ctx.arc(0, 0, Math.max(getTapRadius(), b.size * 0.65), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    if (b.flashTimer > 0) { ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 30; }
+    if (b.type === 'boss') { ctx.shadowColor = '#ff79c6'; ctx.shadowBlur = 20 + Math.sin(animT * 5) * 8; }
+
+    ctx.font = `${b.size}px serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.scale(-1, 1); ctx.fillText(b.emoji, 0, 0); ctx.scale(-1, 1);
+    ctx.shadowBlur = 0;
+
+    // HP bar
+    if (b.maxHp > 1) {
+      const bw = b.size + 8, bh = 5, bx = -(b.size + 8) / 2, by = -b.size / 2 - 12;
+      const f  = b.hp / b.maxHp;
+      ctx.fillStyle = '#1a0a0a'; ctx.fillRect(bx, by, bw, bh);
+      ctx.fillStyle = f > 0.5 ? '#00ff88' : f > 0.25 ? '#ffaa00' : '#ff4444';
+      ctx.fillRect(bx, by, bw * f, bh);
+      ctx.strokeStyle = '#ffffff44'; ctx.lineWidth = 1; ctx.strokeRect(bx, by, bw, bh);
+    }
+
+    ctx.restore();
+  }
+}
+
+// ── Bolts ─────────────────────────────────────────────────
+function drawBolts() {
+  for (const bolt of bolts) {
+    if (!bolt.segments.length) continue;
+    const alpha = bolt.hit ? Math.max(0, 1 - bolt.age / 0.18) : 1;
+    ctx.save();
+    ctx.globalAlpha = alpha * 0.5; ctx.strokeStyle = '#a0c0ff'; ctx.lineWidth = 6;
+    ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 20; ctx.lineCap = 'round';
+    ctx.beginPath();
+    bolt.segments.forEach((s, i) => { if (i === 0) ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2); });
+    ctx.stroke();
+    ctx.globalAlpha = alpha; ctx.strokeStyle = '#e0f0ff'; ctx.lineWidth = 2; ctx.shadowBlur = 8;
+    ctx.stroke();
+    ctx.restore();
+    if (bolt.hit) {
+      const r = 40 * (1 - bolt.age / 0.18);
+      ctx.save(); ctx.globalAlpha = alpha * 0.7;
+      const g = ctx.createRadialGradient(bolt.x, bolt.y, 0, bolt.x, bolt.y, r);
+      g.addColorStop(0, '#ffffff'); g.addColorStop(0.3, '#00ffe7aa'); g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(bolt.x, bolt.y, r, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+
+// ── Particles ─────────────────────────────────────────────
+function drawParticles() {
+  for (const p of particles) {
+    const t = p.life / (p.maxLife || 0.7);
+    ctx.save(); ctx.globalAlpha = t; ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size * t, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+}
+
+// ── Zap texts ─────────────────────────────────────────────
+function drawZapTexts() {
+  for (const z of zapTexts) {
+    const t = Math.min(1, z.life / 0.9);
+    ctx.save(); ctx.globalAlpha = t; ctx.fillStyle = z.color;
+    ctx.shadowColor = z.color; ctx.shadowBlur = 14;
+    ctx.font = `bold ${Math.round(15 + (1 - t) * 4)}px 'Courier New', monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(z.text, z.x, z.y); ctx.restore();
+  }
+}
+
+// ── HUD ───────────────────────────────────────────────────
+function drawHUD() {
+  const pad = 14;
+  const s   = uiScale();
+  ctx.save();
+
+  // Score
+  ctx.font = `bold ${Math.round(20 * s)}px Courier New`;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillStyle = '#ffe156'; ctx.shadowColor = '#ffe156'; ctx.shadowBlur = 10;
+  ctx.fillText(score.toLocaleString(), pad, pad);
+  ctx.shadowBlur = 0;
+  ctx.font = `${Math.round(10 * s)}px Courier New`; ctx.fillStyle = '#7070a0';
+  ctx.fillText('SCORE', pad, pad + Math.round(24 * s));
+
+  // Hi score
+  ctx.textAlign = 'center';
+  ctx.font = `${Math.round(11 * s)}px Courier New`; ctx.fillStyle = '#7070a0';
+  ctx.fillText(`HI ${hiScore.toLocaleString()}`, W / 2, pad + 2);
+
+  // Wave
+  ctx.textAlign = 'right';
+  ctx.font = `bold ${Math.round(20 * s)}px Courier New`;
+  ctx.fillStyle = '#00ffe7'; ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 10;
+  // Leave room for mute button on the right
+  ctx.fillText(`WAVE ${wave}`, W - pad - Math.round(40 * s), pad);
+  ctx.shadowBlur = 0;
+
+  // Wave progress bar
+  const prog = bugsNeeded > 0 ? Math.min(1, killsThisWave / bugsNeeded) : 0;
+  const bw   = Math.round(110 * s);
+  const bx   = W - pad - Math.round(40 * s) - bw;
+  const by   = pad + Math.round(26 * s);
+  ctx.fillStyle = '#0a1a2a'; ctx.fillRect(bx, by, bw, 5);
+  const grd = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+  grd.addColorStop(0, '#00ffe7'); grd.addColorStop(1, '#a000ff');
+  ctx.fillStyle = grd; ctx.fillRect(bx, by, bw * prog, 5);
+  ctx.strokeStyle = '#ffffff22'; ctx.lineWidth = 1; ctx.strokeRect(bx, by, bw, 5);
+
+  ctx.restore();
+
+  // Wave clear banner
+  if (waveClearing && bugs.length === 0) {
+    ctx.save();
+    ctx.font = `bold ${Math.round(24 * s)}px Courier New`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#00ffe7'; ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 24;
+    ctx.globalAlpha = 0.9 + Math.sin(animT * 6) * 0.1;
+    ctx.fillText(`WAVE ${wave} CLEAR!`, W / 2, H * 0.18);
+    ctx.restore();
+  }
+}
+
+// ── Mute button ───────────────────────────────────────────
+function drawMuteBtn() {
+  const mr = getMuteRect();
+  ctx.save();
+  ctx.fillStyle   = 'rgba(0,20,30,0.7)';
+  ctx.strokeStyle = '#00ffe755';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath(); ctx.roundRect(mr.x, mr.y, mr.w, mr.h, 6); ctx.fill(); ctx.stroke();
+
+  ctx.font         = `${Math.round(mr.w * 0.65)}px serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(musicOn ? '🔊' : '🔇', mr.x + mr.w / 2, mr.y + mr.h / 2 + 1);
+  ctx.restore();
+}
+
+// ── Game loop ─────────────────────────────────────────────
+let lastTime = null;
+
+function loop(ts) {
+  if (lastTime === null) lastTime = ts;
+  let dt = (ts - lastTime) / 1000;
+  lastTime = ts;
+  dt = Math.min(dt, DELTA_CAP);
+  update(dt);
+  draw(dt);
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
