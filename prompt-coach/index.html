@@ -467,6 +467,8 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   opacity: 0.8;
 }
 .btn-refine:hover { border-color: var(--gold); color: var(--gold); opacity: 1; }
+.btn-refine.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); opacity: 1; }
+.refine-tick { font-size: 12px; margin-left: 4px; }
 
 /* ── EXPORT PANEL ── */
 .export-panel {
@@ -668,11 +670,11 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
       <div class="refinement-panel" style="background:transparent;border:none;padding:0;margin-top:0;">
         <div class="refinement-title">Refine further</div>
         <div class="refinement-btns">
-          <button class="btn-refine" onclick="refine('shorter')">Make it shorter</button>
-          <button class="btn-refine" onclick="refine('example')">Add an example</button>
-          <button class="btn-refine" onclick="refine('negatives')">Flip negatives to positives</button>
-          <button class="btn-refine" onclick="refine('grounding')">Add grounding instruction</button>
-          <button class="btn-refine" onclick="refine('format')">Specify output format</button>
+          <button class="btn-refine" onclick="toggleRefine('shorter', this)">Make it shorter</button>
+          <button class="btn-refine" onclick="toggleRefine('example', this)">Add an example</button>
+          <button class="btn-refine" onclick="toggleRefine('negatives', this)">Flip negatives to positives</button>
+          <button class="btn-refine" onclick="toggleRefine('grounding', this)">Add grounding instruction</button>
+          <button class="btn-refine" onclick="toggleRefine('format', this)">Specify output format</button>
         </div>
       </div>
     </div>
@@ -1005,7 +1007,7 @@ function buildCoachedPrompt(raw, findings) {
   const issues = findings.filter(f => f.status !== 'good');
 
   // Add action verb if missing
-  if (findings.find(f => f.id === 'action_verb' && f.status === 'missing')) {
+  if (findings.find(f => f.rule.id === 'action_verb' && f.status === 'missing')) {
     p = 'Write ' + p.charAt(0).toLowerCase() + p.slice(1);
   }
 
@@ -1064,25 +1066,25 @@ function buildCoachedPrompt(raw, findings) {
 
   const additions = [];
 
-  if (findings.find(f => f.id === 'context' && f.status !== 'good')) {
+  if (findings.find(f => f.rule.id === 'context' && f.status !== 'good')) {
     additions.push('Context: [Add your situation, company, or project in 1–2 sentences here.]');
   }
-  if (findings.find(f => f.id === 'audience' && f.status !== 'good')) {
+  if (findings.find(f => f.rule.id === 'audience' && f.status !== 'good')) {
     additions.push('Audience: [Specify who will read this — e.g., non-technical manager, sales team, job candidate.]');
   }
-  if (findings.find(f => f.id === 'tone' && f.status !== 'good')) {
+  if (findings.find(f => f.rule.id === 'tone' && f.status !== 'good')) {
     additions.push('Tone: Professional and direct.');
   }
-  if (findings.find(f => f.id === 'format' && f.status !== 'good')) {
+  if (findings.find(f => f.rule.id === 'format' && f.status !== 'good')) {
     additions.push('Format: Use clear headers and bullet points.');
   }
-  if (findings.find(f => f.id === 'length' && f.status !== 'good')) {
-    additions.push('Length: Keep the response under 200 words unless more detail is explicitly needed.');
+  if (findings.find(f => f.rule.id === 'length' && f.status !== 'good')) {
+    additions.push('Length: Be concise — respond in under 150 words or 3-5 bullet points.');
   }
-  if (findings.find(f => f.id === 'examples' && f.status !== 'good')) {
-    additions.push('Example: [Optional — paste one sample input/output pair to show what you mean.]');
+  if (findings.find(f => f.rule.id === 'examples' && f.status !== 'good')) {
+    additions.push('Example: For instance, [paste a sample input or scenario here] should produce [describe what good output looks like].');
   }
-  if (findings.find(f => f.id === 'data_grounding' && f.status !== 'good')) {
+  if (findings.find(f => f.rule.id === 'data_grounding' && f.status !== 'good')) {
     additions.push('Data: [Paste your actual data, metrics, or results here — or add: "Ask me for the data before responding."]');
   }
 
@@ -1122,6 +1124,8 @@ function renderDiff(original, coached, findings) {
 }
 
 function renderCoached(coached) {
+  refineBasePrompt = coached;
+  resetRefineState();
   document.getElementById('coachedText').textContent = coached;
 }
 
@@ -1139,29 +1143,66 @@ function appendToChangelog(text) {
   el.appendChild(div);
 }
 
-function refine(type) {
-  const el = document.getElementById('coachedText');
-  let p = el.textContent;
+// Per-button toggle state — keyed by refinement type
+let refineBasePrompt = '';
+const REFINE_TYPES = ['shorter', 'example', 'negatives', 'grounding', 'format'];
+const refineActive = Object.fromEntries(REFINE_TYPES.map(t => [t, false]));
+
+function resetRefineState() {
+  REFINE_TYPES.forEach(t => { refineActive[t] = false; });
+  document.querySelectorAll('.btn-refine').forEach(btn => setRefineButtonActive(btn, false));
+}
+
+function setRefineButtonActive(btn, active) {
+  if (active) {
+    btn.classList.add('active');
+    if (!btn.querySelector('.refine-tick')) {
+      const tick = document.createElement('span');
+      tick.className = 'refine-tick';
+      tick.textContent = ' ✓';
+      btn.appendChild(tick);
+    }
+  } else {
+    btn.classList.remove('active');
+    const tick = btn.querySelector('.refine-tick');
+    if (tick) tick.remove();
+  }
+}
+
+function updateCoachedText(text) {
+  document.getElementById('coachedText').textContent = text;
+  document.getElementById('diffAfter').textContent = text;
+}
+
+// Pure function: apply one refinement type to a prompt string, return result
+function doRefinement(type, p) {
+  let text = p;
+  let changed = false;
   let changeLog = '';
 
   if (type === 'shorter') {
-    if (!/Length:/i.test(p)) {
-      p += '\nLength: Be concise — respond in under 100 words.';
+    if (!/^Length:/im.test(text)) {
+      text += '\nLength: Be concise — respond in under 100 words.';
+      changed = true;
       changeLog = '<strong>Added length constraint:</strong> Explicit word limit reduces model over-production and padding.';
     } else {
-      p = p.replace(/Length:.*$/m, 'Length: Be concise — respond in under 100 words.');
+      const next = text.replace(/^Length:.*$/m, 'Length: Be concise — respond in under 100 words.');
+      if (next !== text) { text = next; changed = true; }
       changeLog = '<strong>Updated length constraint:</strong> Set to under 100 words.';
     }
   }
+
   if (type === 'example') {
-    if (!/Example:/i.test(p)) {
-      p += '\nExample: For instance, if the input is [X], the output should look like [Y].';
+    if (!/^Example:/im.test(text)) {
+      text += '\nExample: For instance, if the input is [X], the output should look like [Y].';
+      changed = true;
       changeLog = '<strong>Added example slot:</strong> Fill in [X] and [Y] to activate few-shot priming — the highest-leverage prompting technique.';
     }
   }
+
   if (type === 'negatives') {
-    const before = p;
-    const refineNegPatterns = [
+    const before = text;
+    const patterns = [
       [/don['']t\s+(?:make\s+it\s+|be\s+)?(?:too\s+|overly\s+)?formal/gi,            'use a conversational, approachable tone'],
       [/avoid\s+(?:being\s+)?(?:too\s+|overly\s+)?formal/gi,                          'use a conversational, approachable tone'],
       [/don['']t\s+(?:use\s+)?(?:too\s+much\s+)?(?:corporate\s+|business\s+)?jargon/gi, 'use plain everyday language'],
@@ -1183,31 +1224,62 @@ function refine(type) {
       [/avoid\s+([\w]+(?:\s+[\w]+){0,3})/gi,    (_, phrase) => `avoid ${phrase.trim()} ⚠ [rewrite as a positive constraint before using]`],
       [/\bno\s+([\w]+(?:\s+[\w]+){0,2})\b/gi,   (_, phrase) => `${phrase.trim()}-free`],
     ];
-    for (const [pattern, replacement] of refineNegPatterns) {
-      p = typeof replacement === 'function' ? p.replace(pattern, replacement) : p.replace(pattern, replacement);
+    for (const [pattern, replacement] of patterns) {
+      text = typeof replacement === 'function' ? text.replace(pattern, replacement) : text.replace(pattern, replacement);
     }
-    if (p !== before) changeLog = '<strong>Flipped negative instructions:</strong> "don\'t/avoid" phrases rewritten as positive constraints, or flagged ⚠ where a clean rewrite wasn\'t possible.';
+    if (text !== before) {
+      changed = true;
+      changeLog = '<strong>Flipped negative instructions:</strong> "don\'t/avoid" phrases rewritten as positive constraints, or flagged ⚠ where a clean rewrite wasn\'t possible.';
+    }
   }
+
   if (type === 'grounding') {
-    if (!/grounding|source|evidence|cite|based on/i.test(p)) {
-      p += '\nGrounding: Base your response only on verified facts. If uncertain, say so rather than guessing.';
+    if (!/grounding|source|evidence|cite|based on/i.test(text)) {
+      text += '\nGrounding: Base your response only on verified facts. If uncertain, say so rather than guessing.';
+      changed = true;
       changeLog = '<strong>Added grounding instruction:</strong> Anchors the model to verified facts rather than plausible-sounding fabrications.';
     }
   }
+
   if (type === 'format') {
-    if (!/Format:/i.test(p)) {
-      p += '\nFormat: Respond using numbered steps with a brief header for each.';
+    if (!/^Format:/im.test(text)) {
+      text += '\nFormat: Respond using numbered steps with a brief header for each.';
+      changed = true;
       changeLog = '<strong>Added format instruction:</strong> Numbered steps with headers impose scannable structure on the output.';
     } else {
-      p = p.replace(/Format:.*$/m, 'Format: Respond using numbered steps with a brief header for each.');
+      const next = text.replace(/^Format:.*$/m, 'Format: Respond using numbered steps with a brief header for each.');
+      if (next !== text) { text = next; changed = true; }
       changeLog = '<strong>Updated format instruction:</strong> Changed to numbered steps with a brief header for each.';
     }
   }
 
-  el.textContent = p;
-  document.getElementById('diffAfter').textContent = p;
-  if (changeLog) appendToChangelog(changeLog);
-  showToast('Prompt refined');
+  return { text, changed, changeLog };
+}
+
+function toggleRefine(type, btnEl) {
+  const wasActive = refineActive[type];
+  refineActive[type] = !wasActive;
+
+  if (!wasActive) {
+    // Activating: apply incrementally to current text, log the change
+    const result = doRefinement(type, document.getElementById('coachedText').textContent);
+    if (result.changed) {
+      updateCoachedText(result.text);
+      if (result.changeLog) appendToChangelog(result.changeLog);
+      setRefineButtonActive(btnEl, true);
+    } else {
+      refineActive[type] = false; // nothing to apply; don't mark active
+    }
+  } else {
+    // Deactivating: rebuild from base prompt, re-apply all still-active refinements in order
+    let p = refineBasePrompt;
+    for (const t of REFINE_TYPES) {
+      if (refineActive[t]) p = doRefinement(t, p).text;
+    }
+    updateCoachedText(p);
+    setRefineButtonActive(btnEl, false);
+  }
+  showToast(refineActive[type] ? 'Refinement applied' : 'Refinement removed');
 }
 
 // ═══════════════════════════════════════
