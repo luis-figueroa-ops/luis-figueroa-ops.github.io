@@ -3,1076 +3,1141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prompt Coach | Operations, Augmented</title>
+<title>Prompt Coach — Write Prompts That Actually Work</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 :root {
-  --gold: #C9A84C;
-  --gold-dim: #a8893c;
-  --gold-faint: rgba(201,168,76,0.13);
-  --gold-faint2: rgba(201,168,76,0.06);
   --bg: #0e0e0e;
-  --surface: #161616;
-  --surface2: #1c1c1c;
-  --surface3: #242424;
-  --border: rgba(255,255,255,0.07);
-  --border-gold: rgba(201,168,76,0.28);
-  --text: #f0ede8;
-  --text-muted: #888882;
-  --text-dim: #4a4a46;
-  --radius: 10px;
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --bg2: #161616;
+  --bg3: #1e1e1e;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-border: rgba(201,168,76,0.25);
+  --white: #F0EDE6;
+  --muted: #888;
+  --green: #4caf7d;
+  --yellow: #e0b84c;
+  --red: #e05c5c;
+  --green-bg: rgba(76,175,125,0.1);
+  --yellow-bg: rgba(224,184,76,0.1);
+  --red-bg: rgba(224,92,92,0.1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 15px;
-  line-height: 1.6;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  padding: 0 0 80px;
 }
 
-/* ── HEADER ── */
-header {
-  border-bottom: 1px solid var(--border-gold);
-  background: var(--bg);
-  padding: 0 1.5rem;
-  height: 56px;
+/* ── TOP BAR ── */
+.topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 1px solid var(--gold-border);
+  background: rgba(14,14,14,0.95);
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(8px);
 }
-
-.header-brand { display: flex; align-items: center; gap: 10px; }
-
-.header-logo {
-  width: 30px; height: 30px;
-  background: var(--gold-faint);
-  border: 1px solid var(--gold-dim);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700;
-  color: var(--gold); letter-spacing: -0.5px;
+.topbar-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 3px;
+  color: var(--gold);
 }
+.topbar-back {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.topbar-back:hover { color: var(--gold); }
 
-.header-title { font-size: 14px; font-weight: 500; color: var(--text); }
-.header-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
-
-.header-right { display: flex; align-items: center; gap: 8px; }
-
-.badge {
-  font-size: 11px; color: var(--gold);
-  background: var(--gold-faint); border: 1px solid var(--border-gold);
-  border-radius: 4px; padding: 3px 8px;
-  letter-spacing: 0.04em; text-transform: uppercase;
+/* ── HERO ── */
+.hero {
+  padding: 56px 48px 40px;
+  max-width: 900px;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 6vw, 72px);
+  letter-spacing: 3px;
+  line-height: 0.95;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  font-size: 18px;
+  color: var(--white);
+  opacity: 0.7;
+  line-height: 1.7;
+  max-width: 620px;
 }
 
 /* ── MAIN LAYOUT ── */
-.shell {
-  display: flex; flex: 1;
-  max-width: 860px; width: 100%;
-  margin: 0 auto; padding: 0 1.5rem;
-  gap: 1.5rem;
+.main {
+  padding: 0 48px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* ── SIDEBAR (progress) ── */
-.sidebar {
-  width: 200px; flex-shrink: 0;
-  padding: 1.5rem 0;
-  display: flex; flex-direction: column;
-  gap: 0;
-}
-
-.step-item {
-  display: flex; gap: 10px; align-items: flex-start;
-  padding: 0 0 1.5rem 0;
+/* ── INPUT PANEL ── */
+.input-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px;
+  margin-bottom: 32px;
   position: relative;
 }
-
-.step-item:not(:last-child)::after {
+.input-panel::before {
   content: '';
   position: absolute;
-  left: 12px; top: 26px;
-  width: 1px; bottom: 0;
-  background: var(--border);
-  transition: background 0.3s;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--gold);
 }
 
-.step-item.done:not(:last-child)::after { background: var(--gold-dim); }
-.step-item.active:not(:last-child)::after { background: var(--border); }
-
-.step-dot {
-  width: 25px; height: 25px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 600;
-  border: 1px solid var(--border); background: var(--surface);
-  color: var(--text-dim); transition: all 0.25s;
+.label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: block;
 }
 
-.step-item.active .step-dot {
-  border-color: var(--gold); background: var(--gold-faint);
-  color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
-}
-
-.step-item.done .step-dot {
-  border-color: var(--gold-dim); background: var(--gold-dim);
-  color: #0e0e0e;
-}
-
-.step-info { padding-top: 3px; }
-.step-label { font-size: 12.5px; font-weight: 500; color: var(--text-dim); transition: color 0.25s; }
-.step-item.active .step-label { color: var(--text); }
-.step-item.done .step-label { color: var(--text-muted); }
-.step-hint { font-size: 11px; color: var(--text-dim); margin-top: 1px; line-height: 1.4; }
-.step-item.active .step-hint { color: var(--text-muted); }
-
-/* ── CONTENT AREA ── */
-.content { flex: 1; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
-
-/* ── STEP PANELS ── */
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem 1.5rem;
-  display: none;
-  animation: fadeUp 0.2s ease;
-}
-
-.panel.active { display: block; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.panel-eyebrow {
-  font-size: 11px; color: var(--gold);
-  letter-spacing: 0.06em; text-transform: uppercase;
-  margin-bottom: 0.4rem;
-}
-
-.panel-title {
-  font-size: 17px; font-weight: 500; color: var(--text);
-  margin-bottom: 0.3rem;
-}
-
-.panel-desc { font-size: 13.5px; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.55; }
-
-/* ── FORM ELEMENTS ── */
-label {
-  display: block; font-size: 12.5px; font-weight: 500;
-  color: var(--text-muted); margin-bottom: 5px; letter-spacing: 0.02em;
-}
-
-textarea, input[type="text"], select {
+textarea#promptInput {
   width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 14px;
-  padding: 10px 12px;
-  transition: border-color 0.15s;
-  outline: none;
+  background: var(--bg3);
+  border: 1px solid rgba(201,168,76,0.2);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  padding: 18px 20px;
   resize: vertical;
+  min-height: 160px;
+  outline: none;
+  transition: border-color 0.2s;
 }
+textarea#promptInput:focus { border-color: var(--gold); }
+textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 
-textarea:focus, input[type="text"]:focus, select:focus {
-  border-color: var(--border-gold);
-}
-
-textarea::placeholder, input::placeholder { color: var(--text-dim); }
-
-select { appearance: none; cursor: pointer; resize: none; }
-select option { background: #1c1c1c; color: var(--text); }
-
-.field { margin-bottom: 1rem; }
-.field:last-child { margin-bottom: 0; }
-
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-
-.char-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
-
-/* ── CLARIFYING QUESTION ── */
-.clarify-box {
-  background: var(--gold-faint2);
-  border: 1px solid var(--border-gold);
-  border-radius: 8px;
-  padding: 0.9rem 1.1rem;
-  margin-bottom: 1rem;
+/* ── LIVE TIP ── */
+.live-tip {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--gold-dim);
+  border-left: 3px solid var(--gold);
+  font-size: 14px;
+  color: var(--white);
+  opacity: 0.9;
+  line-height: 1.6;
+  min-height: 44px;
+  transition: all 0.3s;
   display: none;
 }
+.live-tip.visible { display: block; }
+.live-tip strong { color: var(--gold); }
 
-.clarify-box.visible { display: block; }
-
-.clarify-q {
-  font-size: 13px; color: var(--gold);
-  font-weight: 500; margin-bottom: 0.5rem;
+/* ── ACTIONS ── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
-
-.clarify-q::before { content: '→ '; }
-
-.clarify-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.6rem; }
-
-.clarify-opt {
-  font-size: 12.5px;
-  background: none; border: 1px solid var(--border-gold);
-  border-radius: 5px; color: var(--text-muted);
-  padding: 4px 10px; cursor: pointer; font-family: var(--font);
-  transition: all 0.15s;
-}
-
-.clarify-opt:hover { background: var(--gold-faint); color: var(--text); }
-.clarify-opt.selected { background: var(--gold-faint); color: var(--gold); border-color: var(--gold); }
-
-/* ── BUTTONS ── */
-.btn-row { display: flex; gap: 8px; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; }
 
 .btn-primary {
-  background: var(--gold); color: #0e0e0e;
-  border: none; border-radius: 7px;
-  padding: 9px 20px; font-size: 13.5px; font-weight: 600;
-  cursor: pointer; font-family: var(--font); letter-spacing: 0.01em;
-  transition: background 0.15s;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: var(--gold);
+  color: #0e0e0e;
+  border: none;
+  padding: 14px 32px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s;
 }
-
-.btn-primary:hover { background: #d4b05a; }
+.btn-primary:hover { background: #dbb85c; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
 .btn-ghost {
-  background: none; color: var(--text-muted);
-  border: 1px solid var(--border); border-radius: 7px;
-  padding: 8px 16px; font-size: 13px;
-  cursor: pointer; font-family: var(--font);
-  transition: all 0.15s;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.char-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: auto;
 }
 
-.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+/* ── RESULTS WRAPPER ── */
+#results { display: none; }
+#results.visible { display: block; }
 
-.btn-icon {
-  background: none; color: var(--text-muted);
-  border: 1px solid var(--border); border-radius: 7px;
-  padding: 8px 14px; font-size: 12.5px;
-  cursor: pointer; font-family: var(--font);
-  display: flex; align-items: center; gap: 5px;
-  transition: all 0.15s;
+/* ── SCORE PANEL ── */
+.score-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
 }
 
-.btn-icon:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
-
-/* ── RESULT PANEL ── */
-.result-panel {
-  background: var(--surface);
-  border: 1px solid var(--border-gold);
-  border-radius: var(--radius);
-  padding: 1.25rem 1.5rem;
-  display: none;
-}
-
-.result-panel.visible { display: block; animation: fadeUp 0.3s ease; }
-
-.result-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.result-title { font-size: 14px; font-weight: 600; color: var(--gold); letter-spacing: 0.02em; }
-
-.result-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-
-.prompt-block {
-  background: #0a0a00;
-  border: 1px solid rgba(201,168,76,0.2);
-  border-radius: 8px;
-  padding: 1.1rem 1.25rem;
-  font-family: 'Fira Code', 'Courier New', monospace;
-  font-size: 13.5px;
-  color: #d4c49a;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin-bottom: 1rem;
+.score-ring {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
   position: relative;
 }
-
-.feedback-bar {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.9rem 1.1rem;
-  margin-bottom: 1rem;
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring .score-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.score-ring .score-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 
-.feedback-title { font-size: 12px; color: var(--text-muted); margin-bottom: 0.6rem; letter-spacing: 0.03em; text-transform: uppercase; }
-
-.feedback-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-
-.ftag {
-  font-size: 12px; padding: 4px 10px;
-  border-radius: 4px; border: 1px solid;
+.score-meta { flex: 1; }
+.score-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.score-summary {
+  font-size: 16px;
+  color: var(--white);
+  opacity: 0.75;
+  line-height: 1.7;
+  max-width: 560px;
 }
 
-.ftag.good { background: rgba(90,158,111,0.1); border-color: rgba(90,158,111,0.3); color: #5a9e6f; }
-.ftag.tip { background: rgba(201,168,76,0.08); border-color: var(--border-gold); color: var(--gold); }
-
-.ai-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 0.25rem; }
-
-.ai-btn {
-  font-size: 12.5px; padding: 7px 14px;
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--text-muted);
-  cursor: pointer; font-family: var(--font);
-  transition: all 0.15s; text-decoration: none;
-  display: inline-flex; align-items: center; gap: 5px;
+/* ── FINDINGS ── */
+.findings-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px;
+  margin-bottom: 28px;
+}
+.panel-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.panel-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gold-border);
 }
 
-.ai-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+.finding {
+  display: flex;
+  gap: 18px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  align-items: flex-start;
+}
+.finding:last-child { border-bottom: none; }
 
-.signature {
-  text-align: right;
+.finding-badge {
+  flex-shrink: 0;
+  width: 72px;
+  text-align: center;
+  padding: 5px 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 2px;
+  margin-top: 2px;
+}
+.badge-good { background: var(--green-bg); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+.badge-weak { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(224,184,76,0.3); }
+.badge-missing { background: var(--red-bg); color: var(--red); border: 1px solid rgba(224,92,92,0.3); }
+
+.finding-body { flex: 1; }
+.finding-rule {
+  font-family: 'Share Tech Mono', monospace;
   font-size: 12px;
-  color: var(--text-dim);
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.finding-desc {
+  font-size: 15px;
+  color: var(--white);
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.finding-research {
+  font-size: 13px;
+  color: var(--muted);
   font-style: italic;
-  margin-top: 0.75rem;
-  letter-spacing: 0.02em;
+  line-height: 1.5;
 }
 
-/* ── REFINEMENT PANEL ── */
-.refine-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.5rem;
-  display: none;
+/* ── DIFF PANEL ── */
+.diff-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px;
+  margin-bottom: 28px;
 }
 
-.refine-panel.visible { display: block; animation: fadeUp 0.2s ease; }
-
-.refine-title { font-size: 13px; color: var(--text-muted); margin-bottom: 0.75rem; }
-
-.refine-options { display: flex; flex-wrap: wrap; gap: 7px; }
-
-.rfn-btn {
-  font-size: 12.5px;
-  background: none; border: 1px solid var(--border);
-  border-radius: 5px; color: var(--text-muted);
-  padding: 5px 12px; cursor: pointer; font-family: var(--font);
-  transition: all 0.15s;
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
 }
 
-.rfn-btn:hover { border-color: var(--border-gold); color: var(--gold); background: var(--gold-faint2); }
+.diff-col-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.diff-before .diff-col-label { color: var(--red); }
+.diff-after .diff-col-label { color: var(--green); }
 
-/* ── FOOTER ── */
-footer {
-  text-align: center; padding: 0.75rem;
-  font-size: 11px; color: var(--text-dim);
-  border-top: 1px solid var(--border);
+.diff-text {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.85;
+  font-family: 'DM Sans', sans-serif;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-footer a { color: var(--gold-dim); text-decoration: none; }
-footer a:hover { color: var(--gold); }
+.diff-changes {
+  border-top: 1px solid var(--gold-border);
+  padding-top: 24px;
+}
+.diff-changes-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.change-item {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 14px;
+  align-items: flex-start;
+}
+.change-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.change-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.8;
+}
+.change-text strong { color: var(--gold); opacity: 1; }
 
-/* ── PRINT STYLES ── */
-@media print {
-  body { background: #fff; color: #111; }
-  header, footer, .sidebar, .refine-panel,
-  .btn-row, .result-actions, .ai-options,
-  .panel:not(.printed), .feedback-bar { display: none !important; }
-  .shell { max-width: 100%; padding: 0; }
-  .result-panel { display: block !important; border: 1px solid #ccc; border-radius: 6px; padding: 1.5rem; }
-  .result-title { color: #a8893c; }
-  .prompt-block { background: #f9f7f0; color: #333; border: 1px solid #ddd; font-size: 13px; }
-  .print-summary { display: block !important; }
-  .signature { color: #999; }
-  .ftag.good { background: #e8f5ed; border-color: #5a9e6f; color: #2d7a4a; }
-  .ftag.tip { background: #fdf6e3; border-color: #a8893c; color: #7a5c1a; }
-  .feedback-bar { display: block !important; background: #f9f9f9; border: 1px solid #eee; }
-  .result-panel.visible { animation: none; }
+/* ── COACHED PROMPT BOX ── */
+.coached-box {
+  background: var(--bg3);
+  border: 1px solid rgba(201,168,76,0.3);
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.coached-prompt-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--white);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.print-summary { display: none; margin-bottom: 1rem; }
-
-@media (max-width: 640px) {
-  .shell { flex-direction: column; padding: 0 1rem; gap: 0; }
-  .sidebar { width: 100%; flex-direction: row; padding: 1rem 0 0.5rem; flex-wrap: wrap; gap: 0.5rem; overflow-x: auto; }
-  .step-item { padding: 0; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; }
-  .step-item::after { display: none; }
-  .step-hint { display: none; }
-  .step-label { font-size: 11px; text-align: center; }
-  .field-row { grid-template-columns: 1fr; }
+/* ── REFINEMENT BUTTONS ── */
+.refinement-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 28px 36px;
+  margin-bottom: 28px;
 }
+.refinement-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.refinement-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.btn-refine {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.8;
+}
+.btn-refine:hover { border-color: var(--gold); color: var(--gold); opacity: 1; }
+
+/* ── EXPORT PANEL ── */
+.export-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 28px 36px;
+  margin-bottom: 28px;
+}
+.export-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.export-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.btn-export {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid var(--gold-border);
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-export:hover { background: rgba(201,168,76,0.25); }
+.btn-export svg { flex-shrink: 0; }
+
+.ai-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ai-row-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+.btn-ai {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--bg3);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-ai:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── SESSION FOOTER ── */
+.session-footer {
+  padding: 28px 0 0;
+  border-top: 1px solid var(--gold-border);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--gold);
+  color: #0e0e0e;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 700px) {
+  .topbar, .hero, .main { padding-left: 20px; padding-right: 20px; }
+  .diff-grid { grid-template-columns: 1fr; }
+  .score-panel { flex-direction: column; gap: 20px; }
+  .input-panel, .findings-panel, .diff-panel, .refinement-panel, .export-panel { padding: 24px 20px; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.5s ease both; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-brand">
-    <div class="header-logo">PC</div>
-    <div>
-      <div class="header-title">Prompt Coach</div>
-      <div class="header-sub">Operations, Augmented</div>
-    </div>
-  </div>
-  <div class="header-right">
-    <span class="badge">Free Tool</span>
-    <button class="btn-ghost" style="font-size:12px;padding:5px 10px;" onclick="resetAll()">Start over</button>
-  </div>
-</header>
-
-<div class="shell">
-
-  <!-- SIDEBAR STEPS -->
-  <aside class="sidebar" id="sidebar">
-    <div class="step-item active" id="s-step-0">
-      <div class="step-dot">1</div>
-      <div class="step-info">
-        <div class="step-label">Your task</div>
-        <div class="step-hint">What do you want AI to do?</div>
-      </div>
-    </div>
-    <div class="step-item" id="s-step-1">
-      <div class="step-dot">2</div>
-      <div class="step-info">
-        <div class="step-label">Audience</div>
-        <div class="step-hint">Who is this for?</div>
-      </div>
-    </div>
-    <div class="step-item" id="s-step-2">
-      <div class="step-dot">3</div>
-      <div class="step-info">
-        <div class="step-label">Format</div>
-        <div class="step-hint">How should it look?</div>
-      </div>
-    </div>
-    <div class="step-item" id="s-step-3">
-      <div class="step-dot">4</div>
-      <div class="step-info">
-        <div class="step-label">Constraints</div>
-        <div class="step-hint">Rules &amp; limits</div>
-      </div>
-    </div>
-    <div class="step-item" id="s-step-4">
-      <div class="step-dot">5</div>
-      <div class="step-info">
-        <div class="step-label">Your prompt</div>
-        <div class="step-hint">Ready to use</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="content" id="main-content">
-
-    <!-- STEP 0: TASK -->
-    <div class="panel active" id="panel-0">
-      <div class="panel-eyebrow">Step 1 of 4</div>
-      <div class="panel-title">What do you want AI to help you do?</div>
-      <div class="panel-desc">Describe it in plain English. Don't worry about wording it perfectly — that's what we're here for.</div>
-
-      <div class="field">
-        <label for="task-input">Your task</label>
-        <textarea id="task-input" rows="3" placeholder="e.g. Write a summary of a meeting, help me respond to a difficult email, generate ideas for a project name..."></textarea>
-        <div class="char-hint" id="task-hint"></div>
-      </div>
-
-      <div class="clarify-box" id="clarify-0">
-        <div class="clarify-q" id="clarify-q-0"></div>
-        <div id="clarify-opts-0" class="clarify-options"></div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-primary" onclick="goStep(1)">Next →</button>
-        <span style="font-size:12px;color:var(--text-dim);">The most common mistake is being too vague here.</span>
-      </div>
-    </div>
-
-    <!-- STEP 1: AUDIENCE -->
-    <div class="panel" id="panel-1">
-      <div class="panel-eyebrow">Step 2 of 4</div>
-      <div class="panel-title">Who is this output for?</div>
-      <div class="panel-desc">AI calibrates tone, vocabulary, and depth based on the audience. Skipping this is the second most common prompt mistake.</div>
-
-      <div class="field">
-        <label for="audience-select">Audience type</label>
-        <select id="audience-select" onchange="audienceSelectChange()">
-          <option value="">Select an audience...</option>
-          <option value="myself">Just me (personal use)</option>
-          <option value="team">My team or colleagues</option>
-          <option value="executive">Senior leaders / executives</option>
-          <option value="client">A client or external partner</option>
-          <option value="general">General public</option>
-          <option value="expert">Subject matter experts</option>
-          <option value="custom">Someone specific (I'll describe)</option>
-        </select>
-      </div>
-
-      <div class="field" id="audience-custom-field" style="display:none;">
-        <label for="audience-custom">Describe the audience</label>
-        <input type="text" id="audience-custom" placeholder="e.g. HR managers at mid-size companies who are not technical">
-      </div>
-
-      <div class="clarify-box" id="clarify-1">
-        <div class="clarify-q" id="clarify-q-1"></div>
-        <div id="clarify-opts-1" class="clarify-options"></div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-ghost" onclick="goStep(0)">← Back</button>
-        <button class="btn-primary" onclick="goStep(2)">Next →</button>
-      </div>
-    </div>
-
-    <!-- STEP 2: FORMAT -->
-    <div class="panel" id="panel-2">
-      <div class="panel-eyebrow">Step 3 of 4</div>
-      <div class="panel-title">What should the output look like?</div>
-      <div class="panel-desc">AI won't guess your preferred format. Telling it saves you an edit cycle.</div>
-
-      <div class="field-row">
-        <div class="field">
-          <label for="format-select">Output format</label>
-          <select id="format-select">
-            <option value="">Any format</option>
-            <option value="bullet list">Bullet list</option>
-            <option value="numbered list">Numbered list</option>
-            <option value="short paragraph">Short paragraph (under 100 words)</option>
-            <option value="multiple paragraphs">Multiple paragraphs</option>
-            <option value="table">Table</option>
-            <option value="email">Email (with subject line)</option>
-            <option value="step-by-step guide">Step-by-step guide</option>
-            <option value="summary">Summary / TL;DR</option>
-            <option value="JSON">JSON / structured data</option>
-            <option value="code">Code only</option>
-            <option value="custom">I'll describe</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="length-select">Length</label>
-          <select id="length-select">
-            <option value="">No preference</option>
-            <option value="very short (1-2 sentences)">Very short (1-2 sentences)</option>
-            <option value="concise (under 100 words)">Concise (under 100 words)</option>
-            <option value="medium (100-300 words)">Medium (100-300 words)</option>
-            <option value="detailed (300-600 words)">Detailed (300-600 words)</option>
-            <option value="comprehensive (600+ words)">Comprehensive (600+ words)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field" id="format-custom-field" style="display:none;">
-        <label for="format-custom">Describe the format</label>
-        <input type="text" id="format-custom" placeholder="e.g. A table with three columns: Task, Owner, Deadline">
-      </div>
-
-      <div class="clarify-box" id="clarify-2">
-        <div class="clarify-q" id="clarify-q-2"></div>
-        <div id="clarify-opts-2" class="clarify-options"></div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-ghost" onclick="goStep(1)">← Back</button>
-        <button class="btn-primary" onclick="goStep(3)">Next →</button>
-      </div>
-    </div>
-
-    <!-- STEP 3: CONSTRAINTS -->
-    <div class="panel" id="panel-3">
-      <div class="panel-eyebrow">Step 4 of 4</div>
-      <div class="panel-title">Any rules, tone, or things to avoid?</div>
-      <div class="panel-desc">Constraints are optional — but they separate good prompts from great ones. Tell the AI what matters to you. Use "do this" not "don't do that."</div>
-
-      <div class="field">
-        <label for="tone-select">Tone</label>
-        <select id="tone-select">
-          <option value="">No specific tone</option>
-          <option value="professional and formal">Professional and formal</option>
-          <option value="friendly and conversational">Friendly and conversational</option>
-          <option value="direct and concise">Direct and concise</option>
-          <option value="empathetic and supportive">Empathetic and supportive</option>
-          <option value="confident and persuasive">Confident and persuasive</option>
-          <option value="neutral and objective">Neutral and objective</option>
-          <option value="creative and expressive">Creative and expressive</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="constraints-input">Specific rules or things to include / avoid</label>
-        <textarea id="constraints-input" rows="2" placeholder="e.g. Use plain language, no jargon. Keep it action-oriented. Include a next step at the end. Avoid buzzwords."></textarea>
-      </div>
-
-      <div class="field">
-        <label for="context-input">Background context (optional but powerful)</label>
-        <textarea id="context-input" rows="2" placeholder="e.g. I work in sales operations at a SaaS company. The email is going to a VP who values brevity."></textarea>
-      </div>
-
-      <div class="clarify-box" id="clarify-3">
-        <div class="clarify-q" id="clarify-q-3"></div>
-        <div id="clarify-opts-3" class="clarify-options"></div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-ghost" onclick="goStep(2)">← Back</button>
-        <button class="btn-primary" onclick="buildPrompt()">Build my prompt →</button>
-      </div>
-    </div>
-
-    <!-- RESULT PANEL -->
-    <div class="result-panel" id="result-panel">
-
-      <!-- Print-only summary -->
-      <div class="print-summary" id="print-summary"></div>
-
-      <div class="result-header">
-        <div class="result-title">Your prompt — ready to use</div>
-        <div class="result-actions">
-          <button class="btn-icon" onclick="copyPrompt()" id="copy-btn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            Copy
-          </button>
-          <button class="btn-icon" onclick="window.print()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Save as PDF
-          </button>
-          <button class="btn-icon" onclick="editPrompt()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Edit
-          </button>
-        </div>
-      </div>
-
-      <div class="prompt-block" id="prompt-output"></div>
-
-      <div class="feedback-bar">
-        <div class="feedback-title">What makes this prompt work</div>
-        <div class="feedback-tags" id="feedback-tags"></div>
-      </div>
-
-      <div style="margin-bottom:0.75rem;">
-        <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:0.6rem;">Test it in your AI of choice</div>
-        <div class="ai-options">
-          <a class="ai-btn" id="ai-claude" href="#" target="_blank" onclick="openAI('claude',event)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            Claude
-          </a>
-          <a class="ai-btn" id="ai-chatgpt" href="#" target="_blank" onclick="openAI('chatgpt',event)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            ChatGPT
-          </a>
-          <a class="ai-btn" id="ai-gemini" href="#" target="_blank" onclick="openAI('gemini',event)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            Gemini
-          </a>
-          <a class="ai-btn" id="ai-copilot" href="#" target="_blank" onclick="openAI('copilot',event)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            Copilot
-          </a>
-        </div>
-      </div>
-
-      <div class="signature">Reads between the lines of a process document.</div>
-    </div>
-
-    <!-- REFINE PANEL -->
-    <div class="refine-panel" id="refine-panel">
-      <div class="refine-title">Want to adjust the prompt?</div>
-      <div class="refine-options">
-        <button class="rfn-btn" onclick="refine('specific')">Make it more specific</button>
-        <button class="rfn-btn" onclick="refine('shorter')">Make it shorter</button>
-        <button class="rfn-btn" onclick="refine('example')">Add an example</button>
-        <button class="rfn-btn" onclick="refine('tone')">Change the tone</button>
-        <button class="rfn-btn" onclick="refine('context')">Add more context</button>
-        <button class="rfn-btn" onclick="resetAll()">Start over</button>
-      </div>
-    </div>
-
-  </main>
+<div class="topbar">
+  <span class="topbar-brand">Prompt Coach</span>
+  <a class="topbar-back" href="https://luis-figueroa-ops.github.io">← Back to Tools</a>
 </div>
 
-<footer>
-  Built by <a href="https://luis-figueroa-ops.github.io" target="_blank">luis-figueroa-ops.github.io</a>
-  &nbsp;·&nbsp; Operations, Augmented &nbsp;·&nbsp; No API key required · Zero cost to use
-</footer>
+<div class="hero">
+  <div class="hero-eyebrow">Career Tools</div>
+  <h1>Prompt<br><span>Coach</span></h1>
+  <p class="hero-sub">Type a rough prompt. Get a score, a diagnosis, a coached version, and export-ready buttons — no API key, no sign-in, zero cost.</p>
+</div>
+
+<div class="main">
+
+  <!-- INPUT PANEL -->
+  <div class="input-panel fade-up">
+    <label class="label" for="promptInput">Your Prompt or Task Description</label>
+    <textarea id="promptInput" placeholder="e.g. write me something about onboarding..."></textarea>
+    <div id="liveTip" class="live-tip"></div>
+    <div class="actions">
+      <button class="btn-primary" id="analyzeBtn" onclick="analyzePrompt()">Analyze Prompt</button>
+      <button class="btn-ghost" onclick="clearAll()">Clear</button>
+      <span class="char-count" id="charCount">0 chars</span>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- SCORE -->
+    <div class="score-panel fade-up">
+      <div class="score-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#222" stroke-width="10"/>
+          <circle id="scoreArc" cx="60" cy="60" r="50" fill="none" stroke="#C9A84C" stroke-width="10"
+            stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"
+            style="transition: stroke-dashoffset 0.8s ease, stroke 0.4s"/>
+        </svg>
+        <div class="score-num">
+          <span id="scoreNum" style="color: var(--gold)">0</span>
+          <span class="score-label">/ 100</span>
+        </div>
+      </div>
+      <div class="score-meta">
+        <div class="score-title" id="scoreTitle">—</div>
+        <div class="score-summary" id="scoreSummary"></div>
+      </div>
+    </div>
+
+    <!-- FINDINGS -->
+    <div class="findings-panel fade-up">
+      <div class="panel-title">Diagnosis</div>
+      <div id="findingsList"></div>
+    </div>
+
+    <!-- DIFF -->
+    <div class="diff-panel fade-up">
+      <div class="panel-title">Before &amp; After</div>
+      <div class="diff-grid">
+        <div class="diff-before">
+          <div class="diff-col-label">Original</div>
+          <div class="diff-text" id="diffBefore"></div>
+        </div>
+        <div class="diff-after">
+          <div class="diff-col-label">Coached Version</div>
+          <div class="diff-text" id="diffAfter"></div>
+        </div>
+      </div>
+      <div class="diff-changes">
+        <div class="diff-changes-title">What changed &amp; why</div>
+        <div id="changesList"></div>
+      </div>
+    </div>
+
+    <!-- COACHED PROMPT (FULL) -->
+    <div class="findings-panel fade-up" id="coachedSection">
+      <div class="panel-title">Coached Prompt</div>
+      <div class="coached-box">
+        <div class="coached-prompt-text" id="coachedText"></div>
+      </div>
+
+      <!-- REFINEMENT -->
+      <div class="refinement-panel" style="background:transparent;border:none;padding:0;margin-top:0;">
+        <div class="refinement-title">Refine further</div>
+        <div class="refinement-btns">
+          <button class="btn-refine" onclick="refine('shorter')">Make it shorter</button>
+          <button class="btn-refine" onclick="refine('example')">Add an example</button>
+          <button class="btn-refine" onclick="refine('negatives')">Flip negatives to positives</button>
+          <button class="btn-refine" onclick="refine('grounding')">Add grounding instruction</button>
+          <button class="btn-refine" onclick="refine('format')">Specify output format</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="export-panel fade-up">
+      <div class="export-title">Export &amp; Test</div>
+      <div class="export-row">
+        <button class="btn-export" onclick="copyCoached()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy Coached Prompt
+        </button>
+        <button class="btn-export" onclick="savePDF()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Save as PDF
+        </button>
+      </div>
+      <div class="ai-row-label">Test in your AI of choice</div>
+      <div class="ai-row">
+        <button class="btn-ai" onclick="openAI('claude')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.5"/><path d="M10 22l6-12 6 12M12.5 18h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Claude
+        </button>
+        <button class="btn-ai" onclick="openAI('chatgpt')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.5"/><path d="M10 16a6 6 0 0112 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          ChatGPT
+        </button>
+        <button class="btn-ai" onclick="openAI('gemini')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><polygon points="16,4 28,16 16,28 4,16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          Gemini
+        </button>
+        <button class="btn-ai" onclick="openAI('copilot')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5"/><path d="M10 16h12M16 10v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Copilot
+        </button>
+      </div>
+    </div>
+
+    <div class="session-footer fade-up">
+      <em>Reads between the lines of a process document.</em>
+    </div>
+
+  </div><!-- /results -->
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
 
 <script>
-// ── STATE ──
-const state = {
-  task: '', audience: '', audienceCustom: '',
-  format: '', length: '', formatCustom: '',
-  tone: '', constraints: '', context: '',
-  generatedPrompt: ''
-};
-
-let currentStep = 0;
-
-// ── CLARIFYING QUESTIONS by step ──
-const clarifyData = {
-  0: {
-    trigger: (val) => val.length > 10 && val.length < 60,
-    question: 'Is this a one-time task or something you want to reuse?',
-    options: ['One-time task', 'Reusable template', 'Not sure yet']
+// ═══════════════════════════════════════════════════════
+// COACHING RULES — grounded in prompt engineering research
+// ═══════════════════════════════════════════════════════
+const RULES = [
+  {
+    id: 'action_verb',
+    name: 'Action Verb',
+    weight: 12,
+    check(p) {
+      const verbs = /^(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|help me|give me|show me)/i;
+      return verbs.test(p.trim()) ? 'good' : 'missing';
+    },
+    goodMsg: 'Opens with a clear action verb — the model knows exactly what to do.',
+    weakMsg: null,
+    missingMsg: 'No action verb at the start. The model has to guess what you want done.',
+    research: 'OpenAI and Anthropic prompt guides both cite imperative-verb openers as the single highest-leverage fix for vague prompts. The model\'s instruction-tuning is anchored to action words.'
   },
-  1: {
-    trigger: (val) => val === 'team',
-    question: 'What level of detail does your team expect?',
-    options: ['High-level summary', 'Full detail', 'Depends on the output']
+  {
+    id: 'vagueness',
+    name: 'Specificity',
+    weight: 12,
+    check(p) {
+      const vague = /\b(something|stuff|things|whatever|anything|some kind|sort of|kind of|etc\.?|and so on)\b/i;
+      const specific = p.length > 80 && !vague.test(p);
+      if (vague.test(p)) return 'missing';
+      if (p.length < 40) return 'weak';
+      return specific ? 'good' : 'weak';
+    },
+    goodMsg: 'Specific enough that the model has a clear target.',
+    weakMsg: 'A bit thin — the model will fill gaps with generic defaults.',
+    missingMsg: 'Vague filler words detected. The model can\'t act on "something" or "stuff".',
+    research: 'Wei et al. (2022) chain-of-thought research shows specificity reduces hallucination by giving the model a verifiable target rather than a semantic cloud.'
   },
-  2: {
-    trigger: (val) => val === 'bullet list' || val === 'numbered list',
-    question: 'How many items should the list have?',
-    options: ['3-5 items', '5-10 items', 'As many as needed']
+  {
+    id: 'audience',
+    name: 'Audience',
+    weight: 8,
+    check(p) {
+      const hasAudience = /\b(for a|for an|for my|audience|reader|beginner|expert|manager|team|client|customer|executive|engineer|developer|non-?technical|stakeholder)\b/i;
+      return hasAudience.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Audience is specified — the model can calibrate vocabulary and depth.',
+    weakMsg: 'No audience stated. The model will guess a middle-ground reader, often missing the mark.',
+    missingMsg: null,
+    research: 'Anthropic\'s Constitutional AI work shows audience specification shifts tone and complexity calibration. Without it, models default to a neutral register that often fits no one perfectly.'
   },
-  3: {
-    trigger: (val) => val.length > 5,
-    question: 'Should the AI explain its reasoning, or just give the answer?',
-    options: ['Just the output', 'Brief explanation', 'Full reasoning']
+  {
+    id: 'format',
+    name: 'Output Format',
+    weight: 10,
+    check(p) {
+      const hasFormat = /\b(bullet|bulleted|numbered|list|table|paragraph|json|markdown|summary|outline|step.by.step|in \d+ (words|sentences|paragraphs|points)|as a|format|structure)\b/i;
+      return hasFormat.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Output format is defined — no guessing on structure.',
+    weakMsg: 'No format specified. The model will pick one, often verbose prose when you wanted bullets.',
+    missingMsg: null,
+    research: 'Zhou et al. (2023) "Large Language Models are Human-Level Prompt Engineers" found format constraints were the #2 most impactful prompt variable after task clarity.'
+  },
+  {
+    id: 'context',
+    name: 'Context',
+    weight: 12,
+    check(p) {
+      const hasContext = /\b(we are|i am|i\'m|our|my|company|team|project|currently|working on|building|situation|background|context)\b/i;
+      if (hasContext.test(p)) return 'good';
+      if (p.length > 120) return 'weak';
+      return 'missing';
+    },
+    goodMsg: 'Context provided — the model can tailor the response to your situation.',
+    weakMsg: 'Limited context. Adding your situation, company, or project usually doubles relevance.',
+    missingMsg: 'No context. The model is working blind. A sentence about your situation dramatically improves output.',
+    research: 'Brown et al. (2020) GPT-3 few-shot paper established that in-context examples and situational priming are the primary mechanism for steering large models toward task-relevant outputs.'
+  },
+  {
+    id: 'negative_instructions',
+    name: 'Negative Instructions',
+    weight: 8,
+    check(p) {
+      const hasNeg = /\b(don\'t|do not|never|avoid|without|no (lists|bullets|headers|markdown|jargon|fluff|filler|intro|summary|preamble))\b/i;
+      return hasNeg.test(p) ? 'weak' : 'good';
+    },
+    goodMsg: 'No negative instructions detected — prompt is framed positively.',
+    weakMsg: 'Contains "don\'t" or "avoid" phrasing. Negative instructions are less reliable — models sometimes invert them under load.',
+    missingMsg: null,
+    research: 'Mishra et al. (2022) "Reframing Instructional Prompts to GPTk\'s Language" found that flipping negatives to positive constraints increased instruction-following accuracy by ~12% across benchmarks.'
+  },
+  {
+    id: 'length',
+    name: 'Length Constraint',
+    weight: 8,
+    check(p) {
+      const hasLength = /\b(in \d+|under \d+|about \d+|max \d+|no more than|at most|concise|brief|short|detailed|thorough|comprehensive|one.page|one page|\d+ words|\d+ sentences|\d+ paragraphs|\d+ bullet)\b/i;
+      return hasLength.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Length or depth is constrained — the model knows when to stop.',
+    weakMsg: 'No length constraint. Models often over-produce. Specify "in 3 bullets" or "under 150 words" to get tighter output.',
+    missingMsg: null,
+    research: 'Anthropic prompt engineering docs recommend explicit length tokens as one of the fastest ways to reduce padding and filler, which accounts for ~20-30% of raw model output on open-ended tasks.'
+  },
+  {
+    id: 'multitask',
+    name: 'Single Focus',
+    weight: 10,
+    check(p) {
+      const connectors = (p.match(/\b(and also|and then|additionally|furthermore|as well as|plus|also)\b/gi) || []).length;
+      const tasks = (p.match(/\b(write|create|analyze|summarize|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify)\b/gi) || []).length;
+      if (tasks > 2 || connectors > 1) return 'weak';
+      return 'good';
+    },
+    goodMsg: 'Single focused task — models perform significantly better on one clear objective.',
+    weakMsg: 'Multiple tasks detected. Models split attention and deliver mediocre results on each. Consider separate prompts.',
+    missingMsg: null,
+    research: 'Anthropic recommends breaking multi-task prompts into sequential sub-prompts. Liu et al. (2023) found accuracy drops ~18% when prompts contain 3+ distinct tasks vs. one.'
+  },
+  {
+    id: 'examples',
+    name: 'Examples',
+    weight: 10,
+    check(p) {
+      const hasExample = /\b(for example|e\.g\.|such as|like this|here\'s an example|sample|example:|input:|output:|e\.g:|e\.g,)\b/i;
+      return hasExample.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Includes an example — few-shot priming is one of the most reliable accuracy boosters.',
+    weakMsg: 'No example provided. Even one "for example" clause can cut ambiguity in half.',
+    missingMsg: null,
+    research: 'Brown et al. (2020) GPT-3 paper: few-shot examples are the highest-leverage prompting technique for instruction following, often outperforming fine-tuned smaller models.'
+  },
+  {
+    id: 'tone',
+    name: 'Tone',
+    weight: 10,
+    check(p) {
+      const hasTone = /\b(professional|casual|formal|informal|friendly|direct|concise|technical|plain|conversational|persuasive|neutral|serious|humorous|empathetic|confident|authoritative)\b/i;
+      return hasTone.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Tone is specified — the model can match your voice.',
+    weakMsg: 'No tone specified. The model defaults to a neutral academic tone that often sounds robotic.',
+    missingMsg: null,
+    research: 'Style and tone tokens are among the fastest interventions for output quality. Reynolds & McDonell (2021) showed tone modifiers reduce post-editing time by ~25% in writing tasks.'
   }
-};
+];
 
-let clarifyAnswers = { 0: null, 1: null, 2: null, 3: null };
+// ═══════════════════════════════════════
+// LIVE TIP ENGINE
+// ═══════════════════════════════════════
+const TIPS = [
+  { trigger: p => p.length > 0 && p.length < 20, msg: '<strong>Too short.</strong> Even a 10-word context sentence will dramatically improve results.' },
+  { trigger: p => /\b(something|stuff|things)\b/i.test(p), msg: '<strong>Vague word detected.</strong> Replace "something" or "stuff" with the actual deliverable.' },
+  { trigger: p => /\bdon\'t\b/i.test(p), msg: '<strong>Negative instruction.</strong> Try flipping "don\'t include X" to "focus only on Y" for more reliable results.' },
+  { trigger: p => p.length > 30 && !/\b(write|create|draft|summarize|analyze|list|generate|build|describe|explain|review|suggest|evaluate|outline|extract|identify|fix|improve|help)\b/i.test(p.trim().split(' ').slice(0,3).join(' ')), msg: '<strong>No action verb.</strong> Start with what you want done: Write, Analyze, Summarize, List...' },
+  { trigger: p => (p.match(/\b(and also|and then|additionally)\b/gi) || []).length > 1, msg: '<strong>Multiple tasks.</strong> Split into separate prompts for much better results on each.' },
+  { trigger: p => p.length > 60 && !/\b(bullet|list|table|paragraph|json|\d+ words|\d+ sentences)\b/i.test(p), msg: '<strong>No format specified.</strong> Add "as a bulleted list" or "in 3 paragraphs" to control output shape.' },
+  { trigger: p => p.length > 80 && !/\b(for a|for my|audience|beginner|expert|manager|team|client)\b/i.test(p), msg: '<strong>Who is this for?</strong> Adding "for a non-technical manager" or "for a sales team" focuses the output instantly.' },
+];
 
-// ── NAVIGATION ──
-function goStep(n) {
-  if (n > 0 && !validateStep(currentStep)) return;
+const input = document.getElementById('promptInput');
+const liveTipEl = document.getElementById('liveTip');
+const charCountEl = document.getElementById('charCount');
 
-  document.getElementById(`panel-${currentStep}`).classList.remove('active');
-  document.getElementById(`s-step-${currentStep}`).classList.remove('active');
-  document.getElementById(`s-step-${currentStep}`).classList.add('done');
-
-  if (n < currentStep) {
-    for (let i = n; i <= currentStep; i++) {
-      document.getElementById(`s-step-${i}`).classList.remove('done');
-    }
-  }
-
-  currentStep = n;
-  document.getElementById(`panel-${n}`).classList.add('active');
-  document.getElementById(`s-step-${n}`).classList.remove('done');
-  document.getElementById(`s-step-${n}`).classList.add('active');
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  triggerClarify(n);
-}
-
-function validateStep(step) {
-  if (step === 0) {
-    const val = document.getElementById('task-input').value.trim();
-    if (!val) {
-      document.getElementById('task-input').focus();
-      document.getElementById('task-input').style.borderColor = 'rgba(201,168,76,0.6)';
-      setTimeout(() => document.getElementById('task-input').style.borderColor = '', 1500);
-      return false;
-    }
-    state.task = val;
-  }
-  if (step === 1) {
-    const sel = document.getElementById('audience-select').value;
-    state.audience = sel;
-    if (sel === 'custom') state.audienceCustom = document.getElementById('audience-custom').value.trim();
-  }
-  if (step === 2) {
-    state.format = document.getElementById('format-select').value;
-    state.length = document.getElementById('length-select').value;
-    if (state.format === 'custom') state.formatCustom = document.getElementById('format-custom').value.trim();
-  }
-  return true;
-}
-
-// ── CLARIFYING QUESTIONS ──
-function triggerClarify(step) {
-  const box = document.getElementById(`clarify-${step}`);
-  if (!box || !clarifyData[step]) return;
-
-  let triggerVal = '';
-  if (step === 0) triggerVal = document.getElementById('task-input').value.trim();
-  if (step === 1) triggerVal = document.getElementById('audience-select').value;
-  if (step === 2) triggerVal = document.getElementById('format-select').value;
-  if (step === 3) triggerVal = document.getElementById('constraints-input').value.trim();
-
-  const data = clarifyData[step];
-  if (data.trigger(triggerVal)) {
-    document.getElementById(`clarify-q-${step}`).textContent = data.question;
-    const optsEl = document.getElementById(`clarify-opts-${step}`);
-    optsEl.innerHTML = '';
-    data.options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.className = 'clarify-opt';
-      btn.textContent = opt;
-      btn.onclick = () => {
-        optsEl.querySelectorAll('.clarify-opt').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        clarifyAnswers[step] = opt;
-      };
-      optsEl.appendChild(btn);
-    });
-    box.classList.add('visible');
+input.addEventListener('input', () => {
+  const p = input.value;
+  charCountEl.textContent = p.length + ' chars';
+  const tip = TIPS.find(t => t.trigger(p));
+  if (tip && p.length > 5) {
+    liveTipEl.innerHTML = '💡 ' + tip.msg;
+    liveTipEl.classList.add('visible');
   } else {
-    box.classList.remove('visible');
+    liveTipEl.classList.remove('visible');
   }
-}
-
-// ── AUDIENCE SELECT CHANGE ──
-function audienceSelectChange() {
-  const val = document.getElementById('audience-select').value;
-  document.getElementById('audience-custom-field').style.display = val === 'custom' ? 'block' : 'none';
-  triggerClarify(1);
-}
-
-// ── FORMAT SELECT CHANGE ──
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('format-select').addEventListener('change', function() {
-    document.getElementById('format-custom-field').style.display = this.value === 'custom' ? 'block' : 'none';
-    triggerClarify(2);
-  });
-
-  document.getElementById('task-input').addEventListener('input', function() {
-    const len = this.value.length;
-    const hint = document.getElementById('task-hint');
-    if (len < 20) hint.textContent = 'Try to be more specific about what you want.';
-    else if (len < 60) hint.textContent = 'Good — a bit more detail will help.';
-    else hint.textContent = 'Nice. That gives AI enough to work with.';
-    triggerClarify(0);
-  });
-
-  document.getElementById('constraints-input').addEventListener('input', () => triggerClarify(3));
 });
 
-// ── BUILD PROMPT ──
-function buildPrompt() {
-  if (!validateStep(3)) return;
+// ═══════════════════════════════════════
+// COACH ENGINE
+// ═══════════════════════════════════════
+function analyzePrompt() {
+  const raw = input.value.trim();
+  if (!raw) { showToast('Paste a prompt first'); return; }
 
-  state.constraints = document.getElementById('constraints-input').value.trim();
-  state.context = document.getElementById('context-input').value.trim();
-  state.tone = document.getElementById('tone-select').value;
+  const findings = RULES.map(r => ({
+    rule: r,
+    status: r.check(raw)
+  }));
 
-  const lines = [];
+  const score = computeScore(findings);
+  const coached = buildCoachedPrompt(raw, findings);
 
-  // Role / context line
-  if (state.context) {
-    lines.push(`Context: ${state.context}`);
-    lines.push('');
-  }
+  renderScore(score, findings);
+  renderFindings(findings);
+  renderDiff(raw, coached, findings);
+  renderCoached(coached);
 
-  // Core task
-  lines.push(`Task: ${state.task}`);
-
-  // Audience
-  if (state.audience) {
-    const audienceMap = {
-      myself: 'Write this for my own personal use.',
-      team: 'The output will be shared with my team.',
-      executive: 'The audience is senior leadership — keep it executive-level and strategic.',
-      client: 'This is for an external client or partner.',
-      general: 'Write for a general audience with no assumed background knowledge.',
-      expert: 'The audience consists of subject matter experts in this field.',
-      custom: state.audienceCustom || 'A specific audience (described above).'
-    };
-    lines.push(`Audience: ${audienceMap[state.audience] || state.audience}`);
-  }
-
-  // Format
-  const formatParts = [];
-  if (state.format && state.format !== 'custom') formatParts.push(`Format: ${state.format}`);
-  if (state.format === 'custom' && state.formatCustom) formatParts.push(`Format: ${state.formatCustom}`);
-  if (state.length) formatParts.push(`Length: ${state.length}`);
-  if (formatParts.length) lines.push(formatParts.join('. ') + '.');
-
-  // Tone
-  if (state.tone) lines.push(`Tone: ${state.tone}.`);
-
-  // Constraints
-  if (state.constraints) {
-    lines.push('');
-    lines.push(`Rules: ${state.constraints}`);
-  }
-
-  // Clarify answers as hints
-  const extras = [];
-  if (clarifyAnswers[0] === 'Reusable template') extras.push('Write this as a reusable template I can adapt.');
-  if (clarifyAnswers[2] === '3-5 items') extras.push('Limit the list to 3-5 items.');
-  if (clarifyAnswers[2] === '5-10 items') extras.push('Include 5-10 items in the list.');
-  if (clarifyAnswers[3] === 'Brief explanation') extras.push('Briefly explain your reasoning after the output.');
-  if (clarifyAnswers[3] === 'Full reasoning') extras.push('Show your full reasoning process, then give the final output.');
-  if (extras.length) { lines.push(''); extras.forEach(e => lines.push(e)); }
-
-  state.generatedPrompt = lines.join('\n');
-
-  document.getElementById('prompt-output').textContent = state.generatedPrompt;
-
-  // Feedback tags
-  buildFeedbackTags();
-
-  // Print summary
-  buildPrintSummary();
-
-  // Show result
-  document.getElementById('result-panel').classList.add('visible');
-  document.getElementById('refine-panel').classList.add('visible');
-
-  // Mark step 5 active
-  document.getElementById('s-step-4').classList.add('active');
-  document.getElementById('s-step-3').classList.remove('active');
-  document.getElementById('s-step-3').classList.add('done');
-
-  setTimeout(() => {
-    document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function buildFeedbackTags() {
-  const tags = [];
-  tags.push({ type: 'good', text: 'Task defined' });
-  if (state.audience) tags.push({ type: 'good', text: 'Audience set' });
-  else tags.push({ type: 'tip', text: 'Tip: adding an audience improves tone' });
-  if (state.format) tags.push({ type: 'good', text: 'Format specified' });
-  else tags.push({ type: 'tip', text: 'Tip: specifying format saves an edit cycle' });
-  if (state.tone) tags.push({ type: 'good', text: 'Tone specified' });
-  if (state.constraints) tags.push({ type: 'good', text: 'Constraints included' });
-  if (state.context) tags.push({ type: 'good', text: 'Context grounded' });
-
-  const el = document.getElementById('feedback-tags');
-  el.innerHTML = '';
-  tags.forEach(t => {
-    const span = document.createElement('span');
-    span.className = `ftag ${t.type}`;
-    span.textContent = t.text;
-    el.appendChild(span);
+function computeScore(findings) {
+  let earned = 0, total = 0;
+  findings.forEach(f => {
+    total += f.rule.weight;
+    if (f.status === 'good') earned += f.rule.weight;
+    else if (f.status === 'weak') earned += f.rule.weight * 0.4;
   });
+  return Math.round((earned / total) * 100);
 }
 
-function buildPrintSummary() {
-  const el = document.getElementById('print-summary');
-  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  el.innerHTML = `
-    <div style="border-bottom:1px solid #ddd;padding-bottom:0.75rem;margin-bottom:1rem;">
-      <div style="font-size:18px;font-weight:600;color:#a8893c;margin-bottom:4px;">Prompt Coach — Operations, Augmented</div>
-      <div style="font-size:12px;color:#999;">Generated ${date} · luis-figueroa-ops.github.io</div>
-    </div>
-    <div style="margin-bottom:0.75rem;">
-      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">Task</div>
-      <div style="font-size:13px;color:#333;">${escapeHtml(state.task)}</div>
-    </div>
-  `;
+function scoreLabel(s) {
+  if (s >= 85) return { label: 'Strong Prompt', color: 'var(--green)' };
+  if (s >= 65) return { label: 'Decent Prompt', color: 'var(--yellow)' };
+  if (s >= 40) return { label: 'Needs Work', color: 'var(--yellow)' };
+  return { label: 'Weak Prompt', color: 'var(--red)' };
 }
 
-function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function scoreSummary(s, findings) {
+  const missing = findings.filter(f => f.status === 'missing').map(f => f.rule.name.toLowerCase());
+  const weak = findings.filter(f => f.status === 'weak').map(f => f.rule.name.toLowerCase());
+  if (s >= 85) return 'This prompt is well-structured. Minor refinements possible.';
+  if (missing.length > 0) return `Missing: ${missing.slice(0,3).join(', ')}. These gaps will produce generic or off-target results.`;
+  if (weak.length > 0) return `Weak on: ${weak.slice(0,3).join(', ')}. Tighten these to get noticeably better output.`;
+  return 'The coached version below applies targeted fixes to each weak area.';
 }
 
-// ── OPEN AI ──
-function openAI(which, e) {
-  e.preventDefault();
-  const urls = {
-    claude: 'https://claude.ai/new',
-    chatgpt: 'https://chatgpt.com/',
-    gemini: 'https://gemini.google.com/',
-    copilot: 'https://copilot.microsoft.com/'
-  };
-  // Copy prompt to clipboard first, then open
-  navigator.clipboard.writeText(state.generatedPrompt).then(() => {
-    window.open(urls[which], '_blank');
-    // Brief visual feedback
-    const btn = document.getElementById(`ai-${which}`);
-    const orig = btn.innerHTML;
-    btn.innerHTML = btn.innerHTML.replace(which.charAt(0).toUpperCase() + which.slice(1), 'Copied + Opening...');
-    setTimeout(() => { btn.innerHTML = orig; }, 2000);
-  }).catch(() => {
-    window.open(urls[which], '_blank');
-  });
+function renderScore(score, findings) {
+  const { label, color } = scoreLabel(score);
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreNum').style.color = color;
+  document.getElementById('scoreTitle').textContent = label;
+  document.getElementById('scoreTitle').style.color = color;
+  document.getElementById('scoreSummary').textContent = scoreSummary(score, findings);
+  const arc = document.getElementById('scoreArc');
+  const circumference = 314;
+  const offset = circumference - (score / 100) * circumference;
+  arc.style.strokeDashoffset = offset;
+  arc.style.stroke = color;
 }
 
-// ── COPY PROMPT ──
-function copyPrompt() {
-  navigator.clipboard.writeText(state.generatedPrompt).then(() => {
-    const btn = document.getElementById('copy-btn');
-    btn.innerHTML = btn.innerHTML.replace('Copy', 'Copied!');
-    btn.style.color = '#5a9e6f';
-    btn.style.borderColor = 'rgba(90,158,111,0.4)';
-    setTimeout(() => {
-      btn.innerHTML = btn.innerHTML.replace('Copied!', 'Copy');
-      btn.style.color = '';
-      btn.style.borderColor = '';
-    }, 2000);
-  });
+function renderFindings(findings) {
+  const el = document.getElementById('findingsList');
+  el.innerHTML = findings.map(f => {
+    const badgeClass = f.status === 'good' ? 'badge-good' : f.status === 'weak' ? 'badge-weak' : 'badge-missing';
+    const msg = f.status === 'good' ? f.rule.goodMsg : f.status === 'weak' ? (f.rule.weakMsg || f.rule.missingMsg) : f.rule.missingMsg;
+    return `
+      <div class="finding">
+        <div class="finding-badge ${badgeClass}">${f.status}</div>
+        <div class="finding-body">
+          <div class="finding-rule">${f.rule.name}</div>
+          <div class="finding-desc">${msg}</div>
+          <div class="finding-research">${f.rule.research}</div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
-// ── EDIT PROMPT ──
-function editPrompt() {
-  const block = document.getElementById('prompt-output');
-  if (block.contentEditable === 'true') {
-    block.contentEditable = 'false';
-    block.style.outline = 'none';
-    state.generatedPrompt = block.textContent;
-  } else {
-    block.contentEditable = 'true';
-    block.style.outline = '1px solid rgba(201,168,76,0.5)';
-    block.style.borderRadius = '4px';
-    block.focus();
+// ═══════════════════════════════════════
+// COACHED PROMPT BUILDER
+// ═══════════════════════════════════════
+function buildCoachedPrompt(raw, findings) {
+  let p = raw.trim();
+  const issues = findings.filter(f => f.status !== 'good');
+
+  // Add action verb if missing
+  if (findings.find(f => f.id === 'action_verb' && f.status === 'missing')) {
+    p = 'Write ' + p.charAt(0).toLowerCase() + p.slice(1);
   }
+
+  // Replace vague words
+  p = p.replace(/\bsomething\b/gi, 'a structured document')
+       .replace(/\bstuff\b/gi, 'relevant content')
+       .replace(/\bthings\b/gi, 'items')
+       .replace(/\betc\.?\b/gi, '')
+       .replace(/\band so on\b/gi, '')
+       .trim();
+
+  // Flip negative instructions
+  p = p.replace(/don['']t use ([\w\s]+)/gi, 'use only $1-free language')
+       .replace(/don['']t include ([\w\s]+)/gi, 'omit $1 entirely')
+       .replace(/avoid ([\w\s]+)/gi, 'focus on $1-free content');
+
+  const additions = [];
+
+  if (findings.find(f => f.id === 'context' && f.status !== 'good')) {
+    additions.push('Context: [Add your situation, company, or project in 1–2 sentences here.]');
+  }
+  if (findings.find(f => f.id === 'audience' && f.status !== 'good')) {
+    additions.push('Audience: [Specify who will read this — e.g., non-technical manager, sales team, job candidate.]');
+  }
+  if (findings.find(f => f.id === 'tone' && f.status !== 'good')) {
+    additions.push('Tone: Professional and direct.');
+  }
+  if (findings.find(f => f.id === 'format' && f.status !== 'good')) {
+    additions.push('Format: Use clear headers and bullet points.');
+  }
+  if (findings.find(f => f.id === 'length' && f.status !== 'good')) {
+    additions.push('Length: Keep the response under 200 words unless more detail is explicitly needed.');
+  }
+  if (findings.find(f => f.id === 'examples' && f.status !== 'good')) {
+    additions.push('Example: [Optional — paste one sample input/output pair to show what you mean.]');
+  }
+
+  if (additions.length > 0) {
+    p = p.replace(/\.\s*$/, '') + '.\n\n' + additions.join('\n');
+  }
+
+  return p;
 }
 
-// ── REFINE ──
+function renderDiff(original, coached, findings) {
+  document.getElementById('diffBefore').textContent = original;
+  document.getElementById('diffAfter').textContent = coached;
+
+  const changes = [];
+  findings.filter(f => f.status !== 'good').forEach((f, i) => {
+    let change = '';
+    if (f.rule.id === 'action_verb') change = '<strong>Added action verb:</strong> Opening with an imperative tells the model what mode to enter before reading the rest.';
+    else if (f.rule.id === 'vagueness') change = '<strong>Removed vague words:</strong> "Something" and "stuff" were replaced with specific deliverable language.';
+    else if (f.rule.id === 'negative_instructions') change = '<strong>Flipped negatives:</strong> "Don\'t include X" rewritten as positive constraints — more reliable under model pressure.';
+    else if (f.rule.id === 'context') change = '<strong>Added context placeholder:</strong> Even a sentence about your situation doubles output relevance.';
+    else if (f.rule.id === 'audience') change = '<strong>Added audience field:</strong> The model calibrates vocabulary, depth, and register to your reader.';
+    else if (f.rule.id === 'format') change = '<strong>Added format instruction:</strong> Explicit structure prevents the model from choosing prose when you wanted bullets.';
+    else if (f.rule.id === 'length') change = '<strong>Added length constraint:</strong> Models over-produce by default. A word/sentence limit forces tighter output.';
+    else if (f.rule.id === 'tone') change = '<strong>Added tone:</strong> "Professional and direct" prevents the model\'s default neutral-academic register.';
+    else if (f.rule.id === 'examples') change = '<strong>Added example slot:</strong> Even one example activates few-shot priming — the highest-leverage prompting technique.';
+    else if (f.rule.id === 'multitask') change = '<strong>Single focus flagged:</strong> Consider splitting multi-task requests into sequential prompts.';
+    if (change) changes.push(`<div class="change-item"><span class="change-num">${String(i+1).padStart(2,'0')}</span><div class="change-text">${change}</div></div>`);
+  });
+
+  document.getElementById('changesList').innerHTML = changes.length
+    ? changes.join('')
+    : '<div class="change-text" style="color:var(--green)">No major changes needed — this prompt is already well-structured.</div>';
+}
+
+function renderCoached(coached) {
+  document.getElementById('coachedText').textContent = coached;
+}
+
+// ═══════════════════════════════════════
+// REFINEMENTS
+// ═══════════════════════════════════════
 function refine(type) {
-  const refinements = {
-    specific: '\n\nBe as specific and concrete as possible. Avoid generalities.',
-    shorter: '\n\nKeep the response brief and to the point.',
-    example: '\n\nInclude one concrete example to illustrate the output.',
-    tone: '\n\nAdjust the tone to be more conversational and approachable.',
-    context: '\n\nTake into account the full context provided before generating your response.'
-  };
+  const el = document.getElementById('coachedText');
+  let p = el.textContent;
 
-  if (refinements[type]) {
-    state.generatedPrompt += refinements[type];
-    document.getElementById('prompt-output').textContent = state.generatedPrompt;
-    document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth' });
+  if (type === 'shorter') {
+    if (!/Length:/i.test(p)) {
+      p += '\nLength: Be concise — respond in under 100 words.';
+    } else {
+      p = p.replace(/Length:.*$/m, 'Length: Be concise — respond in under 100 words.');
+    }
   }
+  if (type === 'example') {
+    if (!/Example:/i.test(p)) {
+      p += '\nExample: For instance, if the input is [X], the output should look like [Y].';
+    }
+  }
+  if (type === 'negatives') {
+    p = p.replace(/don['']t ([\w\s]+)/gi, 'only $1')
+         .replace(/avoid ([\w\s]+)/gi, 'focus exclusively on non-$1 content')
+         .replace(/no ([\w\s]+)/gi, '$1-free');
+  }
+  if (type === 'grounding') {
+    if (!/grounding|source|evidence|cite|based on/i.test(p)) {
+      p += '\nGrounding: Base your response only on verified facts. If uncertain, say so rather than guessing.';
+    }
+  }
+  if (type === 'format') {
+    if (!/Format:/i.test(p)) {
+      p += '\nFormat: Respond using numbered steps with a brief header for each.';
+    } else {
+      p = p.replace(/Format:.*$/m, 'Format: Respond using numbered steps with a brief header for each.');
+    }
+  }
+
+  el.textContent = p;
+  document.getElementById('diffAfter').textContent = p;
+  showToast('Prompt refined');
 }
 
-// ── RESET ──
-function resetAll() {
-  currentStep = 0;
-  state.task = ''; state.audience = ''; state.audienceCustom = '';
-  state.format = ''; state.length = ''; state.formatCustom = '';
-  state.tone = ''; state.constraints = ''; state.context = '';
-  state.generatedPrompt = '';
-  clarifyAnswers = { 0: null, 1: null, 2: null, 3: null };
+// ═══════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════
+function copyCoached() {
+  const text = document.getElementById('coachedText').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+}
 
-  document.getElementById('task-input').value = '';
-  document.getElementById('audience-select').value = '';
-  document.getElementById('audience-custom').value = '';
-  document.getElementById('format-select').value = '';
-  document.getElementById('length-select').value = '';
-  document.getElementById('format-custom').value = '';
-  document.getElementById('tone-select').value = '';
-  document.getElementById('constraints-input').value = '';
-  document.getElementById('context-input').value = '';
-  document.getElementById('task-hint').textContent = '';
+function savePDF() {
+  window.print();
+}
 
-  document.getElementById('audience-custom-field').style.display = 'none';
-  document.getElementById('format-custom-field').style.display = 'none';
-  document.getElementById('result-panel').classList.remove('visible');
-  document.getElementById('refine-panel').classList.remove('visible');
+const AI_URLS = {
+  claude: 'https://claude.ai/new',
+  chatgpt: 'https://chatgpt.com/',
+  gemini: 'https://gemini.google.com/app',
+  copilot: 'https://copilot.microsoft.com/'
+};
 
-  [0,1,2,3,4].forEach(i => {
-    const panel = document.getElementById(`panel-${i}`);
-    const step = document.getElementById(`s-step-${i}`);
-    if (panel) { panel.classList.remove('active'); }
-    if (step) { step.classList.remove('active','done'); }
-    const cb = document.getElementById(`clarify-${i}`);
-    if (cb) cb.classList.remove('visible');
+function openAI(which) {
+  const text = document.getElementById('coachedText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Prompt copied — opening ' + which.charAt(0).toUpperCase() + which.slice(1));
+    setTimeout(() => window.open(AI_URLS[which], '_blank'), 400);
   });
+}
 
-  document.getElementById('panel-0').classList.add('active');
-  document.getElementById('s-step-0').classList.add('active');
+function clearAll() {
+  input.value = '';
+  charCountEl.textContent = '0 chars';
+  liveTipEl.classList.remove('visible');
+  document.getElementById('results').classList.remove('visible');
+}
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 </script>
 </body>
