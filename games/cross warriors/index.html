@@ -248,6 +248,43 @@ function playSound(type) {
   } catch(e){}
 }
 
+function playIntroSong() {
+  if (!AC) return;
+  const now = AC.currentTime;
+  function note(freq, t, dur, vol) {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'square'; o.frequency.value = freq;
+    o.connect(g); g.connect(AC.destination);
+    g.gain.setValueAtTime(0, now+t);
+    g.gain.linearRampToValueAtTime(vol, now+t+0.025);
+    g.gain.setValueAtTime(vol*0.85, now+t+dur-0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, now+t+dur);
+    o.start(now+t); o.stop(now+t+dur+0.02);
+  }
+  function kick(t) {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(100,now+t); o.frequency.exponentialRampToValueAtTime(28,now+t+0.15);
+    o.connect(g); g.connect(AC.destination);
+    g.gain.setValueAtTime(0.45,now+t); g.gain.exponentialRampToValueAtTime(0.001,now+t+0.22);
+    o.start(now+t); o.stop(now+t+0.24);
+  }
+  // March-tempo fanfare (BPM ~120): G major pentatonic warrior theme
+  const m = [
+    [392,0.00,0.20], [392,0.24,0.20], [392,0.48,0.30], // G4 G4 G4 (dotted march)
+    [523,0.82,0.52],                                     // C5 (held)
+    [659,1.38,0.24], [587,1.65,0.24],                   // E5 D5
+    [523,1.92,0.16], [587,2.10,0.16], [659,2.28,0.48],  // C5 D5 E5
+    [523,2.80,0.32],                                     // C5
+    [392,3.15,0.14], [440,3.31,0.14], [494,3.47,0.14], [523,3.63,0.14], [659,3.79,0.20], // G A B C E (run up)
+    [784,4.02,0.85],                                     // G5 (triumphant finish)
+  ];
+  m.forEach(([f,t,d]) => {
+    note(f,   t, d, 0.18); // lead
+    note(f/2, t, d, 0.09); // octave below for body
+  });
+  [0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0].forEach(t => kick(t));
+}
+
 // === ENTITIES ===
 
 function makeDemon(type, lvl) {
@@ -366,6 +403,7 @@ function advanceLevel() {
 function startGame() {
   initAudio();
   GS.score=0; GS.lives=CONFIG.PLAYER_LIVES;
+  playIntroSong();
   startLevel(1);
 }
 
