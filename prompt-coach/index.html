@@ -731,12 +731,16 @@ const RULES = [
     name: 'Action Verb',
     weight: 12,
     check(p) {
-      const verbs = /^(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|help me|give me|show me)/i;
-      return verbs.test(p.trim()) ? 'good' : 'missing';
+      const startsWithVerb = /^(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|give me|show me)/i;
+      const delegation = /\b(help me\s+(?:to\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|design|plan)|i need you to|act as\s+a|assist me\s+(?:with|in)|can you\s+(?:please\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|describe|identify|fix|improve)|please\s+(?:write|create|draft|summarize|analyze|explain|generate|list))\b/i;
+      const verbAnywhere = /\b(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan)\b/i;
+      if (startsWithVerb.test(p.trim()) || delegation.test(p)) return 'good';
+      if (verbAnywhere.test(p)) return 'weak';
+      return 'missing';
     },
-    goodMsg: 'Opens with a clear action verb — the model knows exactly what to do.',
-    weakMsg: null,
-    missingMsg: 'No action verb at the start. The model has to guess what you want done.',
+    goodMsg: 'Contains a clear action directive — the model knows exactly what it needs to do.',
+    weakMsg: 'Action verb is buried. Lead with an imperative ("Write", "Analyze", "List") for better instruction-following.',
+    missingMsg: 'No action verb found anywhere. The model has to guess what you want done.',
     research: 'OpenAI and Anthropic prompt guides both cite imperative-verb openers as the single highest-leverage fix for vague prompts. The model\'s instruction-tuning is anchored to action words.'
   },
   {
@@ -745,13 +749,15 @@ const RULES = [
     weight: 12,
     check(p) {
       const vague = /\b(something|stuff|things|whatever|anything|some kind|sort of|kind of|etc\.?|and so on)\b/i;
-      const specific = p.length > 80 && !vague.test(p);
+      const vagueScope = /\b(all the important|some training|everything relevant|any key points?|all relevant|some useful|important things?|various topics?|key topics?|relevant information|the main (?:things?|points?|topics?))\b/i;
       if (vague.test(p)) return 'missing';
+      if (vagueScope.test(p)) return 'weak';
       if (p.length < 40) return 'weak';
-      return specific ? 'good' : 'weak';
+      if (p.length > 80) return 'good';
+      return 'weak';
     },
     goodMsg: 'Specific enough that the model has a clear target.',
-    weakMsg: 'A bit thin — the model will fill gaps with generic defaults.',
+    weakMsg: 'Vague scope phrase detected ("all the important topics", "everything relevant", etc.). Replace with the exact list of what you need.',
     missingMsg: 'Vague filler words detected. The model can\'t act on "something" or "stuff".',
     research: 'Wei et al. (2022) chain-of-thought research shows specificity reduces hallucination by giving the model a verifiable target rather than a semantic cloud.'
   },
@@ -872,7 +878,7 @@ const TIPS = [
   { trigger: p => p.length > 0 && p.length < 20, msg: '<strong>Too short.</strong> Even a 10-word context sentence will dramatically improve results.' },
   { trigger: p => /\b(something|stuff|things)\b/i.test(p), msg: '<strong>Vague word detected.</strong> Replace "something" or "stuff" with the actual deliverable.' },
   { trigger: p => /\bdon\'t\b/i.test(p), msg: '<strong>Negative instruction.</strong> Try flipping "don\'t include X" to "focus only on Y" for more reliable results.' },
-  { trigger: p => p.length > 30 && !/\b(write|create|draft|summarize|analyze|list|generate|build|describe|explain|review|suggest|evaluate|outline|extract|identify|fix|improve|help)\b/i.test(p.trim().split(' ').slice(0,3).join(' ')), msg: '<strong>No action verb.</strong> Start with what you want done: Write, Analyze, Summarize, List...' },
+  { trigger: p => p.length > 30 && !/\b(write|create|draft|summarize|analyze|list|generate|build|describe|explain|review|suggest|evaluate|outline|extract|identify|fix|improve|help|act as|assist|can you|please)\b/i.test(p), msg: '<strong>No action directive.</strong> Lead with what you want done: "Write", "Analyze", "Summarize", or "Help me create..."' },
   { trigger: p => (p.match(/\b(and also|and then|additionally)\b/gi) || []).length > 1, msg: '<strong>Multiple tasks.</strong> Split into separate prompts for much better results on each.' },
   { trigger: p => p.length > 60 && !/\b(bullet|list|table|paragraph|json|\d+ words|\d+ sentences)\b/i.test(p), msg: '<strong>No format specified.</strong> Add "as a bulleted list" or "in 3 paragraphs" to control output shape.' },
   { trigger: p => p.length > 80 && !/\b(for a|for my|audience|beginner|expert|manager|team|client)\b/i.test(p), msg: '<strong>Who is this for?</strong> Adding "for a non-technical manager" or "for a sales team" focuses the output instantly.' },
@@ -995,10 +1001,43 @@ function buildCoachedPrompt(raw, findings) {
        .replace(/\band so on\b/gi, '')
        .trim();
 
-  // Flip negative instructions
-  p = p.replace(/don['']t use ([\w\s]+)/gi, 'use only $1-free language')
-       .replace(/don['']t include ([\w\s]+)/gi, 'omit $1 entirely')
-       .replace(/avoid ([\w\s]+)/gi, 'focus on $1-free content');
+  // Replace vague scope phrases with specific placeholders
+  p = p.replace(/all the important (\w+)/gi, '[specify exactly which $1]')
+       .replace(/everything relevant/gi, '[specify exactly what content is relevant]')
+       .replace(/any key points?/gi, '[list the specific points you need covered]')
+       .replace(/all relevant (\w+)/gi, '[list the specific $1 that apply]')
+       .replace(/some training (\w+)/gi, '[specify the exact training $1 topic]')
+       .replace(/some useful (\w+)/gi, '[specify which $1 exactly]')
+       .replace(/important things?/gi, '[list the specific items]')
+       .replace(/various topics?/gi, '[list the specific topics]')
+       .replace(/key topics?/gi, '[list the specific topics]')
+       .replace(/relevant information/gi, '[specify which information exactly]')
+       .replace(/the main things?/gi, '[list the specific items]')
+       .replace(/the main points?/gi, '[list the specific points]')
+       .replace(/the main topics?/gi, '[list the specific topics]');
+
+  // Semantic negative-to-positive rewrites (specific patterns before generic fallback)
+  const negativeRewrites = [
+    [/don['']t\s+(?:make\s+it\s+|be\s+)?(?:too\s+|overly\s+)?formal/gi,            'use a conversational, approachable tone'],
+    [/avoid\s+(?:being\s+)?(?:too\s+|overly\s+)?formal/gi,                          'use a conversational, approachable tone'],
+    [/don['']t\s+(?:use\s+)?(?:too\s+much\s+)?(?:corporate\s+|business\s+)?jargon/gi, 'use plain everyday language'],
+    [/avoid\s+(?:using\s+)?(?:too\s+much\s+)?(?:corporate\s+|business\s+)?jargon/gi,  'use plain everyday language'],
+    [/don['']t\s+(?:make\s+it\s+|be\s+)?too\s+long/gi,                             'keep it concise — under 150 words'],
+    [/don['']t\s+make\s+(?:it\s+)?(?:too\s+)?lengthy/gi,                            'keep it concise — under 150 words'],
+    [/avoid\s+(?:making\s+(?:it\s+)?)?(?:too\s+)?(?:long|lengthy)/gi,               'keep it concise — under 150 words'],
+    [/don['']t\s+(?:be\s+)?repeat\w*/gi,                                             'each point should add new information'],
+    [/avoid\s+repeat\w*/gi,                                                           'each point should add new information'],
+    [/don['']t\s+use\s+(?:bullet\s+points?|bullets)/gi,                             'write in flowing prose paragraphs'],
+    [/avoid\s+(?:using\s+)?(?:bullet\s+points?|bullets)/gi,                         'write in flowing prose paragraphs'],
+    [/don['']t\s+use\s+headers?/gi,                                                  'write as continuous prose without section headers'],
+    [/avoid\s+(?:using\s+)?headers?/gi,                                              'write as continuous prose without section headers'],
+    // Generic fallback — catches anything not matched above
+    [/don['']t\s+([\w]+(?:\s+[\w]+){0,3})/gi, (_, phrase) => `ensure the response does not include ${phrase.trim()}`],
+    [/avoid\s+([\w]+(?:\s+[\w]+){0,3})/gi,    (_, phrase) => `keep the response free of ${phrase.trim()}`],
+  ];
+  for (const [pattern, replacement] of negativeRewrites) {
+    p = typeof replacement === 'function' ? p.replace(pattern, replacement) : p.replace(pattern, replacement);
+  }
 
   const additions = [];
 
@@ -1035,9 +1074,11 @@ function renderDiff(original, coached, findings) {
   const changes = [];
   findings.filter(f => f.status !== 'good').forEach((f, i) => {
     let change = '';
-    if (f.rule.id === 'action_verb') change = '<strong>Added action verb:</strong> Opening with an imperative tells the model what mode to enter before reading the rest.';
-    else if (f.rule.id === 'vagueness') change = '<strong>Removed vague words:</strong> "Something" and "stuff" were replaced with specific deliverable language.';
-    else if (f.rule.id === 'negative_instructions') change = '<strong>Flipped negatives:</strong> "Don\'t include X" rewritten as positive constraints — more reliable under model pressure.';
+    if (f.rule.id === 'action_verb') change = f.status === 'missing'
+      ? '<strong>Added action verb:</strong> Opening with an imperative tells the model what mode to enter before reading the rest.'
+      : '<strong>Action verb buried:</strong> Consider restructuring to lead with your directive — "Write...", "Analyze...", "List..."';
+    else if (f.rule.id === 'vagueness') change = '<strong>Replaced vague language:</strong> Filler words and vague scope phrases were replaced with specific placeholders — fill them in with your exact requirements.';
+    else if (f.rule.id === 'negative_instructions') change = '<strong>Rewrote negative instructions:</strong> Phrases like "don\'t be formal" became positive constraints like "use a conversational tone" — semantically clearer and more reliable under model pressure.';
     else if (f.rule.id === 'context') change = '<strong>Added context placeholder:</strong> Even a sentence about your situation doubles output relevance.';
     else if (f.rule.id === 'audience') change = '<strong>Added audience field:</strong> The model calibrates vocabulary, depth, and register to your reader.';
     else if (f.rule.id === 'format') change = '<strong>Added format instruction:</strong> Explicit structure prevents the model from choosing prose when you wanted bullets.';
@@ -1077,9 +1118,25 @@ function refine(type) {
     }
   }
   if (type === 'negatives') {
-    p = p.replace(/don['']t ([\w\s]+)/gi, 'only $1')
-         .replace(/avoid ([\w\s]+)/gi, 'focus exclusively on non-$1 content')
-         .replace(/no ([\w\s]+)/gi, '$1-free');
+    const refineNegPatterns = [
+      [/don['']t\s+(?:make\s+it\s+|be\s+)?(?:too\s+|overly\s+)?formal/gi,            'use a conversational, approachable tone'],
+      [/avoid\s+(?:being\s+)?(?:too\s+|overly\s+)?formal/gi,                          'use a conversational, approachable tone'],
+      [/don['']t\s+(?:use\s+)?(?:too\s+much\s+)?(?:corporate\s+|business\s+)?jargon/gi, 'use plain everyday language'],
+      [/avoid\s+(?:using\s+)?(?:too\s+much\s+)?(?:corporate\s+|business\s+)?jargon/gi,  'use plain everyday language'],
+      [/don['']t\s+(?:make\s+it\s+|be\s+)?too\s+long/gi,                             'keep it concise — under 150 words'],
+      [/don['']t\s+make\s+(?:it\s+)?(?:too\s+)?lengthy/gi,                            'keep it concise — under 150 words'],
+      [/avoid\s+(?:making\s+(?:it\s+)?)?(?:too\s+)?(?:long|lengthy)/gi,               'keep it concise — under 150 words'],
+      [/don['']t\s+(?:be\s+)?repeat\w*/gi,                                             'each point should add new information'],
+      [/avoid\s+repeat\w*/gi,                                                           'each point should add new information'],
+      [/don['']t\s+use\s+(?:bullet\s+points?|bullets)/gi,                             'write in flowing prose paragraphs'],
+      [/avoid\s+(?:using\s+)?(?:bullet\s+points?|bullets)/gi,                         'write in flowing prose paragraphs'],
+      [/don['']t\s+([\w]+(?:\s+[\w]+){0,3})/gi, (_, phrase) => `ensure the response does not include ${phrase.trim()}`],
+      [/avoid\s+([\w]+(?:\s+[\w]+){0,3})/gi,    (_, phrase) => `keep the response free of ${phrase.trim()}`],
+      [/\bno\s+([\w]+(?:\s+[\w]+){0,2})\b/gi,   (_, phrase) => `${phrase.trim()}-free`],
+    ];
+    for (const [pattern, replacement] of refineNegPatterns) {
+      p = typeof replacement === 'function' ? p.replace(pattern, replacement) : p.replace(pattern, replacement);
+    }
   }
   if (type === 'grounding') {
     if (!/grounding|source|evidence|cite|based on/i.test(p)) {
