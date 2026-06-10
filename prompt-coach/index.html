@@ -468,6 +468,8 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 }
 .btn-refine:hover { border-color: var(--gold); color: var(--gold); opacity: 1; }
 .btn-refine.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); opacity: 1; }
+.btn-refine.already-applied { opacity: 0.35; cursor: not-allowed; color: var(--muted); border-color: rgba(255,255,255,0.08); }
+.btn-refine.already-applied:hover { border-color: rgba(255,255,255,0.08); color: var(--muted); opacity: 0.35; }
 .refine-tick { font-size: 12px; margin-left: 4px; }
 
 /* ── EXPORT PANEL ── */
@@ -670,11 +672,11 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
       <div class="refinement-panel" style="background:transparent;border:none;padding:0;margin-top:0;">
         <div class="refinement-title">Refine further</div>
         <div class="refinement-btns">
-          <button class="btn-refine" onclick="toggleRefine('shorter', this)">Make it shorter</button>
-          <button class="btn-refine" onclick="toggleRefine('example', this)">Add an example</button>
-          <button class="btn-refine" onclick="toggleRefine('negatives', this)">Flip negatives to positives</button>
-          <button class="btn-refine" onclick="toggleRefine('grounding', this)">Add grounding instruction</button>
-          <button class="btn-refine" onclick="toggleRefine('format', this)">Specify output format</button>
+          <button class="btn-refine" data-refine-type="shorter"   onclick="toggleRefine('shorter', this)">Make it shorter</button>
+          <button class="btn-refine" data-refine-type="example"   onclick="toggleRefine('example', this)">Add an example</button>
+          <button class="btn-refine" data-refine-type="negatives" onclick="toggleRefine('negatives', this)">Flip negatives to positives</button>
+          <button class="btn-refine" data-refine-type="grounding" onclick="toggleRefine('grounding', this)">Add grounding instruction</button>
+          <button class="btn-refine" data-refine-type="format"    onclick="toggleRefine('format', this)">Specify output format</button>
         </div>
       </div>
     </div>
@@ -1126,6 +1128,7 @@ function renderDiff(original, coached, findings) {
 function renderCoached(coached) {
   refineBasePrompt = coached;
   resetRefineState();
+  syncRefineButtonStates(coached);
   document.getElementById('coachedText').textContent = coached;
 }
 
@@ -1136,6 +1139,10 @@ function appendToChangelog(text) {
   const el = document.getElementById('changesList');
   const noChanges = el.querySelector('.no-changes-msg');
   if (noChanges) noChanges.remove();
+  // Deduplicate: skip if an identical entry is already present
+  for (const item of el.querySelectorAll('.change-item .change-text')) {
+    if (item.innerHTML === text) return;
+  }
   const count = el.querySelectorAll('.change-item').length + 1;
   const div = document.createElement('div');
   div.className = 'change-item';
@@ -1148,9 +1155,36 @@ let refineBasePrompt = '';
 const REFINE_TYPES = ['shorter', 'example', 'negatives', 'grounding', 'format'];
 const refineActive = Object.fromEntries(REFINE_TYPES.map(t => [t, false]));
 
+// Detect content the coaching engine already added, so buttons can be disabled
+const REFINE_APPLIED_CHECKS = {
+  shorter:   text => /^Length:/im.test(text),
+  example:   text => /^Example:/im.test(text),
+  negatives: ()   => false,  // in-place rewrites; no reliable single marker
+  grounding: text => /^Grounding:/im.test(text),
+  format:    text => /^Format:/im.test(text),
+};
+
+function syncRefineButtonStates(coached) {
+  document.querySelectorAll('.btn-refine[data-refine-type]').forEach(btn => {
+    const type = btn.dataset.refineType;
+    const check = REFINE_APPLIED_CHECKS[type];
+    if (check && check(coached)) {
+      if (!btn.dataset.origLabel) btn.dataset.origLabel = btn.textContent.trim();
+      btn.textContent = 'Already applied';
+      btn.disabled = true;
+      btn.classList.add('already-applied');
+    }
+  });
+}
+
 function resetRefineState() {
   REFINE_TYPES.forEach(t => { refineActive[t] = false; });
-  document.querySelectorAll('.btn-refine').forEach(btn => setRefineButtonActive(btn, false));
+  document.querySelectorAll('.btn-refine').forEach(btn => {
+    setRefineButtonActive(btn, false);
+    btn.disabled = false;
+    btn.classList.remove('already-applied');
+    if (btn.dataset.origLabel) btn.textContent = btn.dataset.origLabel;
+  });
 }
 
 function setRefineButtonActive(btn, active) {
@@ -1257,6 +1291,7 @@ function doRefinement(type, p) {
 }
 
 function toggleRefine(type, btnEl) {
+  if (btnEl.disabled) return;
   const wasActive = refineActive[type];
   refineActive[type] = !wasActive;
 
