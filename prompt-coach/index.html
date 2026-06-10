@@ -1078,7 +1078,7 @@ function buildCoachedPrompt(raw, findings) {
     additions.push('Tone: Professional and direct.');
   }
   if (findings.find(f => f.rule.id === 'format' && f.status !== 'good')) {
-    additions.push('Format: Use clear headers and bullet points.');
+    additions.push('Format: Respond using numbered steps with a brief header for each.');
   }
   if (findings.find(f => f.rule.id === 'length' && f.status !== 'good')) {
     additions.push('Length: Be concise — respond in under 150 words or 3-5 bullet points.');
@@ -1160,7 +1160,7 @@ const REFINE_APPLIED_CHECKS = {
   shorter:   text => /^Length:/im.test(text),
   example:   text => /^Example:/im.test(text),
   negatives: ()   => false,  // in-place rewrites; no reliable single marker
-  grounding: text => /^Grounding:/im.test(text),
+  grounding: text => /^Grounding:/im.test(text) || /^Data:/im.test(text),
   format:    text => /^Format:/im.test(text),
 };
 
