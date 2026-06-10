@@ -468,8 +468,8 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 }
 .btn-refine:hover { border-color: var(--gold); color: var(--gold); opacity: 1; }
 .btn-refine.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); opacity: 1; }
-.btn-refine.already-applied { opacity: 0.35; cursor: not-allowed; color: var(--muted); border-color: rgba(255,255,255,0.08); }
-.btn-refine.already-applied:hover { border-color: rgba(255,255,255,0.08); color: var(--muted); opacity: 0.35; }
+.btn-refine.already-included { opacity: 0.35; cursor: not-allowed; color: var(--muted); border-color: rgba(255,255,255,0.08); }
+.btn-refine.already-included:hover { border-color: rgba(255,255,255,0.08); color: var(--muted); opacity: 0.35; }
 .refine-tick { font-size: 12px; margin-left: 4px; }
 
 /* ── EXPORT PANEL ── */
@@ -1126,7 +1126,6 @@ function renderDiff(original, coached, findings) {
 }
 
 function renderCoached(coached) {
-  refineBasePrompt = coached;
   resetRefineState();
   syncRefineButtonStates(coached);
   document.getElementById('coachedText').textContent = coached;
@@ -1150,39 +1149,42 @@ function appendToChangelog(text) {
   el.appendChild(div);
 }
 
-// Per-button toggle state — keyed by refinement type
-let refineBasePrompt = '';
 const REFINE_TYPES = ['shorter', 'example', 'negatives', 'grounding', 'format'];
-const refineActive = Object.fromEntries(REFINE_TYPES.map(t => [t, false]));
 
-// Detect content the coaching engine already added, so buttons can be disabled
-const REFINE_APPLIED_CHECKS = {
-  shorter:   text => /^Length:/im.test(text),
-  example:   text => /^Example:/im.test(text),
-  negatives: ()   => false,  // in-place rewrites; no reliable single marker
-  grounding: text => /^Grounding:/im.test(text) || /^Data:/im.test(text),
+// Per-button independent state — each button owns its own active flag and pre-apply snapshot
+const refineState = Object.fromEntries(REFINE_TYPES.map(t => [t, { active: false, snapshot: '' }]));
+
+// "Already included" detection — button is dimmed/disabled when coached prompt already contains the refinement
+const REFINE_INCLUDED_CHECKS = {
+  shorter:   text => /concise|under\s+1|bullet\s+points?/i.test(text),
+  example:   text => /^Example:/im.test(text) || /for\s+instance/i.test(text),
+  negatives: ()   => false,
+  grounding: text => /^Grounding:/im.test(text),
   format:    text => /^Format:/im.test(text),
 };
 
 function syncRefineButtonStates(coached) {
   document.querySelectorAll('.btn-refine[data-refine-type]').forEach(btn => {
     const type = btn.dataset.refineType;
-    const check = REFINE_APPLIED_CHECKS[type];
+    const check = REFINE_INCLUDED_CHECKS[type];
     if (check && check(coached)) {
       if (!btn.dataset.origLabel) btn.dataset.origLabel = btn.textContent.trim();
-      btn.textContent = 'Already applied';
+      btn.textContent = 'Already included';
       btn.disabled = true;
-      btn.classList.add('already-applied');
+      btn.classList.add('already-included');
     }
   });
 }
 
 function resetRefineState() {
-  REFINE_TYPES.forEach(t => { refineActive[t] = false; });
+  REFINE_TYPES.forEach(t => {
+    refineState[t].active = false;
+    refineState[t].snapshot = '';
+  });
   document.querySelectorAll('.btn-refine').forEach(btn => {
     setRefineButtonActive(btn, false);
     btn.disabled = false;
-    btn.classList.remove('already-applied');
+    btn.classList.remove('already-included');
     if (btn.dataset.origLabel) btn.textContent = btn.dataset.origLabel;
   });
 }
@@ -1292,29 +1294,27 @@ function doRefinement(type, p) {
 
 function toggleRefine(type, btnEl) {
   if (btnEl.disabled) return;
-  const wasActive = refineActive[type];
-  refineActive[type] = !wasActive;
+  const state = refineState[type];
 
-  if (!wasActive) {
-    // Activating: apply incrementally to current text, log the change
-    const result = doRefinement(type, document.getElementById('coachedText').textContent);
+  if (!state.active) {
+    // Snapshot current coached text before applying so revert is exact
+    state.snapshot = document.getElementById('coachedText').textContent;
+    const result = doRefinement(type, state.snapshot);
     if (result.changed) {
+      state.active = true;
       updateCoachedText(result.text);
       if (result.changeLog) appendToChangelog(result.changeLog);
       setRefineButtonActive(btnEl, true);
-    } else {
-      refineActive[type] = false; // nothing to apply; don't mark active
+      showToast('Refinement applied');
     }
   } else {
-    // Deactivating: rebuild from base prompt, re-apply all still-active refinements in order
-    let p = refineBasePrompt;
-    for (const t of REFINE_TYPES) {
-      if (refineActive[t]) p = doRefinement(t, p).text;
-    }
-    updateCoachedText(p);
+    // Revert to this button's own pre-apply snapshot
+    state.active = false;
+    updateCoachedText(state.snapshot);
+    state.snapshot = '';
     setRefineButtonActive(btnEl, false);
+    showToast('Refinement removed');
   }
-  showToast(refineActive[type] ? 'Refinement applied' : 'Refinement removed');
 }
 
 // ═══════════════════════════════════════
