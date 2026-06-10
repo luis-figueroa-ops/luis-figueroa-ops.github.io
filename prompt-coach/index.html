@@ -868,6 +868,22 @@ const RULES = [
     weakMsg: 'No tone specified. The model defaults to a neutral academic tone that often sounds robotic.',
     missingMsg: null,
     research: 'Style and tone tokens are among the fastest interventions for output quality. Reynolds & McDonell (2021) showed tone modifiers reduce post-editing time by ~25% in writing tasks.'
+  },
+  {
+    id: 'data_grounding',
+    name: 'Data Grounding',
+    weight: 20,
+    check(p) {
+      const refsOwnData = /\b(our\s+(?:data|metrics|results|performance|numbers|report|campaign|analytics|stats|statistics|figures|findings|survey|study)|analyze\s+(?:our|the\s+following|my)\s+\w+|review\s+(?:our|the\s+following|my)\s+\w+|based\s+on\s+(?:our|my)\s+\w+)\b/i;
+      const hasNumbers = /\b\d+(?:[.,]\d+)?(?:\s*%|\s*k\b|\s*M\b|\s*million|\s*billion|\s*dollars?)|\$\s*\d|\d+\s*(?:users|clicks|conversions|sales|leads|impressions|sessions|visits|revenue|signups|downloads|views|responses?)\b/i;
+      const hasAttachedData = /\b(attached|below|above|the following|here is|here are|see table|see chart|see data|data:|metrics:|results:|the data shows|from the table|from the chart)\b/i;
+      if (refsOwnData.test(p) && !hasNumbers.test(p) && !hasAttachedData.test(p)) return 'missing';
+      return 'good';
+    },
+    goodMsg: 'Prompt references data and includes numbers or an explicit data source — well grounded.',
+    weakMsg: null,
+    missingMsg: 'This prompt asks AI to analyze your data — but no data is provided. Without source material, AI will fabricate plausible-sounding numbers. Paste your actual data into the prompt or instruct AI to ask you for it first.',
+    research: 'Retrieval-augmented generation (RAG) research consistently shows that LLMs without source material confabulate statistics at high rates. Providing even a raw data table dramatically reduces fabrication by giving the model a verifiable anchor.'
   }
 ];
 
@@ -1031,9 +1047,16 @@ function buildCoachedPrompt(raw, findings) {
     [/avoid\s+(?:using\s+)?(?:bullet\s+points?|bullets)/gi,                         'write in flowing prose paragraphs'],
     [/don['']t\s+use\s+headers?/gi,                                                  'write as continuous prose without section headers'],
     [/avoid\s+(?:using\s+)?headers?/gi,                                              'write as continuous prose without section headers'],
-    // Generic fallback — catches anything not matched above
-    [/don['']t\s+([\w]+(?:\s+[\w]+){0,3})/gi, (_, phrase) => `ensure the response does not include ${phrase.trim()}`],
-    [/avoid\s+([\w]+(?:\s+[\w]+){0,3})/gi,    (_, phrase) => `keep the response free of ${phrase.trim()}`],
+    // Verb-phrase specifics — must precede generic fallback to avoid broken sentences
+    [/don['']t\s+focus\s+too\s+much\s+on\s+([\w\s,]+?)(?=\s*[.,;]|\s+and\b|\s+but\b|$)/gi, (_, x) => `prioritize substance over ${x.trim()}`],
+    [/avoid\s+focus(?:ing)?\s+too\s+much\s+on\s+([\w\s,]+?)(?=\s*[.,;]|\s+and\b|\s+but\b|$)/gi, (_, x) => `keep focus on outcomes rather than ${x.trim()}`],
+    [/don['']t\s+(?:be\s+)?(?:too\s+)?(?:verbose|wordy)/gi,    'keep responses tight and to the point'],
+    [/don['']t\s+(?:be\s+)?(?:too\s+)?technical/gi,            'use accessible language for a general audience'],
+    [/don['']t\s+(?:be\s+)?(?:too\s+)?casual/gi,               'maintain a professional tone throughout'],
+    [/don['']t\s+(?:be\s+)?(?:too\s+)?(?:brief|short)/gi,      'provide sufficient depth to fully answer the question'],
+    // Generic fallback — preserve original phrasing and flag; never produce a broken sentence
+    [/don['']t\s+([\w]+(?:\s+[\w]+){0,3})/gi, (_, phrase) => `don't ${phrase.trim()} ⚠ [rewrite as a positive constraint before using]`],
+    [/avoid\s+([\w]+(?:\s+[\w]+){0,3})/gi,    (_, phrase) => `avoid ${phrase.trim()} ⚠ [rewrite as a positive constraint before using]`],
   ];
   for (const [pattern, replacement] of negativeRewrites) {
     p = typeof replacement === 'function' ? p.replace(pattern, replacement) : p.replace(pattern, replacement);
@@ -1058,6 +1081,9 @@ function buildCoachedPrompt(raw, findings) {
   }
   if (findings.find(f => f.id === 'examples' && f.status !== 'good')) {
     additions.push('Example: [Optional — paste one sample input/output pair to show what you mean.]');
+  }
+  if (findings.find(f => f.id === 'data_grounding' && f.status !== 'good')) {
+    additions.push('Data: [Paste your actual data, metrics, or results here — or add: "Ask me for the data before responding."]');
   }
 
   if (additions.length > 0) {
@@ -1086,12 +1112,13 @@ function renderDiff(original, coached, findings) {
     else if (f.rule.id === 'tone') change = '<strong>Added tone:</strong> "Professional and direct" prevents the model\'s default neutral-academic register.';
     else if (f.rule.id === 'examples') change = '<strong>Added example slot:</strong> Even one example activates few-shot priming — the highest-leverage prompting technique.';
     else if (f.rule.id === 'multitask') change = '<strong>Single focus flagged:</strong> Consider splitting multi-task requests into sequential prompts.';
+    else if (f.rule.id === 'data_grounding') change = '<strong>Added data placeholder:</strong> AI will confabulate numbers without source material. Paste actual data into the placeholder, or instruct the model to ask you for it first.';
     if (change) changes.push(`<div class="change-item"><span class="change-num">${String(i+1).padStart(2,'0')}</span><div class="change-text">${change}</div></div>`);
   });
 
   document.getElementById('changesList').innerHTML = changes.length
     ? changes.join('')
-    : '<div class="change-text" style="color:var(--green)">No major changes needed — this prompt is already well-structured.</div>';
+    : '<div class="change-text no-changes-msg" style="color:var(--green)">No major changes needed — this prompt is already well-structured.</div>';
 }
 
 function renderCoached(coached) {
@@ -1101,23 +1128,39 @@ function renderCoached(coached) {
 // ═══════════════════════════════════════
 // REFINEMENTS
 // ═══════════════════════════════════════
+function appendToChangelog(text) {
+  const el = document.getElementById('changesList');
+  const noChanges = el.querySelector('.no-changes-msg');
+  if (noChanges) noChanges.remove();
+  const count = el.querySelectorAll('.change-item').length + 1;
+  const div = document.createElement('div');
+  div.className = 'change-item';
+  div.innerHTML = `<span class="change-num">${String(count).padStart(2, '0')}</span><div class="change-text">${text}</div>`;
+  el.appendChild(div);
+}
+
 function refine(type) {
   const el = document.getElementById('coachedText');
   let p = el.textContent;
+  let changeLog = '';
 
   if (type === 'shorter') {
     if (!/Length:/i.test(p)) {
       p += '\nLength: Be concise — respond in under 100 words.';
+      changeLog = '<strong>Added length constraint:</strong> Explicit word limit reduces model over-production and padding.';
     } else {
       p = p.replace(/Length:.*$/m, 'Length: Be concise — respond in under 100 words.');
+      changeLog = '<strong>Updated length constraint:</strong> Set to under 100 words.';
     }
   }
   if (type === 'example') {
     if (!/Example:/i.test(p)) {
       p += '\nExample: For instance, if the input is [X], the output should look like [Y].';
+      changeLog = '<strong>Added example slot:</strong> Fill in [X] and [Y] to activate few-shot priming — the highest-leverage prompting technique.';
     }
   }
   if (type === 'negatives') {
+    const before = p;
     const refineNegPatterns = [
       [/don['']t\s+(?:make\s+it\s+|be\s+)?(?:too\s+|overly\s+)?formal/gi,            'use a conversational, approachable tone'],
       [/avoid\s+(?:being\s+)?(?:too\s+|overly\s+)?formal/gi,                          'use a conversational, approachable tone'],
@@ -1130,29 +1173,40 @@ function refine(type) {
       [/avoid\s+repeat\w*/gi,                                                           'each point should add new information'],
       [/don['']t\s+use\s+(?:bullet\s+points?|bullets)/gi,                             'write in flowing prose paragraphs'],
       [/avoid\s+(?:using\s+)?(?:bullet\s+points?|bullets)/gi,                         'write in flowing prose paragraphs'],
-      [/don['']t\s+([\w]+(?:\s+[\w]+){0,3})/gi, (_, phrase) => `ensure the response does not include ${phrase.trim()}`],
-      [/avoid\s+([\w]+(?:\s+[\w]+){0,3})/gi,    (_, phrase) => `keep the response free of ${phrase.trim()}`],
+      [/don['']t\s+focus\s+too\s+much\s+on\s+([\w\s,]+?)(?=\s*[.,;]|\s+and\b|\s+but\b|$)/gi, (_, x) => `prioritize substance over ${x.trim()}`],
+      [/avoid\s+focus(?:ing)?\s+too\s+much\s+on\s+([\w\s,]+?)(?=\s*[.,;]|\s+and\b|\s+but\b|$)/gi, (_, x) => `keep focus on outcomes rather than ${x.trim()}`],
+      [/don['']t\s+(?:be\s+)?(?:too\s+)?(?:verbose|wordy)/gi,    'keep responses tight and to the point'],
+      [/don['']t\s+(?:be\s+)?(?:too\s+)?technical/gi,            'use accessible language for a general audience'],
+      [/don['']t\s+(?:be\s+)?(?:too\s+)?casual/gi,               'maintain a professional tone throughout'],
+      [/don['']t\s+(?:be\s+)?(?:too\s+)?(?:brief|short)/gi,      'provide sufficient depth to fully answer the question'],
+      [/don['']t\s+([\w]+(?:\s+[\w]+){0,3})/gi, (_, phrase) => `don't ${phrase.trim()} ⚠ [rewrite as a positive constraint before using]`],
+      [/avoid\s+([\w]+(?:\s+[\w]+){0,3})/gi,    (_, phrase) => `avoid ${phrase.trim()} ⚠ [rewrite as a positive constraint before using]`],
       [/\bno\s+([\w]+(?:\s+[\w]+){0,2})\b/gi,   (_, phrase) => `${phrase.trim()}-free`],
     ];
     for (const [pattern, replacement] of refineNegPatterns) {
       p = typeof replacement === 'function' ? p.replace(pattern, replacement) : p.replace(pattern, replacement);
     }
+    if (p !== before) changeLog = '<strong>Flipped negative instructions:</strong> "don\'t/avoid" phrases rewritten as positive constraints, or flagged ⚠ where a clean rewrite wasn\'t possible.';
   }
   if (type === 'grounding') {
     if (!/grounding|source|evidence|cite|based on/i.test(p)) {
       p += '\nGrounding: Base your response only on verified facts. If uncertain, say so rather than guessing.';
+      changeLog = '<strong>Added grounding instruction:</strong> Anchors the model to verified facts rather than plausible-sounding fabrications.';
     }
   }
   if (type === 'format') {
     if (!/Format:/i.test(p)) {
       p += '\nFormat: Respond using numbered steps with a brief header for each.';
+      changeLog = '<strong>Added format instruction:</strong> Numbered steps with headers impose scannable structure on the output.';
     } else {
       p = p.replace(/Format:.*$/m, 'Format: Respond using numbered steps with a brief header for each.');
+      changeLog = '<strong>Updated format instruction:</strong> Changed to numbered steps with a brief header for each.';
     }
   }
 
   el.textContent = p;
   document.getElementById('diffAfter').textContent = p;
+  if (changeLog) appendToChangelog(changeLog);
   showToast('Prompt refined');
 }
 
