@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Coach | Operations, Augmented</title>
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-dim: #a8893c;
+  --gold-faint: rgba(201,168,76,0.13);
+  --gold-faint2: rgba(201,168,76,0.06);
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --surface2: #1c1c1c;
+  --surface3: #242424;
+  --border: rgba(255,255,255,0.07);
+  --border-gold: rgba(201,168,76,0.28);
+  --text: #f0ede8;
+  --text-muted: #888882;
+  --text-dim: #4a4a46;
+  --radius: 10px;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+  border-bottom: 1px solid var(--border-gold);
+  background: var(--bg);
+  padding: 0 1.5rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand { display: flex; align-items: center; gap: 10px; }
+
+.header-logo {
+  width: 30px; height: 30px;
+  background: var(--gold-faint);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  color: var(--gold); letter-spacing: -0.5px;
+}
+
+.header-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.header-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+
+.header-right { display: flex; align-items: center; gap: 8px; }
+
+.badge {
+  font-size: 11px; color: var(--gold);
+  background: var(--gold-faint); border: 1px solid var(--border-gold);
+  border-radius: 4px; padding: 3px 8px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+/* ── MAIN LAYOUT ── */
+.shell {
+  display: flex; flex: 1;
+  max-width: 860px; width: 100%;
+  margin: 0 auto; padding: 0 1.5rem;
+  gap: 1.5rem;
+}
+
+/* ── SIDEBAR (progress) ── */
+.sidebar {
+  width: 200px; flex-shrink: 0;
+  padding: 1.5rem 0;
+  display: flex; flex-direction: column;
+  gap: 0;
+}
+
+.step-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 0 0 1.5rem 0;
+  position: relative;
+}
+
+.step-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 12px; top: 26px;
+  width: 1px; bottom: 0;
+  background: var(--border);
+  transition: background 0.3s;
+}
+
+.step-item.done:not(:last-child)::after { background: var(--gold-dim); }
+.step-item.active:not(:last-child)::after { background: var(--border); }
+
+.step-dot {
+  width: 25px; height: 25px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-dim); transition: all 0.25s;
+}
+
+.step-item.active .step-dot {
+  border-color: var(--gold); background: var(--gold-faint);
+  color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+}
+
+.step-item.done .step-dot {
+  border-color: var(--gold-dim); background: var(--gold-dim);
+  color: #0e0e0e;
+}
+
+.step-info { padding-top: 3px; }
+.step-label { font-size: 12.5px; font-weight: 500; color: var(--text-dim); transition: color 0.25s; }
+.step-item.active .step-label { color: var(--text); }
+.step-item.done .step-label { color: var(--text-muted); }
+.step-hint { font-size: 11px; color: var(--text-dim); margin-top: 1px; line-height: 1.4; }
+.step-item.active .step-hint { color: var(--text-muted); }
+
+/* ── CONTENT AREA ── */
+.content { flex: 1; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+
+/* ── STEP PANELS ── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: none;
+  animation: fadeUp 0.2s ease;
+}
+
+.panel.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-eyebrow {
+  font-size: 11px; color: var(--gold);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.panel-title {
+  font-size: 17px; font-weight: 500; color: var(--text);
+  margin-bottom: 0.3rem;
+}
+
+.panel-desc { font-size: 13.5px; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.55; }
+
+/* ── FORM ELEMENTS ── */
+label {
+  display: block; font-size: 12.5px; font-weight: 500;
+  color: var(--text-muted); margin-bottom: 5px; letter-spacing: 0.02em;
+}
+
+textarea, input[type="text"], select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 10px 12px;
+  transition: border-color 0.15s;
+  outline: none;
+  resize: vertical;
+}
+
+textarea:focus, input[type="text"]:focus, select:focus {
+  border-color: var(--border-gold);
+}
+
+textarea::placeholder, input::placeholder { color: var(--text-dim); }
+
+select { appearance: none; cursor: pointer; resize: none; }
+select option { background: #1c1c1c; color: var(--text); }
+
+.field { margin-bottom: 1rem; }
+.field:last-child { margin-bottom: 0; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.char-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+/* ── CLARIFYING QUESTION ── */
+.clarify-box {
+  background: var(--gold-faint2);
+  border: 1px solid var(--border-gold);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.clarify-box.visible { display: block; }
+
+.clarify-q {
+  font-size: 13px; color: var(--gold);
+  font-weight: 500; margin-bottom: 0.5rem;
+}
+
+.clarify-q::before { content: '→ '; }
+
+.clarify-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.6rem; }
+
+.clarify-opt {
+  font-size: 12.5px;
+  background: none; border: 1px solid var(--border-gold);
+  border-radius: 5px; color: var(--text-muted);
+  padding: 4px 10px; cursor: pointer; font-family: var(--font);
+  transition: all 0.15s;
+}
+
+.clarify-opt:hover { background: var(--gold-faint); color: var(--text); }
+.clarify-opt.selected { background: var(--gold-faint); color: var(--gold); border-color: var(--gold); }
+
+/* ── BUTTONS ── */
+.btn-row { display: flex; gap: 8px; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; }
+
+.btn-primary {
+  background: var(--gold); color: #0e0e0e;
+  border: none; border-radius: 7px;
+  padding: 9px 20px; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; font-family: var(--font); letter-spacing: 0.01em;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover { background: #d4b05a; }
+
+.btn-ghost {
+  background: none; color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: 7px;
+  padding: 8px 16px; font-size: 13px;
+  cursor: pointer; font-family: var(--font);
+  transition: all 0.15s;
+}
+
+.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+.btn-icon {
+  background: none; color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: 7px;
+  padding: 8px 14px; font-size: 12.5px;
+  cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; gap: 5px;
+  transition: all 0.15s;
+}
+
+.btn-icon:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+/* ── RESULT PANEL ── */
+.result-panel {
+  background: var(--surface);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: none;
+}
+
+.result-panel.visible { display: block; animation: fadeUp 0.3s ease; }
+
+.result-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.result-title { font-size: 14px; font-weight: 600; color: var(--gold); letter-spacing: 0.02em; }
+
+.result-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.prompt-block {
+  background: #0a0a00;
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 13.5px;
+  color: #d4c49a;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.feedback-bar {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.feedback-title { font-size: 12px; color: var(--text-muted); margin-bottom: 0.6rem; letter-spacing: 0.03em; text-transform: uppercase; }
+
+.feedback-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.ftag {
+  font-size: 12px; padding: 4px 10px;
+  border-radius: 4px; border: 1px solid;
+}
+
+.ftag.good { background: rgba(90,158,111,0.1); border-color: rgba(90,158,111,0.3); color: #5a9e6f; }
+.ftag.tip { background: rgba(201,168,76,0.08); border-color: var(--border-gold); color: var(--gold); }
+
+.ai-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 0.25rem; }
+
+.ai-btn {
+  font-size: 12.5px; padding: 7px 14px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text-muted);
+  cursor: pointer; font-family: var(--font);
+  transition: all 0.15s; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+
+.ai-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+.signature {
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+/* ── REFINEMENT PANEL ── */
+.refine-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.5rem;
+  display: none;
+}
+
+.refine-panel.visible { display: block; animation: fadeUp 0.2s ease; }
+
+.refine-title { font-size: 13px; color: var(--text-muted); margin-bottom: 0.75rem; }
+
+.refine-options { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.rfn-btn {
+  font-size: 12.5px;
+  background: none; border: 1px solid var(--border);
+  border-radius: 5px; color: var(--text-muted);
+  padding: 5px 12px; cursor: pointer; font-family: var(--font);
+  transition: all 0.15s;
+}
+
+.rfn-btn:hover { border-color: var(--border-gold); color: var(--gold); background: var(--gold-faint2); }
+
+/* ── FOOTER ── */
+footer {
+  text-align: center; padding: 0.75rem;
+  font-size: 11px; color: var(--text-dim);
+  border-top: 1px solid var(--border);
+}
+
+footer a { color: var(--gold-dim); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+
+/* ── PRINT STYLES ── */
+@media print {
+  body { background: #fff; color: #111; }
+  header, footer, .sidebar, .refine-panel,
+  .btn-row, .result-actions, .ai-options,
+  .panel:not(.printed), .feedback-bar { display: none !important; }
+  .shell { max-width: 100%; padding: 0; }
+  .result-panel { display: block !important; border: 1px solid #ccc; border-radius: 6px; padding: 1.5rem; }
+  .result-title { color: #a8893c; }
+  .prompt-block { background: #f9f7f0; color: #333; border: 1px solid #ddd; font-size: 13px; }
+  .print-summary { display: block !important; }
+  .signature { color: #999; }
+  .ftag.good { background: #e8f5ed; border-color: #5a9e6f; color: #2d7a4a; }
+  .ftag.tip { background: #fdf6e3; border-color: #a8893c; color: #7a5c1a; }
+  .feedback-bar { display: block !important; background: #f9f9f9; border: 1px solid #eee; }
+  .result-panel.visible { animation: none; }
+}
+
+.print-summary { display: none; margin-bottom: 1rem; }
+
+@media (max-width: 640px) {
+  .shell { flex-direction: column; padding: 0 1rem; gap: 0; }
+  .sidebar { width: 100%; flex-direction: row; padding: 1rem 0 0.5rem; flex-wrap: wrap; gap: 0.5rem; overflow-x: auto; }
+  .step-item { padding: 0; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; }
+  .step-item::after { display: none; }
+  .step-hint { display: none; }
+  .step-label { font-size: 11px; text-align: center; }
+  .field-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div class="header-logo">PC</div>
+    <div>
+      <div class="header-title">Prompt Coach</div>
+      <div class="header-sub">Operations, Augmented</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge">Free Tool</span>
+    <button class="btn-ghost" style="font-size:12px;padding:5px 10px;" onclick="resetAll()">Start over</button>
+  </div>
+</header>
+
+<div class="shell">
+
+  <!-- SIDEBAR STEPS -->
+  <aside class="sidebar" id="sidebar">
+    <div class="step-item active" id="s-step-0">
+      <div class="step-dot">1</div>
+      <div class="step-info">
+        <div class="step-label">Your task</div>
+        <div class="step-hint">What do you want AI to do?</div>
+      </div>
+    </div>
+    <div class="step-item" id="s-step-1">
+      <div class="step-dot">2</div>
+      <div class="step-info">
+        <div class="step-label">Audience</div>
+        <div class="step-hint">Who is this for?</div>
+      </div>
+    </div>
+    <div class="step-item" id="s-step-2">
+      <div class="step-dot">3</div>
+      <div class="step-info">
+        <div class="step-label">Format</div>
+        <div class="step-hint">How should it look?</div>
+      </div>
+    </div>
+    <div class="step-item" id="s-step-3">
+      <div class="step-dot">4</div>
+      <div class="step-info">
+        <div class="step-label">Constraints</div>
+        <div class="step-hint">Rules &amp; limits</div>
+      </div>
+    </div>
+    <div class="step-item" id="s-step-4">
+      <div class="step-dot">5</div>
+      <div class="step-info">
+        <div class="step-label">Your prompt</div>
+        <div class="step-hint">Ready to use</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content" id="main-content">
+
+    <!-- STEP 0: TASK -->
+    <div class="panel active" id="panel-0">
+      <div class="panel-eyebrow">Step 1 of 4</div>
+      <div class="panel-title">What do you want AI to help you do?</div>
+      <div class="panel-desc">Describe it in plain English. Don't worry about wording it perfectly — that's what we're here for.</div>
+
+      <div class="field">
+        <label for="task-input">Your task</label>
+        <textarea id="task-input" rows="3" placeholder="e.g. Write a summary of a meeting, help me respond to a difficult email, generate ideas for a project name..."></textarea>
+        <div class="char-hint" id="task-hint"></div>
+      </div>
+
+      <div class="clarify-box" id="clarify-0">
+        <div class="clarify-q" id="clarify-q-0"></div>
+        <div id="clarify-opts-0" class="clarify-options"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="goStep(1)">Next →</button>
+        <span style="font-size:12px;color:var(--text-dim);">The most common mistake is being too vague here.</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: AUDIENCE -->
+    <div class="panel" id="panel-1">
+      <div class="panel-eyebrow">Step 2 of 4</div>
+      <div class="panel-title">Who is this output for?</div>
+      <div class="panel-desc">AI calibrates tone, vocabulary, and depth based on the audience. Skipping this is the second most common prompt mistake.</div>
+
+      <div class="field">
+        <label for="audience-select">Audience type</label>
+        <select id="audience-select" onchange="audienceSelectChange()">
+          <option value="">Select an audience...</option>
+          <option value="myself">Just me (personal use)</option>
+          <option value="team">My team or colleagues</option>
+          <option value="executive">Senior leaders / executives</option>
+          <option value="client">A client or external partner</option>
+          <option value="general">General public</option>
+          <option value="expert">Subject matter experts</option>
+          <option value="custom">Someone specific (I'll describe)</option>
+        </select>
+      </div>
+
+      <div class="field" id="audience-custom-field" style="display:none;">
+        <label for="audience-custom">Describe the audience</label>
+        <input type="text" id="audience-custom" placeholder="e.g. HR managers at mid-size companies who are not technical">
+      </div>
+
+      <div class="clarify-box" id="clarify-1">
+        <div class="clarify-q" id="clarify-q-1"></div>
+        <div id="clarify-opts-1" class="clarify-options"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="goStep(0)">← Back</button>
+        <button class="btn-primary" onclick="goStep(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: FORMAT -->
+    <div class="panel" id="panel-2">
+      <div class="panel-eyebrow">Step 3 of 4</div>
+      <div class="panel-title">What should the output look like?</div>
+      <div class="panel-desc">AI won't guess your preferred format. Telling it saves you an edit cycle.</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="format-select">Output format</label>
+          <select id="format-select">
+            <option value="">Any format</option>
+            <option value="bullet list">Bullet list</option>
+            <option value="numbered list">Numbered list</option>
+            <option value="short paragraph">Short paragraph (under 100 words)</option>
+            <option value="multiple paragraphs">Multiple paragraphs</option>
+            <option value="table">Table</option>
+            <option value="email">Email (with subject line)</option>
+            <option value="step-by-step guide">Step-by-step guide</option>
+            <option value="summary">Summary / TL;DR</option>
+            <option value="JSON">JSON / structured data</option>
+            <option value="code">Code only</option>
+            <option value="custom">I'll describe</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="length-select">Length</label>
+          <select id="length-select">
+            <option value="">No preference</option>
+            <option value="very short (1-2 sentences)">Very short (1-2 sentences)</option>
+            <option value="concise (under 100 words)">Concise (under 100 words)</option>
+            <option value="medium (100-300 words)">Medium (100-300 words)</option>
+            <option value="detailed (300-600 words)">Detailed (300-600 words)</option>
+            <option value="comprehensive (600+ words)">Comprehensive (600+ words)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="format-custom-field" style="display:none;">
+        <label for="format-custom">Describe the format</label>
+        <input type="text" id="format-custom" placeholder="e.g. A table with three columns: Task, Owner, Deadline">
+      </div>
+
+      <div class="clarify-box" id="clarify-2">
+        <div class="clarify-q" id="clarify-q-2"></div>
+        <div id="clarify-opts-2" class="clarify-options"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn-primary" onclick="goStep(3)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: CONSTRAINTS -->
+    <div class="panel" id="panel-3">
+      <div class="panel-eyebrow">Step 4 of 4</div>
+      <div class="panel-title">Any rules, tone, or things to avoid?</div>
+      <div class="panel-desc">Constraints are optional — but they separate good prompts from great ones. Tell the AI what matters to you. Use "do this" not "don't do that."</div>
+
+      <div class="field">
+        <label for="tone-select">Tone</label>
+        <select id="tone-select">
+          <option value="">No specific tone</option>
+          <option value="professional and formal">Professional and formal</option>
+          <option value="friendly and conversational">Friendly and conversational</option>
+          <option value="direct and concise">Direct and concise</option>
+          <option value="empathetic and supportive">Empathetic and supportive</option>
+          <option value="confident and persuasive">Confident and persuasive</option>
+          <option value="neutral and objective">Neutral and objective</option>
+          <option value="creative and expressive">Creative and expressive</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="constraints-input">Specific rules or things to include / avoid</label>
+        <textarea id="constraints-input" rows="2" placeholder="e.g. Use plain language, no jargon. Keep it action-oriented. Include a next step at the end. Avoid buzzwords."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="context-input">Background context (optional but powerful)</label>
+        <textarea id="context-input" rows="2" placeholder="e.g. I work in sales operations at a SaaS company. The email is going to a VP who values brevity."></textarea>
+      </div>
+
+      <div class="clarify-box" id="clarify-3">
+        <div class="clarify-q" id="clarify-q-3"></div>
+        <div id="clarify-opts-3" class="clarify-options"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="goStep(2)">← Back</button>
+        <button class="btn-primary" onclick="buildPrompt()">Build my prompt →</button>
+      </div>
+    </div>
+
+    <!-- RESULT PANEL -->
+    <div class="result-panel" id="result-panel">
+
+      <!-- Print-only summary -->
+      <div class="print-summary" id="print-summary"></div>
+
+      <div class="result-header">
+        <div class="result-title">Your prompt — ready to use</div>
+        <div class="result-actions">
+          <button class="btn-icon" onclick="copyPrompt()" id="copy-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+          <button class="btn-icon" onclick="window.print()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Save as PDF
+          </button>
+          <button class="btn-icon" onclick="editPrompt()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <div class="prompt-block" id="prompt-output"></div>
+
+      <div class="feedback-bar">
+        <div class="feedback-title">What makes this prompt work</div>
+        <div class="feedback-tags" id="feedback-tags"></div>
+      </div>
+
+      <div style="margin-bottom:0.75rem;">
+        <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:0.6rem;">Test it in your AI of choice</div>
+        <div class="ai-options">
+          <a class="ai-btn" id="ai-claude" href="#" target="_blank" onclick="openAI('claude',event)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Claude
+          </a>
+          <a class="ai-btn" id="ai-chatgpt" href="#" target="_blank" onclick="openAI('chatgpt',event)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            ChatGPT
+          </a>
+          <a class="ai-btn" id="ai-gemini" href="#" target="_blank" onclick="openAI('gemini',event)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Gemini
+          </a>
+          <a class="ai-btn" id="ai-copilot" href="#" target="_blank" onclick="openAI('copilot',event)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Copilot
+          </a>
+        </div>
+      </div>
+
+      <div class="signature">Reads between the lines of a process document.</div>
+    </div>
+
+    <!-- REFINE PANEL -->
+    <div class="refine-panel" id="refine-panel">
+      <div class="refine-title">Want to adjust the prompt?</div>
+      <div class="refine-options">
+        <button class="rfn-btn" onclick="refine('specific')">Make it more specific</button>
+        <button class="rfn-btn" onclick="refine('shorter')">Make it shorter</button>
+        <button class="rfn-btn" onclick="refine('example')">Add an example</button>
+        <button class="rfn-btn" onclick="refine('tone')">Change the tone</button>
+        <button class="rfn-btn" onclick="refine('context')">Add more context</button>
+        <button class="rfn-btn" onclick="resetAll()">Start over</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  Built by <a href="https://luis-figueroa-ops.github.io" target="_blank">luis-figueroa-ops.github.io</a>
+  &nbsp;·&nbsp; Operations, Augmented &nbsp;·&nbsp; No API key required · Zero cost to use
+</footer>
+
+<script>
+// ── STATE ──
+const state = {
+  task: '', audience: '', audienceCustom: '',
+  format: '', length: '', formatCustom: '',
+  tone: '', constraints: '', context: '',
+  generatedPrompt: ''
+};
+
+let currentStep = 0;
+
+// ── CLARIFYING QUESTIONS by step ──
+const clarifyData = {
+  0: {
+    trigger: (val) => val.length > 10 && val.length < 60,
+    question: 'Is this a one-time task or something you want to reuse?',
+    options: ['One-time task', 'Reusable template', 'Not sure yet']
+  },
+  1: {
+    trigger: (val) => val === 'team',
+    question: 'What level of detail does your team expect?',
+    options: ['High-level summary', 'Full detail', 'Depends on the output']
+  },
+  2: {
+    trigger: (val) => val === 'bullet list' || val === 'numbered list',
+    question: 'How many items should the list have?',
+    options: ['3-5 items', '5-10 items', 'As many as needed']
+  },
+  3: {
+    trigger: (val) => val.length > 5,
+    question: 'Should the AI explain its reasoning, or just give the answer?',
+    options: ['Just the output', 'Brief explanation', 'Full reasoning']
+  }
+};
+
+let clarifyAnswers = { 0: null, 1: null, 2: null, 3: null };
+
+// ── NAVIGATION ──
+function goStep(n) {
+  if (n > 0 && !validateStep(currentStep)) return;
+
+  document.getElementById(`panel-${currentStep}`).classList.remove('active');
+  document.getElementById(`s-step-${currentStep}`).classList.remove('active');
+  document.getElementById(`s-step-${currentStep}`).classList.add('done');
+
+  if (n < currentStep) {
+    for (let i = n; i <= currentStep; i++) {
+      document.getElementById(`s-step-${i}`).classList.remove('done');
+    }
+  }
+
+  currentStep = n;
+  document.getElementById(`panel-${n}`).classList.add('active');
+  document.getElementById(`s-step-${n}`).classList.remove('done');
+  document.getElementById(`s-step-${n}`).classList.add('active');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  triggerClarify(n);
+}
+
+function validateStep(step) {
+  if (step === 0) {
+    const val = document.getElementById('task-input').value.trim();
+    if (!val) {
+      document.getElementById('task-input').focus();
+      document.getElementById('task-input').style.borderColor = 'rgba(201,168,76,0.6)';
+      setTimeout(() => document.getElementById('task-input').style.borderColor = '', 1500);
+      return false;
+    }
+    state.task = val;
+  }
+  if (step === 1) {
+    const sel = document.getElementById('audience-select').value;
+    state.audience = sel;
+    if (sel === 'custom') state.audienceCustom = document.getElementById('audience-custom').value.trim();
+  }
+  if (step === 2) {
+    state.format = document.getElementById('format-select').value;
+    state.length = document.getElementById('length-select').value;
+    if (state.format === 'custom') state.formatCustom = document.getElementById('format-custom').value.trim();
+  }
+  return true;
+}
+
+// ── CLARIFYING QUESTIONS ──
+function triggerClarify(step) {
+  const box = document.getElementById(`clarify-${step}`);
+  if (!box || !clarifyData[step]) return;
+
+  let triggerVal = '';
+  if (step === 0) triggerVal = document.getElementById('task-input').value.trim();
+  if (step === 1) triggerVal = document.getElementById('audience-select').value;
+  if (step === 2) triggerVal = document.getElementById('format-select').value;
+  if (step === 3) triggerVal = document.getElementById('constraints-input').value.trim();
+
+  const data = clarifyData[step];
+  if (data.trigger(triggerVal)) {
+    document.getElementById(`clarify-q-${step}`).textContent = data.question;
+    const optsEl = document.getElementById(`clarify-opts-${step}`);
+    optsEl.innerHTML = '';
+    data.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'clarify-opt';
+      btn.textContent = opt;
+      btn.onclick = () => {
+        optsEl.querySelectorAll('.clarify-opt').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        clarifyAnswers[step] = opt;
+      };
+      optsEl.appendChild(btn);
+    });
+    box.classList.add('visible');
+  } else {
+    box.classList.remove('visible');
+  }
+}
+
+// ── AUDIENCE SELECT CHANGE ──
+function audienceSelectChange() {
+  const val = document.getElementById('audience-select').value;
+  document.getElementById('audience-custom-field').style.display = val === 'custom' ? 'block' : 'none';
+  triggerClarify(1);
+}
+
+// ── FORMAT SELECT CHANGE ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('format-select').addEventListener('change', function() {
+    document.getElementById('format-custom-field').style.display = this.value === 'custom' ? 'block' : 'none';
+    triggerClarify(2);
+  });
+
+  document.getElementById('task-input').addEventListener('input', function() {
+    const len = this.value.length;
+    const hint = document.getElementById('task-hint');
+    if (len < 20) hint.textContent = 'Try to be more specific about what you want.';
+    else if (len < 60) hint.textContent = 'Good — a bit more detail will help.';
+    else hint.textContent = 'Nice. That gives AI enough to work with.';
+    triggerClarify(0);
+  });
+
+  document.getElementById('constraints-input').addEventListener('input', () => triggerClarify(3));
+});
+
+// ── BUILD PROMPT ──
+function buildPrompt() {
+  if (!validateStep(3)) return;
+
+  state.constraints = document.getElementById('constraints-input').value.trim();
+  state.context = document.getElementById('context-input').value.trim();
+  state.tone = document.getElementById('tone-select').value;
+
+  const lines = [];
+
+  // Role / context line
+  if (state.context) {
+    lines.push(`Context: ${state.context}`);
+    lines.push('');
+  }
+
+  // Core task
+  lines.push(`Task: ${state.task}`);
+
+  // Audience
+  if (state.audience) {
+    const audienceMap = {
+      myself: 'Write this for my own personal use.',
+      team: 'The output will be shared with my team.',
+      executive: 'The audience is senior leadership — keep it executive-level and strategic.',
+      client: 'This is for an external client or partner.',
+      general: 'Write for a general audience with no assumed background knowledge.',
+      expert: 'The audience consists of subject matter experts in this field.',
+      custom: state.audienceCustom || 'A specific audience (described above).'
+    };
+    lines.push(`Audience: ${audienceMap[state.audience] || state.audience}`);
+  }
+
+  // Format
+  const formatParts = [];
+  if (state.format && state.format !== 'custom') formatParts.push(`Format: ${state.format}`);
+  if (state.format === 'custom' && state.formatCustom) formatParts.push(`Format: ${state.formatCustom}`);
+  if (state.length) formatParts.push(`Length: ${state.length}`);
+  if (formatParts.length) lines.push(formatParts.join('. ') + '.');
+
+  // Tone
+  if (state.tone) lines.push(`Tone: ${state.tone}.`);
+
+  // Constraints
+  if (state.constraints) {
+    lines.push('');
+    lines.push(`Rules: ${state.constraints}`);
+  }
+
+  // Clarify answers as hints
+  const extras = [];
+  if (clarifyAnswers[0] === 'Reusable template') extras.push('Write this as a reusable template I can adapt.');
+  if (clarifyAnswers[2] === '3-5 items') extras.push('Limit the list to 3-5 items.');
+  if (clarifyAnswers[2] === '5-10 items') extras.push('Include 5-10 items in the list.');
+  if (clarifyAnswers[3] === 'Brief explanation') extras.push('Briefly explain your reasoning after the output.');
+  if (clarifyAnswers[3] === 'Full reasoning') extras.push('Show your full reasoning process, then give the final output.');
+  if (extras.length) { lines.push(''); extras.forEach(e => lines.push(e)); }
+
+  state.generatedPrompt = lines.join('\n');
+
+  document.getElementById('prompt-output').textContent = state.generatedPrompt;
+
+  // Feedback tags
+  buildFeedbackTags();
+
+  // Print summary
+  buildPrintSummary();
+
+  // Show result
+  document.getElementById('result-panel').classList.add('visible');
+  document.getElementById('refine-panel').classList.add('visible');
+
+  // Mark step 5 active
+  document.getElementById('s-step-4').classList.add('active');
+  document.getElementById('s-step-3').classList.remove('active');
+  document.getElementById('s-step-3').classList.add('done');
+
+  setTimeout(() => {
+    document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function buildFeedbackTags() {
+  const tags = [];
+  tags.push({ type: 'good', text: 'Task defined' });
+  if (state.audience) tags.push({ type: 'good', text: 'Audience set' });
+  else tags.push({ type: 'tip', text: 'Tip: adding an audience improves tone' });
+  if (state.format) tags.push({ type: 'good', text: 'Format specified' });
+  else tags.push({ type: 'tip', text: 'Tip: specifying format saves an edit cycle' });
+  if (state.tone) tags.push({ type: 'good', text: 'Tone specified' });
+  if (state.constraints) tags.push({ type: 'good', text: 'Constraints included' });
+  if (state.context) tags.push({ type: 'good', text: 'Context grounded' });
+
+  const el = document.getElementById('feedback-tags');
+  el.innerHTML = '';
+  tags.forEach(t => {
+    const span = document.createElement('span');
+    span.className = `ftag ${t.type}`;
+    span.textContent = t.text;
+    el.appendChild(span);
+  });
+}
+
+function buildPrintSummary() {
+  const el = document.getElementById('print-summary');
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  el.innerHTML = `
+    <div style="border-bottom:1px solid #ddd;padding-bottom:0.75rem;margin-bottom:1rem;">
+      <div style="font-size:18px;font-weight:600;color:#a8893c;margin-bottom:4px;">Prompt Coach — Operations, Augmented</div>
+      <div style="font-size:12px;color:#999;">Generated ${date} · luis-figueroa-ops.github.io</div>
+    </div>
+    <div style="margin-bottom:0.75rem;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">Task</div>
+      <div style="font-size:13px;color:#333;">${escapeHtml(state.task)}</div>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── OPEN AI ──
+function openAI(which, e) {
+  e.preventDefault();
+  const urls = {
+    claude: 'https://claude.ai/new',
+    chatgpt: 'https://chatgpt.com/',
+    gemini: 'https://gemini.google.com/',
+    copilot: 'https://copilot.microsoft.com/'
+  };
+  // Copy prompt to clipboard first, then open
+  navigator.clipboard.writeText(state.generatedPrompt).then(() => {
+    window.open(urls[which], '_blank');
+    // Brief visual feedback
+    const btn = document.getElementById(`ai-${which}`);
+    const orig = btn.innerHTML;
+    btn.innerHTML = btn.innerHTML.replace(which.charAt(0).toUpperCase() + which.slice(1), 'Copied + Opening...');
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  }).catch(() => {
+    window.open(urls[which], '_blank');
+  });
+}
+
+// ── COPY PROMPT ──
+function copyPrompt() {
+  navigator.clipboard.writeText(state.generatedPrompt).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.innerHTML = btn.innerHTML.replace('Copy', 'Copied!');
+    btn.style.color = '#5a9e6f';
+    btn.style.borderColor = 'rgba(90,158,111,0.4)';
+    setTimeout(() => {
+      btn.innerHTML = btn.innerHTML.replace('Copied!', 'Copy');
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 2000);
+  });
+}
+
+// ── EDIT PROMPT ──
+function editPrompt() {
+  const block = document.getElementById('prompt-output');
+  if (block.contentEditable === 'true') {
+    block.contentEditable = 'false';
+    block.style.outline = 'none';
+    state.generatedPrompt = block.textContent;
+  } else {
+    block.contentEditable = 'true';
+    block.style.outline = '1px solid rgba(201,168,76,0.5)';
+    block.style.borderRadius = '4px';
+    block.focus();
+  }
+}
+
+// ── REFINE ──
+function refine(type) {
+  const refinements = {
+    specific: '\n\nBe as specific and concrete as possible. Avoid generalities.',
+    shorter: '\n\nKeep the response brief and to the point.',
+    example: '\n\nInclude one concrete example to illustrate the output.',
+    tone: '\n\nAdjust the tone to be more conversational and approachable.',
+    context: '\n\nTake into account the full context provided before generating your response.'
+  };
+
+  if (refinements[type]) {
+    state.generatedPrompt += refinements[type];
+    document.getElementById('prompt-output').textContent = state.generatedPrompt;
+    document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ── RESET ──
+function resetAll() {
+  currentStep = 0;
+  state.task = ''; state.audience = ''; state.audienceCustom = '';
+  state.format = ''; state.length = ''; state.formatCustom = '';
+  state.tone = ''; state.constraints = ''; state.context = '';
+  state.generatedPrompt = '';
+  clarifyAnswers = { 0: null, 1: null, 2: null, 3: null };
+
+  document.getElementById('task-input').value = '';
+  document.getElementById('audience-select').value = '';
+  document.getElementById('audience-custom').value = '';
+  document.getElementById('format-select').value = '';
+  document.getElementById('length-select').value = '';
+  document.getElementById('format-custom').value = '';
+  document.getElementById('tone-select').value = '';
+  document.getElementById('constraints-input').value = '';
+  document.getElementById('context-input').value = '';
+  document.getElementById('task-hint').textContent = '';
+
+  document.getElementById('audience-custom-field').style.display = 'none';
+  document.getElementById('format-custom-field').style.display = 'none';
+  document.getElementById('result-panel').classList.remove('visible');
+  document.getElementById('refine-panel').classList.remove('visible');
+
+  [0,1,2,3,4].forEach(i => {
+    const panel = document.getElementById(`panel-${i}`);
+    const step = document.getElementById(`s-step-${i}`);
+    if (panel) { panel.classList.remove('active'); }
+    if (step) { step.classList.remove('active','done'); }
+    const cb = document.getElementById(`clarify-${i}`);
+    if (cb) cb.classList.remove('visible');
+  });
+
+  document.getElementById('panel-0').classList.add('active');
+  document.getElementById('s-step-0').classList.add('active');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
