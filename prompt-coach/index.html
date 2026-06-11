@@ -730,7 +730,7 @@ const RULES = [
     weight: 12,
     check(p) {
       const startsWithVerb = /^(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|give me|show me)/i;
-      const delegation = /\b(help me\s+(?:to\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|design|plan)|i need you to|act as\s+a|assist me\s+(?:with|in)|can you\s+(?:please\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|describe|identify|fix|improve)|please\s+(?:write|create|draft|summarize|analyze|explain|generate|list))\b/i;
+      const delegation = /\b(help me\s+(?:to\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|design|plan)|i need you to|act as\s+(?:a|an)\b|assist me\s+(?:with|in)|can you\s+(?:please\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|describe|identify|fix|improve)|please\s+(?:write|create|draft|summarize|analyze|explain|generate|list))\b/i;
       const verbAnywhere = /\b(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan)\b/i;
       if (startsWithVerb.test(p.trim()) || delegation.test(p)) return 'good';
       if (verbAnywhere.test(p)) return 'weak';
@@ -746,9 +746,11 @@ const RULES = [
     name: 'Specificity',
     weight: 12,
     check(p) {
-      const vague = /\b(something|stuff|things|whatever|anything|some kind|sort of|kind of|etc\.?|and so on)\b/i;
+      const vague = /\b(something|stuff|whatever|anything|some kind|sort of|kind of|etc\.?|and so on)\b/i;
+      const vagueThings = /\bthings\b/i;
+      const specificThings = /\b\d+\s+things\b/i;
       const vagueScope = /\b(all the important|some training|everything relevant|any key points?|all relevant|some useful|important things?|various topics?|key topics?|relevant information|the main (?:things?|points?|topics?))\b/i;
-      if (vague.test(p)) return 'missing';
+      if (vague.test(p) || (vagueThings.test(p) && !specificThings.test(p))) return 'missing';
       if (vagueScope.test(p)) return 'weak';
       if (p.length < 40) return 'weak';
       if (p.length > 80) return 'good';
