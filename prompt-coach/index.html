@@ -347,76 +347,6 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   line-height: 1.5;
 }
 
-/* ── DIFF PANEL ── */
-.diff-panel {
-  background: var(--bg2);
-  border: 1px solid var(--gold-border);
-  padding: 36px;
-  margin-bottom: 28px;
-}
-
-.diff-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 28px;
-}
-
-.diff-col-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.diff-before .diff-col-label { color: var(--red); }
-.diff-after .diff-col-label { color: var(--green); }
-
-.diff-text {
-  font-size: 15px;
-  line-height: 1.8;
-  color: var(--white);
-  opacity: 0.85;
-  font-family: 'DM Sans', sans-serif;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.diff-changes {
-  border-top: 1px solid var(--gold-border);
-  padding-top: 24px;
-}
-.diff-changes-title {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-.change-item {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 14px;
-  align-items: flex-start;
-}
-.change-num {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  color: var(--gold);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.change-text {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--white);
-  opacity: 0.8;
-}
-.change-text strong { color: var(--gold); opacity: 1; }
-
 /* ── COACHED PROMPT BOX ── */
 .coached-box {
   background: var(--bg3);
@@ -469,6 +399,70 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 .btn-refine:hover { border-color: var(--gold); color: var(--gold); opacity: 1; }
 .btn-refine.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); opacity: 1; }
 .refine-tick { font-size: 12px; margin-left: 4px; }
+
+/* ── COACH FIELDS ── */
+.coach-field {
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  background: var(--bg3);
+  border-left: 3px solid var(--gold-border);
+  transition: border-left-color 0.2s;
+}
+.coach-field:focus-within {
+  border-left-color: var(--gold);
+}
+.coach-field-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.coach-field input[type="text"],
+.coach-field textarea {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.15);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  padding: 12px 16px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.coach-field input[type="text"]:focus,
+.coach-field textarea:focus {
+  border-color: var(--gold);
+}
+.coach-field input[type="text"]::placeholder,
+.coach-field textarea::placeholder {
+  color: rgba(240,237,230,0.3);
+}
+.coach-field-why {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.original-prompt-display {
+  background: var(--bg3);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 3px solid var(--muted);
+  padding: 18px 20px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.85;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 28px;
+}
 
 /* ── EXPORT PANEL ── */
 .export-panel {
@@ -572,9 +566,8 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 
 @media (max-width: 700px) {
   .topbar, .hero, .main { padding-left: 20px; padding-right: 20px; }
-  .diff-grid { grid-template-columns: 1fr; }
   .score-panel { flex-direction: column; gap: 20px; }
-  .input-panel, .findings-panel, .diff-panel, .refinement-panel, .export-panel { padding: 24px 20px; }
+  .input-panel, .findings-panel, .refinement-panel, .export-panel { padding: 24px 20px; }
 }
 
 @keyframes fadeUp {
@@ -588,13 +581,13 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 
 <div class="topbar">
   <span class="topbar-brand">Prompt Coach</span>
-  <a class="topbar-back" href="https://luis-figueroa-ops.github.io">← Back to Tools</a>
+  <a class="topbar-back" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
 </div>
 
 <div class="hero">
   <div class="hero-eyebrow">Career Tools</div>
   <h1>Prompt<br><span>Coach</span></h1>
-  <p class="hero-sub">Type a rough prompt. Get a score, a diagnosis, a coached version, and export-ready buttons — no API key, no sign-in, zero cost.</p>
+  <p class="hero-sub">Type a rough prompt. Get a score, a diagnosis, a coached version, and export-ready buttons &#8212; no API key, no sign-in, zero cost.</p>
 </div>
 
 <div class="main">
@@ -629,7 +622,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
         </div>
       </div>
       <div class="score-meta">
-        <div class="score-title" id="scoreTitle">—</div>
+        <div class="score-title" id="scoreTitle">&#8212;</div>
         <div class="score-summary" id="scoreSummary"></div>
       </div>
     </div>
@@ -640,41 +633,35 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
       <div id="findingsList"></div>
     </div>
 
-    <!-- DIFF -->
-    <div class="diff-panel fade-up">
-      <div class="panel-title">Before &amp; After</div>
-      <div class="diff-grid">
-        <div class="diff-before">
-          <div class="diff-col-label">Original</div>
-          <div class="diff-text" id="diffBefore"></div>
-        </div>
-        <div class="diff-after">
-          <div class="diff-col-label">Coached Version</div>
-          <div class="diff-text" id="diffAfter"></div>
-        </div>
-      </div>
-      <div class="diff-changes">
-        <div class="diff-changes-title">What changed &amp; why</div>
-        <div id="changesList"></div>
-      </div>
-    </div>
+    <!-- REWRITE YOUR PROMPT -->
+    <div class="findings-panel fade-up" id="rewritePanel">
+      <div class="panel-title">Rewrite Your Prompt</div>
 
-    <!-- COACHED PROMPT (FULL) -->
-    <div class="findings-panel fade-up" id="coachedSection">
-      <div class="panel-title">Coached Prompt</div>
-      <div class="coached-box">
-        <div class="coached-prompt-text" id="coachedText"></div>
+      <div class="label">Your Original Prompt</div>
+      <div class="original-prompt-display" id="originalPromptDisplay"></div>
+
+      <div id="coachFieldsContainer"></div>
+
+      <div id="allGoodMsg" style="display:none;padding:16px 20px;background:var(--green-bg);border:1px solid rgba(76,175,125,0.3);color:var(--green);font-size:15px;line-height:1.6;margin-bottom:24px;">
+        Your prompt is already well-structured. Use the export buttons below to copy and test it.
       </div>
 
-      <!-- REFINEMENT -->
-      <div class="refinement-panel" style="background:transparent;border:none;padding:0;margin-top:0;">
-        <div class="refinement-title">Refine further</div>
-        <div class="refinement-btns">
-          <button class="btn-refine" data-refine-type="shorter"   onclick="toggleRefine('shorter', this)">Make it shorter</button>
-          <button class="btn-refine" data-refine-type="formal"    onclick="toggleRefine('formal', this)">Make it more formal</button>
-          <button class="btn-refine" data-refine-type="casual"    onclick="toggleRefine('casual', this)">Make it more casual</button>
-          <button class="btn-refine" data-refine-type="reasoning" onclick="toggleRefine('reasoning', this)">Show your reasoning</button>
-          <button class="btn-refine" data-refine-type="language"  onclick="toggleRefine('language', this)">Simplify the language</button>
+      <button class="btn-primary" id="buildBtn" onclick="buildAssembledPrompt()" style="width:100%;margin-top:4px;margin-bottom:28px;">Build My Coached Prompt</button>
+
+      <div id="assembledSection" style="display:none;">
+        <div class="label" style="margin-bottom:12px;">Your Coached Prompt</div>
+        <div class="coached-box">
+          <div class="coached-prompt-text" id="coachedText"></div>
+        </div>
+        <div style="background:transparent;border:none;padding:0;margin-top:4px;">
+          <div class="refinement-title">Refine further</div>
+          <div class="refinement-btns">
+            <button class="btn-refine" data-refine-type="shorter"   onclick="toggleRefine('shorter', this)">Make it shorter</button>
+            <button class="btn-refine" data-refine-type="formal"    onclick="toggleRefine('formal', this)">Make it more formal</button>
+            <button class="btn-refine" data-refine-type="casual"    onclick="toggleRefine('casual', this)">Make it more casual</button>
+            <button class="btn-refine" data-refine-type="reasoning" onclick="toggleRefine('reasoning', this)">Show your reasoning</button>
+            <button class="btn-refine" data-refine-type="language"  onclick="toggleRefine('language', this)">Simplify the language</button>
+          </div>
         </div>
       </div>
     </div>
@@ -925,19 +912,14 @@ function analyzePrompt() {
   const raw = input.value.trim();
   if (!raw) { showToast('Paste a prompt first'); return; }
 
-  const findings = RULES.map(r => ({
-    rule: r,
-    status: r.check(raw)
-  }));
-
+  const findings = RULES.map(r => ({ rule: r, status: r.check(raw) }));
   const score = computeScore(findings);
-  const coached = buildCoachedPrompt(raw, findings);
 
   renderScore(score, findings);
   renderFindings(findings);
-  renderDiff(raw, coached, findings);
-  renderCoached(coached);
+  renderRewriteFields(raw, findings);
 
+  document.getElementById('assembledSection').style.display = 'none';
   document.getElementById('results').classList.add('visible');
   document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -963,9 +945,9 @@ function scoreSummary(s, findings) {
   const missing = findings.filter(f => f.status === 'missing').map(f => f.rule.name.toLowerCase());
   const weak = findings.filter(f => f.status === 'weak').map(f => f.rule.name.toLowerCase());
   if (s >= 85) return 'This prompt is well-structured. Minor refinements possible.';
-  if (missing.length > 0) return `Missing: ${missing.slice(0,3).join(', ')}. These gaps will produce generic or off-target results.`;
-  if (weak.length > 0) return `Weak on: ${weak.slice(0,3).join(', ')}. Tighten these to get noticeably better output.`;
-  return 'The coached version below applies targeted fixes to each weak area.';
+  if (missing.length > 0) return 'Missing: ' + missing.slice(0,3).join(', ') + '. These gaps will produce generic or off-target results.';
+  if (weak.length > 0) return 'Weak on: ' + weak.slice(0,3).join(', ') + '. Fill in the fields below to tighten these.';
+  return 'Fill in the fields below to build your coached prompt.';
 }
 
 function renderScore(score, findings) {
@@ -977,8 +959,7 @@ function renderScore(score, findings) {
   document.getElementById('scoreSummary').textContent = scoreSummary(score, findings);
   const arc = document.getElementById('scoreArc');
   const circumference = 314;
-  const offset = circumference - (score / 100) * circumference;
-  arc.style.strokeDashoffset = offset;
+  arc.style.strokeDashoffset = circumference - (score / 100) * circumference;
   arc.style.stroke = color;
 }
 
@@ -1000,153 +981,143 @@ function renderFindings(findings) {
 }
 
 // ═══════════════════════════════════════
-// COACHED PROMPT BUILDER
+// REWRITE FIELDS
 // ═══════════════════════════════════════
-function buildCoachedPrompt(raw, findings) {
-  let p = raw.trim();
-  const issues = findings.filter(f => f.status !== 'good');
+const COACH_FIELDS = {
+  action_verb: {
+    label: 'Action Verb',
+    type: 'input',
+    placeholder: 'e.g. "Write a 3-paragraph overview of..." or "Analyze the following and list..."',
+    why: 'Leading with an imperative verb tells the model what mode to enter before it reads anything else.'
+  },
+  context: {
+    label: 'Context',
+    type: 'textarea',
+    placeholder: 'e.g. "I\'m a Sales Ops analyst preparing a territory review for my VP..."',
+    why: 'One sentence about your situation doubles output relevance — the model stops guessing and starts targeting.'
+  },
+  audience: {
+    label: 'Audience',
+    type: 'input',
+    placeholder: 'e.g. "A non-technical hiring manager" or "My sales team of 12 AEs"',
+    why: 'The model calibrates vocabulary, depth, and assumed knowledge to whoever you name here.'
+  },
+  format: {
+    label: 'Format',
+    type: 'input',
+    placeholder: 'e.g. "Numbered list with a bold header for each item" or "3 short paragraphs"',
+    why: 'Without a format instruction, the model picks one — usually verbose prose when you wanted bullets.'
+  },
+  length: {
+    label: 'Length',
+    type: 'input',
+    placeholder: 'e.g. "Under 150 words" or "3-5 bullet points maximum"',
+    why: 'Models over-produce by default. A hard limit forces them to prioritize only what matters.'
+  },
+  tone: {
+    label: 'Tone',
+    type: 'input',
+    placeholder: 'e.g. "Professional and direct" or "Conversational, like talking to a colleague"',
+    why: 'Without a tone instruction the model defaults to a neutral academic register that often sounds robotic.'
+  },
+  examples: {
+    label: 'Examples',
+    type: 'textarea',
+    placeholder: 'e.g. "For instance, a prompt like [X] should produce output that looks like [Y]"',
+    why: 'Even one concrete example activates few-shot priming — the single highest-leverage prompting technique.'
+  },
+  negative_instructions: {
+    label: 'Negative Instructions',
+    type: 'textarea',
+    placeholder: 'Rewrite your constraint as a positive: instead of "don\'t be formal", write "use a conversational tone"',
+    why: 'Negative instructions are less reliable under model pressure — flip them to say what you want, not what you don\'t.'
+  },
+  multitask: {
+    label: 'Single Focus',
+    type: 'textarea',
+    placeholder: 'e.g. Separate your tasks: Prompt 1: "Analyze X" / Prompt 2: "Then write Y based on that analysis"',
+    why: 'Models split attention on multi-task prompts and deliver mediocre results on each. One objective = one prompt.'
+  },
+  data_grounding: {
+    label: 'Data',
+    type: 'textarea',
+    placeholder: 'Paste your actual data here, or write: "Ask me for the data before responding."',
+    why: 'AI will confabulate statistics without source material. Always give it the actual numbers or tell it to ask.'
+  },
+  vagueness: {
+    label: 'Specificity',
+    type: 'textarea',
+    placeholder: 'Replace vague words like "something" or "stuff" with your exact deliverable.',
+    why: 'Vague filler words force the model to guess what you want. Be specific about what you need.'
+  }
+};
 
-  // Add action verb if missing
-  if (findings.find(f => f.rule.id === 'action_verb' && f.status === 'missing')) {
-    p = 'Write ' + p.charAt(0).toLowerCase() + p.slice(1);
+function escAttr(s) {
+  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+}
+
+function renderRewriteFields(raw, findings) {
+  document.getElementById('originalPromptDisplay').textContent = raw;
+
+  const container = document.getElementById('coachFieldsContainer');
+  const notGood = findings.filter(f => f.status !== 'good');
+
+  if (notGood.length === 0) {
+    container.innerHTML = '';
+    document.getElementById('allGoodMsg').style.display = 'block';
+    document.getElementById('buildBtn').style.display = 'none';
+    return;
   }
 
-  // Replace vague words
-  p = p.replace(/\bsomething\b/gi, 'a structured document')
-       .replace(/\bstuff\b/gi, 'relevant content')
-       .replace(/\bthings\b/gi, 'items')
-       .replace(/\betc\.?\b/gi, '')
-       .replace(/\band so on\b/gi, '')
-       .trim();
+  document.getElementById('allGoodMsg').style.display = 'none';
+  document.getElementById('buildBtn').style.display = 'block';
 
-  // Replace vague scope phrases with specific placeholders
-  p = p.replace(/all the important (\w+)/gi, '[specify exactly which $1]')
-       .replace(/everything relevant/gi, '[specify exactly what content is relevant]')
-       .replace(/any key points?/gi, '[list the specific points you need covered]')
-       .replace(/all relevant (\w+)/gi, '[list the specific $1 that apply]')
-       .replace(/some training (\w+)/gi, '[specify the exact training $1 topic]')
-       .replace(/some useful (\w+)/gi, '[specify which $1 exactly]')
-       .replace(/important things?/gi, '[list the specific items]')
-       .replace(/various topics?/gi, '[list the specific topics]')
-       .replace(/key topics?/gi, '[list the specific topics]')
-       .replace(/relevant information/gi, '[specify which information exactly]')
-       .replace(/the main things?/gi, '[list the specific items]')
-       .replace(/the main points?/gi, '[list the specific points]')
-       .replace(/the main topics?/gi, '[list the specific topics]');
+  container.innerHTML = notGood.map(f => {
+    const cfg = COACH_FIELDS[f.rule.id];
+    if (!cfg) return '';
+    const badgeClass = f.status === 'weak' ? 'badge-weak' : 'badge-missing';
+    const inputEl = cfg.type === 'textarea'
+      ? `<textarea class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" rows="3" placeholder="${escAttr(cfg.placeholder)}"></textarea>`
+      : `<input type="text" class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" placeholder="${escAttr(cfg.placeholder)}">`;
+    return `
+      <div class="coach-field">
+        <div class="coach-field-label">
+          ${cfg.label}
+          <span class="finding-badge ${badgeClass}">${f.status}</span>
+        </div>
+        ${inputEl}
+        <div class="coach-field-why">${cfg.why}</div>
+      </div>`;
+  }).join('');
+}
 
-  // Semantic negative-to-positive rewrites (specific patterns before generic fallback)
-  const negativeRewrites = [
-    [/don['']t\s+(?:make\s+it\s+|be\s+)?(?:too\s+|overly\s+)?formal/gi,            'use a conversational, approachable tone'],
-    [/avoid\s+(?:being\s+)?(?:too\s+|overly\s+)?formal/gi,                          'use a conversational, approachable tone'],
-    [/don['']t\s+(?:use\s+)?(?:too\s+much\s+)?(?:corporate\s+|business\s+)?jargon/gi, 'use plain everyday language'],
-    [/avoid\s+(?:using\s+)?(?:too\s+much\s+)?(?:corporate\s+|business\s+)?jargon/gi,  'use plain everyday language'],
-    [/don['']t\s+(?:make\s+it\s+|be\s+)?too\s+long/gi,                             'keep it concise — under 150 words'],
-    [/don['']t\s+make\s+(?:it\s+)?(?:too\s+)?lengthy/gi,                            'keep it concise — under 150 words'],
-    [/avoid\s+(?:making\s+(?:it\s+)?)?(?:too\s+)?(?:long|lengthy)/gi,               'keep it concise — under 150 words'],
-    [/don['']t\s+(?:be\s+)?repeat\w*/gi,                                             'each point should add new information'],
-    [/avoid\s+repeat\w*/gi,                                                           'each point should add new information'],
-    [/don['']t\s+use\s+(?:bullet\s+points?|bullets)/gi,                             'write in flowing prose paragraphs'],
-    [/avoid\s+(?:using\s+)?(?:bullet\s+points?|bullets)/gi,                         'write in flowing prose paragraphs'],
-    [/don['']t\s+use\s+headers?/gi,                                                  'write as continuous prose without section headers'],
-    [/avoid\s+(?:using\s+)?headers?/gi,                                              'write as continuous prose without section headers'],
-    // Verb-phrase specifics — must precede generic fallback to avoid broken sentences
-    [/don['']t\s+focus\s+too\s+much\s+on\s+([\w\s,]+?)(?=\s*[.,;]|\s+and\b|\s+but\b|$)/gi, (_, x) => `prioritize substance over ${x.trim()}`],
-    [/avoid\s+focus(?:ing)?\s+too\s+much\s+on\s+([\w\s,]+?)(?=\s*[.,;]|\s+and\b|\s+but\b|$)/gi, (_, x) => `keep focus on outcomes rather than ${x.trim()}`],
-    [/don['']t\s+(?:be\s+)?(?:too\s+)?(?:verbose|wordy)/gi,    'keep responses tight and to the point'],
-    [/don['']t\s+(?:be\s+)?(?:too\s+)?technical/gi,            'use accessible language for a general audience'],
-    [/don['']t\s+(?:be\s+)?(?:too\s+)?casual/gi,               'maintain a professional tone throughout'],
-    [/don['']t\s+(?:be\s+)?(?:too\s+)?(?:brief|short)/gi,      'provide sufficient depth to fully answer the question'],
-    // Generic fallback — preserve original phrasing and flag; never produce a broken sentence
-    [/don['']t\s+([\w]+(?:\s+[\w]+){0,3})/gi, (_, phrase) => `don't ${phrase.trim()} ⚠ [rewrite as a positive constraint before using]`],
-    [/avoid\s+([\w]+(?:\s+[\w]+){0,3})/gi,    (_, phrase) => `avoid ${phrase.trim()} ⚠ [rewrite as a positive constraint before using]`],
-  ];
-  for (const [pattern, replacement] of negativeRewrites) {
-    p = typeof replacement === 'function' ? p.replace(pattern, replacement) : p.replace(pattern, replacement);
-  }
-
+function buildAssembledPrompt() {
+  const original = document.getElementById('promptInput').value.trim();
   const additions = [];
 
-  if (findings.find(f => f.rule.id === 'context' && f.status !== 'good')) {
-    additions.push('Context: [Add your situation, company, or project in 1–2 sentences here.]');
-  }
-  if (findings.find(f => f.rule.id === 'audience' && f.status !== 'good')) {
-    additions.push('Audience: [Specify who will read this — e.g., non-technical manager, sales team, job candidate.]');
-  }
-  if (findings.find(f => f.rule.id === 'tone' && f.status !== 'good')) {
-    additions.push('Tone: Professional and direct.');
-  }
-  if (findings.find(f => f.rule.id === 'format' && f.status !== 'good')) {
-    additions.push('Format: Respond using numbered steps with a brief header for each.');
-  }
-  if (findings.find(f => f.rule.id === 'length' && f.status !== 'good')) {
-    additions.push('Length: Be concise — respond in under 150 words or 3-5 bullet points.');
-  }
-  if (findings.find(f => f.rule.id === 'examples' && f.status !== 'good')) {
-    additions.push('Example: For instance, [paste a sample input or scenario here] should produce [describe what good output looks like].');
-  }
-  if (findings.find(f => f.rule.id === 'data_grounding' && f.status !== 'good')) {
-    additions.push('Data: [Paste your actual data, metrics, or results here — or add: "Ask me for the data before responding."]');
-  }
-
-  if (additions.length > 0) {
-    p = p.replace(/\.\s*$/, '') + '.\n\n' + additions.join('\n');
-  }
-
-  return p;
-}
-
-function renderDiff(original, coached, findings) {
-  document.getElementById('diffBefore').textContent = original;
-  document.getElementById('diffAfter').textContent = coached;
-
-  const changes = [];
-  findings.filter(f => f.status !== 'good').forEach((f, i) => {
-    let change = '';
-    if (f.rule.id === 'action_verb') change = f.status === 'missing'
-      ? '<strong>Added action verb:</strong> Opening with an imperative tells the model what mode to enter before reading the rest.'
-      : '<strong>Action verb buried:</strong> Consider restructuring to lead with your directive — "Write...", "Analyze...", "List..."';
-    else if (f.rule.id === 'vagueness') change = '<strong>Replaced vague language:</strong> Filler words and vague scope phrases were replaced with specific placeholders — fill them in with your exact requirements.';
-    else if (f.rule.id === 'negative_instructions') change = '<strong>Rewrote negative instructions:</strong> Phrases like "don\'t be formal" became positive constraints like "use a conversational tone" — semantically clearer and more reliable under model pressure.';
-    else if (f.rule.id === 'context') change = '<strong>Added context placeholder:</strong> Even a sentence about your situation doubles output relevance.';
-    else if (f.rule.id === 'audience') change = '<strong>Added audience field:</strong> The model calibrates vocabulary, depth, and register to your reader.';
-    else if (f.rule.id === 'format') change = '<strong>Added format instruction:</strong> Explicit structure prevents the model from choosing prose when you wanted bullets.';
-    else if (f.rule.id === 'length') change = '<strong>Added length constraint:</strong> Models over-produce by default. A word/sentence limit forces tighter output.';
-    else if (f.rule.id === 'tone') change = '<strong>Added tone:</strong> "Professional and direct" prevents the model\'s default neutral-academic register.';
-    else if (f.rule.id === 'examples') change = '<strong>Added example slot:</strong> Even one example activates few-shot priming — the highest-leverage prompting technique.';
-    else if (f.rule.id === 'multitask') change = '<strong>Single focus flagged:</strong> Consider splitting multi-task requests into sequential prompts.';
-    else if (f.rule.id === 'data_grounding') change = '<strong>Added data placeholder:</strong> AI will confabulate numbers without source material. Paste actual data into the placeholder, or instruct the model to ask you for it first.';
-    if (change) changes.push(`<div class="change-item"><span class="change-num">${String(i+1).padStart(2,'0')}</span><div class="change-text">${change}</div></div>`);
+  document.querySelectorAll('.coach-field-input').forEach(field => {
+    const val = field.value.trim();
+    if (val) additions.push(field.dataset.criterionName + ': ' + val);
   });
 
-  document.getElementById('changesList').innerHTML = changes.length
-    ? changes.join('')
-    : '<div class="change-text no-changes-msg" style="color:var(--green)">No major changes needed — this prompt is already well-structured.</div>';
-}
+  let assembled = original;
+  if (additions.length > 0) {
+    assembled = original.replace(/\.\s*$/, '') + '.\n\n' + additions.join('\n');
+  }
 
-function renderCoached(coached) {
-  baseCoached = coached;
+  baseCoached = assembled;
   resetRefineState();
-  document.getElementById('coachedText').textContent = coached;
+  document.getElementById('coachedText').textContent = assembled;
+
+  const assembledSection = document.getElementById('assembledSection');
+  assembledSection.style.display = 'block';
+  assembledSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('Coached prompt assembled');
 }
 
 // ═══════════════════════════════════════
 // REFINEMENTS
 // ═══════════════════════════════════════
-function appendToChangelog(text) {
-  const el = document.getElementById('changesList');
-  const noChanges = el.querySelector('.no-changes-msg');
-  if (noChanges) noChanges.remove();
-  // Deduplicate: skip if an identical entry is already present
-  for (const item of el.querySelectorAll('.change-item .change-text')) {
-    if (item.innerHTML === text) return;
-  }
-  const count = el.querySelectorAll('.change-item').length + 1;
-  const div = document.createElement('div');
-  div.className = 'change-item';
-  div.innerHTML = `<span class="change-num">${String(count).padStart(2, '0')}</span><div class="change-text">${text}</div>`;
-  el.appendChild(div);
-}
-
 let baseCoached = '';
 const REFINE_TYPES = ['shorter', 'formal', 'casual', 'reasoning', 'language'];
 const refineActive = Object.fromEntries(REFINE_TYPES.map(t => [t, false]));
@@ -1167,7 +1138,6 @@ const REFINE_CHANGELOGS = {
   language:  '<strong>Added language instruction:</strong> Plain language at 8th grade level — no jargon unless defined.',
 };
 
-// formal and casual are mutually exclusive
 const REFINE_EXCLUSIVE = { formal: 'casual', casual: 'formal' };
 
 function resetRefineState() {
@@ -1196,7 +1166,6 @@ function setRefineButtonActive(btn, active) {
 
 function updateCoachedText(text) {
   document.getElementById('coachedText').textContent = text;
-  document.getElementById('diffAfter').textContent = text;
 }
 
 function applyActiveRefinements() {
@@ -1211,7 +1180,6 @@ function toggleRefine(type, btnEl) {
   if (btnEl.disabled) return;
 
   if (refineActive[type]) {
-    // Deactivate: re-enable the exclusive partner if one exists
     refineActive[type] = false;
     setRefineButtonActive(btnEl, false);
     const excl = REFINE_EXCLUSIVE[type];
@@ -1221,7 +1189,6 @@ function toggleRefine(type, btnEl) {
     }
     showToast('Refinement removed');
   } else {
-    // Activate: disable the exclusive partner if one exists
     const excl = REFINE_EXCLUSIVE[type];
     if (excl) {
       refineActive[excl] = false;
@@ -1230,7 +1197,6 @@ function toggleRefine(type, btnEl) {
     }
     refineActive[type] = true;
     setRefineButtonActive(btnEl, true);
-    appendToChangelog(REFINE_CHANGELOGS[type]);
     showToast('Refinement applied');
   }
 
@@ -1250,9 +1216,9 @@ function savePDF() {
 }
 
 const AI_URLS = {
-  claude: 'https://claude.ai/new',
+  claude:  'https://claude.ai/new',
   chatgpt: 'https://chatgpt.com/',
-  gemini: 'https://gemini.google.com/app',
+  gemini:  'https://gemini.google.com/app',
   copilot: 'https://copilot.microsoft.com/'
 };
 
