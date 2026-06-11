@@ -620,10 +620,62 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 
+/* ── EXAMPLE CHIPS ── */
+.example-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.example-chip {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+.example-chip:hover { border-color: var(--gold); color: var(--gold); }
+.example-chip.chip-active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+.example-preview {
+  padding: 12px 16px;
+  background: var(--gold-dim);
+  border-left: 3px solid var(--gold);
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: rgba(240,237,230,0.85);
+  line-height: 1.6;
+}
+.btn-use-example {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+  display: block;
+}
+.btn-use-example:hover { border-color: var(--gold); color: var(--gold); }
+
 @media (max-width: 700px) {
   .topbar, .hero, .main { padding-left: 20px; padding-right: 20px; }
   .score-panel { flex-direction: column; gap: 20px; }
   .input-panel, .findings-panel, .refinement-panel, .export-panel { padding: 24px 20px; }
+  .example-chips-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
 }
 
 @keyframes fadeUp {
@@ -1171,6 +1223,30 @@ function renderRewriteFields(raw, findings) {
   container.innerHTML = notGood.map(f => {
     const cfg = COACH_FIELDS[f.rule.id];
     if (!cfg) return '';
+
+    if (f.rule.id === 'examples') {
+      return `
+      <div class="coach-field" data-field-id="examples">
+        <div class="coach-field-label">
+          An Example &#8212; Optional
+          <span class="finding-badge field-badge badge-neutral">OPTIONAL</span>
+        </div>
+        <div class="example-chips-row">
+          <button class="example-chip" data-chip="format" onclick="handleExampleChip(this, 'format')">Format</button>
+          <button class="example-chip" data-chip="tone" onclick="handleExampleChip(this, 'tone')">Tone</button>
+          <button class="example-chip" data-chip="inputoutput" onclick="handleExampleChip(this, 'inputoutput')">Input / Output</button>
+          <button class="example-chip" data-chip="match" onclick="handleExampleChip(this, 'match')">Match Something</button>
+        </div>
+        <div class="example-preview" style="display:none;">
+          <span class="example-preview-text"></span>
+          <button class="btn-use-example" onclick="useExamplePreview(this)">Use This As A Starting Point</button>
+        </div>
+        <textarea class="coach-field-input" data-criterion-name="An Example" data-rule-id="examples" rows="3" placeholder="Write your own example here, or leave it blank &#8212; this field is optional"></textarea>
+        <div class="coach-field-why" style="color:var(--gold);opacity:0.7;">&#9670; This field is optional. Skip it if you don&#39;t have an example &#8212; it will not block the coached prompt.</div>
+        <div class="coach-field-why">If you can show the AI one example of what you&#39;re looking for, it will match that style much more closely. But skip this if you don&#39;t have one &#8212; your prompt will still build fine without it.</div>
+      </div>`;
+    }
+
     const badgeClass = f.status === 'weak' ? 'badge-weak' : 'badge-missing';
     const inputEl = cfg.type === 'textarea'
       ? `<textarea class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" data-rule-id="${f.rule.id}" rows="3" placeholder="${escAttr(cfg.placeholder)}"></textarea>`
@@ -1219,6 +1295,7 @@ function setBadgeStatus(ruleId, status) {
 }
 
 function updateFieldBadge(ruleId) {
+  if (ruleId === 'examples') return;
   const field = document.querySelector(`[data-rule-id="${ruleId}"]`);
   if (!field) return;
   const value = field.value.trim();
@@ -1396,6 +1473,47 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════
+// EXAMPLE CHIP SYSTEM
+// ═══════════════════════════════════════
+const EXAMPLE_CHIP_TEXTS = {
+  format: 'Structure it like a report with a bold header, 3 bullet points, and a one-sentence summary at the bottom — for example: "Header: [Topic] / Bullets: [Point 1], [Point 2], [Point 3] / Summary: [One sentence wrap-up]"',
+  tone: 'Write it the way a coach talks to a beginner — warm, simple, no jargon. For example: "Explain it like I\'m hearing this for the first time. Encouraging tone, short sentences, no technical terms unless you define them."',
+  inputoutput: 'Show the AI what goes in and what should come out. For example: "Given a list of 10 customer complaints, the output should be a grouped summary with 3 categories, each with a headline and 2-3 bullet points underneath."',
+  match: 'Paste something you already have that looks right. For example: "Format it similar to this: [paste a paragraph, email, report section, or any sample output you want to match in style or structure]"'
+};
+
+function handleExampleChip(chipEl, chipType) {
+  const fieldDiv = chipEl.closest('.coach-field');
+  const preview = fieldDiv.querySelector('.example-preview');
+  const previewText = fieldDiv.querySelector('.example-preview-text');
+  const allChips = fieldDiv.querySelectorAll('.example-chip');
+
+  if (chipEl.classList.contains('chip-active')) {
+    chipEl.classList.remove('chip-active');
+    preview.style.display = 'none';
+    return;
+  }
+
+  allChips.forEach(c => c.classList.remove('chip-active'));
+  chipEl.classList.add('chip-active');
+  previewText.textContent = EXAMPLE_CHIP_TEXTS[chipType];
+  preview.style.display = 'block';
+}
+
+function useExamplePreview(btnEl) {
+  const fieldDiv = btnEl.closest('.coach-field');
+  const preview = fieldDiv.querySelector('.example-preview');
+  const previewText = fieldDiv.querySelector('.example-preview-text');
+  const textarea = fieldDiv.querySelector('.coach-field-input');
+  const allChips = fieldDiv.querySelectorAll('.example-chip');
+
+  if (textarea) textarea.value = previewText.textContent;
+  preview.style.display = 'none';
+  allChips.forEach(c => c.classList.remove('chip-active'));
+  updateFieldBadge('examples');
 }
 
 function toggleExplainer() {
