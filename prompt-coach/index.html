@@ -97,11 +97,51 @@ body {
 }
 .hero h1 span { color: var(--gold); }
 .hero-sub {
-  font-size: 18px;
+  font-size: 20px;
   color: var(--white);
-  opacity: 0.7;
+  opacity: 0.85;
   line-height: 1.7;
   max-width: 620px;
+}
+
+/* ── SCORING EXPLAINER ── */
+.scoring-explainer {
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-left: 3px solid var(--gold);
+  padding: 20px 24px;
+  margin-top: 24px;
+  max-width: 720px;
+  position: relative;
+}
+.scoring-explainer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.scoring-explainer-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.scoring-explainer-dismiss {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.scoring-explainer p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: rgba(240,237,230,0.8);
+  line-height: 1.7;
+  margin: 0;
 }
 
 /* ── MAIN LAYOUT ── */
@@ -597,6 +637,13 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   <div class="hero-eyebrow">Career Tools</div>
   <h1>Prompt<br><span>Coach</span></h1>
   <p class="hero-sub">Type a rough prompt. Get a score, a diagnosis, a coached version, and export-ready buttons &#8212; no API key, no sign-in, zero cost.</p>
+  <div class="scoring-explainer" id="scoringExplainer">
+    <div class="scoring-explainer-top">
+      <span class="scoring-explainer-label">How the Scoring Works</span>
+      <button class="scoring-explainer-dismiss" onclick="dismissExplainer()" aria-label="Dismiss">&times;</button>
+    </div>
+    <p>This tool uses pattern-based rules to analyze your prompt &mdash; no AI, no API call, no waiting. The field badges update as you type to guide your rewrite. They&rsquo;re a helpful signal to build your understanding of what makes an effective prompt, so you develop the instinct to write better ones every time you sit down with Claude, ChatGPT, or any AI &mdash; think of it as a coach pointing at the gaps, not a grade.</p>
+  </div>
 </div>
 
 <div class="main">
@@ -753,7 +800,10 @@ const RULES = [
       if (vague.test(p) || (vagueThings.test(p) && !specificThings.test(p))) return 'missing';
       if (vagueScope.test(p)) return 'weak';
       if (p.length < 40) return 'weak';
-      if (p.length > 80) return 'good';
+      const wordCount = p.split(' ').filter(w => w.length > 0).length;
+      if (wordCount < 5) return 'weak';
+      const hasSpecificity = /\d/.test(p) || /\b(how to|about|including|covering|specifically)\b/i.test(p) || p.includes(',');
+      if (hasSpecificity) return 'good';
       return 'weak';
     },
     goodMsg: 'Specific enough that the model has a clear target.',
@@ -766,7 +816,7 @@ const RULES = [
     name: 'Audience',
     weight: 8,
     check(p) {
-      const hasAudience = /\b(for a|for an|for my|audience|reader|beginner|expert|manager|team|client|customer|executive|engineer|developer|non-?technical|stakeholder)\b/i;
+      const hasAudience = /\b(for a|for an|for my|for me|for myself|i\'m the|i am the|i want to|i need to|to help me|so i can|i\'m a|i am a|audience|reader|beginner|expert|manager|team|client|customer|executive|engineer|developer|non-?technical|stakeholder)\b/i;
       return hasAudience.test(p) ? 'good' : 'weak';
     },
     goodMsg: 'Audience is specified — the model can calibrate vocabulary and depth.',
@@ -792,6 +842,8 @@ const RULES = [
     name: 'Context',
     weight: 12,
     check(p) {
+      const words = p.split(' ').filter(w => w.length > 0);
+      if (words.length < 3) return 'weak';
       const hasContext = /\b(we are|i am|i\'m|our|my|company|team|project|currently|working on|building|situation|background|context)\b/i;
       if (hasContext.test(p)) return 'good';
       if (p.length > 120) return 'weak';
@@ -821,7 +873,10 @@ const RULES = [
     weight: 8,
     check(p) {
       const hasLength = /\b(in \d+|under \d+|about \d+|max \d+|no more than|at most|concise|brief|short|detailed|thorough|comprehensive|one.page|one page|\d+ words|\d+ sentences|\d+ paragraphs|\d+ bullet)\b/i;
-      return hasLength.test(p) ? 'good' : 'weak';
+      if (!hasLength.test(p)) return 'weak';
+      const hasNumber = /\d/.test(p);
+      const hasUnit = /\b(words|pages|bullets|paragraphs|sentences|minutes|sections|items|points)\b/i.test(p);
+      return (hasNumber || hasUnit) ? 'good' : 'weak';
     },
     goodMsg: 'Length or depth is constrained — the model knows when to stop.',
     weakMsg: 'No length constraint. Models often over-produce. Specify "in 3 bullets" or "under 150 words" to get tighter output.',
@@ -1322,6 +1377,19 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
+
+function dismissExplainer() {
+  const box = document.getElementById('scoringExplainer');
+  if (box) box.style.display = 'none';
+  localStorage.setItem('promptcoach_explainer_dismissed', 'true');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('promptcoach_explainer_dismissed') === 'true') {
+    const box = document.getElementById('scoringExplainer');
+    if (box) box.style.display = 'none';
+  }
+});
 </script>
 </body>
 </html>
