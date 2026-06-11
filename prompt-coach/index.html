@@ -142,6 +142,13 @@ body {
   color: rgba(240,237,230,0.8);
   line-height: 1.7;
   margin: 0;
+  max-height: 200px;
+  overflow: visible;
+  transition: max-height 0.3s ease;
+}
+.scoring-explainer p.collapsed {
+  max-height: 0;
+  overflow: hidden;
 }
 
 /* ── MAIN LAYOUT ── */
@@ -640,7 +647,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   <div class="scoring-explainer" id="scoringExplainer">
     <div class="scoring-explainer-top">
       <span class="scoring-explainer-label">How the Scoring Works</span>
-      <button class="scoring-explainer-dismiss" onclick="dismissExplainer()" aria-label="Dismiss">&times;</button>
+      <button class="scoring-explainer-dismiss" id="explainerToggleBtn" onclick="toggleExplainer()" aria-label="Toggle scoring explanation">&times;</button>
     </div>
     <p>This tool uses pattern-based rules to analyze your prompt &mdash; no AI, no API call, no waiting. The field badges update as you type to guide your rewrite. They&rsquo;re a helpful signal to build your understanding of what makes an effective prompt, so you develop the instinct to write better ones every time you sit down with Claude, ChatGPT, or any AI &mdash; think of it as a coach pointing at the gaps, not a grade.</p>
   </div>
@@ -802,7 +809,7 @@ const RULES = [
       if (p.length < 40) return 'weak';
       const wordCount = p.split(' ').filter(w => w.length > 0).length;
       if (wordCount < 5) return 'weak';
-      const hasSpecificity = /\d/.test(p) || /\b(how to|about|including|covering|specifically)\b/i.test(p) || p.includes(',');
+      const hasSpecificity = /\d/.test(p) || /\b(including|covering|specifically)\b/i.test(p) || p.includes(',') || (/\b(how to|about)\b/i.test(p) && (p.includes(',') || /\d/.test(p)));
       if (hasSpecificity) return 'good';
       return 'weak';
     },
@@ -816,7 +823,7 @@ const RULES = [
     name: 'Audience',
     weight: 8,
     check(p) {
-      const hasAudience = /\b(for a|for an|for my|for me|for myself|i\'m the|i am the|i want to|i need to|to help me|so i can|i\'m a|i am a|audience|reader|beginner|expert|manager|team|client|customer|executive|engineer|developer|non-?technical|stakeholder)\b/i;
+      const hasAudience = /\b(for a|for an|for my|for me|for myself|i\'m the|i am the|to help me|so i can|i\'m a|i am a|audience|reader|beginner|expert|manager|team|client|customer|executive|engineer|developer|non-?technical|stakeholder)\b/i;
       return hasAudience.test(p) ? 'good' : 'weak';
     },
     goodMsg: 'Audience is specified — the model can calibrate vocabulary and depth.',
@@ -872,10 +879,11 @@ const RULES = [
     name: 'Length Constraint',
     weight: 8,
     check(p) {
-      const hasLength = /\b(in \d+|under \d+|about \d+|max \d+|no more than|at most|concise|brief|short|detailed|thorough|comprehensive|one.page|one page|\d+ words|\d+ sentences|\d+ paragraphs|\d+ bullet)\b/i;
-      if (!hasLength.test(p)) return 'weak';
       const hasNumber = /\d/.test(p);
       const hasUnit = /\b(words|pages|bullets|paragraphs|sentences|minutes|sections|items|points)\b/i.test(p);
+      if (hasNumber && hasUnit) return 'good';
+      const hasLength = /\b(in \d+|under \d+|about \d+|max \d+|no more than|at most|concise|brief|short|detailed|thorough|comprehensive|one.page|one page|\d+ words|\d+ sentences|\d+ paragraphs|\d+ bullet)\b/i;
+      if (!hasLength.test(p)) return 'weak';
       return (hasNumber || hasUnit) ? 'good' : 'weak';
     },
     goodMsg: 'Length or depth is constrained — the model knows when to stop.',
@@ -1228,15 +1236,27 @@ function updateFieldBadge(ruleId) {
 function buildAssembledPrompt() {
   const original = document.getElementById('promptInput').value.trim();
   const additions = [];
+  let openingInstruction = '';
 
   document.querySelectorAll('.coach-field-input').forEach(field => {
     const val = field.value.trim();
-    if (val) additions.push(field.dataset.criterionName + ': ' + val);
+    if (!val) return;
+    if (field.dataset.ruleId === 'action_verb') {
+      openingInstruction = val;
+    } else {
+      additions.push(field.dataset.criterionName + ': ' + val);
+    }
   });
 
-  let assembled = original;
-  if (additions.length > 0) {
-    assembled = original.replace(/\.\s*$/, '') + '.\n\n' + additions.join('\n');
+  let assembled;
+  if (openingInstruction) {
+    assembled = openingInstruction.replace(/\.\s*$/, '');
+    if (additions.length > 0) assembled += '\n\n' + additions.join('\n');
+  } else {
+    assembled = original;
+    if (additions.length > 0) {
+      assembled = original.replace(/\.\s*$/, '') + '.\n\n' + additions.join('\n');
+    }
   }
 
   baseCoached = assembled;
@@ -1378,18 +1398,21 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-function dismissExplainer() {
-  const box = document.getElementById('scoringExplainer');
-  if (box) box.style.display = 'none';
-  localStorage.setItem('promptcoach_explainer_dismissed', 'true');
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  if (localStorage.getItem('promptcoach_explainer_dismissed') === 'true') {
-    const box = document.getElementById('scoringExplainer');
-    if (box) box.style.display = 'none';
+function toggleExplainer() {
+  const p = document.querySelector('#scoringExplainer p');
+  const btn = document.getElementById('explainerToggleBtn');
+  const topRow = document.querySelector('.scoring-explainer-top');
+  if (!p || !btn) return;
+  if (p.classList.contains('collapsed')) {
+    p.classList.remove('collapsed');
+    btn.textContent = '×';
+    topRow.style.marginBottom = '10px';
+  } else {
+    p.classList.add('collapsed');
+    btn.textContent = '▼';
+    topRow.style.marginBottom = '0';
   }
-});
+}
 </script>
 </body>
 </html>
