@@ -324,6 +324,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 .badge-good { background: var(--green-bg); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
 .badge-weak { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(224,184,76,0.3); }
 .badge-missing { background: var(--red-bg); color: var(--red); border: 1px solid rgba(224,92,92,0.3); }
+.badge-neutral { background: rgba(136,136,136,0.15); color: #888; border: 1px solid rgba(136,136,136,0.3); }
 
 .finding-body { flex: 1; }
 .finding-rule {
@@ -449,6 +450,14 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   color: var(--muted);
   margin-top: 8px;
   line-height: 1.6;
+}
+.field-resolved {
+  border-left-color: var(--green) !important;
+  transition: border-left-color 0.3s ease;
+}
+.field-resolved .coach-field-label {
+  color: var(--green);
+  transition: color 0.3s ease;
 }
 .original-prompt-display {
   background: var(--bg3);
@@ -867,11 +876,12 @@ const RULES = [
       const hasNumbers = /\b\d+(?:[.,]\d+)?(?:\s*%|\s*k\b|\s*M\b|\s*million|\s*billion|\s*dollars?)|\$\s*\d|\d+\s*(?:users|clicks|conversions|sales|leads|impressions|sessions|visits|revenue|signups|downloads|views|responses?)\b/i;
       const hasAttachedData = /\b(attached|below|above|the following|here is|here are|see table|see chart|see data|data:|metrics:|results:|the data shows|from the table|from the chart)\b/i;
       if (refsOwnData.test(p) && !hasNumbers.test(p) && !hasAttachedData.test(p)) return 'missing';
-      return 'good';
+      return 'na';
     },
     goodMsg: 'Prompt references data and includes numbers or an explicit data source — well grounded.',
     weakMsg: null,
     missingMsg: 'This prompt asks AI to analyze your data — but no data is provided. Without source material, AI will fabricate plausible-sounding numbers. Paste your actual data into the prompt or instruct AI to ask you for it first.',
+    notApplicableMsg: 'This prompt isn\'t asking AI to analyze data, so no grounding is needed. If you want to add a data source or metrics, you can still include them.',
     research: 'Retrieval-augmented generation (RAG) research consistently shows that LLMs without source material confabulate statistics at high rates. Providing even a raw data table dramatically reduces fabrication by giving the model a verifiable anchor.'
   }
 ];
@@ -928,7 +938,7 @@ function computeScore(findings) {
   let earned = 0, total = 0;
   findings.forEach(f => {
     total += f.rule.weight;
-    if (f.status === 'good') earned += f.rule.weight;
+    if (f.status === 'good' || f.status === 'na') earned += f.rule.weight;
     else if (f.status === 'weak') earned += f.rule.weight * 0.4;
   });
   return Math.round((earned / total) * 100);
@@ -966,11 +976,27 @@ function renderScore(score, findings) {
 function renderFindings(findings) {
   const el = document.getElementById('findingsList');
   el.innerHTML = findings.map(f => {
-    const badgeClass = f.status === 'good' ? 'badge-good' : f.status === 'weak' ? 'badge-weak' : 'badge-missing';
-    const msg = f.status === 'good' ? f.rule.goodMsg : f.status === 'weak' ? (f.rule.weakMsg || f.rule.missingMsg) : f.rule.missingMsg;
+    let badgeClass, msg, badgeLabel;
+    if (f.status === 'na') {
+      badgeClass = 'badge-neutral';
+      msg = f.rule.notApplicableMsg || '';
+      badgeLabel = 'N/A';
+    } else if (f.status === 'good') {
+      badgeClass = 'badge-good';
+      msg = f.rule.goodMsg;
+      badgeLabel = 'good';
+    } else if (f.status === 'weak') {
+      badgeClass = 'badge-weak';
+      msg = f.rule.weakMsg || f.rule.missingMsg;
+      badgeLabel = 'weak';
+    } else {
+      badgeClass = 'badge-missing';
+      msg = f.rule.missingMsg;
+      badgeLabel = 'missing';
+    }
     return `
       <div class="finding">
-        <div class="finding-badge ${badgeClass}">${f.status}</div>
+        <div class="finding-badge ${badgeClass}">${badgeLabel}</div>
         <div class="finding-body">
           <div class="finding-rule">${f.rule.name}</div>
           <div class="finding-desc">${msg}</div>
@@ -1023,7 +1049,8 @@ const COACH_FIELDS = {
   examples: {
     label: 'Examples',
     type: 'textarea',
-    placeholder: 'e.g. "For instance, a prompt like [X] should produce output that looks like [Y]"',
+    placeholder: 'Optional but high-impact — e.g. "A prompt like [X] should produce output that looks like [Y]" — leave blank if you don\'t have one, the coached prompt will still build.',
+    optionalNote: 'This field is optional. Skip it if you don\'t have an example — it will not block the coached prompt.',
     why: 'Even one concrete example activates few-shot priming — the single highest-leverage prompting technique.'
   },
   negative_instructions: {
@@ -1047,7 +1074,7 @@ const COACH_FIELDS = {
   vagueness: {
     label: 'Specificity',
     type: 'textarea',
-    placeholder: 'Replace vague words like "something" or "stuff" with your exact deliverable.',
+    placeholder: 'Describe exactly what you need — be specific about the topic, scope, and deliverable. e.g. "A 3-topic overview covering X, Y, and Z" rather than "something about marketing"',
     why: 'Vague filler words force the model to guess what you want. Be specific about what you need.'
   }
 };
@@ -1056,11 +1083,14 @@ function escAttr(s) {
   return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
 
+let currentOriginalPrompt = '';
+
 function renderRewriteFields(raw, findings) {
+  currentOriginalPrompt = raw;
   document.getElementById('originalPromptDisplay').textContent = raw;
 
   const container = document.getElementById('coachFieldsContainer');
-  const notGood = findings.filter(f => f.status !== 'good');
+  const notGood = findings.filter(f => f.status !== 'good' && f.status !== 'na');
 
   if (notGood.length === 0) {
     container.innerHTML = '';
@@ -1077,18 +1107,64 @@ function renderRewriteFields(raw, findings) {
     if (!cfg) return '';
     const badgeClass = f.status === 'weak' ? 'badge-weak' : 'badge-missing';
     const inputEl = cfg.type === 'textarea'
-      ? `<textarea class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" rows="3" placeholder="${escAttr(cfg.placeholder)}"></textarea>`
-      : `<input type="text" class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" placeholder="${escAttr(cfg.placeholder)}">`;
+      ? `<textarea class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" data-rule-id="${f.rule.id}" rows="3" placeholder="${escAttr(cfg.placeholder)}"></textarea>`
+      : `<input type="text" class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" data-rule-id="${f.rule.id}" placeholder="${escAttr(cfg.placeholder)}">`;
+    const optionalLine = cfg.optionalNote
+      ? `<div class="coach-field-why" style="color:var(--gold);opacity:0.7;">&#9670; ${cfg.optionalNote}</div>`
+      : '';
     return `
-      <div class="coach-field">
+      <div class="coach-field" data-rule-id="${f.rule.id}">
         <div class="coach-field-label">
           ${cfg.label}
           <span class="finding-badge ${badgeClass}">${f.status}</span>
         </div>
         ${inputEl}
+        ${optionalLine}
         <div class="coach-field-why">${cfg.why}</div>
       </div>`;
   }).join('');
+
+  container.querySelectorAll('.coach-field-input').forEach(el => {
+    el.addEventListener('input', updateFieldBadges);
+  });
+}
+
+function getAssembledDraft() {
+  const parts = [currentOriginalPrompt];
+  document.querySelectorAll('.coach-field-input').forEach(field => {
+    const val = field.value.trim();
+    if (val) parts.push(val);
+  });
+  return parts.join(' ');
+}
+
+function updateFieldBadges() {
+  const draft = getAssembledDraft();
+  const findings = RULES.map(r => ({ rule: r, status: r.check(draft) }));
+
+  document.querySelectorAll('.coach-field[data-rule-id]').forEach(fieldDiv => {
+    const ruleId = fieldDiv.dataset.ruleId;
+    const finding = findings.find(f => f.rule.id === ruleId);
+    if (!finding) return;
+
+    const badge = fieldDiv.querySelector('.finding-badge');
+    if (!badge) return;
+
+    const s = finding.status;
+    badge.className = 'finding-badge ' + (
+      s === 'good'    ? 'badge-good'    :
+      s === 'weak'    ? 'badge-weak'    :
+      s === 'na'      ? 'badge-neutral' :
+      'badge-missing'
+    );
+    badge.textContent = s === 'good' ? 'GOOD' : s === 'weak' ? 'WEAK' : s === 'missing' ? 'MISSING' : 'N/A';
+
+    if (s === 'good') {
+      fieldDiv.classList.add('field-resolved');
+    } else {
+      fieldDiv.classList.remove('field-resolved');
+    }
+  });
 }
 
 function buildAssembledPrompt() {
@@ -1108,6 +1184,7 @@ function buildAssembledPrompt() {
   baseCoached = assembled;
   resetRefineState();
   document.getElementById('coachedText').textContent = assembled;
+  updateFieldBadges();
 
   const assembledSection = document.getElementById('assembledSection');
   assembledSection.style.display = 'block';
