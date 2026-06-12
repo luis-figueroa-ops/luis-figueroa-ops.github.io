@@ -420,6 +420,26 @@ function getMuteRect() {
   return { x: W - 14 - sz, y: 14, w: sz, h: sz };
 }
 
+// ── Pause ─────────────────────────────────────────────────
+let paused = false;
+
+function getPauseRect() {
+  const s  = uiScale();
+  const sz = Math.round(28 * s);
+  const mr = getMuteRect();
+  return { x: mr.x - sz - 8, y: 14, w: sz, h: sz };
+}
+
+function togglePause() {
+  if (state !== 'playing') return;
+  paused = !paused;
+  if (paused) {
+    stopMusic();
+  } else {
+    if (musicOn) startMusic();
+  }
+}
+
 // ── Game State ───────────────────────────────────────────
 let state = 'title';
 let score, hiScore, wave, tableHealth;
@@ -555,6 +575,15 @@ function handleFire(e) {
 
   const pos = getEventPos(e);
 
+  // Check pause button first
+  const pr = getPauseRect();
+  if (pos.x >= pr.x && pos.x <= pr.x + pr.w && pos.y >= pr.y && pos.y <= pr.y + pr.h) {
+    togglePause();
+    return;
+  }
+
+  if (paused) return;
+
   // Check mute button first
   const mr = getMuteRect();
   if (pos.x >= mr.x && pos.x <= mr.x + mr.w && pos.y >= mr.y && pos.y <= mr.y + mr.h) {
@@ -579,11 +608,16 @@ function handleFire(e) {
 canvas.addEventListener('click',      handleFire, { passive: false });
 canvas.addEventListener('touchstart', handleFire, { passive: false });
 
+document.addEventListener('keydown', e => {
+  if (e.key === ' ') { e.preventDefault(); togglePause(); }
+});
+
 document.getElementById('startBtn').addEventListener('click', () => {
   getAudio();
   showScreen(null);
   initGame();
   state = 'playing';
+  paused = false;
   startMusic();
 });
 
@@ -591,6 +625,7 @@ document.getElementById('restartBtn').addEventListener('click', () => {
   showScreen(null);
   initGame();
   state = 'playing';
+  paused = false;
   startMusic();
 });
 
@@ -604,7 +639,7 @@ showScreen('startScreen');
 
 // ── Update ────────────────────────────────────────────────
 function update(dt) {
-  if (state !== 'playing') return;
+  if (state !== 'playing' || paused) return;
 
   // Spawn
   if (!waveClearing) {
@@ -797,7 +832,51 @@ function draw(dt) {
     drawZapTexts();
     drawHUD();
     drawMuteBtn();
+    drawPauseBtn();
+    if (paused) drawPauseOverlay();
   }
+}
+
+function drawPauseBtn() {
+  const pr = getPauseRect();
+  ctx.save();
+  ctx.fillStyle   = paused ? '#00ffe7' : 'rgba(0,20,30,0.7)';
+  ctx.strokeStyle = '#00ffe755';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath(); ctx.roundRect(pr.x, pr.y, pr.w, pr.h, 6); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = paused ? '#050510' : '#00ffe7';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (paused) {
+    // Play triangle
+    const cx = pr.x + pr.w / 2, cy = pr.y + pr.h / 2, s = pr.h * 0.3;
+    ctx.beginPath();
+    ctx.moveTo(cx - s * 0.6, cy - s); ctx.lineTo(cx - s * 0.6, cy + s); ctx.lineTo(cx + s * 0.9, cy);
+    ctx.closePath(); ctx.fill();
+  } else {
+    // Pause bars
+    const cx = pr.x + pr.w / 2, cy = pr.y + pr.h / 2;
+    const bw = pr.w * 0.15, bh = pr.h * 0.5;
+    ctx.fillRect(cx - bw * 1.4, cy - bh / 2, bw, bh);
+    ctx.fillRect(cx + bw * 0.4, cy - bh / 2, bw, bh);
+  }
+  ctx.restore();
+}
+
+function drawPauseOverlay() {
+  const s = uiScale();
+  ctx.save();
+  ctx.fillStyle = 'rgba(5,5,20,0.78)';
+  ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#00ffe7';
+  ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 28;
+  ctx.font = `bold ${Math.round(40 * s)}px 'Courier New', monospace`;
+  ctx.fillText('PAUSED', W / 2, H / 2);
+  ctx.shadowBlur = 0;
+  ctx.font = `${Math.round(11 * s)}px 'Courier New', monospace`;
+  ctx.fillStyle = '#a0a0cc';
+  ctx.fillText('SPACE OR ▶ BUTTON TO RESUME', W / 2, H / 2 + Math.round(46 * s));
+  ctx.restore();
 }
 
 // ── Snack table ───────────────────────────────────────────

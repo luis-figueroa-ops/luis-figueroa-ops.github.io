@@ -98,6 +98,15 @@
     text-align: center; letter-spacing: 2px; width: 200px; outline: none;
   }
   #player-name:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(0,255,231,0.2); }
+  #pause-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 3px; color: var(--bg); background: var(--accent); border: none;
+    padding: 5px 12px; cursor: pointer;
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+    transition: all 0.15s; box-shadow: 0 0 18px rgba(0,255,231,0.3);
+    -webkit-tap-highlight-color: transparent; display: none; white-space: nowrap;
+  }
+  #pause-btn:active { background: #fff; transform: scale(0.97); }
 </style>
 </head>
 <body>
@@ -108,10 +117,13 @@
       <div id="score">0</div>
     </div>
     <div id="hud-right">
-      <div id="lives-display">
-        <div class="life-pip" id="pip1"></div>
-        <div class="life-pip" id="pip2"></div>
-        <div class="life-pip" id="pip3"></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button id="pause-btn">⏸ PAUSE</button>
+        <div id="lives-display">
+          <div class="life-pip" id="pip1"></div>
+          <div class="life-pip" id="pip2"></div>
+          <div class="life-pip" id="pip3"></div>
+        </div>
       </div>
       <div id="powerup-bar">
         <span class="pu-icon" id="pu-shield">🛡️</span>
@@ -349,6 +361,20 @@ let touchActive = false;
 let touchInProgress = false;
 
 let keys = {};
+let paused = false;
+const pauseBtn = document.getElementById('pause-btn');
+
+function togglePause() {
+  if (state !== 'playing') return;
+  paused = !paused;
+  pauseBtn.textContent = paused ? '▶ RESUME' : '⏸ PAUSE';
+  try {
+    if (audioCtx) { if (paused) audioCtx.suspend(); else audioCtx.resume(); }
+  } catch(e) {}
+}
+
+pauseBtn.addEventListener('click', togglePause);
+
 let shieldActive = false, shieldTimer = 0;
 let slowActive   = false, slowTimer   = 0;
 let powerups = [], obstacles = [];
@@ -381,6 +407,7 @@ canvas.addEventListener('mouseleave', () => { mouseMoved = false; });
 
 // ─── Keyboard input ───────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
+  if (e.key === ' ') { e.preventDefault(); togglePause(); return; }
   keys[e.key] = true;
   if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault();
 });
@@ -453,6 +480,7 @@ function startGame() {
   document.getElementById('overlay-title').style.textShadow='0 0 40px var(--accent), 0 0 80px rgba(0,255,231,0.3)';
   document.getElementById('overlay-score-label').style.display='none';
   document.getElementById('overlay-score-val').style.display='none';
+  paused=false; pauseBtn.style.display='block'; pauseBtn.textContent='⏸ PAUSE';
   updateHUD(); updatePowerupUI();
   document.getElementById('overlay').classList.add('hidden');
   state='playing';
@@ -556,25 +584,42 @@ function checkPickup(pu){const dx=pu.x-P.x,dy=pu.y-P.y;return Math.sqrt(dx*dx+dy
 let _lastLoopTs = 0;
 function loop(ts) {
   animId = requestAnimationFrame(loop);
-  // Cap effective tick rate to ~60 fps so the game runs at the same speed on
-  // 120 Hz phones (iPhone Pro, Pixel) as on 60 Hz desktop monitors.
-  // Without this, score/speed/movement all run 2× too fast on 120 Hz screens.
   if (ts - _lastLoopTs < 14) return;
   _lastLoopTs = ts;
+
+  if (paused) {
+    // Draw pause overlay on top of last frame
+    ctx.fillStyle = 'rgba(13,13,28,0.72)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.save();
+    ctx.font = "900 30px 'Orbitron', sans-serif";
+    ctx.fillStyle = '#00ffe7';
+    ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 30;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('PAUSED', W/2, H/2);
+    ctx.shadowBlur = 0;
+    ctx.font = "11px 'Share Tech Mono', monospace";
+    ctx.fillStyle = '#aaaacc';
+    ctx.letterSpacing = '2px';
+    ctx.fillText('SPACE / ⏸ TO RESUME', W/2, H/2 + 38);
+    ctx.restore();
+    return;
+  }
+
   frame++;
   ctx.fillStyle='#0a0a0f'; ctx.fillRect(0,0,W,H);
-  gridOffset=(gridOffset+getObstacleSpeed()*0.3)%40;
+  if(!paused) gridOffset=(gridOffset+getObstacleSpeed()*0.3)%40;
   ctx.strokeStyle=slowActive?'#0e1a1a':'#12121e'; ctx.lineWidth=1;
   for(let y=-40+gridOffset;y<H+40;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   if(slowActive){ctx.fillStyle='rgba(80,0,180,0.06)';ctx.fillRect(0,0,W,H);}
   stars.forEach(s=>{
-    s.y+=s.s*(slowActive?0.3:1); if(s.y>H){s.y=-2;s.x=Math.random()*W;}
+    if(!paused){s.y+=s.s*(slowActive?0.3:1); if(s.y>H){s.y=-2;s.x=Math.random()*W;}}
     ctx.fillStyle=`rgba(200,200,255,${0.3+s.r*0.2})`;
     ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
   });
 
-  if (state==='playing') {
+  if (state==='playing' && !paused) {
     if(shieldTimer>0){shieldTimer--;if(shieldTimer===0){shieldActive=false;updatePowerupUI();setEngineHumSlowmo(false);}}
     if(slowTimer>0){slowTimer--;if(slowTimer===0){slowActive=false;updatePowerupUI();setEngineHumSlowmo(false);}}
 
@@ -612,7 +657,7 @@ function loop(ts) {
   }
 
   obstacles=obstacles.filter(obs=>{
-    obs.y+=obs.speed*getSpeedMult();
+    if(!paused) obs.y+=obs.speed*getSpeedMult();
     ctx.shadowBlur=12;
     if(obs.hue===0){ctx.fillStyle='rgba(255,45,85,0.9)';ctx.shadowColor='#ff2d55';}
     else{ctx.fillStyle='rgba(255,200,0,0.9)';ctx.shadowColor='#ffcc00';}
@@ -622,9 +667,9 @@ function loop(ts) {
     } else { ctx.fillRect(obs.x,obs.y,obs.w,obs.h); }
     ctx.shadowBlur=0;
     const pw=P.w*0.7, ph=P.h*0.7;
-    if(state==='playing'&&checkAABB(P.x-pw/2,P.y-ph/2,pw,ph,obs.x,obs.y,obs.w,obs.h)){handlePlayerHit();return false;}
+    if(!paused&&state==='playing'&&checkAABB(P.x-pw/2,P.y-ph/2,pw,ph,obs.x,obs.y,obs.w,obs.h)){handlePlayerHit();return false;}
     // Near-miss whoosh: obstacle just passed the ship's row and was close horizontally
-    if(state==='playing'&&obs.y>P.y&&obs.y-obs.speed*getSpeedMult()<=P.y){
+    if(!paused&&state==='playing'&&obs.y>P.y&&obs.y-obs.speed*getSpeedMult()<=P.y){
       const nearX=Math.abs((obs.x+obs.w/2)-P.x)<60;
       if(nearX) SFX.whoosh();
     }
@@ -633,14 +678,14 @@ function loop(ts) {
   if(bossActive&&boss) drawBoss();
 
   powerups=powerups.filter(pu=>{
-    pu.y+=pu.vy; pu.life--;
+    if(!paused){pu.y+=pu.vy; pu.life--;}
     const alpha=Math.min(1,pu.life/60), col=pu.type==='shield'?'#4488ff':'#aa44ff';
     ctx.shadowColor=col;ctx.shadowBlur=14;ctx.strokeStyle=col;ctx.lineWidth=2;ctx.globalAlpha=alpha;
     ctx.beginPath();ctx.arc(pu.x,pu.y,pu.r,0,Math.PI*2);ctx.stroke();
     ctx.font='14px serif';ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(pu.type==='shield'?'🛡️':'⏱️',pu.x,pu.y);
     ctx.globalAlpha=1;ctx.shadowBlur=0;
-    if(state==='playing'&&checkPickup(pu)){
+    if(!paused&&state==='playing'&&checkPickup(pu)){
       SFX.powerup();
       if(pu.type==='shield'){shieldActive=true;shieldTimer=600;}else{slowActive=true;slowTimer=480;setEngineHumSlowmo(true);}
       updatePowerupUI();spawnParticles(pu.x,pu.y,col,14);showLevelFlash(pu.type==='shield'?'SHIELD!':'SLOW-MO!',col);
@@ -650,7 +695,7 @@ function loop(ts) {
   });
 
   particles=particles.filter(p=>{
-    p.x+=p.vx;p.y+=p.vy;p.vy+=0.12;p.life-=p.decay;
+    if(!paused){p.x+=p.vx;p.y+=p.vy;p.vy+=0.12;p.life-=p.decay;}
     ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
     ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=1; return p.life>0;
@@ -685,6 +730,7 @@ function loop(ts) {
 }
 
 function showGameOver() {
+  paused=false; pauseBtn.style.display='none';
   const playerName=document.getElementById('player-name').value||'PILOT';
   try{localStorage.setItem('dodge_pilot_name',playerName);}catch(e){}
   const entries=addToLB(playerName,score);

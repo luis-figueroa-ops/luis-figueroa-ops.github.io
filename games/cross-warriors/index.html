@@ -442,7 +442,13 @@ function handleTap(cx, cy) {
 
 canvas.addEventListener('click',   e=>handleTap(e.clientX,e.clientY));
 canvas.addEventListener('touchstart', e=>{ e.preventDefault(); handleTap(e.changedTouches[0].clientX,e.changedTouches[0].clientY); },{passive:false});
-document.addEventListener('keydown', e=>{ if(e.key==='Escape'){if(GS.screen==='playing'){GS.screen='paused';GS.paused=true;}else if(GS.screen==='paused'){GS.screen='playing';GS.paused=false;}}});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'||e.key===' '){
+    if(e.key===' ') e.preventDefault();
+    if(GS.screen==='playing'){GS.screen='paused';GS.paused=true;}
+    else if(GS.screen==='paused'){GS.screen='playing';GS.paused=false;}
+  }
+});
 
 // === UPDATE ===
 
@@ -945,9 +951,27 @@ function drawHUD() {
     ctx.fillStyle=active?'#FFD700':'#2A1A00';
     ctx.fillRect(cx-s*.13,cy-s*.5,s*.26,s); ctx.fillRect(cx-s*.5,cy-s*.13,s,s*.26);
   }
+  // Pause button (top-right corner; tapping that quadrant also triggers pause via handleTap)
+  const isPaused = GS.screen==='paused';
+  const pbW=28*SC, pbH=20*SC, pbX=W-10*SC-pbW, pbY=6*SC;
+  ctx.fillStyle=isPaused?'#FFD700':'#8B0000';
+  ctx.fillRect(pbX,pbY,pbW,pbH);
+  ctx.strokeStyle='#FFD700'; ctx.lineWidth=1*SC; ctx.strokeRect(pbX,pbY,pbW,pbH);
+  ctx.fillStyle=isPaused?'#8B0000':'#FFD700';
+  if(isPaused){
+    // play triangle
+    ctx.beginPath();
+    ctx.moveTo(pbX+pbW*.33,pbY+pbH*.2); ctx.lineTo(pbX+pbW*.33,pbY+pbH*.8); ctx.lineTo(pbX+pbW*.75,pbY+pbH*.5);
+    ctx.closePath(); ctx.fill();
+  } else {
+    // pause bars
+    ctx.fillRect(pbX+pbW*.28,pbY+pbH*.2,pbW*.13,pbH*.6);
+    ctx.fillRect(pbX+pbW*.59,pbY+pbH*.2,pbW*.13,pbH*.6);
+  }
+
   // Score
   ctx.fillStyle='#FFD700'; ctx.font=`${6.5*SC}px 'Press Start 2P'`; ctx.textAlign='right';
-  ctx.fillText(`${GS.score}`,W-10*SC,22*SC);
+  ctx.fillText(`${GS.score}`,W-10*SC-pbW-8*SC,22*SC);
   // Level
   ctx.fillStyle='#8B0000'; ctx.font=`${5.5*SC}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText(`LVL ${GS.level}`,W/2,18*SC);
@@ -1103,11 +1127,13 @@ function drawVictory() {
 }
 
 function drawPause() {
-  ctx.fillStyle='rgba(0,0,0,0.62)'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#FFD700'; ctx.font=`${12*SC}px 'Press Start 2P'`; ctx.textAlign='center';
+  ctx.fillStyle='rgba(0,0,0,0.68)'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#FFD700'; ctx.shadowColor='#FFD700'; ctx.shadowBlur=24;
+  ctx.font=`${12*SC}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText('PAUSED',W/2,H*.45);
-  ctx.fillStyle='#FFF'; ctx.font=`${5.5*SC}px 'Press Start 2P'`;
-  ctx.fillText('Tap or press Esc to resume',W/2,H*.55);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#FFF'; ctx.font=`${5*SC}px 'Press Start 2P'`;
+  ctx.fillText('TAP ▶  OR SPACE TO RESUME',W/2,H*.56);
 }
 
 // === RENDER ===
