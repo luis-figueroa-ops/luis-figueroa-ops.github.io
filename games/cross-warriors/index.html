@@ -1064,42 +1064,47 @@ function drawLevelCard() {
   const elapsed=2600-GS.levelCardTimer;
   const fadeIn=Math.min(1,elapsed/500);
   ctx.save(); ctx.globalAlpha=fadeIn;
+  const lcMob = W < 480 ? 1.6 : 1;
   ctx.fillStyle='rgba(0,0,0,0.72)'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#8B0000'; ctx.font=`${7.5*SC}px 'Press Start 2P'`; ctx.textAlign='center';
+  ctx.fillStyle='#FF4444'; ctx.font=`${7.5*SC*lcMob}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText(`LEVEL ${GS.level}`,W/2,H*.4);
   ctx.fillStyle='#FFD700'; ctx.shadowColor='#FFD700'; ctx.shadowBlur=22;
-  ctx.font=`${10*SC}px 'Press Start 2P'`;
+  ctx.font=`${10*SC*lcMob}px 'Press Start 2P'`;
   ctx.fillText(ld.name.toUpperCase(),W/2,H*.5);
   ctx.shadowBlur=0;
   if(GS.level===12){
-    ctx.fillStyle='#FF4500'; ctx.font=`${5.5*SC}px 'Press Start 2P'`;
+    ctx.fillStyle='#FF4500'; ctx.font=`${5.5*SC*lcMob}px 'Press Start 2P'`;
     ctx.fillText('-- BOSS BATTLE --',W/2,H*.6);
   }
   ctx.restore();
 }
 
 function drawBetween() {
+  const bwMob = W < 480 ? 1.6 : 1;
   ctx.fillStyle='rgba(0,0,0,0.88)'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#FFD700'; ctx.font=`${8.5*SC}px 'Press Start 2P'`; ctx.textAlign='center';
+  ctx.fillStyle='#FFD700'; ctx.shadowColor='#FFD700'; ctx.shadowBlur=18;
+  ctx.font=`${8.5*SC*bwMob}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText('LEVEL COMPLETE!',W/2,H*.3);
-  ctx.fillStyle='#FFF'; ctx.font=`${5.5*SC}px 'Press Start 2P'`;
-  ctx.fillText(`Level: ${GS.level}`,W/2,H*.42);
-  ctx.fillText(`Kills: ${GS.levelKills}`,W/2,H*.49);
-  ctx.fillText(`Score: ${GS.score}`,W/2,H*.56);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#FFFFFF'; ctx.font=`${5.5*SC*bwMob}px 'Press Start 2P'`;
+  ctx.fillText(`Level: ${GS.level}`,W/2,H*.44);
+  ctx.fillText(`Kills: ${GS.levelKills}`,W/2,H*.52);
+  ctx.fillText(`Score: ${GS.score}`,W/2,H*.60);
 }
 
 function drawGameOver() {
+  const goMob = W < 480 ? 1.6 : 1;
   ctx.fillStyle='rgba(139,0,0,0.55)'; ctx.fillRect(0,0,W,H);
   ctx.fillStyle='#FF1111'; ctx.shadowColor='#FF0000'; ctx.shadowBlur=35;
   ctx.font=`${19*SC}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText('FALLEN',W/2,H*.34); ctx.shadowBlur=0;
-  ctx.fillStyle='#FFF'; ctx.font=`${5.5*SC}px 'Press Start 2P'`;
+  ctx.fillStyle='#FFFFFF'; ctx.font=`${5.5*SC*goMob}px 'Press Start 2P'`;
   ctx.fillText(`Score: ${GS.score}`,W/2,H*.47);
   ctx.fillText(`Reached: Level ${GS.level}`,W/2,H*.54);
-  const bw=160*SC,bh=34*SC,bx=W/2-bw/2,by=H*.64;
+  const bw=160*SC*goMob,bh=36*SC*goMob,bx=W/2-bw/2,by=H*.64;
   ctx.fillStyle='#8B0000'; ctx.fillRect(bx,by,bw,bh);
   ctx.strokeStyle='#FFD700'; ctx.lineWidth=2; ctx.strokeRect(bx,by,bw,bh);
-  ctx.fillStyle='#FFD700'; ctx.font=`${6*SC}px 'Press Start 2P'`;
+  ctx.fillStyle='#FFD700'; ctx.font=`${6*SC*goMob}px 'Press Start 2P'`;
   ctx.fillText('RISE AGAIN',W/2,by+bh*.65);
 }
 
