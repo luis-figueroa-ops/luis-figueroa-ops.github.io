@@ -434,7 +434,7 @@ function getPauseRect() {
   const s  = uiScale();
   const sz = Math.round(28 * s);
   const mr = getMuteRect();
-  return { x: mr.x - sz - 8, y: 14, w: sz, h: sz };
+  return { x: mr.x - sz - 14, y: 14, w: sz, h: sz };
 }
 
 function togglePause() {
@@ -456,6 +456,7 @@ let spawnTimer, spawnInterval;
 let bugsSpawned, killsThisWave, bugsNeeded;
 let bossAlive;
 let badge = null; // { text, timer }
+let earnedBadges = []; // collection of all earned badge texts
 // Turret aims at last tapped position (not auto-aim)
 let aimX = -1, aimY = -1;
 
@@ -471,6 +472,7 @@ function initGame() {
   zapFlashes    = [];
   particles     = [];
   zapTexts      = [];
+  earnedBadges  = [];
   waveClearing  = false;
   nextWaveDelay = 2.5;
   spawnTimer    = 0;
@@ -731,6 +733,7 @@ function update(dt) {
         ];
         const idx = (wave / 4 - 1) % BADGES.length;
         badge = { text: BADGES[idx], timer: 3.0 };
+        earnedBadges.push(BADGES[idx]);
       }
       startWave(wave + 1);
     }
@@ -1108,38 +1111,58 @@ function drawHUD() {
   const s   = uiScale();
   ctx.save();
 
-  // Score
-  ctx.font = `bold ${Math.round(20 * s)}px Courier New`;
+  // Score (bigger, brighter)
   ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-  ctx.fillStyle = '#ffe156'; ctx.shadowColor = '#ffe156'; ctx.shadowBlur = 10;
+  ctx.font = `bold ${Math.round(28 * s)}px Courier New`;
+  ctx.fillStyle = '#ffe156'; ctx.shadowColor = '#ffe156'; ctx.shadowBlur = 18;
   ctx.fillText(score.toLocaleString(), pad, pad);
   ctx.shadowBlur = 0;
-  ctx.font = `${Math.round(10 * s)}px Courier New`; ctx.fillStyle = '#7070a0';
-  ctx.fillText('SCORE', pad, pad + Math.round(24 * s));
+  ctx.font = `bold ${Math.round(13 * s)}px Courier New`;
+  ctx.fillStyle = '#ffe15699';
+  ctx.fillText('SCORE', pad, pad + Math.round(32 * s));
 
   // Hi score
   ctx.textAlign = 'center';
   ctx.font = `${Math.round(11 * s)}px Courier New`; ctx.fillStyle = '#7070a0';
   ctx.fillText(`HI ${hiScore.toLocaleString()}`, W / 2, pad + 2);
 
-  // Wave
+  // Wave label — positioned left of buttons with breathing room
+  const pr  = getPauseRect();
+  const waveX = pr.x - 16;
   ctx.textAlign = 'right';
   ctx.font = `bold ${Math.round(20 * s)}px Courier New`;
   ctx.fillStyle = '#00ffe7'; ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 10;
-  // Leave room for mute button on the right
-  ctx.fillText(`WAVE ${wave}`, W - pad - Math.round(40 * s), pad);
+  ctx.fillText(`WAVE ${wave}`, waveX, pad);
   ctx.shadowBlur = 0;
 
   // Wave progress bar
   const prog = bugsNeeded > 0 ? Math.min(1, killsThisWave / bugsNeeded) : 0;
   const bw   = Math.round(110 * s);
-  const bx   = W - pad - Math.round(40 * s) - bw;
+  const bx   = waveX - bw;
   const by   = pad + Math.round(26 * s);
   ctx.fillStyle = '#0a1a2a'; ctx.fillRect(bx, by, bw, 5);
   const grd = ctx.createLinearGradient(bx, 0, bx + bw, 0);
   grd.addColorStop(0, '#00ffe7'); grd.addColorStop(1, '#a000ff');
   ctx.fillStyle = grd; ctx.fillRect(bx, by, bw * prog, 5);
   ctx.strokeStyle = '#ffffff22'; ctx.lineWidth = 1; ctx.strokeRect(bx, by, bw, 5);
+
+  // Earned badge collection row (top center)
+  if (earnedBadges.length > 0) {
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.font = `${Math.round(11 * s)}px Courier New`;
+    const badgeY = pad + Math.round(18 * s);
+    const spacing = Math.round(110 * s);
+    const totalW  = earnedBadges.length * spacing;
+    const startX  = W / 2 - totalW / 2 + spacing / 2;
+    earnedBadges.forEach((b, i) => {
+      const bx = startX + i * spacing;
+      ctx.fillStyle = '#ffffff22';
+      ctx.beginPath(); ctx.roundRect(bx - spacing / 2 + 2, badgeY - 2, spacing - 4, Math.round(18 * s), 4); ctx.fill();
+      ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd70088'; ctx.shadowBlur = 6;
+      ctx.fillText(b, bx, badgeY);
+      ctx.shadowBlur = 0;
+    });
+  }
 
   ctx.restore();
 
