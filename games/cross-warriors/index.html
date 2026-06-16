@@ -494,7 +494,7 @@ function updateSwords(dt) {
 }
 
 function hitDemon(d, sw) {
-  d.hp--; d.hitFlash=0.3;
+  d.hp -= W < 480 ? 2 : 1; d.hitFlash=0.3;
   spawnParts(sw.x,sw.y,d.color,5);
   if(d.hp<=0){
     killDemon(d); // death sound covers the final blow
