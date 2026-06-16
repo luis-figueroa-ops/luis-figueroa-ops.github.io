@@ -514,8 +514,8 @@ function createBug(type) {
     y,
     originY: y,
     // Boss HP scales down on narrow screens: mobile gets 5 hits, desktop keeps 10
-    hp: (type === 'boss') ? (W < 500 ? 6 : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
-    maxHp: (type === 'boss') ? (W < 500 ? 6 : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
+    hp: (type === 'boss') ? (W < 500 ? 5 : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
+    maxHp: (type === 'boss') ? (W < 500 ? 5 : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
     speed: def.speed * sM,
     emoji: def.emoji,
     size: def.size,
