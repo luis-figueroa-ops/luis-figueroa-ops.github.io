@@ -733,7 +733,7 @@ function update(dt) {
         ];
         const idx = (wave / 4 - 1) % BADGES.length;
         badge = { text: BADGES[idx], timer: 3.0 };
-        earnedBadges.push(BADGES[idx]);
+        earnedBadges = [BADGES[idx]];
       }
       startWave(wave + 1);
     }
