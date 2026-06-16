@@ -1036,7 +1036,8 @@ function drawStart() {
   });
   const pulse=Math.sin(Date.now()/480)*.5+.5;
   ctx.save(); ctx.shadowColor='#FFD700'; ctx.shadowBlur=18+pulse*32;
-  ctx.fillStyle='#FFD700'; ctx.font=`${17*SC}px 'Press Start 2P'`; ctx.textAlign='center';
+  const titleScale = W < 480 ? 1.5 : 1;
+  ctx.fillStyle='#FFD700'; ctx.font=`${17*SC*titleScale}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText('CROSS',W/2,H*.28); ctx.fillText('WARRIORS',W/2,H*.37);
   ctx.restore();
   ctx.fillStyle='#8B0000'; ctx.font=`${7.5*SC}px 'Press Start 2P'`; ctx.textAlign='center';
