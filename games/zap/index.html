@@ -698,12 +698,11 @@ function update(dt) {
     bolt.age += dt;
     if (bolt.hit) { if (bolt.age > 0.18) bolts.splice(i, 1); continue; }
 
-    // Update last known target position; if bug is gone, fade bolt out
-    if (bugs.includes(bolt.target)) {
+    // Track live target position; freeze last known pos when dead
+    const targetAlive = bugs.includes(bolt.target);
+    if (targetAlive) {
       bolt.lastX = bolt.target.x;
       bolt.lastY = bolt.target.y;
-    } else {
-      bolt.hit = true; bolt.age = 0; continue;
     }
 
     const tx = bolt.lastX, ty = bolt.lastY;
@@ -721,7 +720,9 @@ function update(dt) {
 
     bolt.segments = buildArcSegments(getTurretX() + 20, H * 0.5, bolt.x, bolt.y);
 
-    if (dist < (bolt.target.size / 2 + 10)) {
+    // Use larger hit radius for dead targets to avoid oscillation getting bolt stuck
+    const hitRadius = targetAlive ? (bolt.target.size / 2 + 10) : 50;
+    if (dist < hitRadius) {
       bolt.hit = true; bolt.age = 0;
     }
     if (bolt.x > W + 50 || bolt.y < -50 || bolt.y > H + 50) bolts.splice(i, 1);
