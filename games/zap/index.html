@@ -1152,7 +1152,7 @@ function drawHUD() {
   if (earnedBadges.length > 0) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     ctx.font = `bold ${Math.round(14 * s)}px Courier New`;
-    const badgeY  = pad + Math.round(24 * s);
+    const badgeY  = W < 500 ? pad + Math.round(44 * s) : pad + Math.round(24 * s);
     const spacing = Math.round(130 * s);
     const startX  = W / 2 - (earnedBadges.length * spacing) / 2 + spacing / 2;
     earnedBadges.forEach((b, i) => {
