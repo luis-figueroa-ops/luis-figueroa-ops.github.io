@@ -552,6 +552,7 @@ function fireBolt(targetBug) {
     vx: (dx / dist) * BOLT_SPEED,
     vy: (dy / dist) * BOLT_SPEED,
     target: targetBug,
+    lastX: targetBug.x, lastY: targetBug.y,
     segments: [],
     age: 0, hit: false,
   });
@@ -697,10 +698,13 @@ function update(dt) {
     bolt.age += dt;
     if (bolt.hit) { if (bolt.age > 0.18) bolts.splice(i, 1); continue; }
 
-    // If the target bug was already killed and removed, discard this bolt
-    if (!bugs.includes(bolt.target)) { bolts.splice(i, 1); continue; }
+    // Update last known target position; keep flying there even after bug dies
+    if (bugs.includes(bolt.target)) {
+      bolt.lastX = bolt.target.x;
+      bolt.lastY = bolt.target.y;
+    }
 
-    const tx = bolt.target.x, ty = bolt.target.y;
+    const tx = bolt.lastX, ty = bolt.lastY;
     const dx = tx - bolt.x, dy = ty - bolt.y;
     const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
@@ -715,7 +719,7 @@ function update(dt) {
 
     bolt.segments = buildArcSegments(getTurretX() + 20, H * 0.5, bolt.x, bolt.y);
 
-    if (dist < (bolt.target.size / 2) + 10) {
+    if (dist < (bolt.target.size / 2 + 10)) {
       bolt.hit = true; bolt.age = 0;
     }
     if (bolt.x > W + 50 || bolt.y < -50 || bolt.y > H + 50) bolts.splice(i, 1);
