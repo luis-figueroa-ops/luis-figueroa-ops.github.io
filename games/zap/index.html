@@ -610,8 +610,11 @@ function handleFire(e) {
   }
 }
 
-canvas.addEventListener('click',      handleFire, { passive: false });
-canvas.addEventListener('touchstart', handleFire, { passive: false });
+if ('ontouchstart' in window) {
+  canvas.addEventListener('touchstart', handleFire, { passive: false });
+} else {
+  canvas.addEventListener('click', handleFire, { passive: false });
+}
 
 document.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); togglePause(); }
