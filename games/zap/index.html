@@ -199,7 +199,13 @@ const DELTA_CAP   = 0.05;  // 50ms max delta
 const MAX_HEALTH  = 5;
 
 // Tap radius scales up on narrow screens so small bugs are easier to hit
-function getTapRadius(bug) { return W < 500 ? (bug && bug.type === 'boss' ? 80 : 54) : 42; }
+function getTapRadius(bug) {
+  if (W >= 500) return 42;
+  if (!bug) return 54;
+  if (bug.type === 'boss') return 80;
+  if (bug.type === 'bee' || bug.type === 'beetle') return 65;
+  return 54;
+}
 
 const BUG_DEFS = {
   fly:      { emoji: '\u{1FAB0}', hp: 1,  speed: 90,  score: 10,  size: 24, sineAmp: 0,  sineFreq: 0   },
@@ -513,8 +519,8 @@ function createBug(type) {
     x: -def.size,
     y,
     originY: y,
-    hp: (type === 'boss') ? (W < 500 ? (wave >= 9 ? 1 : wave >= 6 ? 2 : 3) : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
-    maxHp: (type === 'boss') ? (W < 500 ? (wave >= 9 ? 1 : wave >= 6 ? 2 : 3) : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
+    hp: (type === 'boss') ? (W < 500 ? 5 : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
+    maxHp: (type === 'boss') ? (W < 500 ? 5 : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
     speed: def.speed * sM,
     emoji: def.emoji,
     size: def.size,
