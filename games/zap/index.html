@@ -455,6 +455,7 @@ let waveClearing, nextWaveDelay;
 let spawnTimer, spawnInterval;
 let bugsSpawned, killsThisWave, bugsNeeded;
 let bossAlive;
+let badge = null; // { text, timer }
 // Turret aims at last tapped position (not auto-aim)
 let aimX = -1, aimY = -1;
 
@@ -728,6 +729,9 @@ function update(dt) {
     p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 120 * dt;
   }
 
+  // Badge timer
+  if (badge) { badge.timer -= dt; if (badge.timer <= 0) badge = null; }
+
   // Zap texts
   for (let i = zapTexts.length - 1; i >= 0; i--) {
     const z = zapTexts[i];
@@ -745,6 +749,22 @@ function update(dt) {
       nextWaveDelay = 2.5;
       soundWaveClear();
       spawnZapText(W / 2, H * 0.4, `WAVE ${wave} CLEAR! +100`, '#00ffe7');
+      if (wave % 4 === 0) {
+        const BADGES = [
+          '🔥 Bug Slayer!',
+          '⚡ Zap Master!',
+          '💀 Exterminator!',
+          '🏆 Pest Destroyer!',
+          '👾 Bug Whisperer?',
+          '🦾 Unstoppable!',
+          '🌪️ Swarm Crusher!',
+          '😤 They Never Learn!',
+          '🧹 Clean Sweep!',
+          '🎯 Precision Zapper!',
+        ];
+        const idx = (wave / 4 - 1) % BADGES.length;
+        badge = { text: BADGES[idx], timer: 3.0 };
+      }
       startWave(wave + 1);
     }
   }
@@ -841,10 +861,38 @@ function draw(dt) {
     drawParticles();
     drawZapTexts();
     drawHUD();
+    drawBadge();
     drawMuteBtn();
     drawPauseBtn();
     if (paused) drawPauseOverlay();
   }
+}
+
+function drawBadge() {
+  if (!badge) return;
+  const t     = badge.timer;
+  const alpha = t > 2.5 ? (3.0 - t) / 0.5 : t < 0.5 ? t / 0.5 : 1;
+  const s     = W < 500 ? 0.85 : 1;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  const bw = Math.min(W * 0.82, 420 * s);
+  const bh = 72 * s;
+  const bx = (W - bw) / 2;
+  const by = H * 0.28;
+  ctx.fillStyle = '#1a003a';
+  ctx.strokeStyle = '#ffcc00';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(bx, by, bw, bh, 14);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#ffcc00';
+  ctx.font = `bold ${Math.round(26 * s)}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = '#ffcc00'; ctx.shadowBlur = 16;
+  ctx.fillText(badge.text, W / 2, by + bh / 2);
+  ctx.shadowBlur = 0;
+  ctx.restore();
 }
 
 function drawPauseBtn() {
