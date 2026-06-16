@@ -1123,8 +1123,10 @@ function drawHUD() {
 
   // Hi score
   ctx.textAlign = 'center';
-  ctx.font = `${Math.round(11 * s)}px Courier New`; ctx.fillStyle = '#7070a0';
+  ctx.font = `bold ${Math.round(16 * s)}px Courier New`;
+  ctx.fillStyle = '#ff79c6'; ctx.shadowColor = '#ff79c6'; ctx.shadowBlur = 12;
   ctx.fillText(`HI ${hiScore.toLocaleString()}`, W / 2, pad + 2);
+  ctx.shadowBlur = 0;
 
   // Wave label — positioned left of buttons with breathing room
   const pr  = getPauseRect();
@@ -1146,19 +1148,18 @@ function drawHUD() {
   ctx.fillStyle = grd; ctx.fillRect(bx, by, bw * prog, 5);
   ctx.strokeStyle = '#ffffff22'; ctx.lineWidth = 1; ctx.strokeRect(bx, by, bw, 5);
 
-  // Earned badge collection row (top center)
+  // Earned badge collection row (below hi score, top center)
   if (earnedBadges.length > 0) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.font = `${Math.round(11 * s)}px Courier New`;
-    const badgeY = pad + Math.round(18 * s);
-    const spacing = Math.round(110 * s);
-    const totalW  = earnedBadges.length * spacing;
-    const startX  = W / 2 - totalW / 2 + spacing / 2;
+    ctx.font = `bold ${Math.round(14 * s)}px Courier New`;
+    const badgeY  = pad + Math.round(24 * s);
+    const spacing = Math.round(130 * s);
+    const startX  = W / 2 - (earnedBadges.length * spacing) / 2 + spacing / 2;
     earnedBadges.forEach((b, i) => {
       const bx = startX + i * spacing;
-      ctx.fillStyle = '#ffffff22';
-      ctx.beginPath(); ctx.roundRect(bx - spacing / 2 + 2, badgeY - 2, spacing - 4, Math.round(18 * s), 4); ctx.fill();
-      ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd70088'; ctx.shadowBlur = 6;
+      ctx.fillStyle = '#ffffff18';
+      ctx.beginPath(); ctx.roundRect(bx - spacing / 2 + 2, badgeY - 3, spacing - 4, Math.round(22 * s), 5); ctx.fill();
+      ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 10;
       ctx.fillText(b, bx, badgeY);
       ctx.shadowBlur = 0;
     });
