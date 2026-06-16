@@ -1040,19 +1040,21 @@ function drawStart() {
   ctx.fillStyle='#FFD700'; ctx.font=`${17*SC*titleScale}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText('CROSS',W/2,H*.28); ctx.fillText('WARRIORS',W/2,H*.37);
   ctx.restore();
-  ctx.fillStyle='#8B0000'; ctx.font=`${7.5*SC}px 'Press Start 2P'`; ctx.textAlign='center';
+  const mobScale = W < 480 ? 1.6 : 1;
+  ctx.fillStyle='#8B0000'; ctx.font=`${7.5*SC*mobScale}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText('Defeat the demons. Face Satan.',W/2,H*.46);
   ctx.fillText('Stand firm.',W/2,H*.52);
-  // Cross icon
-  const cx=W/2,cy=H*.62,cs=18*SC;
-  ctx.fillStyle='#FFD700'; ctx.shadowColor='#FFD700'; ctx.shadowBlur=14;
+  // Cross icon with breathing glow
+  const cx=W/2,cy=H*.62,cs=28*SC*mobScale;
+  const crossGlow = 20 + pulse * 40;
+  ctx.save(); ctx.fillStyle='#FFD700'; ctx.shadowColor='#FFD700'; ctx.shadowBlur=crossGlow;
   ctx.fillRect(cx-cs*.11,cy-cs,cs*.22,cs*1.7); ctx.fillRect(cx-cs*.5,cy-cs*.5,cs,cs*.22);
-  ctx.shadowBlur=0;
+  ctx.restore();
   // Button
-  const bw=155*SC,bh=34*SC,bx=W/2-bw/2,by=H*.73;
+  const bw=155*SC*mobScale,bh=40*SC*mobScale,bx=W/2-bw/2,by=H*.76;
   ctx.fillStyle='#8B0000'; ctx.fillRect(bx,by,bw,bh);
   ctx.strokeStyle='#FFD700'; ctx.lineWidth=2; ctx.strokeRect(bx,by,bw,bh);
-  ctx.fillStyle='#FFD700'; ctx.font=`${6.5*SC}px 'Press Start 2P'`; ctx.textAlign='center';
+  ctx.fillStyle='#FFD700'; ctx.font=`${6.5*SC*mobScale}px 'Press Start 2P'`; ctx.textAlign='center';
   ctx.fillText('TAP TO BEGIN',W/2,by+bh*.65);
 }
 
