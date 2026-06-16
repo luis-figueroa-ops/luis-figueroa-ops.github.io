@@ -450,7 +450,7 @@ function togglePause() {
 // ── Game State ───────────────────────────────────────────
 let state = 'title';
 let score, hiScore, wave, tableHealth;
-let bugs, bolts, particles, zapTexts;
+let bugs, zapFlashes, particles, zapTexts;
 let waveClearing, nextWaveDelay;
 let spawnTimer, spawnInterval;
 let bugsSpawned, killsThisWave, bugsNeeded;
@@ -468,7 +468,7 @@ function initGame() {
   wave          = 1;
   tableHealth   = MAX_HEALTH;
   bugs          = [];
-  bolts         = [];
+  zapFlashes    = [];
   particles     = [];
   zapTexts      = [];
   waveClearing  = false;
@@ -493,7 +493,7 @@ function startWave(w) {
 }
 
 function waveIsClear() {
-  return waveClearing && bugs.length === 0 && bolts.length === 0;
+  return waveClearing && bugs.length === 0;
 }
 
 // ── Bug factory ──────────────────────────────────────────
@@ -539,22 +539,12 @@ function createBug(type) {
   bugsSpawned++;
 }
 
-// ── Bolt factory ─────────────────────────────────────────
-function fireBolt(targetBug) {
+// ── Zap flash factory ─────────────────────────────────────
+function spawnZapFlash(targetBug) {
   soundZap();
-  const sx = getTurretX() + 20;
-  const sy = H * 0.5;
-  const dx = targetBug.x - sx;
-  const dy = targetBug.y - sy;
-  const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-  bolts.push({
-    x: sx, y: sy,
-    vx: (dx / dist) * BOLT_SPEED,
-    vy: (dy / dist) * BOLT_SPEED,
-    target: targetBug,
-    lastX: targetBug.x, lastY: targetBug.y,
-    segments: [],
-    age: 0, hit: false,
+  zapFlashes.push({
+    segments: buildArcSegments(getTurretX() + 20, H * 0.5, targetBug.x, targetBug.y),
+    age: 0,
   });
 }
 
@@ -605,8 +595,8 @@ function handleFire(e) {
   if (bug) {
     aimX = bug.x;
     aimY = bug.y;
-    hitBug(bug);   // damage is instant on tap
-    fireBolt(bug); // bolt is visual only
+    hitBug(bug);        // damage is instant on tap
+    spawnZapFlash(bug); // flash is visual only
   } else {
     // Missed — play small feedback, aim toward tap
     aimX = pos.x;
@@ -692,40 +682,10 @@ function update(dt) {
     }
   }
 
-  // Bolts
-  for (let i = bolts.length - 1; i >= 0; i--) {
-    const bolt = bolts[i];
-    bolt.age += dt;
-    if (bolt.hit) { if (bolt.age > 0.18) bolts.splice(i, 1); continue; }
-
-    // Track live target position; freeze last known pos when dead
-    const targetAlive = bugs.includes(bolt.target);
-    if (targetAlive) {
-      bolt.lastX = bolt.target.x;
-      bolt.lastY = bolt.target.y;
-    }
-
-    const tx = bolt.lastX, ty = bolt.lastY;
-    const dx = tx - bolt.x, dy = ty - bolt.y;
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-
-    // Soft homing
-    bolt.vx += (dx / dist) * BOLT_SPEED * 6 * dt;
-    bolt.vy += (dy / dist) * BOLT_SPEED * 6 * dt;
-    const v = Math.sqrt(bolt.vx ** 2 + bolt.vy ** 2) || 1;
-    bolt.vx = (bolt.vx / v) * BOLT_SPEED;
-    bolt.vy = (bolt.vy / v) * BOLT_SPEED;
-    bolt.x += bolt.vx * dt;
-    bolt.y += bolt.vy * dt;
-
-    bolt.segments = buildArcSegments(getTurretX() + 20, H * 0.5, bolt.x, bolt.y);
-
-    // Use larger hit radius for dead targets to avoid oscillation getting bolt stuck
-    const hitRadius = targetAlive ? (bolt.target.size / 2 + 10) : 50;
-    if (dist < hitRadius) {
-      bolt.hit = true; bolt.age = 0;
-    }
-    if (bolt.x > W + 50 || bolt.y < -50 || bolt.y > H + 50) bolts.splice(i, 1);
+  // Zap flashes
+  for (let i = zapFlashes.length - 1; i >= 0; i--) {
+    zapFlashes[i].age += dt;
+    if (zapFlashes[i].age > 0.20) zapFlashes.splice(i, 1);
   }
 
   // Particles
@@ -864,7 +824,7 @@ function draw(dt) {
     drawTable();
     drawTurret();
     drawBugs();
-    drawBolts();
+    drawZapFlashes();
     drawParticles();
     drawZapTexts();
     drawHUD();
@@ -1102,28 +1062,20 @@ function drawBugs() {
   }
 }
 
-// ── Bolts ─────────────────────────────────────────────────
-function drawBolts() {
-  for (const bolt of bolts) {
-    if (!bolt.segments.length) continue;
-    const alpha = bolt.hit ? Math.max(0, 1 - bolt.age / 0.18) : 1;
+// ── Zap flashes ───────────────────────────────────────────
+function drawZapFlashes() {
+  for (const f of zapFlashes) {
+    const alpha = Math.max(0, 1 - f.age / 0.20);
+    if (!f.segments.length) continue;
     ctx.save();
     ctx.globalAlpha = alpha * 0.5; ctx.strokeStyle = '#a0c0ff'; ctx.lineWidth = 6;
     ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 20; ctx.lineCap = 'round';
     ctx.beginPath();
-    bolt.segments.forEach((s, i) => { if (i === 0) ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2); });
+    f.segments.forEach((s, i) => { if (i === 0) ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2); });
     ctx.stroke();
     ctx.globalAlpha = alpha; ctx.strokeStyle = '#e0f0ff'; ctx.lineWidth = 2; ctx.shadowBlur = 8;
     ctx.stroke();
     ctx.restore();
-    if (bolt.hit) {
-      const r = 40 * (1 - bolt.age / 0.18);
-      ctx.save(); ctx.globalAlpha = alpha * 0.7;
-      const g = ctx.createRadialGradient(bolt.x, bolt.y, 0, bolt.x, bolt.y, r);
-      g.addColorStop(0, '#ffffff'); g.addColorStop(0.3, '#00ffe7aa'); g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(bolt.x, bolt.y, r, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    }
   }
 }
 
