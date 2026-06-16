@@ -208,11 +208,12 @@ function getTapRadius(bug) {
 }
 
 const BUG_DEFS = {
-  fly:      { emoji: '\u{1FAB0}', hp: 1,  speed: 90,  score: 10,  size: 24, sineAmp: 0,  sineFreq: 0   },
-  bee:      { emoji: '\u{1F41D}', hp: 2,  speed: 115, score: 35,  size: 22, sineAmp: 22, sineFreq: 2.8 },
-  mosquito: { emoji: '\u{1F99F}', hp: 1,  speed: 130, score: 25,  size: 22, sineAmp: 28, sineFreq: 2.4 },
-  beetle:   { emoji: '\u{1FAB2}', hp: 3,  speed: 70,  score: 50,  size: 28, sineAmp: 18, sineFreq: 1.2 },
-  boss:     { emoji: '\u{1F997}', hp: 10, speed: 55,  score: 200, size: 52, sineAmp: 40, sineFreq: 0.9 },
+  fly:        { emoji: '\u{1FAB0}', hp: 1,  speed: 90,  score: 10,  size: 24, sineAmp: 0,  sineFreq: 0   },
+  bee:        { emoji: '\u{1F41D}', hp: 2,  speed: 115, score: 35,  size: 22, sineAmp: 22, sineFreq: 2.8 },
+  mosquito:   { emoji: '\u{1F99F}', hp: 1,  speed: 130, score: 25,  size: 22, sineAmp: 28, sineFreq: 2.4 },
+  beetle:     { emoji: '\u{1FAB2}', hp: 3,  speed: 70,  score: 50,  size: 28, sineAmp: 18, sineFreq: 1.2 },
+  cockroach:  { emoji: '\u{1FAB3}', hp: 2,  speed: 100, score: 40,  size: 26, sineAmp: 14, sineFreq: 1.8 },
+  boss:       { emoji: '\u{1F997}', hp: 5,  speed: 55,  score: 200, size: 52, sineAmp: 40, sineFreq: 0.9 },
 };
 
 const TABLE_FOOD = ['🍎','🍊','🍇','🍕','🧁','🍫','🥤','🍿','🍓','🥪'];
@@ -504,6 +505,7 @@ function spawnBug() {
   let pool = ['fly'];
   if (wave >= 2) pool.push('bee');
   if (wave >= 3) pool.push('mosquito', 'mosquito');
+  if (wave >= 4) pool.push('cockroach');
   if (wave >= 5) pool.push('beetle');
   createBug(pool[Math.floor(Math.random() * pool.length)]);
 }
@@ -519,8 +521,8 @@ function createBug(type) {
     x: -def.size,
     y,
     originY: y,
-    hp: (type === 'boss') ? (W < 500 ? 5 : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
-    maxHp: (type === 'boss') ? (W < 500 ? 5 : Math.max(5, Math.round(def.hp * getBugSpeedScale()))) : def.hp,
+    hp:    def.hp,
+    maxHp: def.hp,
     speed: def.speed * sM,
     emoji: def.emoji,
     size: def.size,
