@@ -603,7 +603,8 @@ function handleFire(e) {
   if (bug) {
     aimX = bug.x;
     aimY = bug.y;
-    fireBolt(bug);
+    hitBug(bug);   // damage is instant on tap
+    fireBolt(bug); // bolt is visual only
   } else {
     // Missed — play small feedback, aim toward tap
     aimX = pos.x;
@@ -714,7 +715,6 @@ function update(dt) {
     bolt.segments = buildArcSegments(getTurretX() + 20, H * 0.5, bolt.x, bolt.y);
 
     if (dist < (bolt.target.size / 2) + 10) {
-      hitBug(bolt.target);
       bolt.hit = true; bolt.age = 0;
     }
     if (bolt.x > W + 50 || bolt.y < -50 || bolt.y > H + 50) bolts.splice(i, 1);
