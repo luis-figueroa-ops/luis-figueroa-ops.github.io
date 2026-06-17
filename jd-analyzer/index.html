@@ -182,13 +182,15 @@
       white-space: nowrap;
     }
 
-    .theme-btn:hover { background-color: #243554; border-color: #B8963E; color: #B8963E; }
+    .theme-btn:hover:not(:disabled) { background-color: #243554; border-color: #B8963E; color: #B8963E; }
+    .theme-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .theme-btn.viewed {
       background-color: #1a2e1a;
       border-color: #4a7a4a;
       color: #7ab87a;
       opacity: 0.85;
     }
+    .theme-btn.viewed:disabled { opacity: 0.4; }
 
     .chat-section {
       margin-top: 20px;
@@ -492,6 +494,23 @@
 
     let conversationHistory = [];
     let goDeepUsed = false;
+    let requestInFlight = false;
+
+    function lockUI() {
+      requestInFlight = true;
+      sendBtn.disabled = true;
+      if (!goDeepUsed) goDeepBtn.disabled = true;
+      tmaybBtn.disabled = true;
+      document.querySelectorAll('.theme-btn').forEach(b => { b.disabled = true; });
+    }
+
+    function unlockUI() {
+      requestInFlight = false;
+      sendBtn.disabled = false;
+      if (!goDeepUsed) goDeepBtn.disabled = false;
+      tmaybBtn.disabled = false;
+      document.querySelectorAll('.theme-btn').forEach(b => { b.disabled = false; });
+    }
 
     function checkInputs() {
       const hasKey = apiKeyInput.value.trim().length > 10;
@@ -514,7 +533,7 @@
           return match;
         })
         .replace(/\n\n/g, '</p><p>')
-        .replace(/^(?!<[hul])(.*.\S.*)$/gm, '<p>$1</p>')
+        .replace(/^(?!<[hul])(.*\S.*)$/gm, '<p>$1</p>')
         .replace(/<p><\/p>/g, '')
         .replace(/---/g, '<hr style="border-color:#3a4f72;margin:20px 0;">')
         .replace(/<\/ul>\s*<ul>/g, '');
@@ -651,8 +670,10 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       themeButtons.innerHTML = '';
       themeContainer.classList.remove('visible');
       goDeepUsed = false;
+      requestInFlight = false;
       goDeepBtn.disabled = false;
       goDeepBtn.textContent = 'Go Deeper';
+      tmaybBtn.disabled = false;
       output.classList.remove('visible');
       chatSection.classList.remove('visible');
       errorBox.classList.remove('visible');
@@ -693,11 +714,11 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
     });
 
     goDeepBtn.addEventListener('click', async () => {
-      if (goDeepUsed) return;
+      if (goDeepUsed || requestInFlight) return;
       const apiKey = apiKeyInput.value.trim();
       if (!apiKey) return;
 
-      goDeepBtn.disabled = true;
+      lockUI();
       goDeepBtn.textContent = 'Extracting themes...';
 
       const themeRequest = 'Based on this job description, extract 3-6 business process areas or competency themes. Respond ONLY with a JSON array of short plain-language string labels, nothing else. Example format: ["Influencing Without Authority", "Managing Competing Priorities", "Diagnosing Before Prescribing"]. No explanation, no markdown fences, just the raw JSON array.';
@@ -735,17 +756,22 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         themeContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       } catch (err) {
-        goDeepBtn.disabled = false;
         goDeepBtn.textContent = 'Go Deeper';
         conversationHistory.pop();
         const errBubble = addChatBubble('assistant', `Couldn't extract themes: ${err.message}. Try again.`);
         errBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      } finally {
+        unlockUI();
+        if (goDeepUsed) goDeepBtn.disabled = false;
       }
     });
 
     async function handleThemeClick(btn, theme) {
+      if (requestInFlight) return;
       const apiKey = apiKeyInput.value.trim();
       if (!apiKey) return;
+
+      lockUI();
 
       const message = `Go deeper on: ${theme}`;
       conversationHistory.push({ role: 'user', content: message });
@@ -771,14 +797,17 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         thinkingBubble.className = 'chat-bubble assistant';
         thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
         conversationHistory.pop();
+      } finally {
+        unlockUI();
       }
     }
 
     tmaybBtn.addEventListener('click', async () => {
+      if (requestInFlight) return;
       const apiKey = apiKeyInput.value.trim();
       if (!apiKey) return;
 
-      tmaybBtn.disabled = true;
+      lockUI();
 
       const message = 'Apply the Tell Me About Yourself Bridge framework to this specific job description. Walk me through each part of the framework — Log Line, Past, Future, and Closing Pivot — tailored to what this JD reveals about the company\'s business problems and needs.';
 
@@ -801,17 +830,18 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
         conversationHistory.pop();
       } finally {
-        tmaybBtn.disabled = false;
+        unlockUI();
       }
     });
 
     async function sendFollowUp() {
+      if (requestInFlight) return;
       const apiKey = apiKeyInput.value.trim();
       const userMessage = followUpInput.value.trim();
       if (!userMessage || !apiKey) return;
 
+      lockUI();
       followUpInput.value = '';
-      sendBtn.disabled = true;
 
       conversationHistory.push({ role: 'user', content: userMessage });
       addChatBubble('user', userMessage);
@@ -832,7 +862,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
         conversationHistory.pop();
       } finally {
-        sendBtn.disabled = false;
+        unlockUI();
         followUpInput.focus();
       }
     }
