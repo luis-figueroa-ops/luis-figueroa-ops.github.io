@@ -421,7 +421,16 @@
     <div class="header">
       <h1>Is This Job Worth Applying To?</h1>
       <p class="tagline">"I read process documents the way other people read between the lines."</p>
-      <p class="sub">Paste any job description. Get a structured ops read on what the role actually is, who it's really for, and what to ask in the interview. Then keep the conversation going.</p>
+      <p class="sub">Paste any job description. Get a structured ops read on what the role actually is, who it&#8217;s really for, and what to ask in the interview. Then go deeper &#8212; the business problems behind each requirement, the thinking they&#8217;re actually evaluating, and how to bridge your story to the role.</p>
+    </div>
+
+    <div class="card">
+      <label for="apiKey">Your Anthropic API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-..." />
+      <p class="hint">
+        Your key stays in your browser and is never stored anywhere.
+        Don't have one? <a href="https://console.anthropic.com" target="_blank">Get a free key at console.anthropic.com</a>
+      </p>
     </div>
 
     <div class="card">
@@ -473,6 +482,7 @@
   </div>
 
   <script>
+    const apiKeyInput = document.getElementById('apiKey');
     const jdInput = document.getElementById('jdInput');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const output = document.getElementById('output');
@@ -513,10 +523,12 @@
     }
 
     function checkInputs() {
+      const hasKey = apiKeyInput.value.trim().length > 10;
       const hasJD = jdInput.value.trim().length > 50;
-      analyzeBtn.disabled = !hasJD;
+      analyzeBtn.disabled = !(hasKey && hasJD);
     }
 
+    apiKeyInput.addEventListener('input', checkInputs);
     jdInput.addEventListener('input', checkInputs);
 
     function renderMarkdown(text) {
@@ -637,13 +649,17 @@ For ALL OTHER FOLLOW-UP messages, respond conversationally and directly. Build o
 
 Be direct, specific, and practical. Never generic. Write like someone who has actually worked in operations and can read between the lines of a process document.`;
 
-    async function callClaude() {
-      const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
+    async function callClaude(apiKey) {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({
+          model: 'claude-opus-4-5',
           max_tokens: 1500,
           system: SYSTEM_PROMPT,
           messages: conversationHistory
@@ -651,11 +667,12 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || data.error || 'API request failed');
+      if (!response.ok) throw new Error(data.error?.message || 'API request failed');
       return data.content[0].text;
     }
 
     analyzeBtn.addEventListener('click', async () => {
+      const apiKey = apiKeyInput.value.trim();
       const jd = jdInput.value.trim();
 
       conversationHistory = [];
@@ -679,7 +696,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       });
 
       try {
-        const result = await callClaude();
+        const result = await callClaude(apiKey);
         conversationHistory.push({ role: 'assistant', content: result });
         outputContent.innerHTML = renderMarkdown(result);
         output.classList.add('visible');
@@ -692,7 +709,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         });
 
       } catch (err) {
-        errorBox.textContent = `Something went wrong: ${err.message}. Try again.`;
+        errorBox.textContent = `Something went wrong: ${err.message}. Check your API key and try again.`;
         errorBox.classList.add('visible');
         conversationHistory = [];
         requestAnimationFrame(() => {
@@ -708,6 +725,8 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
     goDeepBtn.addEventListener('click', async () => {
       if (goDeepUsed || requestInFlight) return;
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) return;
 
       lockUI();
       goDeepBtn.textContent = 'Extracting themes...';
@@ -717,7 +736,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       conversationHistory.push({ role: 'user', content: themeRequest });
 
       try {
-        const result = await callClaude();
+        const result = await callClaude(apiKey);
         conversationHistory.push({ role: 'assistant', content: result });
 
         let themes = [];
@@ -759,6 +778,8 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
     async function handleThemeClick(btn, theme) {
       if (requestInFlight) return;
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) return;
 
       lockUI();
 
@@ -769,7 +790,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
 
       try {
-        const result = await callClaude();
+        const result = await callClaude(apiKey);
         conversationHistory.push({ role: 'assistant', content: result });
 
         thinkingBubble.className = 'chat-bubble assistant';
@@ -784,7 +805,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       } catch (err) {
         thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
+        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
         conversationHistory.pop();
       } finally {
         unlockUI();
@@ -793,6 +814,8 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
     tmaybBtn.addEventListener('click', async () => {
       if (requestInFlight) return;
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) return;
 
       lockUI();
 
@@ -804,7 +827,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
 
       try {
-        const result = await callClaude();
+        const result = await callClaude(apiKey);
         conversationHistory.push({ role: 'assistant', content: result });
 
         thinkingBubble.className = 'chat-bubble assistant';
@@ -814,7 +837,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       } catch (err) {
         thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
+        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
         conversationHistory.pop();
       } finally {
         unlockUI();
@@ -823,8 +846,9 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
     async function sendFollowUp() {
       if (requestInFlight) return;
+      const apiKey = apiKeyInput.value.trim();
       const userMessage = followUpInput.value.trim();
-      if (!userMessage) return;
+      if (!userMessage || !apiKey) return;
 
       lockUI();
       followUpInput.value = '';
@@ -835,7 +859,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
 
       try {
-        const result = await callClaude();
+        const result = await callClaude(apiKey);
         conversationHistory.push({ role: 'assistant', content: result });
 
         thinkingBubble.className = 'chat-bubble assistant';
@@ -845,7 +869,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       } catch (err) {
         thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
+        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
         conversationHistory.pop();
       } finally {
         unlockUI();
