@@ -153,11 +153,6 @@
   </div>
   <div id="step1-section">
     <div class="card">
-      <div class="card-label">Anthropic API Key</div>
-      <input type="password" class="api-input" id="api-key" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" />
-      <p class="api-note">Your key stays in your browser — never stored or sent anywhere except directly to Anthropic. Don't have one? <a href="https://console.anthropic.com" target="_blank" rel="noopener">Get a key at console.anthropic.com</a></p>
-    </div>
-    <div class="card">
       <div class="card-label">Your Role</div>
       <textarea id="role-input" placeholder="Describe what you actually do — not your title. The meetings, the problems, the tasks that eat your time.
 
@@ -179,7 +174,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
       <button class="btn-action" onclick="copyInsights(this)"><span>⎘</span> Copy Insights</button>
       <button class="btn-action" onclick="printInsights()"><span>⬇</span> Save PDF</button>
       <div class="action-bar-divider"></div>
-      <button class="reset-link" onclick="resetTool()">← Start Over</button>
+      <button class="reset-link" onclick="resetTool()"><- Start Over</button>
     </div>
   </div>
   <div class="section-divider" id="divider-2" style="display:none;"></div>
@@ -224,7 +219,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
       <button class="btn-action" onclick="copyAllPrompts(this)" id="copy-all-btn"><span>⎘</span> Copy All</button>
       <button class="btn-action" onclick="printSession()"><span>⬇</span> Save PDF</button>
       <div class="action-bar-divider"></div>
-      <button class="reset-link" onclick="resetTool()">← Start Over</button>
+      <button class="reset-link" onclick="resetTool()"><- Start Over</button>
     </div>
   </div>
   <footer class="footer">
@@ -237,9 +232,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
   let currentInsightIndex = 0, insights = [], promptStore = {}, sharedFields = { role: '', tone: '' };
 
   async function runStep1() {
-    const apiKey = document.getElementById('api-key').value.trim();
     const roleText = document.getElementById('role-input').value.trim();
-    if (!apiKey) { alert('Please enter your Anthropic API key.'); return; }
     if (roleText.length < 40) { alert('Tell me a bit more about your role.'); return; }
     const btn = document.getElementById('analyze-btn');
     const status = document.getElementById('status-1');
@@ -249,9 +242,9 @@ Rules: Give exactly 4 insights. Each must be specific to what the person describ
 Respond ONLY in this JSON format (no markdown, no backticks):
 {"insights": [{"title": "Short action-oriented title (5-8 words)","body": "2-3 sentences: what AI does, what problem it solves, why it matters. Be concrete."}]}`;
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: roleText }] }) });
+      const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: roleText }] }) });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || 'API error');
+      if (!response.ok) throw new Error(data.error?.message || data.error || 'API error');
       const rawText = data.content[0].text.trim();
       let parsed;
       try { parsed = JSON.parse(rawText); } catch { const match = rawText.match(/\{[\s\S]*\}/); if (match) parsed = JSON.parse(match[0]); else throw new Error('Could not parse response.'); }
@@ -314,8 +307,6 @@ Respond ONLY in this JSON format (no markdown, no backticks):
   }
 
   async function buildPrompt() {
-    const apiKey = document.getElementById('api-key').value.trim();
-    if (!apiKey) { alert('API key is missing.'); return; }
     sharedFields.role = document.getElementById('p-role').value.trim();
     sharedFields.tone = document.getElementById('p-tone').value.trim();
     const pieces = { role: sharedFields.role, need: document.getElementById('p-need').value.trim(), context: document.getElementById('p-context').value.trim(), audience: document.getElementById('p-audience').value.trim(), tone: sharedFields.tone, format: document.getElementById('p-format').value.trim() };
@@ -326,9 +317,9 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     const selectedInsight = insights[currentInsightIndex];
     const userMessage = `Selected insight: ${selectedInsight.title}\nInsight detail: ${selectedInsight.body}\n\nPrompt pieces:\n- Role: ${pieces.role||'(not provided)'}\n- What I need: ${pieces.need||'(not provided)'}\n- Context: ${pieces.context||'(not provided)'}\n- Who it's for: ${pieces.audience||'(not provided)'}\n- Tone: ${pieces.tone||'(not provided)'}\n- Format: ${pieces.format||'(not provided)'}\n\nWrite the ready-to-use prompt.`;
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] }) });
+      const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] }) });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || 'API error');
+      if (!response.ok) throw new Error(data.error?.message || data.error || 'API error');
       const promptText = data.content[0].text.trim();
       if (!promptStore[currentInsightIndex]) promptStore[currentInsightIndex] = {};
       promptStore[currentInsightIndex].promptText = promptText; promptStore[currentInsightIndex].pieces = pieces;
@@ -405,7 +396,6 @@ Respond ONLY in this JSON format (no markdown, no backticks):
   function escapeHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   document.addEventListener('DOMContentLoaded', () => { document.getElementById('copy-all-btn').style.display = 'none'; });
-  document.getElementById('api-key').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('role-input').focus(); });
 </script>
 </body>
 </html>
