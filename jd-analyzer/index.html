@@ -420,17 +420,8 @@
 
     <div class="header">
       <h1>Is This Job Worth Applying To?</h1>
-      <p class="tagline">"I read process documents the way other people read between the lines."</p>
+      <p class="tagline">&#8220;I read process documents the way other people read between the lines.&#8221;</p>
       <p class="sub">Paste any job description. Get a structured ops read on what the role actually is, who it&#8217;s really for, and what to ask in the interview. Then go deeper &#8212; the business problems behind each requirement, the thinking they&#8217;re actually evaluating, and how to bridge your story to the role.</p>
-    </div>
-
-    <div class="card">
-      <label for="apiKey">Your Anthropic API Key</label>
-      <input type="password" id="apiKey" placeholder="sk-ant-..." />
-      <p class="hint">
-        Your key stays in your browser and is never stored anywhere.
-        Don't have one? <a href="https://console.anthropic.com" target="_blank">Get a free key at console.anthropic.com</a>
-      </p>
     </div>
 
     <div class="card">
@@ -452,7 +443,7 @@
         <button class="action-btn" id="tmaybBtn">Tell Me About Yourself Bridge</button>
       </div>
       <div class="theme-container" id="themeContainer">
-        <div class="theme-container-label">Competency themes — click any to go deeper</div>
+        <div class="theme-container-label">Competency themes &#8212; click any to go deeper</div>
         <div class="theme-buttons" id="themeButtons"></div>
       </div>
     </div>
@@ -472,7 +463,7 @@
 
     <div class="footer">
       Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a>
-      &nbsp;·&nbsp;
+      &nbsp;&middot;&nbsp;
       <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
       <span class="credit-line">Augmenting Human Potential, One Workflow at a Time</span>
       <span class="credit-line">A tool built by an ops professional who reads between the lines of every process document.</span>
@@ -482,7 +473,6 @@
   </div>
 
   <script>
-    const apiKeyInput = document.getElementById('apiKey');
     const jdInput = document.getElementById('jdInput');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const output = document.getElementById('output');
@@ -523,12 +513,9 @@
     }
 
     function checkInputs() {
-      const hasKey = apiKeyInput.value.trim().length > 10;
-      const hasJD = jdInput.value.trim().length > 50;
-      analyzeBtn.disabled = !(hasKey && hasJD);
+      analyzeBtn.disabled = jdInput.value.trim().length <= 50;
     }
 
-    apiKeyInput.addEventListener('input', checkInputs);
     jdInput.addEventListener('input', checkInputs);
 
     function renderMarkdown(text) {
@@ -543,7 +530,7 @@
           return match;
         })
         .replace(/\n\n/g, '</p><p>')
-        .replace(/^(?!<[hul])(.*\S.*)$/gm, '<p>$1</p>')
+        .replace(/^(?!<[hul])(.+\S.*)$/gm, '<p>$1</p>')
         .replace(/<p><\/p>/g, '')
         .replace(/---/g, '<hr style="border-color:#3a4f72;margin:20px 0;">')
         .replace(/<\/ul>\s*<ul>/g, '');
@@ -622,26 +609,26 @@ COMPETENCY THEME EXTRACTION — when asked to extract themes from a JD as a JSON
 Identify 3-6 business process areas or competency themes grounded in specific JD language. Use this anchor list as your starting point: Project/Program Management, Stakeholder & Cross-Functional Coordination, Revenue/Sales Operations, Process Improvement, Data & Reporting, Vendor/Partner Management, Technical/Systems Operations, Issue Resolution & Troubleshooting, Change Management. Expand beyond this list only when the JD content clearly doesn't fit any anchor — use the same plain-language style. Keep labels short (3-6 words), specific, and plain-language.
 
 METHODOLOGY-NAMING RULE — when drilling down on a theme:
-Name a framework ONLY if the JD text itself names one (e.g., "Six Sigma," "Agile," "RACI," "OKR"). If the JD does not name a framework, describe the approach in plain language. Never invent a framework name that does not appear in the JD.
+Name a framework ONLY if the JD text itself names one (e.g., “Six Sigma,” “Agile,” “RACI,” “OKR”). If the JD does not name a framework, describe the approach in plain language. Never invent a framework name that does not appear in the JD.
 
 MULTI-DIMENSIONAL SCORING RULE — when explaining strong vs. weak on a competency:
-Always describe strong-vs-weak performance as 2-3 simultaneous dimensions being evaluated at once, not a single binary axis. Frame it explicitly: "this isn't just one thing being judged — it's typically X, Y, and Z at the same time."
+Always describe strong-vs-weak performance as 2-3 simultaneous dimensions being evaluated at once, not a single binary axis. Frame it explicitly: “this isn’t just one thing being judged — it’s typically X, Y, and Z at the same time.”
 
 THEME DRILL-DOWN STRUCTURE — when drilling deeper on a specific competency theme, respond in this order:
 1. What this competency means in practice, grounded in the specific JD language that signaled it
 2. The methodology or way of thinking behind doing it well — follow the methodology-naming rule above
 3. What separates a strong demonstration from a weak one — use the multi-dimensional scoring rule above
-4. An illustrative example of the thinking in action — frame it explicitly as generic/illustrative: "here's the shape — make it yours." Never fabricate or assume the user's personal work history.
+4. An illustrative example of the thinking in action — frame it explicitly as generic/illustrative: “here’s the shape — make it yours.” Never fabricate or assume the user’s personal work history.
 
 TELL ME ABOUT YOURSELF BRIDGE FRAMEWORK (adapted from Farah Sharghi, ex-Google recruiter):
-Every line of a job description is a symptom of a business problem the company is trying to solve. The candidate's job is to read the JD like a business owner, then structure a response in these parts:
+Every line of a job description is a symptom of a business problem the company is trying to solve. The candidate’s job is to read the JD like a business owner, then structure a response in these parts:
 
-- Log Line: 1-2 sentences. Sentence one states who the candidate is professionally; sentence two is the "hook" — what their core strength is and why it matters to this business's specific needs. Provide this as an illustrative generic pattern.
-- Past: 2-3 sentences connecting real accomplishments to the JD's hidden business problems. Since this tool does not have the user's actual resume, COACH this section instead of writing it for them — name the specific kind of business problem the JD reveals, describe the kind/shape of metric or scenario the user should be mining from their own background to address it, with a generic illustrative example of what that could sound like. Be explicit that the user needs to swap in their own real number/story.
+- Log Line: 1-2 sentences. Sentence one states who the candidate is professionally; sentence two is the “hook” — what their core strength is and why it matters to this business’s specific needs. Provide this as an illustrative generic pattern.
+- Past: 2-3 sentences connecting real accomplishments to the JD’s hidden business problems. Since this tool does not have the user’s actual resume, COACH this section instead of writing it for them — name the specific kind of business problem the JD reveals, describe the kind/shape of metric or scenario the user should be mining from their own background to address it, with a generic illustrative example of what that could sound like. Be explicit that the user needs to swap in their own real number/story.
 - Future: One sentence on why this specific role is the logical next step. Illustrative pattern.
-- Closing pivot: End the response by asking the interviewer what they'd like to learn more about, then stopping talking. Provide this as a ready-to-use line since it's role-agnostic.
+- Closing pivot: End the response by asking the interviewer what they’d like to learn more about, then stopping talking. Provide this as a ready-to-use line since it’s role-agnostic.
 
-STANDING REMINDER: Never fabricate or assume the user's personal work history. All examples are illustrative patterns the user must adapt to their own real experience.
+STANDING REMINDER: Never fabricate or assume the user’s personal work history. All examples are illustrative patterns the user must adapt to their own real experience.
 
 ---
 
@@ -649,17 +636,13 @@ For ALL OTHER FOLLOW-UP messages, respond conversationally and directly. Build o
 
 Be direct, specific, and practical. Never generic. Write like someone who has actually worked in operations and can read between the lines of a process document.`;
 
-    async function callClaude(apiKey) {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+    async function callClaude() {
+      const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'claude-opus-4-5',
           max_tokens: 1500,
           system: SYSTEM_PROMPT,
           messages: conversationHistory
@@ -672,7 +655,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
     }
 
     analyzeBtn.addEventListener('click', async () => {
-      const apiKey = apiKeyInput.value.trim();
       const jd = jdInput.value.trim();
 
       conversationHistory = [];
@@ -696,7 +678,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       });
 
       try {
-        const result = await callClaude(apiKey);
+        const result = await callClaude();
         conversationHistory.push({ role: 'assistant', content: result });
         outputContent.innerHTML = renderMarkdown(result);
         output.classList.add('visible');
@@ -709,7 +691,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         });
 
       } catch (err) {
-        errorBox.textContent = `Something went wrong: ${err.message}. Check your API key and try again.`;
+        errorBox.textContent = `Something went wrong: ${err.message}. Please try again.`;
         errorBox.classList.add('visible');
         conversationHistory = [];
         requestAnimationFrame(() => {
@@ -725,8 +707,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
     goDeepBtn.addEventListener('click', async () => {
       if (goDeepUsed || requestInFlight) return;
-      const apiKey = apiKeyInput.value.trim();
-      if (!apiKey) return;
 
       lockUI();
       goDeepBtn.textContent = 'Extracting themes...';
@@ -736,7 +716,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       conversationHistory.push({ role: 'user', content: themeRequest });
 
       try {
-        const result = await callClaude(apiKey);
+        const result = await callClaude();
         conversationHistory.push({ role: 'assistant', content: result });
 
         let themes = [];
@@ -778,8 +758,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
     async function handleThemeClick(btn, theme) {
       if (requestInFlight) return;
-      const apiKey = apiKeyInput.value.trim();
-      if (!apiKey) return;
 
       lockUI();
 
@@ -790,7 +768,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
 
       try {
-        const result = await callClaude(apiKey);
+        const result = await callClaude();
         conversationHistory.push({ role: 'assistant', content: result });
 
         thinkingBubble.className = 'chat-bubble assistant';
@@ -805,7 +783,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       } catch (err) {
         thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
+        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
         conversationHistory.pop();
       } finally {
         unlockUI();
@@ -814,8 +792,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
     tmaybBtn.addEventListener('click', async () => {
       if (requestInFlight) return;
-      const apiKey = apiKeyInput.value.trim();
-      if (!apiKey) return;
 
       lockUI();
 
@@ -827,7 +803,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
 
       try {
-        const result = await callClaude(apiKey);
+        const result = await callClaude();
         conversationHistory.push({ role: 'assistant', content: result });
 
         thinkingBubble.className = 'chat-bubble assistant';
@@ -837,7 +813,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       } catch (err) {
         thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
+        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
         conversationHistory.pop();
       } finally {
         unlockUI();
@@ -846,9 +822,8 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
     async function sendFollowUp() {
       if (requestInFlight) return;
-      const apiKey = apiKeyInput.value.trim();
       const userMessage = followUpInput.value.trim();
-      if (!userMessage || !apiKey) return;
+      if (!userMessage) return;
 
       lockUI();
       followUpInput.value = '';
@@ -859,7 +834,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
 
       try {
-        const result = await callClaude(apiKey);
+        const result = await callClaude();
         conversationHistory.push({ role: 'assistant', content: result });
 
         thinkingBubble.className = 'chat-bubble assistant';
@@ -869,7 +844,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       } catch (err) {
         thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
+        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
         conversationHistory.pop();
       } finally {
         unlockUI();
