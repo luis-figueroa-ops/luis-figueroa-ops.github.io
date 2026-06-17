@@ -140,6 +140,55 @@
 
     .action-btn:hover { background-color: #B8963E; color: #1B2A4A; }
     .action-btn.copied { background-color: #2a4a2a; border-color: #4caf50; color: #4caf50; }
+    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Theme buttons container */
+    .theme-container {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #1e3060;
+      border: 1px solid #3a4f72;
+      border-radius: 10px;
+    }
+
+    .theme-container.visible { display: block; }
+
+    .theme-container-label {
+      font-size: 0.78rem;
+      color: #B8963E;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .theme-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .theme-btn {
+      padding: 8px 16px;
+      background-color: transparent;
+      color: #ccd6f6;
+      border: 1px solid #3a4f72;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .theme-btn:hover { background-color: #243554; border-color: #B8963E; color: #B8963E; }
+    .theme-btn.viewed {
+      background-color: #1a2e1a;
+      border-color: #4a7a4a;
+      color: #7ab87a;
+      opacity: 0.85;
+    }
 
     .chat-section {
       margin-top: 20px;
@@ -296,7 +345,8 @@
 
       .header, .card, #analyzeBtn, .loading,
       .error, .action-buttons, .chat-input-row,
-      .bottom-actions, .chat-divider, .footer { display: none !important; }
+      .bottom-actions, .chat-divider, .footer,
+      .theme-container { display: none !important; }
 
       .output {
         display: block !important;
@@ -386,6 +436,12 @@
       <div class="action-buttons">
         <button class="action-btn" id="copyBtnTop">Copy Full Conversation</button>
         <button class="action-btn" id="printBtnTop">Print / Save as PDF</button>
+        <button class="action-btn" id="goDeepBtn">Go Deeper</button>
+        <button class="action-btn" id="tmaybBtn">Tell Me About Yourself Bridge</button>
+      </div>
+      <div class="theme-container" id="themeContainer">
+        <div class="theme-container-label">Competency themes — click any to go deeper</div>
+        <div class="theme-buttons" id="themeButtons"></div>
       </div>
     </div>
 
@@ -425,12 +481,17 @@
     const printBtnTop = document.getElementById('printBtnTop');
     const copyBtnBottom = document.getElementById('copyBtnBottom');
     const printBtnBottom = document.getElementById('printBtnBottom');
+    const goDeepBtn = document.getElementById('goDeepBtn');
+    const tmaybBtn = document.getElementById('tmaybBtn');
+    const themeContainer = document.getElementById('themeContainer');
+    const themeButtons = document.getElementById('themeButtons');
     const chatSection = document.getElementById('chatSection');
     const chatMessages = document.getElementById('chatMessages');
     const followUpInput = document.getElementById('followUpInput');
     const sendBtn = document.getElementById('sendBtn');
 
     let conversationHistory = [];
+    let goDeepUsed = false;
 
     function checkInputs() {
       const hasKey = apiKeyInput.value.trim().length > 10;
@@ -453,7 +514,7 @@
           return match;
         })
         .replace(/\n\n/g, '</p><p>')
-        .replace(/^(?!<[hul])(.*\S.*)$/gm, '<p>$1</p>')
+        .replace(/^(?!<[hul])(.*.\S.*)$/gm, '<p>$1</p>')
         .replace(/<p><\/p>/g, '')
         .replace(/---/g, '<hr style="border-color:#3a4f72;margin:20px 0;">')
         .replace(/<\/ul>\s*<ul>/g, '');
@@ -524,7 +585,38 @@ One paragraph. Describe the actual experience level, background, and working sty
 ## The One Question to Ask in the Interview
 One specific, sharp question the candidate should ask based on what is missing or unclear in this JD. Make it a question that reveals how the team actually operates.
 
-For ALL FOLLOW-UP messages, respond conversationally and directly. Build on the analysis you already gave. Reference specific details from the JD and prior conversation. Stay in your role as an experienced ops professional giving honest career advice.
+---
+
+ADDITIONAL INSTRUCTIONS (used when handling Go Deeper theme-list requests, theme drill-down requests, or Tell Me About Yourself Bridge requests):
+
+COMPETENCY THEME EXTRACTION — when asked to extract themes from a JD as a JSON array:
+Identify 3-6 business process areas or competency themes grounded in specific JD language. Use this anchor list as your starting point: Project/Program Management, Stakeholder & Cross-Functional Coordination, Revenue/Sales Operations, Process Improvement, Data & Reporting, Vendor/Partner Management, Technical/Systems Operations, Issue Resolution & Troubleshooting, Change Management. Expand beyond this list only when the JD content clearly doesn't fit any anchor — use the same plain-language style. Keep labels short (3-6 words), specific, and plain-language.
+
+METHODOLOGY-NAMING RULE — when drilling down on a theme:
+Name a framework ONLY if the JD text itself names one (e.g., "Six Sigma," "Agile," "RACI," "OKR"). If the JD does not name a framework, describe the approach in plain language. Never invent a framework name that does not appear in the JD.
+
+MULTI-DIMENSIONAL SCORING RULE — when explaining strong vs. weak on a competency:
+Always describe strong-vs-weak performance as 2-3 simultaneous dimensions being evaluated at once, not a single binary axis. Frame it explicitly: "this isn't just one thing being judged — it's typically X, Y, and Z at the same time."
+
+THEME DRILL-DOWN STRUCTURE — when drilling deeper on a specific competency theme, respond in this order:
+1. What this competency means in practice, grounded in the specific JD language that signaled it
+2. The methodology or way of thinking behind doing it well — follow the methodology-naming rule above
+3. What separates a strong demonstration from a weak one — use the multi-dimensional scoring rule above
+4. An illustrative example of the thinking in action — frame it explicitly as generic/illustrative: "here's the shape — make it yours." Never fabricate or assume the user's personal work history.
+
+TELL ME ABOUT YOURSELF BRIDGE FRAMEWORK (adapted from Farah Sharghi, ex-Google recruiter):
+Every line of a job description is a symptom of a business problem the company is trying to solve. The candidate's job is to read the JD like a business owner, then structure a response in these parts:
+
+- Log Line: 1-2 sentences. Sentence one states who the candidate is professionally; sentence two is the "hook" — what their core strength is and why it matters to this business's specific needs. Provide this as an illustrative generic pattern.
+- Past: 2-3 sentences connecting real accomplishments to the JD's hidden business problems. Since this tool does not have the user's actual resume, COACH this section instead of writing it for them — name the specific kind of business problem the JD reveals, describe the kind/shape of metric or scenario the user should be mining from their own background to address it, with a generic illustrative example of what that could sound like. Be explicit that the user needs to swap in their own real number/story.
+- Future: One sentence on why this specific role is the logical next step. Illustrative pattern.
+- Closing pivot: End the response by asking the interviewer what they'd like to learn more about, then stopping talking. Provide this as a ready-to-use line since it's role-agnostic.
+
+STANDING REMINDER: Never fabricate or assume the user's personal work history. All examples are illustrative patterns the user must adapt to their own real experience.
+
+---
+
+For ALL OTHER FOLLOW-UP messages, respond conversationally and directly. Build on the analysis you already gave. Reference specific details from the JD and prior conversation. Stay in your role as an experienced ops professional giving honest career advice.
 
 Be direct, specific, and practical. Never generic. Write like someone who has actually worked in operations and can read between the lines of a process document.`;
 
@@ -556,6 +648,11 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       conversationHistory = [];
       chatMessages.innerHTML = '';
+      themeButtons.innerHTML = '';
+      themeContainer.classList.remove('visible');
+      goDeepUsed = false;
+      goDeepBtn.disabled = false;
+      goDeepBtn.textContent = 'Go Deeper';
       output.classList.remove('visible');
       chatSection.classList.remove('visible');
       errorBox.classList.remove('visible');
@@ -592,6 +689,119 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       } finally {
         loading.classList.remove('visible');
         analyzeBtn.disabled = false;
+      }
+    });
+
+    goDeepBtn.addEventListener('click', async () => {
+      if (goDeepUsed) return;
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) return;
+
+      goDeepBtn.disabled = true;
+      goDeepBtn.textContent = 'Extracting themes...';
+
+      const themeRequest = 'Based on this job description, extract 3-6 business process areas or competency themes. Respond ONLY with a JSON array of short plain-language string labels, nothing else. Example format: ["Influencing Without Authority", "Managing Competing Priorities", "Diagnosing Before Prescribing"]. No explanation, no markdown fences, just the raw JSON array.';
+
+      conversationHistory.push({ role: 'user', content: themeRequest });
+
+      try {
+        const result = await callClaude(apiKey);
+        conversationHistory.push({ role: 'assistant', content: result });
+
+        let themes = [];
+        try {
+          const cleaned = result.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
+          themes = JSON.parse(cleaned);
+          if (!Array.isArray(themes)) throw new Error('not an array');
+        } catch (_) {
+          themes = result.split('\n')
+            .map(l => l.replace(/^[\s\-\*\d\.\["]+|[\]",\s]+$/g, '').trim())
+            .filter(l => l.length > 2 && l.length < 80);
+        }
+
+        themeButtons.innerHTML = '';
+        themes.forEach(theme => {
+          const btn = document.createElement('button');
+          btn.className = 'theme-btn';
+          btn.textContent = theme;
+          btn.addEventListener('click', () => handleThemeClick(btn, theme));
+          themeButtons.appendChild(btn);
+        });
+
+        themeContainer.classList.add('visible');
+        goDeepUsed = true;
+        goDeepBtn.textContent = 'Go Deeper ✓';
+
+        themeContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        goDeepBtn.disabled = false;
+        goDeepBtn.textContent = 'Go Deeper';
+        conversationHistory.pop();
+        const errBubble = addChatBubble('assistant', `Couldn't extract themes: ${err.message}. Try again.`);
+        errBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    });
+
+    async function handleThemeClick(btn, theme) {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) return;
+
+      const message = `Go deeper on: ${theme}`;
+      conversationHistory.push({ role: 'user', content: message });
+      addChatBubble('user', message);
+
+      const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
+
+      try {
+        const result = await callClaude(apiKey);
+        conversationHistory.push({ role: 'assistant', content: result });
+
+        thinkingBubble.className = 'chat-bubble assistant';
+        thinkingBubble.querySelector('.bubble-label').textContent = 'Analysis';
+        thinkingBubble.querySelector('div:last-child').innerHTML = renderMarkdown(result);
+        thinkingBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+        btn.classList.add('viewed');
+        if (!btn.textContent.startsWith('✓ ')) {
+          btn.textContent = '✓ ' + btn.textContent;
+        }
+
+      } catch (err) {
+        thinkingBubble.className = 'chat-bubble assistant';
+        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
+        conversationHistory.pop();
+      }
+    }
+
+    tmaybBtn.addEventListener('click', async () => {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) return;
+
+      tmaybBtn.disabled = true;
+
+      const message = 'Apply the Tell Me About Yourself Bridge framework to this specific job description. Walk me through each part of the framework — Log Line, Past, Future, and Closing Pivot — tailored to what this JD reveals about the company\'s business problems and needs.';
+
+      conversationHistory.push({ role: 'user', content: message });
+      addChatBubble('user', 'Tell Me About Yourself Bridge');
+
+      const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
+
+      try {
+        const result = await callClaude(apiKey);
+        conversationHistory.push({ role: 'assistant', content: result });
+
+        thinkingBubble.className = 'chat-bubble assistant';
+        thinkingBubble.querySelector('.bubble-label').textContent = 'Analysis';
+        thinkingBubble.querySelector('div:last-child').innerHTML = renderMarkdown(result);
+        thinkingBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+      } catch (err) {
+        thinkingBubble.className = 'chat-bubble assistant';
+        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Check your API key and try again.`;
+        conversationHistory.pop();
+      } finally {
+        tmaybBtn.disabled = false;
       }
     });
 
