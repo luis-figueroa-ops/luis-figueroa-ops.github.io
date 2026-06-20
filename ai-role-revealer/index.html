@@ -72,6 +72,45 @@
     .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
     .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes pulse { 0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+
+    /* Resume banner */
+    .resume-banner { background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.4); padding: 16px 24px; margin-bottom: 32px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .resume-banner-text { flex: 1; font-size: 15px; color: var(--text-muted); min-width: 200px; }
+    .resume-banner-text strong { color: var(--text); }
+    .resume-banner-actions { display: flex; gap: 8px; }
+    .btn-resume { background: var(--accent); color: #fff; border: none; font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em; padding: 10px 20px; cursor: pointer; text-transform: uppercase; transition: background 0.2s; }
+    .btn-resume:hover { background: #8079ff; }
+    .btn-fresh { background: transparent; border: 1px solid var(--border); color: var(--text-dim); font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em; padding: 10px 20px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+    .btn-fresh:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    /* Mode toggle */
+    .mode-toggle { display: flex; gap: 0; margin-bottom: 24px; border: 1px solid var(--border); overflow: hidden; }
+    .mode-btn { flex: 1; background: transparent; border: none; color: var(--text-dim); font-family: var(--mono); font-size: 14px; letter-spacing: 0.07em; padding: 12px 20px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; text-align: center; }
+    .mode-btn:first-child { border-right: 1px solid var(--border); }
+    .mode-btn.active { background: rgba(108,99,255,0.15); color: var(--accent); border-color: var(--accent); }
+    .mode-btn:hover:not(.active) { background: rgba(255,255,255,0.04); color: var(--text-muted); }
+
+    /* Comfort check */
+    .comfort-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .comfort-label { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); width: 100%; margin-bottom: 4px; }
+    .comfort-option { display: flex; align-items: center; gap: 8px; }
+    .comfort-option input[type="radio"] { display: none; }
+    .comfort-option label { background: #0d0d16; border: 1px solid #2e2e48; color: var(--text-dim); font-family: var(--mono); font-size: 14px; padding: 9px 18px; cursor: pointer; letter-spacing: 0.05em; transition: all 0.2s; }
+    .comfort-option input[type="radio"]:checked + label { border-color: var(--accent3); color: var(--accent3); background: rgba(67,232,200,0.08); }
+    .comfort-option label:hover { border-color: var(--border-active); color: var(--text-muted); }
+
+    /* Tool select */
+    .tool-select-wrap { margin-bottom: 20px; }
+    .tool-select-label { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; display: block; }
+    .tool-select { width: 100%; background: #0d0d16; border: 2px solid #2e2e48; color: var(--text); font-family: var(--mono); font-size: 15px; padding: 12px 16px; outline: none; cursor: pointer; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0a0cc' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
+    .tool-select:focus { border-color: var(--accent); }
+    .tool-select option { background: #13131e; }
+
+    /* Access badges */
+    .access-badge { font-size: 10px; padding: 2px 8px; letter-spacing: 0.1em; border: 1px solid; display: inline-flex; align-items: center; gap: 4px; }
+    .access-badge.no-access { background: rgba(67,232,200,0.12); border-color: rgba(67,232,200,0.35); color: var(--accent3); }
+    .access-badge.needs-approval { background: rgba(255,101,132,0.12); border-color: rgba(255,101,132,0.35); color: var(--accent2); }
+
     #insights-section { display: none; }
     .insights-header { margin-bottom: 24px; }
     .insights-header h2 { font-family: var(--sans); font-size: 26px; font-weight: 700; margin-bottom: 8px; }
@@ -81,7 +120,7 @@
     .insight-card.selected { border-left-color: var(--accent3); border-color: rgba(67,232,200,0.5); background: #0e1e1c; box-shadow: 0 4px 24px rgba(67,232,200,0.1); }
     .insight-card.has-prompt { border-left-color: var(--accent2); }
     .insight-card.has-prompt.selected { border-left-color: var(--accent3); border-color: rgba(67,232,200,0.4); }
-    .insight-num { font-size: 14px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; font-weight: 400; }
+    .insight-num { font-size: 14px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-weight: 400; }
     .insight-card.selected .insight-num { color: var(--accent3); }
     .insight-card.has-prompt .insight-num { color: var(--accent2); }
     .insight-card.has-prompt.selected .insight-num { color: var(--accent3); }
@@ -121,6 +160,7 @@
     .prompt-summary-insight .psi-num { font-size: 11px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 4px; }
     .prompt-summary-insight .psi-title { font-family: var(--sans); font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
     .prompt-summary-insight .psi-body { font-size: 15px; color: var(--text-muted); line-height: 1.8; }
+    .prompt-summary-insight .psi-access { margin-top: 10px; }
     .prompt-summary-prompt { background: var(--bg); border: 1px solid var(--border); border-left: 4px solid var(--accent3); padding: 20px 24px; font-size: 15px; line-height: 1.9; color: var(--text-muted); white-space: pre-wrap; word-break: break-word; }
     .prompt-summary-header { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent3); margin-bottom: 10px; }
     .section-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 40px 0; }
@@ -132,11 +172,56 @@
     .footer-left a:hover { color: var(--text); }
     .footer-right { font-size: 13px; color: var(--text-dim); letter-spacing: 0.05em; }
     .hidden { display: none !important; }
-    @media (max-width: 520px) { .card { padding: 20px 16px; } .action-bar { flex-direction: column; align-items: stretch; } .insight-switcher-buttons { flex-direction: column; } }
+
+    /* Print brief area (screen: hidden) */
+    #brief-print-area { display: none; }
+
+    @media (max-width: 520px) { .card { padding: 20px 16px; } .action-bar { flex-direction: column; align-items: stretch; } .insight-switcher-buttons { flex-direction: column; } .comfort-group { flex-direction: column; } }
+
+    /* Print — insights */
+    @media print {
+      body.print-insights .page-wrap > *:not(#insights-section):not(.nav) { display: none !important; }
+      body.print-insights #insights-section { display: block !important; }
+      body.print-insights .action-bar { display: none !important; }
+      body.print-insights .insight-select-hint { display: none !important; }
+    }
+
+    /* Print — session */
+    @media print {
+      body.print-session .page-wrap > *:not(#prompt-output-section):not(.nav) { display: none !important; }
+      body.print-session #prompt-output-section { display: block !important; }
+      body.print-session .action-bar { display: none !important; }
+    }
+
+    /* Print — manager brief */
+    @media print {
+      body.print-brief .page-wrap > * { display: none !important; }
+      body.print-brief #brief-print-area { display: block !important; color: #000; font-family: Georgia, serif; font-size: 13px; line-height: 1.7; }
+      body.print-brief { background: #fff !important; color: #000 !important; }
+      body.print-brief::before, body.print-brief::after { display: none !important; }
+    }
+    .brief-header { border-bottom: 3px solid #333; padding-bottom: 16px; margin-bottom: 24px; }
+    .brief-title { font-size: 22px; font-weight: bold; margin-bottom: 6px; font-family: Georgia, serif; }
+    .brief-subtitle { font-size: 14px; color: #555; font-style: italic; }
+    .brief-section { margin-bottom: 20px; }
+    .brief-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; font-family: monospace; margin-bottom: 6px; }
+    .brief-section-body { font-size: 13px; line-height: 1.7; color: #222; }
+    .brief-access-note { background: #f5f5f5; border-left: 4px solid #555; padding: 10px 14px; margin-bottom: 20px; font-size: 13px; }
+    .brief-prompt-box { background: #f9f9f9; border: 1px solid #ddd; padding: 16px; font-family: monospace; font-size: 13px; line-height: 1.7; white-space: pre-wrap; margin-bottom: 20px; }
+    .brief-footer { border-top: 1px solid #ccc; padding-top: 12px; font-size: 11px; color: #888; display: flex; justify-content: space-between; }
   </style>
 </head>
 <body>
 <div class="page-wrap">
+  <!-- Resume session banner (PR2) -->
+  <div class="resume-banner hidden" id="resume-banner">
+    <div class="resume-banner-text"><strong>Welcome back.</strong> You have a saved session — pick up where you left off?</div>
+    <div class="resume-banner-actions">
+      <button class="btn-resume" onclick="resumeSession()">Resume</button>
+      <button class="btn-fresh" onclick="discardSession()">Start Fresh</button>
+    </div>
+  </div>
+
   <nav class="nav">
     <a href="https://luis-figueroa-ops.github.io/" class="nav-brand">← Operations, Augmented</a>
     <span class="nav-tag">Career Tools</span>
@@ -152,21 +237,48 @@
     <div class="progress-step" id="prog-2"><div class="progress-dot"></div>Step 2 — Build Prompt</div>
   </div>
   <div id="step1-section">
+    <!-- Employee / Manager toggle (PR3) -->
+    <div class="mode-toggle" id="mode-toggle">
+      <button class="mode-btn active" id="mode-employee" onclick="setMode('employee')">I'm an Employee</button>
+      <button class="mode-btn" id="mode-manager" onclick="setMode('manager')">I'm a Manager or Team Lead</button>
+    </div>
+
     <div class="card">
-      <div class="card-label">Your Role</div>
+      <div class="card-label" id="role-card-label">Your Role</div>
+
+      <!-- Comfort check (PR1) -->
+      <div class="comfort-group" id="comfort-group">
+        <span class="comfort-label">Your AI comfort level:</span>
+        <div class="comfort-option"><input type="radio" name="comfort" id="c-beginner" value="Just starting out with AI" onchange="onComfortChange()"><label for="c-beginner">Just starting out with AI</label></div>
+        <div class="comfort-option"><input type="radio" name="comfort" id="c-some" value="Some experience" onchange="onComfortChange()"><label for="c-some">Some experience</label></div>
+        <div class="comfort-option"><input type="radio" name="comfort" id="c-regular" value="Regular user" onchange="onComfortChange()"><label for="c-regular">Regular user</label></div>
+      </div>
+
+      <!-- Tool select (PR1) -->
+      <div class="tool-select-wrap">
+        <span class="tool-select-label">Which AI tool do you have access to?</span>
+        <select class="tool-select" id="tool-select" onchange="onToolChange()">
+          <option value="">Not sure yet</option>
+          <option value="Claude">Claude</option>
+          <option value="ChatGPT">ChatGPT</option>
+          <option value="Microsoft Copilot">Microsoft Copilot</option>
+          <option value="Gemini">Gemini</option>
+        </select>
+      </div>
+
       <textarea id="role-input" placeholder="Describe what you actually do — not your title. The meetings, the problems, the tasks that eat your time.
 
 For example: I manage a team of 8 sales reps across three states. Every week I'm doing pipeline reviews, coaching deals that are stuck, running a forecast call with my VP, and trying to figure out why one territory is underperforming..."></textarea>
       <div style="display:flex; gap:12px; align-items:center; margin-top:20px; flex-wrap:wrap;">
         <button class="btn-primary" id="analyze-btn" onclick="runStep1()">Reveal What's Possible</button>
-        <div class="status-line" id="status-1" style="display:none;"><div class="dot-pulse"><span></span><span></span><span></span></div>Analyzing your role...</div>
+        <div class="status-line" id="status-1" style="display:none;"><div class="dot-pulse"><span></span><span></span><span></span></div><span id="status-1-text">Analyzing your role...</span></div>
       </div>
     </div>
   </div>
   <div id="insights-section">
     <div class="insights-header">
-      <h2>What AI can do for your role</h2>
-      <p>Click any insight to build a prompt for it. You can build prompts for multiple insights — pick the ones that matter most.</p>
+      <h2 id="insights-heading">What AI can do for your role</h2>
+      <p id="insights-subheading">Click any insight to build a prompt for it. You can build prompts for multiple insights — pick the ones that matter most.</p>
     </div>
     <div id="insights-list"></div>
     <div class="action-bar" id="insights-action-bar">
@@ -180,22 +292,22 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
   <div class="section-divider" id="divider-2" style="display:none;"></div>
   <div id="step2-section">
     <div class="step2-intro">
-      <h2>Step 2 — Build Your Prompt</h2>
-      <p>You picked an insight. Fill in the six pieces below and I'll assemble a ready-to-copy prompt. Your answers carry over where they apply.</p>
+      <h2 id="step2-heading">Step 2 — Build Your Prompt</h2>
+      <p id="step2-subheading">You picked an insight. Fill in the six pieces below and I'll assemble a ready-to-copy prompt. Your answers carry over where they apply.</p>
     </div>
     <div class="insight-switcher" id="insight-switcher">
-      <div class="insight-switcher-label">Building prompt for — click to switch:</div>
+      <div class="insight-switcher-label" id="switcher-label">Building prompt for — click to switch:</div>
       <div class="insight-switcher-buttons" id="switcher-buttons"></div>
     </div>
     <div class="selected-insight-pill" id="selected-insight-label"></div>
     <div class="fields-note" id="fields-note">Fields marked <strong style="color:var(--accent);">Shared</strong> carry over between insights. Update the others for each insight you build.</div>
     <div class="prompt-pieces" id="prompt-pieces">
-      <div class="piece"><div class="piece-label">01 — Your Role <span class="sticky-tag">Shared</span></div><textarea id="p-role" rows="2" placeholder="e.g. Sales Operations Analyst at a B2B tech company supporting a 40-person field sales org"></textarea><div class="piece-hint">Be specific — title, company type, team size, scope. Carries over between all insights.</div></div>
-      <div class="piece"><div class="piece-label">02 — What You Need</div><textarea id="p-need" rows="2" placeholder="e.g. A process doc converted into a branching decision tree so reps can self-serve without escalating to me"></textarea><div class="piece-hint">The exact output you want. What should exist when this is done?</div></div>
-      <div class="piece"><div class="piece-label">03 — The Context</div><textarea id="p-context" rows="3" placeholder="e.g. The SOP covers system access provisioning for new reps. It's a linear Word doc. Nobody reads it until something breaks."></textarea><div class="piece-hint">The specific situation, data, or background AI needs to do this well.</div></div>
-      <div class="piece"><div class="piece-label">04 — Who It's For</div><textarea id="p-audience" rows="2" placeholder="e.g. Field reps and cross-functional partners who need to self-serve without me explaining it"></textarea><div class="piece-hint">Who reads or uses this output?</div></div>
-      <div class="piece"><div class="piece-label">05 — Tone <span class="sticky-tag">Shared</span></div><textarea id="p-tone" rows="2" placeholder="e.g. Plain language, directive. No jargon, not formal. Just tell the reader exactly what to do."></textarea><div class="piece-hint">How should the response feel? Carries over between insights.</div></div>
-      <div class="piece"><div class="piece-label">06 — Format</div><textarea id="p-format" rows="2" placeholder="e.g. Branching decision tree — one trigger question at top, each branch ending in a specific action or owner"></textarea><div class="piece-hint">Headers, bullets, numbered list, table, narrative — and roughly how long?</div></div>
+      <div class="piece"><div class="piece-label" id="p-role-label">01 — Your Role <span class="sticky-tag">Shared</span></div><textarea id="p-role" rows="2" placeholder="e.g. Sales Operations Analyst at a B2B tech company supporting a 40-person field sales org" onblur="onPieceBlur()"></textarea><div class="piece-hint" id="p-role-hint">Be specific — title, company type, team size, scope. Carries over between all insights.</div></div>
+      <div class="piece"><div class="piece-label">02 — What You Need</div><textarea id="p-need" rows="2" placeholder="e.g. A process doc converted into a branching decision tree so reps can self-serve without escalating to me" onblur="onPieceBlur()"></textarea><div class="piece-hint">The exact output you want. What should exist when this is done?</div></div>
+      <div class="piece"><div class="piece-label">03 — The Context</div><textarea id="p-context" rows="3" placeholder="e.g. The SOP covers system access provisioning for new reps. It's a linear Word doc. Nobody reads it until something breaks." onblur="onPieceBlur()"></textarea><div class="piece-hint">The specific situation, data, or background AI needs to do this well.</div></div>
+      <div class="piece"><div class="piece-label" id="p-audience-label">04 — Who It's For</div><textarea id="p-audience" rows="2" placeholder="e.g. Field reps and cross-functional partners who need to self-serve without me explaining it" onblur="onPieceBlur()"></textarea><div class="piece-hint" id="p-audience-hint">Who reads or uses this output?</div></div>
+      <div class="piece"><div class="piece-label">05 — Tone <span class="sticky-tag">Shared</span></div><textarea id="p-tone" rows="2" placeholder="e.g. Plain language, directive. No jargon, not formal. Just tell the reader exactly what to do." onblur="onPieceBlur()"></textarea><div class="piece-hint">How should the response feel? Carries over between insights.</div></div>
+      <div class="piece"><div class="piece-label">06 — Format</div><textarea id="p-format" rows="2" placeholder="e.g. Branching decision tree — one trigger question at top, each branch ending in a specific action or owner" onblur="onPieceBlur()"></textarea><div class="piece-hint">Headers, bullets, numbered list, table, narrative — and roughly how long?</div></div>
     </div>
     <div style="display:flex; gap:12px; align-items:center; margin-top:4px; flex-wrap:wrap;">
       <button class="btn-primary" id="build-btn" onclick="buildPrompt()">Build My Prompt</button>
@@ -218,10 +330,15 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
       <button class="btn-action" id="copy-prompt-btn" onclick="copyCurrentPrompt(this)"><span>⎘</span> Copy Prompt</button>
       <button class="btn-action" onclick="copyAllPrompts(this)" id="copy-all-btn"><span>⎘</span> Copy All</button>
       <button class="btn-action" onclick="printSession()"><span>⬇</span> Save PDF</button>
+      <button class="btn-action" id="brief-btn" onclick="generateManagerBrief()" style="display:none;"><span>⬇</span> Manager Brief</button>
       <div class="action-bar-divider"></div>
       <button class="reset-link" onclick="resetTool()"><- Start Over</button>
     </div>
   </div>
+
+  <!-- Hidden print area for manager brief (PR3) -->
+  <div id="brief-print-area"></div>
+
   <footer class="footer">
     <div class="footer-left">Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a> · <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>Augmenting Human Potential, One Workflow at a Time</div>
     <div class="footer-right">HTML / Claude API</div>
@@ -229,7 +346,139 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
   </footer>
 </div>
 <script>
+  const SESSION_KEY = 'ai-role-revealer-session';
   let currentInsightIndex = 0, insights = [], promptStore = {}, sharedFields = { role: '', tone: '' };
+  let comfortLevel = '', selectedTool = '', managerMode = false;
+
+  // ── PR2: localStorage helpers ──────────────────────────────────────────────
+
+  function saveSession() {
+    try {
+      const state = {
+        insights, promptStore, sharedFields, comfortLevel, selectedTool, managerMode,
+        roleInput: document.getElementById('role-input').value
+      };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(state));
+    } catch(e) {}
+  }
+
+  function loadSessionData() {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; }
+  }
+
+  function resumeSession() {
+    const saved = loadSessionData();
+    if (!saved) return;
+    document.getElementById('resume-banner').classList.add('hidden');
+    applySessionState(saved);
+  }
+
+  function discardSession() {
+    localStorage.removeItem(SESSION_KEY);
+    document.getElementById('resume-banner').classList.add('hidden');
+  }
+
+  function applySessionState(state) {
+    comfortLevel = state.comfortLevel || '';
+    selectedTool = state.selectedTool || '';
+    managerMode = state.managerMode || false;
+    sharedFields = state.sharedFields || { role: '', tone: '' };
+    insights = state.insights || [];
+    promptStore = state.promptStore || {};
+
+    // restore UI state
+    if (comfortLevel) {
+      document.querySelectorAll('input[name="comfort"]').forEach(r => { if (r.value === comfortLevel) r.checked = true; });
+    }
+    if (selectedTool) {
+      document.getElementById('tool-select').value = selectedTool;
+    }
+    if (managerMode) applyManagerModeUI();
+
+    const roleInput = state.roleInput || '';
+    document.getElementById('role-input').value = roleInput;
+
+    if (insights.length > 0) {
+      renderInsights();
+      // if any prompts were built, show step2 section for first prompt
+      const firstWithPrompt = Object.keys(promptStore).find(k => promptStore[k] && promptStore[k].promptText);
+      if (firstWithPrompt != null) {
+        selectInsight(parseInt(firstWithPrompt));
+      }
+    }
+  }
+
+  function onComfortChange() {
+    const checked = document.querySelector('input[name="comfort"]:checked');
+    comfortLevel = checked ? checked.value : '';
+    saveSession();
+  }
+
+  function onToolChange() {
+    selectedTool = document.getElementById('tool-select').value;
+    saveSession();
+  }
+
+  function onPieceBlur() {
+    sharedFields.role = document.getElementById('p-role').value;
+    sharedFields.tone = document.getElementById('p-tone').value;
+    saveCurrentPieceState(currentInsightIndex);
+    saveSession();
+  }
+
+  // ── PR3: Mode toggle ───────────────────────────────────────────────────────
+
+  function setMode(mode) {
+    managerMode = (mode === 'manager');
+    document.getElementById('mode-employee').classList.toggle('active', !managerMode);
+    document.getElementById('mode-manager').classList.toggle('active', managerMode);
+    if (managerMode) {
+      applyManagerModeUI();
+    } else {
+      applyEmployeeModeUI();
+    }
+    saveSession();
+  }
+
+  function applyManagerModeUI() {
+    document.getElementById('mode-employee').classList.remove('active');
+    document.getElementById('mode-manager').classList.add('active');
+    document.getElementById('role-card-label').textContent = 'Your Team';
+    document.getElementById('role-input').placeholder = "Describe your team's responsibilities, structure, and where things currently break down.\n\nFor example: I lead an 8-person ops team supporting three business units. We spend most of our time firefighting — data requests, process exceptions, one-off reports. No standardized handoffs. New hires take 6 weeks to get up to speed independently...";
+    document.getElementById('analyze-btn').textContent = 'Reveal Team Gaps';
+    document.getElementById('status-1-text').textContent = 'Analyzing your team...';
+    document.getElementById('insights-heading').textContent = "Where AI can close your team's gaps";
+    document.getElementById('insights-subheading').textContent = 'Click any gap to build a rollout prompt for it. Build multiple to cover different parts of your team.';
+    document.getElementById('step2-heading').textContent = 'Step 2 — Build a Rollout Prompt';
+    document.getElementById('step2-subheading').textContent = "You picked a gap. Fill in the six pieces below and I'll assemble a ready-to-use rollout prompt you can use or hand to your team.";
+    document.getElementById('switcher-label').textContent = 'Building rollout prompt for — click to switch:';
+    document.getElementById('p-role-label').innerHTML = '01 — Your Team <span class="sticky-tag">Shared</span>';
+    document.getElementById('p-role').placeholder = 'e.g. 8-person ops team supporting three business units at a mid-size SaaS company';
+    document.getElementById('p-role-hint').textContent = 'Team size, function, company type. Carries over between all gaps.';
+    document.getElementById('p-audience-label').textContent = '04 — Affected Roles';
+    document.getElementById('p-audience-hint').textContent = 'Which roles on your team does this apply to? Pre-filled from the selected gap.';
+    document.getElementById('brief-btn').style.display = 'flex';
+  }
+
+  function applyEmployeeModeUI() {
+    document.getElementById('role-card-label').textContent = 'Your Role';
+    document.getElementById('role-input').placeholder = "Describe what you actually do — not your title. The meetings, the problems, the tasks that eat your time.\n\nFor example: I manage a team of 8 sales reps across three states. Every week I'm doing pipeline reviews, coaching deals that are stuck, running a forecast call with my VP, and trying to figure out why one territory is underperforming...";
+    document.getElementById('analyze-btn').textContent = "Reveal What's Possible";
+    document.getElementById('status-1-text').textContent = 'Analyzing your role...';
+    document.getElementById('insights-heading').textContent = 'What AI can do for your role';
+    document.getElementById('insights-subheading').textContent = 'Click any insight to build a prompt for it. You can build prompts for multiple insights — pick the ones that matter most.';
+    document.getElementById('step2-heading').textContent = 'Step 2 — Build Your Prompt';
+    document.getElementById('step2-subheading').textContent = "You picked an insight. Fill in the six pieces below and I'll assemble a ready-to-copy prompt. Your answers carry over where they apply.";
+    document.getElementById('switcher-label').textContent = 'Building prompt for — click to switch:';
+    document.getElementById('p-role-label').innerHTML = '01 — Your Role <span class="sticky-tag">Shared</span>';
+    document.getElementById('p-role').placeholder = 'e.g. Sales Operations Analyst at a B2B tech company supporting a 40-person field sales org';
+    document.getElementById('p-role-hint').textContent = 'Be specific — title, company type, team size, scope. Carries over between all insights.';
+    document.getElementById('p-audience-label').textContent = "04 — Who It's For";
+    document.getElementById('p-audience-hint').textContent = 'Who reads or uses this output?';
+    document.getElementById('brief-btn').style.display = 'none';
+  }
+
+  // ── Step 1: Role analysis ──────────────────────────────────────────────────
 
   async function runStep1() {
     const roleText = document.getElementById('role-input').value.trim();
@@ -237,18 +486,37 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
     const btn = document.getElementById('analyze-btn');
     const status = document.getElementById('status-1');
     btn.disabled = true; status.style.display = 'flex';
-    const systemPrompt = `You are the AI Role Revealer. Identify non-obvious, high-value ways AI could help someone in their specific role.
-Rules: Give exactly 4 insights. Each must be specific to what the person described. Name the actual task, the actual problem it solves, and why it matters. Never use: leverage, utilize, streamline, harness, empower, transform, revolutionize. Write like a smart colleague. Make insights non-obvious.
+
+    let systemPrompt, userContent;
+
+    if (managerMode) {
+      systemPrompt = `You are the AI Role Revealer, manager edition. Identify team-level AI training and adoption gaps — places where AI tools could reduce firefighting, standardize work, or cut onboarding time for a team.
+Rules: Give exactly 4 gaps. Each must be specific to what the manager described. Name the actual workflow or breakdown, what AI could fix, and why this matters at team scale. Never use: leverage, utilize, streamline, harness, empower, transform, revolutionize. Write like a smart colleague. Make gaps non-obvious — skip "use AI to write emails."
+For each gap, classify accessLevel: "no_special_access" if the team can act today with standard tools; "needs_approval" if it requires new tools, data permissions, or manager/IT sign-off.
 Respond ONLY in this JSON format (no markdown, no backticks):
-{"insights": [{"title": "Short action-oriented title (5-8 words)","body": "2-3 sentences: what AI does, what problem it solves, why it matters. Be concrete."}]}`;
+{"gaps": [{"title": "Short action-oriented title (5-8 words)","body": "2-3 sentences: what breaks down, how AI closes it, what the team gains.","affectedRoles": "Which roles or functions this gap hits most.","accessLevel": "no_special_access" | "needs_approval"}]}`;
+      userContent = roleText;
+      if (comfortLevel) userContent += `\n\nThe manager's AI comfort level is: ${comfortLevel}. Calibrate insight depth and reassurance accordingly — more hand-holding and "here's literally where to start" for beginners, more advanced/non-obvious angles for regular users.`;
+    } else {
+      systemPrompt = `You are the AI Role Revealer. Identify non-obvious, high-value ways AI could help someone in their specific role.
+Rules: Give exactly 4 insights. Each must be specific to what the person described. Name the actual task, the actual problem it solves, and why it matters. Never use: leverage, utilize, streamline, harness, empower, transform, revolutionize. Write like a smart colleague. Make insights non-obvious.
+For each insight, classify accessLevel: "no_special_access" if the person can try this today with what they already have; "needs_approval" if it requires new tool access, data permissions, or manager sign-off.
+Respond ONLY in this JSON format (no markdown, no backticks):
+{"insights": [{"title": "Short action-oriented title (5-8 words)","body": "2-3 sentences: what AI does, what problem it solves, why it matters. Be concrete.","accessLevel": "no_special_access" | "needs_approval"}]}`;
+      userContent = roleText;
+      if (comfortLevel) userContent += `\n\nThe person's AI comfort level is: ${comfortLevel}. Calibrate insight depth and reassurance accordingly — more hand-holding and "here's literally where to start" for beginners, more advanced/non-obvious angles for regular users.`;
+    }
+
     try {
-      const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: roleText }] }) });
+      const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userContent }] }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error?.message || data.error || 'API error');
       const rawText = data.content[0].text.trim();
       let parsed;
       try { parsed = JSON.parse(rawText); } catch { const match = rawText.match(/\{[\s\S]*\}/); if (match) parsed = JSON.parse(match[0]); else throw new Error('Could not parse response.'); }
-      insights = parsed.insights;
+      // normalize gaps → insights for unified rendering
+      insights = managerMode ? parsed.gaps : parsed.insights;
+      saveSession();
       renderInsights();
     } catch (err) { alert('Something went wrong: ' + err.message); }
     finally { btn.disabled = false; status.style.display = 'none'; }
@@ -258,15 +526,27 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     document.getElementById('step1-section').style.display = 'none';
     const list = document.getElementById('insights-list');
     list.innerHTML = '';
+    const label = managerMode ? 'Gap' : 'Insight';
     insights.forEach((insight, i) => {
       const card = document.createElement('div');
       card.className = 'insight-card'; card.id = 'insight-card-' + i;
-      card.innerHTML = `<div class="insight-num">Insight ${String(i+1).padStart(2,'0')}<span class="prompt-done-badge" id="badge-${i}" style="display:none;">✓ Prompt Built</span></div><div class="insight-title">${escapeHtml(insight.title)}</div><div class="insight-body">${escapeHtml(insight.body)}</div><div class="insight-select-hint">→ Build Prompt</div>`;
+      const accessBadge = renderAccessBadge(insight.accessLevel);
+      const affectedLine = (managerMode && insight.affectedRoles) ? `<div style="font-size:13px;color:var(--text-dim);margin-top:8px;letter-spacing:0.04em;">Affects: ${escapeHtml(insight.affectedRoles)}</div>` : '';
+      card.innerHTML = `<div class="insight-num">${label} ${String(i+1).padStart(2,'0')}<span class="prompt-done-badge" id="badge-${i}" style="display:none;">✓ Prompt Built</span>${accessBadge}</div><div class="insight-title">${escapeHtml(insight.title)}</div><div class="insight-body">${escapeHtml(insight.body)}</div>${affectedLine}<div class="insight-select-hint">→ Build Prompt</div>`;
       card.onclick = () => selectInsight(i);
       list.appendChild(card);
     });
     document.getElementById('insights-section').style.display = 'block';
     updateProgress(1.5);
+  }
+
+  function renderAccessBadge(accessLevel) {
+    if (accessLevel === 'no_special_access') {
+      return '<span class="access-badge no-access">✓ No special access needed</span>';
+    } else if (accessLevel === 'needs_approval') {
+      return '<span class="access-badge needs-approval">⚑ May need approval</span>';
+    }
+    return '';
   }
 
   function selectInsight(idx) {
@@ -283,10 +563,29 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     document.getElementById('p-role').value = sharedFields.role;
     document.getElementById('p-tone').value = sharedFields.tone;
     const saved = promptStore[idx];
-    if (saved && saved.pieces) { document.getElementById('p-need').value = saved.pieces.need || ''; document.getElementById('p-context').value = saved.pieces.context || ''; document.getElementById('p-audience').value = saved.pieces.audience || ''; document.getElementById('p-format').value = saved.pieces.format || ''; }
-    else { ['p-need','p-context','p-audience','p-format'].forEach(id => { document.getElementById(id).value = ''; }); }
-    if (saved && saved.promptText) { document.getElementById('prompt-output-box').textContent = saved.promptText; document.getElementById('current-prompt-area').style.display = 'block'; document.getElementById('prompt-output-section').style.display = 'block'; updateSessionSummary(); }
-    else { document.getElementById('prompt-output-section').style.display = 'none'; }
+    if (saved && saved.pieces) {
+      document.getElementById('p-need').value = saved.pieces.need || '';
+      document.getElementById('p-context').value = saved.pieces.context || '';
+      document.getElementById('p-audience').value = saved.pieces.audience || '';
+      document.getElementById('p-format').value = saved.pieces.format || '';
+    } else {
+      ['p-need','p-context','p-format'].forEach(id => { document.getElementById(id).value = ''; });
+      // pre-fill audience from affectedRoles in manager mode
+      if (managerMode && insights[idx].affectedRoles) {
+        document.getElementById('p-audience').value = insights[idx].affectedRoles;
+      } else {
+        document.getElementById('p-audience').value = '';
+      }
+    }
+    if (saved && saved.promptText) {
+      document.getElementById('prompt-output-box').textContent = saved.promptText;
+      document.getElementById('current-prompt-area').style.display = 'block';
+      document.getElementById('prompt-output-section').style.display = 'block';
+      if (managerMode) document.getElementById('brief-btn').style.display = 'flex';
+      updateSessionSummary();
+    } else {
+      document.getElementById('prompt-output-section').style.display = 'none';
+    }
     setTimeout(() => { document.getElementById('step2-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
   }
 
@@ -313,21 +612,31 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     if (Object.values(pieces).filter(v => v.length > 0).length < 3) { alert('Fill in at least 3 of the 6 pieces.'); return; }
     const btn = document.getElementById('build-btn'); const status = document.getElementById('status-2');
     btn.disabled = true; status.style.display = 'flex';
-    const systemPrompt = `You are an expert at writing AI prompts for working professionals. Write a single, complete, ready-to-use prompt the person can paste into any AI tool. Rules: Write in second person. Include all six pieces naturally. Read as if the person wrote it. Make it specific. 100-200 words. No meta-commentary. Start directly.`;
+
+    const systemPrompt = managerMode
+      ? `You are an expert at writing AI rollout prompts for managers and team leads. Write a single, complete, ready-to-use prompt the manager can paste into any AI tool or hand to their team. Rules: Write in second person. Include all six pieces naturally. Speak to the team-level use case, not just one person. Make it specific. 100-200 words. No meta-commentary. Start directly.`
+      : `You are an expert at writing AI prompts for working professionals. Write a single, complete, ready-to-use prompt the person can paste into any AI tool. Rules: Write in second person. Include all six pieces naturally. Read as if the person wrote it. Make it specific. 100-200 words. No meta-commentary. Start directly.`;
+
     const selectedInsight = insights[currentInsightIndex];
-    const userMessage = `Selected insight: ${selectedInsight.title}\nInsight detail: ${selectedInsight.body}\n\nPrompt pieces:\n- Role: ${pieces.role||'(not provided)'}\n- What I need: ${pieces.need||'(not provided)'}\n- Context: ${pieces.context||'(not provided)'}\n- Who it's for: ${pieces.audience||'(not provided)'}\n- Tone: ${pieces.tone||'(not provided)'}\n- Format: ${pieces.format||'(not provided)'}\n\nWrite the ready-to-use prompt.`;
+    const tool = selectedTool || 'not specified';
+    const affectedNote = (managerMode && selectedInsight.affectedRoles) ? `\n- Affected roles: ${selectedInsight.affectedRoles}` : '';
+    const userMessage = `Selected ${managerMode ? 'gap' : 'insight'}: ${selectedInsight.title}\n${managerMode ? 'Gap' : 'Insight'} detail: ${selectedInsight.body}${affectedNote}\n\nPrompt pieces:\n- ${managerMode ? 'Team' : 'Role'}: ${pieces.role||'(not provided)'}\n- What I need: ${pieces.need||'(not provided)'}\n- Context: ${pieces.context||'(not provided)'}\n- ${managerMode ? 'Affected roles' : "Who it's for"}: ${pieces.audience||'(not provided)'}\n- Tone: ${pieces.tone||'(not provided)'}\n- Format: ${pieces.format||'(not provided)'}\n\nThe person's primary AI tool is: ${tool}. Write the prompt assuming this tool, referencing its actual capabilities where relevant (e.g., file upload, memory, agents) without naming competitors.\n\nWrite the ready-to-use prompt.`;
+
     try {
       const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error?.message || data.error || 'API error');
       const promptText = data.content[0].text.trim();
       if (!promptStore[currentInsightIndex]) promptStore[currentInsightIndex] = {};
-      promptStore[currentInsightIndex].promptText = promptText; promptStore[currentInsightIndex].pieces = pieces;
+      promptStore[currentInsightIndex].promptText = promptText;
+      promptStore[currentInsightIndex].pieces = pieces;
       document.getElementById('prompt-output-box').textContent = promptText;
       document.getElementById('current-prompt-area').style.display = 'block';
       document.getElementById('prompt-output-section').style.display = 'block';
+      if (managerMode) document.getElementById('brief-btn').style.display = 'flex';
       document.getElementById('badge-'+currentInsightIndex).style.display = 'inline-block';
       document.getElementById('insight-card-'+currentInsightIndex).classList.add('has-prompt');
+      saveSession();
       updateSessionSummary(); renderSwitcherButtons();
       setTimeout(() => { document.getElementById('prompt-output-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
     } catch (err) { alert('Something went wrong: ' + err.message); }
@@ -338,11 +647,14 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     const completedKeys = Object.keys(promptStore).filter(k => promptStore[k] && promptStore[k].promptText);
     const list = document.getElementById('session-summary-list');
     if (completedKeys.length === 0) { document.getElementById('session-summary').style.display = 'none'; return; }
+    const label = managerMode ? 'Gap' : 'Insight';
     list.innerHTML = '';
     completedKeys.forEach(k => {
       const i = parseInt(k); const ins = insights[i]; const pt = promptStore[i].promptText;
+      const accessBadge = ins.accessLevel ? (ins.accessLevel === 'no_special_access' ? '<span class="access-badge no-access">✓ No special access needed</span>' : '<span class="access-badge needs-approval">⚑ May need approval</span>') : '';
+      const affectedLine = (managerMode && ins.affectedRoles) ? `<div style="font-size:13px;color:var(--text-dim);margin-top:6px;">Affects: ${escapeHtml(ins.affectedRoles)}</div>` : '';
       const div = document.createElement('div'); div.className = 'prompt-summary-item';
-      div.innerHTML = `<div class="prompt-summary-insight"><div class="psi-num">Insight ${String(i+1).padStart(2,'0')}</div><div class="psi-title">${escapeHtml(ins.title)}</div><div class="psi-body">${escapeHtml(ins.body)}</div></div><div class="prompt-summary-prompt"><div class="prompt-summary-header">↳ Built Prompt</div>${escapeHtml(pt)}</div>`;
+      div.innerHTML = `<div class="prompt-summary-insight"><div class="psi-num">${label} ${String(i+1).padStart(2,'0')}</div><div class="psi-title">${escapeHtml(ins.title)}</div><div class="psi-body">${escapeHtml(ins.body)}</div>${affectedLine}<div class="psi-access" style="margin-top:8px;">${accessBadge}</div></div><div class="prompt-summary-prompt"><div class="prompt-summary-header">↳ Built Prompt</div>${escapeHtml(pt)}</div>`;
       list.appendChild(div);
     });
     document.getElementById('session-summary').style.display = completedKeys.length > 1 ? 'block' : 'none';
@@ -350,7 +662,12 @@ Respond ONLY in this JSON format (no markdown, no backticks):
   }
 
   function copyInsights(btn) {
-    const lines = insights.map((ins, i) => `INSIGHT ${String(i+1).padStart(2,'0')}: ${ins.title}\n${ins.body}`).join('\n\n---\n\n');
+    const label = managerMode ? 'GAP' : 'INSIGHT';
+    const lines = insights.map((ins, i) => {
+      const accessNote = ins.accessLevel === 'no_special_access' ? 'No special access needed' : ins.accessLevel === 'needs_approval' ? 'May need approval' : '';
+      const affectedNote = (managerMode && ins.affectedRoles) ? `\nAffects: ${ins.affectedRoles}` : '';
+      return `${label} ${String(i+1).padStart(2,'0')}: ${ins.title}\n${ins.body}${affectedNote}${accessNote ? '\n[' + accessNote + ']' : ''}`;
+    }).join('\n\n---\n\n');
     navigator.clipboard.writeText(lines).then(() => { btn.textContent = '✓ Copied'; btn.classList.add('copied'); setTimeout(() => { btn.innerHTML = '<span>⎘</span> Copy Insights'; btn.classList.remove('copied'); }, 2000); });
   }
 
@@ -361,30 +678,89 @@ Respond ONLY in this JSON format (no markdown, no backticks):
   function copyAllPrompts(btn) {
     const completedKeys = Object.keys(promptStore).filter(k => promptStore[k] && promptStore[k].promptText);
     if (!completedKeys.length) { alert('No prompts built yet.'); return; }
-    const text = completedKeys.map(k => { const i = parseInt(k); return `INSIGHT ${String(i+1).padStart(2,'0')}: ${insights[i].title}\n\n${insights[i].body}\n\n↳ PROMPT:\n${promptStore[i].promptText}`; }).join('\n\n' + '='.repeat(60) + '\n\n');
+    const label = managerMode ? 'GAP' : 'INSIGHT';
+    const text = completedKeys.map(k => {
+      const i = parseInt(k);
+      const ins = insights[i];
+      const accessNote = ins.accessLevel === 'no_special_access' ? 'No special access needed' : ins.accessLevel === 'needs_approval' ? 'May need approval' : '';
+      const affectedNote = (managerMode && ins.affectedRoles) ? `\nAffects: ${ins.affectedRoles}` : '';
+      return `${label} ${String(i+1).padStart(2,'0')}: ${ins.title}\n\n${ins.body}${affectedNote}${accessNote ? '\n[' + accessNote + ']' : ''}\n\n↳ PROMPT:\n${promptStore[i].promptText}`;
+    }).join('\n\n' + '='.repeat(60) + '\n\n');
     navigator.clipboard.writeText(text).then(() => { btn.textContent = '✓ Copied All'; btn.classList.add('copied'); setTimeout(() => { btn.innerHTML = '<span>⎘</span> Copy All'; btn.classList.remove('copied'); }, 2000); });
   }
 
-  function printInsights() { document.body.classList.remove('print-session'); document.body.classList.add('print-insights'); window.print(); setTimeout(() => document.body.classList.remove('print-insights'), 1000); }
+  function printInsights() { document.body.classList.remove('print-session', 'print-brief'); document.body.classList.add('print-insights'); window.print(); setTimeout(() => document.body.classList.remove('print-insights'), 1000); }
 
   function printSession() {
     const completedKeys = Object.keys(promptStore).filter(k => promptStore[k] && promptStore[k].promptText);
     if (completedKeys.length <= 1) { document.getElementById('session-summary').style.display = 'none'; document.getElementById('current-prompt-area').style.display = 'block'; }
     else { document.getElementById('current-prompt-area').style.display = 'none'; updateSessionSummary(); document.getElementById('session-summary').style.display = 'block'; }
-    document.body.classList.remove('print-insights'); document.body.classList.add('print-session'); window.print();
+    document.body.classList.remove('print-insights', 'print-brief'); document.body.classList.add('print-session'); window.print();
     setTimeout(() => { document.body.classList.remove('print-session'); updateSessionSummary(); document.getElementById('current-prompt-area').style.display = 'block'; }, 1000);
+  }
+
+  // PR3: Manager Brief export ────────────────────────────────────────────────
+
+  function generateManagerBrief() {
+    const ins = insights[currentInsightIndex];
+    const pt = promptStore[currentInsightIndex] && promptStore[currentInsightIndex].promptText;
+    if (!pt) { alert('Build the prompt first before generating a brief.'); return; }
+
+    const accessLine = ins.accessLevel === 'no_special_access'
+      ? 'No special access needed — your team can act on this today with existing tools.'
+      : 'This may require approval: new tool access, data permissions, or IT/manager sign-off may be needed before rolling out.';
+
+    const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const briefEl = document.getElementById('brief-print-area');
+    briefEl.innerHTML = `
+      <div class="brief-header">
+        <div class="brief-title">${escapeHtml(ins.title)}</div>
+        <div class="brief-subtitle">Manager brief — generated ${dateStr}</div>
+      </div>
+      <div class="brief-section">
+        <div class="brief-section-label">Business Case</div>
+        <div class="brief-section-body">${escapeHtml(ins.body)}</div>
+      </div>
+      ${ins.affectedRoles ? `<div class="brief-section"><div class="brief-section-label">Affected Roles</div><div class="brief-section-body">${escapeHtml(ins.affectedRoles)}</div></div>` : ''}
+      <div class="brief-access-note">${escapeHtml(accessLine)}</div>
+      <div class="brief-section">
+        <div class="brief-section-label">Suggested First Step</div>
+        <div class="brief-prompt-box">${escapeHtml(pt)}</div>
+      </div>
+      <div class="brief-footer">
+        <span>Generated by AI Role Revealer — luis-figueroa-ops.github.io</span>
+        <span>${dateStr}</span>
+      </div>
+    `;
+
+    document.body.classList.remove('print-insights', 'print-session');
+    document.body.classList.add('print-brief');
+    window.print();
+    setTimeout(() => { document.body.classList.remove('print-brief'); briefEl.innerHTML = ''; }, 1000);
   }
 
   function resetTool() {
     if (!confirm('Start over? This will clear all insights and prompts.')) return;
-    document.getElementById('role-input').value = ''; document.getElementById('insights-list').innerHTML = '';
-    document.getElementById('insights-section').style.display = 'none'; document.getElementById('step1-section').style.display = 'block';
-    document.getElementById('step2-section').style.display = 'none'; document.getElementById('divider-2').style.display = 'none';
+    localStorage.removeItem(SESSION_KEY);
+    document.getElementById('role-input').value = '';
+    document.getElementById('insights-list').innerHTML = '';
+    document.getElementById('insights-section').style.display = 'none';
+    document.getElementById('step1-section').style.display = 'block';
+    document.getElementById('step2-section').style.display = 'none';
+    document.getElementById('divider-2').style.display = 'none';
     document.getElementById('prompt-output-section').style.display = 'none';
     document.getElementById('prog-1').classList.add('active'); document.getElementById('prog-1').classList.remove('done');
     document.getElementById('prog-2').classList.remove('active');
     ['p-role','p-need','p-context','p-audience','p-tone','p-format'].forEach(id => { document.getElementById(id).value = ''; });
+    document.querySelectorAll('input[name="comfort"]').forEach(r => r.checked = false);
+    document.getElementById('tool-select').value = '';
     insights = []; promptStore = {}; sharedFields = { role: '', tone: '' }; currentInsightIndex = 0;
+    comfortLevel = ''; selectedTool = '';
+    // reset to employee mode
+    managerMode = false; applyEmployeeModeUI();
+    document.getElementById('mode-employee').classList.add('active');
+    document.getElementById('mode-manager').classList.remove('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -393,9 +769,16 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     if (step >= 2) { document.getElementById('prog-2').classList.add('active'); }
   }
 
-  function escapeHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function escapeHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  document.addEventListener('DOMContentLoaded', () => { document.getElementById('copy-all-btn').style.display = 'none'; });
+  // PR2: On load, check for saved session ───────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('copy-all-btn').style.display = 'none';
+    const saved = loadSessionData();
+    if (saved && (saved.insights && saved.insights.length > 0)) {
+      document.getElementById('resume-banner').classList.remove('hidden');
+    }
+  });
 </script>
 </body>
 </html>
