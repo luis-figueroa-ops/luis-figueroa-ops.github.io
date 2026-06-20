@@ -761,7 +761,14 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
         Your prompt is already well-structured. Use the export buttons below to copy and test it.
       </div>
 
-      <button class="btn-primary" id="buildBtn" onclick="buildAssembledPrompt()" style="width:100%;margin-top:4px;margin-bottom:28px;">Build My Coached Prompt</button>
+      <div style="margin-top:4px;margin-bottom:12px;padding:14px 18px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="polishWithAI" style="margin-top:3px;accent-color:#C9A84C;width:15px;height:15px;flex-shrink:0;">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1px;color:#F0EDE6;line-height:1.6;"><strong style="color:#C9A84C;">Polish with AI</strong> <span style="color:#888;font-size:12px;">(optional)</span><br><span style="font-size:12px;color:#888;">Unchecked = instant local assembly, free. &nbsp;Checked = AI weaves your fields into natural prose.</span></span>
+        </label>
+      </div>
+      <button class="btn-primary" id="buildBtn" onclick="buildAssembledPrompt()" style="width:100%;margin-bottom:10px;">Build My Coached Prompt</button>
+      <div id="buildStatus" style="display:none;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;color:#888;text-transform:uppercase;text-align:center;padding:6px 0;margin-bottom:18px;">Assembling your prompt with AI...</div>
 
       <div id="assembledSection" style="display:none;">
         <div class="label" style="margin-bottom:12px;">Your Coached Prompt</div>
@@ -1311,7 +1318,48 @@ function updateFieldBadge(ruleId) {
   setBadgeStatus(ruleId, rule.check(value));
 }
 
-function buildAssembledPrompt() {
+async function buildAssembledPrompt() {
+  const polishAI = document.getElementById('polishWithAI') && document.getElementById('polishWithAI').checked;
+  if (polishAI) {
+    const original = document.getElementById('promptInput').value.trim();
+    const fieldParts = [];
+    document.querySelectorAll('.coach-field-input').forEach(field => {
+      const val = field.value.trim();
+      if (val) fieldParts.push(field.dataset.criterionName + ': ' + val);
+    });
+    const buildBtn = document.getElementById('buildBtn');
+    const buildStatus = document.getElementById('buildStatus');
+    buildBtn.disabled = true;
+    buildStatus.style.display = 'block';
+    try {
+      const resp = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ max_tokens: 500, system: 'Take these prompt-coaching field answers and weave them into one natural, well-written prompt — not a bulleted list of the fields. Write in second person, as if the user wrote it. 100-200 words. No meta-commentary, no markdown formatting, start directly.', messages: [{ role: 'user', content: 'Original prompt: ' + original + '\n\nField answers:\n' + fieldParts.join('\n') }] })
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error?.message || data.error || 'API error');
+      const assembled = data.content[0].text.trim();
+      baseCoached = assembled;
+      resetRefineState();
+      document.getElementById('coachedText').textContent = assembled;
+      const assembledSection = document.getElementById('assembledSection');
+      assembledSection.style.display = 'block';
+      assembledSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showToast('Coached prompt assembled with AI');
+    } catch(err) {
+      showToast('AI unavailable — using local assembly');
+      runLocalAssembly();
+    } finally {
+      buildBtn.disabled = false;
+      buildStatus.style.display = 'none';
+    }
+    return;
+  }
+  runLocalAssembly();
+}
+
+function runLocalAssembly() {
   const original = document.getElementById('promptInput').value.trim();
   const additions = [];
   let openingInstruction = '';

@@ -162,6 +162,12 @@
     .footer-right { font-size: 13px; color: var(--text-dim); letter-spacing: 0.05em; }
     .hidden { display: none !important; }
 
+    /* Step 1 read-only summary */
+    .step1-summary-box { background: #13131e; border: 1px solid #2e2e48; padding: 20px 26px; margin-bottom: 20px; }
+    .step1-summary-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; font-family: var(--sans); font-weight: 600; }
+    .step1-summary-row { font-size: 14px; color: var(--text-muted); line-height: 1.8; }
+    .step1-summary-text { color: var(--text); white-space: pre-wrap; font-size: 15px; margin-top: 10px; line-height: 1.8; border-top: 1px solid var(--border); padding-top: 10px; }
+
     /* Hidden print area (screen: hidden) */
     #full-print-area { display: none; }
 
@@ -227,6 +233,7 @@
     <div class="progress-step" id="prog-2"><div class="progress-dot"></div>Step 2 — Build Prompt</div>
   </div>
   <div id="step1-section">
+    <div id="step1-form">
     <!-- Employee / Manager toggle -->
     <div class="mode-toggle" id="mode-toggle">
       <button class="mode-btn active" id="mode-employee" onclick="setMode('employee')">I'm an Employee</button>
@@ -268,12 +275,15 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
         <div class="status-line" id="status-1" style="display:none;"><div class="dot-pulse"><span></span><span></span><span></span></div><span id="status-1-text">Analyzing your role...</span></div>
       </div>
     </div>
+    </div><!-- /step1-form -->
+    <div id="step1-summary" style="display:none;"></div>
   </div>
 
   <div id="insights-section">
     <div class="insights-header">
       <h2 id="insights-heading">What AI can do for your role</h2>
       <p id="insights-subheading">Click any insight to build a prompt for it. You can build prompts for multiple insights — pick the ones that matter most.</p>
+      <p style="font-size:13px;margin-top:10px;color:var(--text-dim);letter-spacing:0.04em;"><span style="color:var(--accent);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-size:11px;">Step 2 is optional</span> — the insights above are useful on their own. Build a prompt only if you want a ready-to-paste version for your AI tool.</p>
     </div>
     <div id="insights-list"></div>
     <div class="action-bar" id="insights-action-bar">
@@ -546,9 +556,24 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     finally { btn.disabled = false; status.style.display = 'none'; }
   }
 
+  function renderStep1Summary() {
+    document.getElementById('step1-form').style.display = 'none';
+    const summary = document.getElementById('step1-summary');
+    const mode = managerMode ? 'Manager / Team Lead' : 'Employee';
+    const comfort = comfortLevel || 'Not specified';
+    const tool = selectedTool || 'Not specified';
+    const roleText = document.getElementById('role-input').value.trim();
+    summary.innerHTML = `<div class="step1-summary-box">
+      <div class="step1-summary-label">Your Inputs</div>
+      <div class="step1-summary-row"><strong>Mode:</strong> ${escapeHtml(mode)} &nbsp;·&nbsp; <strong>AI Comfort:</strong> ${escapeHtml(comfort)} &nbsp;·&nbsp; <strong>Tool:</strong> ${escapeHtml(tool)}</div>
+      <div class="step1-summary-text">${escapeHtml(roleText)}</div>
+    </div>`;
+    summary.style.display = 'block';
+  }
+
   // skipAnimation=true used on session restore so cards appear instantly
   function renderInsights(skipAnimation) {
-    document.getElementById('step1-section').style.display = 'none';
+    renderStep1Summary();
     const list = document.getElementById('insights-list');
     list.innerHTML = '';
     const label = managerMode ? 'Gap' : 'Insight';
@@ -833,7 +858,9 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     document.getElementById('role-input').value = '';
     document.getElementById('insights-list').innerHTML = '';
     document.getElementById('insights-section').style.display = 'none';
-    document.getElementById('step1-section').style.display = 'block';
+    document.getElementById('step1-form').style.display = 'block';
+    document.getElementById('step1-summary').style.display = 'none';
+    document.getElementById('step1-summary').innerHTML = '';
     document.getElementById('step2-section').style.display = 'none';
     document.getElementById('divider-2').style.display = 'none';
     document.getElementById('prompt-output-section').style.display = 'none';
