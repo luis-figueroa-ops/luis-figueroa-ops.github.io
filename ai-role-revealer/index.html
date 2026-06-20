@@ -319,7 +319,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
       <div class="prompt-output-box" id="prompt-output-box"></div>
     </div>
     <div class="action-bar" style="margin-top:20px;">
-      <button class="btn-action" id="copy-prompt-btn" onclick="copyCurrentPrompt(this)"><span>⎘</span> Copy Prompt</button>
+      <button class="btn-action" id="copy-prompt-btn" onclick="copyCurrentPrompt(this)"><span>⍘</span> Copy Prompt</button>
       <button class="btn-action" onclick="printFullSession()"><span>⬇</span> Save Full Session PDF</button>
       <button class="btn-action" id="brief-btn" onclick="generateManagerBrief()" style="display:none;"><span>⬇</span> Manager Brief</button>
       <div class="action-bar-divider"></div>
@@ -344,7 +344,22 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
   // Fixed palette — one color per insight index, consistent across cards, switcher, prompt output
   const INSIGHT_COLORS = ['#6c63ff', '#43e8c8', '#ff6584', '#f0c14b'];
 
-  // ── Session persistence ────────────────────────────────────────────
+  // Tunable typewriter speed — adjust this constant to change feel site-wide
+  const TYPEWRITER_MS = 14; // ms per character
+
+  // Writes text into element.textContent incrementally; calls onDone when finished
+  function typewriterReveal(element, text, speed, onDone) {
+    element.textContent = '';
+    let i = 0;
+    function tick() {
+      if (i >= text.length) { if (onDone) onDone(); return; }
+      element.textContent += text[i++];
+      setTimeout(tick, speed);
+    }
+    tick();
+  }
+
+  // ── Session persistence ─────────────────────────────────────────────────
 
   function saveSession() {
     try {
@@ -440,7 +455,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
     saveSession();
   }
 
-  // ── Mode toggle ───────────────────────────────────────────────────
+  // ── Mode toggle ─────────────────────────────────────────────────────
 
   function setMode(mode) {
     managerMode = (mode === 'manager');
@@ -488,7 +503,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
     document.getElementById('brief-btn').style.display = 'none';
   }
 
-  // ── Step 1: Role analysis ──────────────────────────────────────────
+  // ── Step 1: Role analysis ──────────────────────────────────────────────
 
   async function runStep1() {
     const roleText = document.getElementById('role-input').value.trim();
@@ -555,22 +570,35 @@ Respond ONLY in this JSON format (no markdown, no backticks):
           <span class="prompt-done-badge" id="badge-${i}" style="${doneBadgeStyle}">✓ Prompt Built</span>
           ${accessBadge}
         </div>
-        <div class="insight-title">${escapeHtml(insight.title)}</div>
-        <div class="insight-body">${escapeHtml(insight.body)}</div>
+        <div class="insight-title" id="insight-title-${i}"></div>
+        <div class="insight-body" id="insight-body-${i}"></div>
         ${affectedLine}
         <div class="insight-select-hint" style="color:${color}">→ Build Prompt</div>`;
       card.onclick = () => selectInsight(i);
 
       if (skipAnimation) {
+        // Session restore: fill text instantly, no animation
+        card.querySelector('#insight-title-' + i).textContent = insight.title;
+        card.querySelector('#insight-body-' + i).textContent = insight.body;
         list.appendChild(card);
       } else {
         card.style.cssText += '; opacity: 0; transform: translateY(14px);';
         list.appendChild(card);
+        // Stagger card entrance, then typewriter-reveal title then body
+        const cardDelay = 80 + i * 150;
         setTimeout(() => {
-          card.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+          card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
           card.style.opacity = '1';
           card.style.transform = 'translateY(0)';
-        }, 60 + i * 260);
+          // Start title reveal shortly after card fades in
+          setTimeout(() => {
+            const titleEl = document.getElementById('insight-title-' + i);
+            const bodyEl  = document.getElementById('insight-body-' + i);
+            typewriterReveal(titleEl, insight.title, TYPEWRITER_MS, () => {
+              typewriterReveal(bodyEl, insight.body, TYPEWRITER_MS, null);
+            });
+          }, 300);
+        }, cardDelay);
       }
     });
 
@@ -690,11 +718,12 @@ Respond ONLY in this JSON format (no markdown, no backticks):
       promptStore[currentInsightIndex].pieces = pieces;
 
       const color = INSIGHT_COLORS[currentInsightIndex % INSIGHT_COLORS.length];
-      document.getElementById('prompt-output-box').textContent = promptText;
-      document.getElementById('prompt-output-box').style.borderLeftColor = color;
+      const outputBox = document.getElementById('prompt-output-box');
+      outputBox.style.borderLeftColor = color;
       document.getElementById('current-prompt-area').style.display = 'block';
       document.getElementById('prompt-output-section').style.display = 'block';
       if (managerMode) document.getElementById('brief-btn').style.display = 'flex';
+      typewriterReveal(outputBox, promptText, TYPEWRITER_MS, null);
 
       const badge = document.getElementById('badge-'+currentInsightIndex);
       badge.style.display = 'inline-flex';
@@ -709,7 +738,7 @@ Respond ONLY in this JSON format (no markdown, no backticks):
   }
 
   function copyCurrentPrompt(btn) {
-    navigator.clipboard.writeText(document.getElementById('prompt-output-box').textContent).then(() => { btn.textContent = '✓ Copied'; btn.classList.add('copied'); setTimeout(() => { btn.innerHTML = '<span>⎘</span> Copy Prompt'; btn.classList.remove('copied'); }, 2000); });
+    navigator.clipboard.writeText(document.getElementById('prompt-output-box').textContent).then(() => { btn.textContent = '✓ Copied'; btn.classList.add('copied'); setTimeout(() => { btn.innerHTML = '<span>⍘</span> Copy Prompt'; btn.classList.remove('copied'); }, 2000); });
   }
 
   function printInsights() {
