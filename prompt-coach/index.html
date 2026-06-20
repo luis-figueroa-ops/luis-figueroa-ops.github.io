@@ -994,6 +994,14 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
           <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5"/><path d="M10 16h12M16 10v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           Copilot
         </button>
+        <button class="btn-ai" onclick="openAI('grok')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l10 10M21 11L11 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Grok
+        </button>
+        <button class="btn-ai" onclick="openAI('perplexity')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1.5"/><path d="M16 8v16M10 12h12M10 20h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Perplexity
+        </button>
       </div>
     </div>
 
@@ -1737,10 +1745,12 @@ function savePDF() {
 }
 
 const AI_URLS = {
-  claude:  'https://claude.ai/new',
-  chatgpt: 'https://chatgpt.com/',
-  gemini:  'https://gemini.google.com/app',
-  copilot: 'https://copilot.microsoft.com/'
+  claude:     'https://claude.ai/new',
+  chatgpt:    'https://chatgpt.com/',
+  gemini:     'https://gemini.google.com/app',
+  copilot:    'https://copilot.microsoft.com/',
+  grok:       'https://grok.com/',
+  perplexity: 'https://www.perplexity.ai/'
 };
 
 function openAI(which) {
