@@ -683,6 +683,162 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   to   { opacity: 1; transform: translateY(0); }
 }
 .fade-up { animation: fadeUp 0.5s ease both; }
+
+/* ── SCORE TREND ── */
+.score-trend {
+  margin-top: 14px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+.score-trend .trend-val { font-size: 14px; color: var(--white); margin-left: 4px; }
+.score-trend .trend-up { color: var(--green); }
+.score-trend .trend-down { color: var(--red); }
+.score-trend .trend-same { color: var(--muted); }
+.score-trend-clear {
+  background: none; border: none; color: var(--muted); font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  padding: 0; margin-left: 10px; text-decoration: underline;
+}
+.score-trend-clear:hover { color: var(--red); }
+
+/* ── AI POLISH TOGGLE ── */
+.polish-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  margin-top: -8px;
+}
+.polish-row label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.polish-row input[type="checkbox"] { accent-color: var(--gold); width: 15px; height: 15px; cursor: pointer; }
+.polish-note { font-size: 12px; color: var(--muted); font-style: italic; }
+
+/* ── LIBRARY ── */
+.library-toggle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.btn-library-toggle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-library-toggle:hover { border-color: var(--gold); color: var(--gold); }
+.library-count-badge {
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid var(--gold-border);
+  border-radius: 2px;
+  font-size: 10px;
+  padding: 1px 6px;
+  font-family: 'Share Tech Mono', monospace;
+}
+.library-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 28px 36px;
+  margin-bottom: 28px;
+  display: none;
+}
+.library-panel.open { display: block; }
+.library-empty {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  padding: 12px 0;
+}
+.library-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.library-entry:last-child { border-bottom: none; }
+.library-score-badge {
+  flex-shrink: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  min-width: 44px;
+  text-align: center;
+  padding: 4px 8px;
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  line-height: 1;
+}
+.library-meta { flex: 1; min-width: 0; }
+.library-snippet {
+  font-size: 14px;
+  color: var(--white);
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.library-date {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.library-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-lib-action {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--muted);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-lib-action:hover { border-color: var(--gold); color: var(--gold); }
+.btn-lib-delete:hover { border-color: var(--red); color: var(--red); }
+
+/* ── SAVE TO LIBRARY BUTTON ── */
+.btn-save-library {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid var(--gold-border);
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-save-library:hover { background: rgba(201,168,76,0.25); }
 </style>
 </head>
 <body>
@@ -701,11 +857,25 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
       <span class="scoring-explainer-label">How the Scoring Works</span>
       <button class="scoring-explainer-dismiss" id="explainerToggleBtn" onclick="toggleExplainer()" aria-label="Toggle scoring explanation">&times;</button>
     </div>
-    <p>This tool uses pattern-based rules to analyze your prompt &mdash; no AI, no API call, no waiting. The field badges update as you type to guide your rewrite. They&rsquo;re a helpful signal to build your understanding of what makes an effective prompt, so you develop the instinct to write better ones every time you sit down with Claude, ChatGPT, or any AI &mdash; think of it as a coach pointing at the gaps, not a grade.</p>
+    <p>This tool uses pattern-based rules to analyze your prompt &mdash; no AI, no API call, no waiting. The field badges update as you type to guide your rewrite. They&rsquo;re a helpful signal to build your understanding of what makes an effective prompt, so you develop the instinct to write better ones every time you sit down with Claude, ChatGPT, or any AI &mdash; think of it as a coach pointing at the gaps, not a grade. As the field&rsquo;s vocabulary shifts toward &ldquo;context engineering&rdquo; in 2026 &mdash; the practice of managing what surrounds the prompt, not just how it&rsquo;s worded &mdash; the Context and Source Grounding rules in this tool represent exactly that layer.</p>
   </div>
 </div>
 
 <div class="main">
+
+  <!-- LIBRARY TOGGLE -->
+  <div class="library-toggle-bar" style="margin-top:28px;">
+    <button class="btn-library-toggle" onclick="toggleLibrary()">
+      &#9776; My Library
+      <span class="library-count-badge" id="libraryCountBadge">0</span>
+    </button>
+  </div>
+
+  <!-- LIBRARY PANEL -->
+  <div class="library-panel" id="libraryPanel">
+    <div class="panel-title">My Prompt Library</div>
+    <div id="libraryList"><div class="library-empty">No saved prompts yet. Analyze a prompt and click "Save to Library" to start building your collection.</div></div>
+  </div>
 
   <!-- INPUT PANEL -->
   <div class="input-panel fade-up">
@@ -739,6 +909,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
       <div class="score-meta">
         <div class="score-title" id="scoreTitle">&#8212;</div>
         <div class="score-summary" id="scoreSummary"></div>
+        <div class="score-trend" id="scoreTrend" style="display:none;"></div>
       </div>
     </div>
 
@@ -761,6 +932,13 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
         Your prompt is already well-structured. Use the export buttons below to copy and test it.
       </div>
 
+      <div class="polish-row">
+        <label>
+          <input type="checkbox" id="polishWithAI">
+          Polish with AI (optional)
+        </label>
+        <span class="polish-note">Unchecked = instant local assembly, free. Checked = AI weaves fields into natural prose.</span>
+      </div>
       <button class="btn-primary" id="buildBtn" onclick="buildAssembledPrompt()" style="width:100%;margin-top:4px;margin-bottom:28px;">Build My Coached Prompt</button>
 
       <div id="assembledSection" style="display:none;">
@@ -792,6 +970,10 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
         <button class="btn-export" onclick="savePDF()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           Save as PDF
+        </button>
+        <button class="btn-save-library" onclick="saveToLibrary()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save to Library
         </button>
       </div>
       <div class="ai-row-label">Test in your AI of choice</div>
@@ -837,7 +1019,7 @@ const RULES = [
     weight: 12,
     check(p) {
       const startsWithVerb = /^(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|give me|show me)/i;
-      const delegation = /\b(help me\s+(?:to\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|design|plan)|i need you to|act as\s+(?:a|an)\b|assist me\s+(?:with|in)|can you\s+(?:please\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|describe|identify|fix|improve)|please\s+(?:write|create|draft|summarize|analyze|explain|generate|list))\b/i;
+      const delegation = /\b(help me\s+(?:to\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|design|plan)|i need you to|assist me\s+(?:with|in)|can you\s+(?:please\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|describe|identify|fix|improve)|please\s+(?:write|create|draft|summarize|analyze|explain|generate|list))\b/i;
       const verbAnywhere = /\b(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan)\b/i;
       if (startsWithVerb.test(p.trim()) || delegation.test(p)) return 'good';
       if (verbAnywhere.test(p)) return 'weak';
@@ -847,6 +1029,19 @@ const RULES = [
     weakMsg: 'Action verb is buried. Lead with an imperative ("Write", "Analyze", "List") for better instruction-following.',
     missingMsg: 'No action verb found anywhere. The model has to guess what you want done.',
     research: 'OpenAI and Anthropic prompt guides both cite imperative-verb openers as the single highest-leverage fix for vague prompts. The model\'s instruction-tuning is anchored to action words.'
+  },
+  {
+    id: 'role_assignment',
+    name: 'Role Assignment',
+    weight: 8,
+    check(p) {
+      const hasRole = /\b(act as|you are a|you are an|as a senior|as an expert|as a professional|as a\s+\w+\s+expert)\b/i;
+      return hasRole.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Role is assigned — the model has a persona to ground its expertise level and voice.',
+    weakMsg: 'No role assigned. Adding "Act as a [specific expert]" measurably changes response depth, separate from what action you ask for.',
+    missingMsg: null,
+    research: 'Role assignment is consistently cited as one of the highest-leverage individual prompting techniques — it primes expertise depth independent of the task verb itself.'
   },
   {
     id: 'vagueness',
@@ -986,21 +1181,37 @@ const RULES = [
     research: 'Style and tone tokens are among the fastest interventions for output quality. Reynolds & McDonell (2021) showed tone modifiers reduce post-editing time by ~25% in writing tasks.'
   },
   {
+    id: 'prompt_focus',
+    name: 'Prompt Focus',
+    weight: 8,
+    check(p) {
+      const wordCount = p.split(' ').filter(w => w.length > 0).length;
+      if (wordCount > 300) return 'weak';
+      return 'good';
+    },
+    goodMsg: 'Prompt is appropriately tight — the model can attend to all of it without diluting focus.',
+    weakMsg: 'Prompt runs long. Past ~300 words, models start losing track of which instruction actually matters. Trim anything not doing direct work.',
+    missingMsg: null,
+    research: 'Research on long-context attention degradation puts the practical sweet spot for most tasks at 150-300 words. Past that, models start losing track of which instruction actually matters.'
+  },
+  {
     id: 'data_grounding',
-    name: 'Data Grounding',
+    name: 'Source Grounding',
     weight: 20,
     check(p) {
       const refsOwnData = /\b(our\s+(?:data|metrics|results|performance|numbers|report|campaign|analytics|stats|statistics|figures|findings|survey|study)|analyze\s+(?:our|the\s+following|my)\s+\w+|review\s+(?:our|the\s+following|my)\s+\w+|based\s+on\s+(?:our|my)\s+\w+)\b/i;
+      const refsExternalSource = /\b(our\s+(?:style guide|brand voice|template|deck|doc|document)|based on (?:the|this|our)\s+\w+|match(?:ing)?\s+(?:this|the|our)\s+(?:style|format|tone|voice)|the attached|this document|see attached)\b/i;
       const hasNumbers = /\b\d+(?:[.,]\d+)?(?:\s*%|\s*k\b|\s*M\b|\s*million|\s*billion|\s*dollars?)|\$\s*\d|\d+\s*(?:users|clicks|conversions|sales|leads|impressions|sessions|visits|revenue|signups|downloads|views|responses?)\b/i;
       const hasAttachedData = /\b(attached|below|above|the following|here is|here are|see table|see chart|see data|data:|metrics:|results:|the data shows|from the table|from the chart)\b/i;
       if (refsOwnData.test(p) && !hasNumbers.test(p) && !hasAttachedData.test(p)) return 'missing';
+      if (refsExternalSource.test(p) && !hasAttachedData.test(p)) return 'missing';
       return 'na';
     },
-    goodMsg: 'Prompt references data and includes numbers or an explicit data source — well grounded.',
+    goodMsg: 'Prompt references source material and includes it or points to it — well grounded.',
     weakMsg: null,
-    missingMsg: 'This prompt asks AI to analyze your data — but no data is provided. Without source material, AI will fabricate plausible-sounding numbers. Paste your actual data into the prompt or instruct AI to ask you for it first.',
-    notApplicableMsg: 'This prompt isn\'t asking AI to analyze data, so no grounding is needed. If you want to add a data source or metrics, you can still include them.',
-    research: 'Retrieval-augmented generation (RAG) research consistently shows that LLMs without source material confabulate statistics at high rates. Providing even a raw data table dramatically reduces fabrication by giving the model a verifiable anchor.'
+    missingMsg: 'This prompt references source material — but none is provided. Without it, AI will fabricate plausible-sounding content. Paste your actual data, style guide, or document into the prompt, or instruct AI to ask you for it first.',
+    notApplicableMsg: 'This prompt isn\'t referencing external source material, so no grounding is needed.',
+    research: 'Retrieval-augmented generation (RAG) research consistently shows that LLMs without source material confabulate at high rates. Providing even a raw data table or style guide excerpt dramatically reduces fabrication by giving the model a verifiable anchor.'
   }
 ];
 
@@ -1047,6 +1258,7 @@ function analyzePrompt() {
   renderScore(score, findings);
   renderFindings(findings);
   renderRewriteFields(raw, findings);
+  appendScoreHistory(score);
 
   document.getElementById('assembledSection').style.display = 'none';
   document.getElementById('results').classList.add('visible');
@@ -1129,11 +1341,17 @@ function renderFindings(findings) {
 // REWRITE FIELDS
 // ═══════════════════════════════════════
 const COACH_FIELDS = {
+  role_assignment: {
+    label: 'Who Should The AI Be',
+    type: 'input',
+    placeholder: 'e.g. "Act as a senior sales operations consultant" or "You are an expert technical writer"',
+    why: 'This is separate from what you want done. Giving the AI a specific persona changes the depth and vocabulary of the response before it even reads your task.'
+  },
   action_verb: {
     label: 'Opening Instruction',
     type: 'input',
-    placeholder: 'e.g. "Act as an expert marketing coach. Write 3 paragraphs about creating content for beginners." or simply "Explain how to..."',
-    why: 'Start your prompt here. Tell the AI what to do and who to be. You can include a role like "Act as a [expert type]" followed by your task — "Write...", "Explain...", "List..." — or just lead with the task directly. This is the first thing the AI reads and it sets the direction for everything that follows.'
+    placeholder: 'e.g. "Write 3 paragraphs about creating content for beginners" or "Explain how to..."',
+    why: 'Tell the AI exactly what to do. Lead with an imperative verb — "Write", "Analyze", "List", "Explain". This is the core task directive and sets the direction for everything that follows.'
   },
   context: {
     label: 'Your Situation',
@@ -1185,10 +1403,10 @@ const COACH_FIELDS = {
     why: 'Models split attention on multi-task prompts and deliver mediocre results on each. One objective = one prompt.'
   },
   data_grounding: {
-    label: 'Data',
+    label: 'Source Material',
     type: 'textarea',
-    placeholder: 'Paste your actual data here, or write: "Ask me for the data before responding."',
-    why: 'AI will confabulate statistics without source material. Always give it the actual numbers or tell it to ask.'
+    placeholder: 'Paste your actual data, style guide, sample document, or brand voice guidelines here — or write: "Ask me for the source material before responding."',
+    why: 'AI will confabulate content without source material. Always give it the actual numbers, style guide, or reference document — or tell it to ask you for it first.'
   },
   vagueness: {
     label: 'What Exactly You Need',
@@ -1223,6 +1441,18 @@ function renderRewriteFields(raw, findings) {
 
   container.innerHTML = notGood.map(f => {
     const cfg = COACH_FIELDS[f.rule.id];
+
+    if (f.rule.id === 'prompt_focus') {
+      return `
+      <div class="coach-field" data-field-id="prompt_focus">
+        <div class="coach-field-label">Prompt Focus <span class="finding-badge field-badge badge-weak">weak</span></div>
+        <div style="padding:14px 16px;background:var(--yellow-bg);border:1px solid rgba(224,184,76,0.3);color:var(--yellow);font-size:14px;line-height:1.6;margin-bottom:6px;">
+          Your prompt runs long. Re-read it and cut anything that isn&rsquo;t doing direct work &mdash; extra context, hedging, repeated points.
+        </div>
+        <div class="coach-field-why">${f.rule.research}</div>
+      </div>`;
+    }
+
     if (!cfg) return '';
 
     if (f.rule.id === 'examples') {
@@ -1311,24 +1541,83 @@ function updateFieldBadge(ruleId) {
   setBadgeStatus(ruleId, rule.check(value));
 }
 
-function buildAssembledPrompt() {
+async function buildAssembledPrompt() {
   const original = document.getElementById('promptInput').value.trim();
   const additions = [];
   let openingInstruction = '';
+  let roleInstruction = '';
+  const fieldValues = {};
 
   document.querySelectorAll('.coach-field-input').forEach(field => {
     const val = field.value.trim();
     if (!val) return;
-    if (field.dataset.ruleId === 'action_verb') {
+    if (field.dataset.ruleId === 'role_assignment') {
+      roleInstruction = val;
+      fieldValues['Role'] = val;
+    } else if (field.dataset.ruleId === 'action_verb') {
       openingInstruction = val;
+      fieldValues['Task'] = val;
     } else {
       additions.push(field.dataset.criterionName + ': ' + val);
+      fieldValues[field.dataset.criterionName] = val;
     }
   });
 
+  const useAI = document.getElementById('polishWithAI') && document.getElementById('polishWithAI').checked;
+
+  if (useAI) {
+    const btn = document.getElementById('buildBtn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Polishing with AI…';
+
+    const fieldSummary = Object.entries(fieldValues).map(([k, v]) => `${k}: ${v}`).join('\n');
+    const content = `Original prompt: ${original}\n\nCoaching fields filled in:\n${fieldSummary}`;
+
+    try {
+      const res = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          max_tokens: 600,
+          system: `Take these prompt-coaching field answers and weave them into one natural, well-written prompt — not a bulleted list of the fields. Write in second person, as if the user wrote it. 100-200 words. No meta-commentary, no markdown formatting, start directly.`,
+          messages: [{ role: 'user', content }]
+        })
+      });
+      const data = await res.json();
+      const assembled = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : null;
+      if (assembled) {
+        baseCoached = assembled;
+        resetRefineState();
+        document.getElementById('coachedText').textContent = assembled;
+        const assembledSection = document.getElementById('assembledSection');
+        assembledSection.style.display = 'block';
+        assembledSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        showToast('AI-polished prompt ready');
+        btn.disabled = false;
+        btn.textContent = originalText;
+        return;
+      }
+    } catch(e) {}
+
+    btn.disabled = false;
+    btn.textContent = originalText;
+    showToast('AI unavailable — using local assembly');
+  }
+
+  // Local assembly
+  let openingLine = '';
+  if (roleInstruction && openingInstruction) {
+    openingLine = roleInstruction.replace(/\.\s*$/, '') + '. ' + openingInstruction.replace(/\.\s*$/, '');
+  } else if (roleInstruction) {
+    openingLine = roleInstruction.replace(/\.\s*$/, '');
+  } else if (openingInstruction) {
+    openingLine = openingInstruction.replace(/\.\s*$/, '');
+  }
+
   let assembled;
-  if (openingInstruction) {
-    assembled = openingInstruction.replace(/\.\s*$/, '');
+  if (openingLine) {
+    assembled = openingLine;
     if (additions.length > 0) assembled += '\n\n' + additions.join('\n');
   } else {
     assembled = original;
@@ -1516,6 +1805,139 @@ function useExamplePreview(btnEl) {
   allChips.forEach(c => c.classList.remove('chip-active'));
   updateFieldBadge('examples');
 }
+
+// ═══════════════════════════════════════
+// SCORE HISTORY (PR2)
+// ═══════════════════════════════════════
+function appendScoreHistory(score) {
+  const key = 'prompt-coach-score-history';
+  const history = JSON.parse(localStorage.getItem(key) || '[]');
+  history.push({ score, timestamp: Date.now() });
+  localStorage.setItem(key, JSON.stringify(history));
+  renderScoreTrend(history);
+}
+
+function renderScoreTrend(history) {
+  if (!history) {
+    const key = 'prompt-coach-score-history';
+    history = JSON.parse(localStorage.getItem(key) || '[]');
+  }
+  const el = document.getElementById('scoreTrend');
+  if (!el) return;
+  if (history.length < 2) { el.style.display = 'none'; return; }
+
+  const last5 = history.slice(-5).map(h => h.score);
+  const prev5 = history.slice(-10, -5).map(h => h.score);
+  const avg = arr => arr.length ? Math.round(arr.reduce((a,b) => a+b, 0) / arr.length) : null;
+
+  const recentAvg = avg(last5);
+  const prevAvg = avg(prev5);
+
+  let trendHtml = `LAST ${last5.length} AVG: <span class="trend-val">${recentAvg}</span>`;
+  if (prevAvg !== null) {
+    const diff = recentAvg - prevAvg;
+    const cls = diff > 0 ? 'trend-up' : diff < 0 ? 'trend-down' : 'trend-same';
+    const arrow = diff > 0 ? '&#8593;' : diff < 0 ? '&#8595;' : '&#8596;';
+    trendHtml += ` <span class="${cls}">${arrow} ${Math.abs(diff)} vs prior ${prev5.length}</span>`;
+  }
+  trendHtml += ` <button class="score-trend-clear" onclick="clearScoreHistory()">clear</button>`;
+
+  el.innerHTML = trendHtml;
+  el.style.display = 'block';
+}
+
+function clearScoreHistory() {
+  localStorage.removeItem('prompt-coach-score-history');
+  const el = document.getElementById('scoreTrend');
+  if (el) el.style.display = 'none';
+  showToast('Score history cleared');
+}
+
+// ═══════════════════════════════════════
+// PROMPT LIBRARY (PR2)
+// ═══════════════════════════════════════
+const LIBRARY_KEY = 'prompt-coach-library';
+
+function getLibrary() {
+  return JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+}
+
+function saveLibrary(lib) {
+  localStorage.setItem(LIBRARY_KEY, JSON.stringify(lib));
+  updateLibraryBadge();
+  renderLibraryList();
+}
+
+function updateLibraryBadge() {
+  const badge = document.getElementById('libraryCountBadge');
+  if (badge) badge.textContent = getLibrary().length;
+}
+
+function saveToLibrary() {
+  const original = document.getElementById('promptInput').value.trim();
+  const coached = document.getElementById('coachedText').textContent.trim();
+  const scoreEl = document.getElementById('scoreNum');
+  const score = scoreEl ? parseInt(scoreEl.textContent) : 0;
+  if (!original) { showToast('Analyze a prompt first'); return; }
+  const lib = getLibrary();
+  lib.unshift({ id: Date.now(), originalPrompt: original, coachedPrompt: coached, score, savedAt: Date.now() });
+  saveLibrary(lib);
+  showToast('Saved to library');
+}
+
+function loadFromLibrary(id) {
+  const lib = getLibrary();
+  const entry = lib.find(e => e.id === id);
+  if (!entry) return;
+  document.getElementById('promptInput').value = entry.originalPrompt;
+  document.getElementById('charCount').textContent = entry.originalPrompt.length + ' chars';
+  analyzePrompt();
+  showToast('Prompt loaded — re-analyzed');
+}
+
+function deleteFromLibrary(id) {
+  const lib = getLibrary().filter(e => e.id !== id);
+  saveLibrary(lib);
+  showToast('Removed from library');
+}
+
+function renderLibraryList() {
+  const container = document.getElementById('libraryList');
+  if (!container) return;
+  const lib = getLibrary();
+  if (!lib.length) {
+    container.innerHTML = '<div class="library-empty">No saved prompts yet. Analyze a prompt and click "Save to Library" to start building your collection.</div>';
+    return;
+  }
+  container.innerHTML = lib.map(entry => {
+    const snippet = (entry.coachedPrompt || entry.originalPrompt || '').slice(0, 120).replace(/</g, '&lt;');
+    const date = new Date(entry.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const scoreColor = entry.score >= 85 ? 'var(--green)' : entry.score >= 65 ? 'var(--yellow)' : 'var(--red)';
+    return `
+    <div class="library-entry" data-id="${entry.id}">
+      <div class="library-score-badge" style="color:${scoreColor};border-color:${scoreColor}33;">${entry.score}</div>
+      <div class="library-meta">
+        <div class="library-snippet">${snippet}&hellip;</div>
+        <div class="library-date">Saved ${date}</div>
+      </div>
+      <div class="library-actions">
+        <button class="btn-lib-action" onclick="loadFromLibrary(${entry.id})">Load</button>
+        <button class="btn-lib-action btn-lib-delete" onclick="deleteFromLibrary(${entry.id})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleLibrary() {
+  const panel = document.getElementById('libraryPanel');
+  if (!panel) return;
+  panel.classList.toggle('open');
+  renderLibraryList();
+}
+
+// Init on page load
+updateLibraryBadge();
+renderScoreTrend();
 
 function toggleExplainer() {
   const p = document.querySelector('#scoringExplainer p');
