@@ -706,8 +706,8 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 /* ── AI POLISH TOGGLE ── */
 .polish-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 16px;
   margin-top: -8px;
 }
@@ -723,7 +723,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   gap: 8px;
 }
 .polish-row input[type="checkbox"] { accent-color: var(--gold); width: 15px; height: 15px; cursor: pointer; }
-.polish-note { font-size: 13px; color: var(--muted); font-style: italic; }
+.polish-note { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.6; }
 
 /* ── LIBRARY ── */
 .library-toggle-bar {
@@ -937,7 +937,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
           <input type="checkbox" id="polishWithAI">
           Polish with AI (optional)
         </label>
-        <span class="polish-note">Unchecked = instant local assembly, free. Checked = AI weaves fields into natural prose.</span>
+        <span class="polish-note">Off: your fields stay as a clear, labeled list — instant and free, good for your own quick reference. On: AI rewrites them into one natural prompt that reads like you wrote it yourself — better when you're sharing it with someone else or pasting it somewhere it shouldn't look like a filled-in template.</span>
       </div>
       <button class="btn-primary" id="buildBtn" onclick="buildAssembledPrompt()" style="width:100%;margin-top:4px;margin-bottom:28px;">Build My Coached Prompt</button>
 
