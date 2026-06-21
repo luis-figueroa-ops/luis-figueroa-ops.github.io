@@ -108,6 +108,21 @@
 
     #startScreen, #gameoverScreen { display: none; }
     #startScreen.active, #gameoverScreen.active { display: block; }
+
+    .back-nav {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 50;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+    }
+    .back-nav a {
+      color: #6868a0;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-nav a:hover { color: #00ffe7; text-shadow: 0 0 8px #00ffe788; }
   </style>
 
   <!-- Google Analytics -->
@@ -147,6 +162,8 @@
     <button class="btn" id="restartBtn">PLAY AGAIN</button>
   </div>
 </div>
+
+<div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
 
 <script>
 // ─────────────────────────────────────────────────────────
