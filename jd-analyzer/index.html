@@ -28,6 +28,20 @@
 
     .container { max-width: 720px; width: 100%; }
 
+    .back-nav {
+      width: 100%;
+      max-width: 720px;
+      margin-bottom: 16px;
+    }
+    .back-nav a {
+      color: #8892b0;
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+    .back-nav a:hover { color: #B8963E; }
+
     .header { text-align: center; margin-bottom: 36px; }
     .header h1 { font-size: 2.3rem; color: #B8963E; margin-bottom: 10px; line-height: 1.2; }
     .header .tagline { font-size: 1.15rem; color: #ccd6f6; font-style: italic; margin-bottom: 6px; }
@@ -351,7 +365,7 @@
       .header, .card, #analyzeBtn, .loading,
       .error, .action-buttons, .chat-input-row,
       .bottom-actions, .chat-divider, .footer,
-      .theme-container { display: none !important; }
+      .theme-container, .back-nav { display: none !important; }
 
       .output {
         display: block !important;
@@ -411,6 +425,10 @@
   </style>
 </head>
 <body>
+  <div class="back-nav">
+    <a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a>
+  </div>
+
   <div class="container">
 
     <div class="print-header" style="display:none;">
@@ -609,26 +627,26 @@ COMPETENCY THEME EXTRACTION — when asked to extract themes from a JD as a JSON
 Identify 3-6 business process areas or competency themes grounded in specific JD language. Use this anchor list as your starting point: Project/Program Management, Stakeholder & Cross-Functional Coordination, Revenue/Sales Operations, Process Improvement, Data & Reporting, Vendor/Partner Management, Technical/Systems Operations, Issue Resolution & Troubleshooting, Change Management. Expand beyond this list only when the JD content clearly doesn't fit any anchor — use the same plain-language style. Keep labels short (3-6 words), specific, and plain-language.
 
 METHODOLOGY-NAMING RULE — when drilling down on a theme:
-Name a framework ONLY if the JD text itself names one (e.g., “Six Sigma,” “Agile,” “RACI,” “OKR”). If the JD does not name a framework, describe the approach in plain language. Never invent a framework name that does not appear in the JD.
+Name a framework ONLY if the JD text itself names one (e.g., "Six Sigma," "Agile," "RACI," "OKR"). If the JD does not name a framework, describe the approach in plain language. Never invent a framework name that does not appear in the JD.
 
 MULTI-DIMENSIONAL SCORING RULE — when explaining strong vs. weak on a competency:
-Always describe strong-vs-weak performance as 2-3 simultaneous dimensions being evaluated at once, not a single binary axis. Frame it explicitly: “this isn’t just one thing being judged — it’s typically X, Y, and Z at the same time.”
+Always describe strong-vs-weak performance as 2-3 simultaneous dimensions being evaluated at once, not a single binary axis. Frame it explicitly: "this isn't just one thing being judged — it's typically X, Y, and Z at the same time."
 
 THEME DRILL-DOWN STRUCTURE — when drilling deeper on a specific competency theme, respond in this order:
 1. What this competency means in practice, grounded in the specific JD language that signaled it
 2. The methodology or way of thinking behind doing it well — follow the methodology-naming rule above
 3. What separates a strong demonstration from a weak one — use the multi-dimensional scoring rule above
-4. An illustrative example of the thinking in action — frame it explicitly as generic/illustrative: “here’s the shape — make it yours.” Never fabricate or assume the user’s personal work history.
+4. An illustrative example of the thinking in action — frame it explicitly as generic/illustrative: "here's the shape — make it yours." Never fabricate or assume the user's personal work history.
 
 TELL ME ABOUT YOURSELF BRIDGE FRAMEWORK (adapted from Farah Sharghi, ex-Google recruiter):
-Every line of a job description is a symptom of a business problem the company is trying to solve. The candidate’s job is to read the JD like a business owner, then structure a response in these parts:
+Every line of a job description is a symptom of a business problem the company is trying to solve. The candidate's job is to read the JD like a business owner, then structure a response in these parts:
 
-- Log Line: 1-2 sentences. Sentence one states who the candidate is professionally; sentence two is the “hook” — what their core strength is and why it matters to this business’s specific needs. Provide this as an illustrative generic pattern.
-- Past: 2-3 sentences connecting real accomplishments to the JD’s hidden business problems. Since this tool does not have the user’s actual resume, COACH this section instead of writing it for them — name the specific kind of business problem the JD reveals, describe the kind/shape of metric or scenario the user should be mining from their own background to address it, with a generic illustrative example of what that could sound like. Be explicit that the user needs to swap in their own real number/story.
+- Log Line: 1-2 sentences. Sentence one states who the candidate is professionally; sentence two is the "hook" — what their core strength is and why it matters to this business's specific needs. Provide this as an illustrative generic pattern.
+- Past: 2-3 sentences connecting real accomplishments to the JD's hidden business problems. Since this tool does not have the user's actual resume, COACH this section instead of writing it for them — name the specific kind of business problem the JD reveals, describe the kind/shape of metric or scenario the user should be mining from their own background to address it, with a generic illustrative example of what that could sound like. Be explicit that the user needs to swap in their own real number/story.
 - Future: One sentence on why this specific role is the logical next step. Illustrative pattern.
-- Closing pivot: End the response by asking the interviewer what they’d like to learn more about, then stopping talking. Provide this as a ready-to-use line since it’s role-agnostic.
+- Closing pivot: End the response by asking the interviewer what they'd like to learn more about, then stopping talking. Provide this as a ready-to-use line since it's role-agnostic.
 
-STANDING REMINDER: Never fabricate or assume the user’s personal work history. All examples are illustrative patterns the user must adapt to their own real experience.
+STANDING REMINDER: Never fabricate or assume the user's personal work history. All examples are illustrative patterns the user must adapt to their own real experience.
 
 ---
 
