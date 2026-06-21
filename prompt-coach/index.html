@@ -1011,9 +1011,9 @@ const RULES = [
   }
 ];
 
-// ═══════════════════════════════════════
+// ═══════════════════════
 // LIVE TIP ENGINE
-// ═══════════════════════════════════════
+// ═══════════════════════
 const TIPS = [
   { trigger: p => p.length > 0 && p.length < 20, msg: '<strong>Too short.</strong> Even a 10-word context sentence will dramatically improve results.' },
   { trigger: p => /\b(something|stuff|things)\b/i.test(p), msg: '<strong>Vague word detected.</strong> Replace "something" or "stuff" with the actual deliverable.' },
@@ -1040,9 +1040,9 @@ input.addEventListener('input', () => {
   }
 });
 
-// ═══════════════════════════════════════
+// ═══════════════════════
 // COACH ENGINE
-// ═══════════════════════════════════════
+// ═══════════════════════
 function analyzePrompt() {
   const raw = input.value.trim();
   if (!raw) { showToast('Paste a prompt first'); return; }
@@ -1132,9 +1132,9 @@ function renderFindings(findings) {
   }).join('');
 }
 
-// ═══════════════════════════════════════
+// ═══════════════════════
 // REWRITE FIELDS
-// ═══════════════════════════════════════
+// ═══════════════════════
 const COACH_FIELDS = {
   action_verb: {
     label: 'Opening Instruction',
@@ -1258,7 +1258,7 @@ function renderRewriteFields(raw, findings) {
     const badgeClass = f.status === 'weak' ? 'badge-weak' : 'badge-missing';
     const inputEl = cfg.type === 'textarea'
       ? `<textarea class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" data-rule-id="${f.rule.id}" rows="3" placeholder="${escAttr(cfg.placeholder)}"></textarea>`
-      : `<input type="text" class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" data-rule-id="${f.rule.id}" placeholder="${escAttr(cfg.placeholder)}">`;
+      : `<input type="text" class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" data-rule-id="${f.rule.id}" placeholder="${escAttr(cfg.placeholder)}">``;
     const optionalLine = cfg.optionalNote
       ? `<div class="coach-field-why" style="color:var(--gold);opacity:0.7;">&#9670; ${cfg.optionalNote}</div>`
       : '';
@@ -1395,9 +1395,9 @@ function runLocalAssembly() {
   showToast('Coached prompt assembled');
 }
 
-// ═══════════════════════════════════════
+// ═══════════════════════
 // REFINEMENTS
-// ═══════════════════════════════════════
+// ═══════════════════════
 let baseCoached = '';
 const REFINE_TYPES = ['shorter', 'formal', 'casual', 'reasoning', 'language'];
 const refineActive = Object.fromEntries(REFINE_TYPES.map(t => [t, false]));
@@ -1483,9 +1483,9 @@ function toggleRefine(type, btnEl) {
   applyActiveRefinements();
 }
 
-// ═══════════════════════════════════════
+// ═══════════════════════
 // EXPORT
-// ═══════════════════════════════════════
+// ═══════════════════════
 function copyCoached() {
   const text = document.getElementById('coachedText').textContent;
   navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
@@ -1524,9 +1524,9 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// ═══════════════════════════════════════
+// ═══════════════════════
 // EXAMPLE CHIP SYSTEM
-// ═══════════════════════════════════════
+// ═══════════════════════
 const EXAMPLE_CHIP_TEXTS = {
   format: 'Structure it like a report with a bold header, 3 bullet points, and a one-sentence summary at the bottom — for example: "Header: [Topic] / Bullets: [Point 1], [Point 2], [Point 3] / Summary: [One sentence wrap-up]"',
   tone: 'Write it the way a coach talks to a beginner — warm, simple, no jargon. For example: "Explain it like I\'m hearing this for the first time. Encouraging tone, short sentences, no technical terms unless you define them."',
