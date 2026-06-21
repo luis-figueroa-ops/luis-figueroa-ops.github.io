@@ -711,19 +711,43 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   margin-bottom: 16px;
   margin-top: -8px;
 }
-.polish-row label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.polish-row input[type="checkbox"] { accent-color: var(--gold); width: 15px; height: 15px; cursor: pointer; }
 .polish-note { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.6; }
+
+/* ── AI TOGGLE SWITCH ── */
+.ai-toggle { display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 4px; }
+.ai-toggle input { display: none; }
+.ai-toggle-track {
+  width: 44px; height: 24px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 999px; position: relative; flex-shrink: 0;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.ai-toggle-thumb {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+  background: #777; transition: transform 0.25s ease, background 0.25s ease;
+}
+.ai-toggle input:checked + .ai-toggle-track {
+  background: var(--gold); border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(201,168,76,0.65), 0 0 3px rgba(201,168,76,0.9);
+}
+.ai-toggle input:checked + .ai-toggle-track .ai-toggle-thumb {
+  transform: translateX(20px); background: #0e0e0e;
+}
+.ai-toggle-label {
+  font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+.ai-toggle input:checked ~ .ai-toggle-label {
+  color: var(--gold); text-shadow: 0 0 8px rgba(201,168,76,0.5);
+}
+
+/* ── START OVER LINK ── */
+.reset-link {
+  background: none; border: none; cursor: pointer;
+  font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); padding: 0; margin-top: 12px; display: block;
+  transition: color 0.2s;
+}
+.reset-link:hover { color: var(--gold); }
 
 /* ── LIBRARY ── */
 .library-toggle-bar {
@@ -933,11 +957,12 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
       </div>
 
       <div class="polish-row">
-        <label>
+        <label class="ai-toggle">
           <input type="checkbox" id="polishWithAI">
-          Polish with AI (optional)
+          <span class="ai-toggle-track"><span class="ai-toggle-thumb"></span></span>
+          <span class="ai-toggle-label">Polish with AI <span style="opacity:0.6;font-weight:normal;">(optional)</span></span>
         </label>
-        <span class="polish-note">Off: your fields stay as a clear, labeled list — instant and free, good for your own quick reference. On: AI rewrites them into one natural prompt that reads like you wrote it yourself — better when you're sharing it with someone else or pasting it somewhere it shouldn't look like a filled-in template.</span>
+        <span class="polish-note">Unchecked: your fields stay as a clear, labeled list — instant and free, good for your own quick reference. Checked: AI rewrites them into one natural prompt that reads like you wrote it yourself — better when you're sharing it with someone else or pasting it somewhere it shouldn't look like a filled-in template.</span>
       </div>
       <button class="btn-primary" id="buildBtn" onclick="buildAssembledPrompt()" style="width:100%;margin-top:4px;margin-bottom:28px;">Build My Coached Prompt</button>
 
@@ -1003,6 +1028,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
           Perplexity
         </button>
       </div>
+      <button class="reset-link" onclick="startOver()">&#8592; Start Over</button>
     </div>
 
     <div class="session-footer fade-up">
@@ -1766,6 +1792,21 @@ function clearAll() {
   charCountEl.textContent = '0 chars';
   liveTipEl.classList.remove('visible');
   document.getElementById('results').classList.remove('visible');
+}
+
+function startOver() {
+  if (!confirm('Start over? This clears your current prompt, analysis, and any fields you\'ve filled in.')) return;
+  input.value = '';
+  charCountEl.textContent = '0 chars';
+  liveTipEl.classList.remove('visible');
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('assembledSection').style.display = 'none';
+  const polishEl = document.getElementById('polishWithAI');
+  if (polishEl) polishEl.checked = false;
+  resetRefineState();
+  baseCoached = '';
+  document.getElementById('coachedText').textContent = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function showToast(msg) {
