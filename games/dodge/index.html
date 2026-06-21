@@ -27,6 +27,13 @@
     pointer-events: none; z-index: 100;
   }
   #game-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .back-nav { font-size: 11px; letter-spacing: 1px; }
+  .back-nav a {
+    color: #8888aa;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-nav a:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
   #hud { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
   #hud-left { display: flex; flex-direction: column; gap: 2px; }
   #score-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--accent); letter-spacing: 3px; opacity: 0.6; }
@@ -111,6 +118,7 @@
 </head>
 <body>
 <div id="game-wrapper">
+  <div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
   <div id="hud">
     <div id="hud-left">
       <div id="score-label">SCORE</div>
@@ -181,7 +189,9 @@ let cssToGame = 1;
 function resize() {
   const availW = window.innerWidth  - 4;
   const availH = window.innerHeight - 4;
-  const extraH = 70;
+  // extraH accounts for non-canvas vertical chrome: the back-to-tools link,
+  // the HUD row, and flex gaps between game-wrapper children.
+  const extraH = 100;
 
   // Calculate what scale would be needed to fit
   const fitScale = Math.min(availW / GW, (availH - extraH) / GH);
