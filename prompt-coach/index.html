@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Coach — Write Prompts That Actually Work</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e0e0e;
+  --bg2: #161616;
+  --bg3: #1e1e1e;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-border: rgba(201,168,76,0.25);
+  --white: #F0EDE6;
+  --muted: #888;
+  --green: #4caf7d;
+  --yellow: #e0b84c;
+  --red: #e05c5c;
+  --green-bg: rgba(76,175,125,0.1);
+  --yellow-bg: rgba(224,184,76,0.1);
+  --red-bg: rgba(224,92,92,0.1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 1px solid var(--gold-border);
+  background: rgba(14,14,14,0.95);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+.topbar-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 3px;
+  color: var(--gold);
+}
+.topbar-back {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.topbar-back:hover { color: var(--gold); }
+
+/* ── HERO ── */
+.hero {
+  padding: 56px 48px 40px;
+  max-width: 900px;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 6vw, 72px);
+  letter-spacing: 3px;
+  line-height: 0.95;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  font-size: 20px;
+  color: var(--white);
+  opacity: 0.85;
+  line-height: 1.7;
+  max-width: 620px;
+}
+
+/* ── SCORING EXPLAINER ── */
+.scoring-explainer {
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-left: 3px solid var(--gold);
+  padding: 20px 24px;
+  margin-top: 24px;
+  max-width: 720px;
+  position: relative;
+}
+.scoring-explainer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.scoring-explainer-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.scoring-explainer-dismiss {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.scoring-explainer p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: rgba(240,237,230,0.8);
+  line-height: 1.7;
+  margin: 0;
+  max-height: 200px;
+  overflow: visible;
+  transition: max-height 0.3s ease;
+}
+.scoring-explainer p.collapsed {
+  max-height: 0;
+  overflow: hidden;
+}
+
+/* ── MAIN LAYOUT ── */
+.main {
+  padding: 0 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── INPUT PANEL ── */
+.input-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px;
+  margin-bottom: 32px;
+  position: relative;
+}
+.input-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--gold);
+}
+
+.label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: block;
+}
+
+textarea#promptInput {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid rgba(201,168,76,0.2);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  padding: 18px 20px;
+  resize: vertical;
+  min-height: 160px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+textarea#promptInput:focus { border-color: var(--gold); }
+textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
+
+/* ── LIVE TIP ── */
+.live-tip {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--gold-dim);
+  border-left: 3px solid var(--gold);
+  font-size: 14px;
+  color: var(--white);
+  opacity: 0.9;
+  line-height: 1.6;
+  min-height: 44px;
+  transition: all 0.3s;
+  display: none;
+}
+.live-tip.visible { display: block; }
+.live-tip strong { color: var(--gold); }
+
+/* ── ACTIONS ── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: var(--gold);
+  color: #0e0e0e;
+  border: none;
+  padding: 14px 32px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: #dbb85c; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-ghost {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.char-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+/* ── RESULTS WRAPPER ── */
+#results { display: none; }
+#results.visible { display: block; }
+
+/* ── SCORE PANEL ── */
+.score-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.score-ring {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  position: relative;
+}
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring .score-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.score-ring .score-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.score-meta { flex: 1; }
+.score-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.score-summary {
+  font-size: 16px;
+  color: var(--white);
+  opacity: 0.75;
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+/* ── FINDINGS ── */
+.findings-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px;
+  margin-bottom: 28px;
+}
+.panel-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.panel-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gold-border);
+}
+
+.finding {
+  display: flex;
+  gap: 18px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  align-items: flex-start;
+}
+.finding:last-child { border-bottom: none; }
+
+.finding-badge {
+  flex-shrink: 0;
+  width: 72px;
+  text-align: center;
+  padding: 5px 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 2px;
+  margin-top: 2px;
+}
+.badge-good { background: var(--green-bg); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+.badge-weak { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(224,184,76,0.3); }
+.badge-missing { background: var(--red-bg); color: var(--red); border: 1px solid rgba(224,92,92,0.3); }
+.badge-neutral { background: rgba(136,136,136,0.15); color: #888; border: 1px solid rgba(136,136,136,0.3); }
+
+.finding-body { flex: 1; }
+.finding-rule {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.finding-desc {
+  font-size: 15px;
+  color: var(--white);
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.finding-research {
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* ── COACHED PROMPT BOX ── */
+.coached-box {
+  background: var(--bg3);
+  border: 1px solid rgba(201,168,76,0.3);
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.coached-prompt-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--white);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── REFINEMENT BUTTONS ── */
+.refinement-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 28px 36px;
+  margin-bottom: 28px;
+}
+.refinement-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.refinement-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.btn-refine {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.8;
+}
+.btn-refine:hover { border-color: var(--gold); color: var(--gold); opacity: 1; }
+.btn-refine.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); opacity: 1; }
+.refine-tick { font-size: 12px; margin-left: 4px; }
+
+/* ── COACH FIELDS ── */
+.coach-field {
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  background: var(--bg3);
+  border-left: 3px solid var(--gold-border);
+  transition: border-left-color 0.2s;
+}
+.coach-field:focus-within {
+  border-left-color: var(--gold);
+}
+.coach-field-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.coach-field input[type="text"],
+.coach-field textarea {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.15);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  padding: 12px 16px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.coach-field input[type="text"]:focus,
+.coach-field textarea:focus {
+  border-color: var(--gold);
+}
+.coach-field input[type="text"]::placeholder,
+.coach-field textarea::placeholder {
+  color: rgba(240,237,230,0.3);
+}
+.coach-field-why {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.field-resolved {
+  border-left-color: var(--green) !important;
+  transition: border-left-color 0.3s ease;
+}
+.field-resolved .coach-field-label {
+  color: var(--green);
+  transition: color 0.3s ease;
+}
+.original-prompt-display {
+  background: var(--bg3);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 3px solid var(--muted);
+  padding: 18px 20px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.85;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 28px;
+}
+
+/* ── EXPORT PANEL ── */
+.export-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 28px 36px;
+  margin-bottom: 28px;
+}
+.export-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.export-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.btn-export {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid var(--gold-border);
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-export:hover { background: rgba(201,168,76,0.25); }
+.btn-export svg { flex-shrink: 0; }
+
+.ai-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ai-row-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+.btn-ai {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--bg3);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-ai:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── SESSION FOOTER ── */
+.session-footer {
+  padding: 28px 0 0;
+  border-top: 1px solid var(--gold-border);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--gold);
+  color: #0e0e0e;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── EXAMPLE CHIPS ── */
+.example-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.example-chip {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+.example-chip:hover { border-color: var(--gold); color: var(--gold); }
+.example-chip.chip-active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+.example-preview {
+  padding: 12px 16px;
+  background: var(--gold-dim);
+  border-left: 3px solid var(--gold);
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: rgba(240,237,230,0.85);
+  line-height: 1.6;
+}
+.btn-use-example {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+  display: block;
+}
+.btn-use-example:hover { border-color: var(--gold); color: var(--gold); }
+
+@media (max-width: 700px) {
+  .topbar, .hero, .main { padding-left: 20px; padding-right: 20px; }
+  .score-panel { flex-direction: column; gap: 20px; }
+  .input-panel, .findings-panel, .refinement-panel, .export-panel { padding: 24px 20px; }
+  .example-chips-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.5s ease both; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-brand">Prompt Coach</span>
+  <a class="topbar-back" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Career Tools</div>
+  <h1>Prompt<br><span>Coach</span></h1>
+  <p class="hero-sub">Type a rough prompt. Get a score, a diagnosis, a coached version, and export-ready buttons &#8212; no API key, no sign-in, zero cost.</p>
+  <div class="scoring-explainer" id="scoringExplainer">
+    <div class="scoring-explainer-top">
+      <span class="scoring-explainer-label">How the Scoring Works</span>
+      <button class="scoring-explainer-dismiss" id="explainerToggleBtn" onclick="toggleExplainer()" aria-label="Toggle scoring explanation">&times;</button>
+    </div>
+    <p>This tool uses pattern-based rules to analyze your prompt &mdash; no AI, no API call, no waiting. The field badges update as you type to guide your rewrite. They&rsquo;re a helpful signal to build your understanding of what makes an effective prompt, so you develop the instinct to write better ones every time you sit down with Claude, ChatGPT, or any AI &mdash; think of it as a coach pointing at the gaps, not a grade.</p>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- INPUT PANEL -->
+  <div class="input-panel fade-up">
+    <label class="label" for="promptInput">Your Prompt or Task Description</label>
+    <textarea id="promptInput" placeholder="e.g. write me something about onboarding..."></textarea>
+    <div id="liveTip" class="live-tip"></div>
+    <div class="actions">
+      <button class="btn-primary" id="analyzeBtn" onclick="analyzePrompt()">Analyze Prompt</button>
+      <button class="btn-ghost" onclick="clearAll()">Clear</button>
+      <span class="char-count" id="charCount">0 chars</span>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- SCORE -->
+    <div class="score-panel fade-up">
+      <div class="score-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#222" stroke-width="10"/>
+          <circle id="scoreArc" cx="60" cy="60" r="50" fill="none" stroke="#C9A84C" stroke-width="10"
+            stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"
+            style="transition: stroke-dashoffset 0.8s ease, stroke 0.4s"/>
+        </svg>
+        <div class="score-num">
+          <span id="scoreNum" style="color: var(--gold)">0</span>
+          <span class="score-label">/ 100</span>
+        </div>
+      </div>
+      <div class="score-meta">
+        <div class="score-title" id="scoreTitle">&#8212;</div>
+        <div class="score-summary" id="scoreSummary"></div>
+      </div>
+    </div>
+
+    <!-- FINDINGS -->
+    <div class="findings-panel fade-up">
+      <div class="panel-title">Diagnosis</div>
+      <div id="findingsList"></div>
+    </div>
+
+    <!-- REWRITE YOUR PROMPT -->
+    <div class="findings-panel fade-up" id="rewritePanel">
+      <div class="panel-title">Rewrite Your Prompt</div>
+
+      <div class="label">Your Original Prompt</div>
+      <div class="original-prompt-display" id="originalPromptDisplay"></div>
+
+      <div id="coachFieldsContainer"></div>
+
+      <div id="allGoodMsg" style="display:none;padding:16px 20px;background:var(--green-bg);border:1px solid rgba(76,175,125,0.3);color:var(--green);font-size:15px;line-height:1.6;margin-bottom:24px;">
+        Your prompt is already well-structured. Use the export buttons below to copy and test it.
+      </div>
+
+      <div style="margin-top:4px;margin-bottom:12px;padding:14px 18px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="polishWithAI" style="margin-top:3px;accent-color:#C9A84C;width:15px;height:15px;flex-shrink:0;">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1px;color:#F0EDE6;line-height:1.6;"><strong style="color:#C9A84C;">Polish with AI</strong> <span style="color:#888;font-size:12px;">(optional)</span><br><span style="font-size:12px;color:#888;">Unchecked = instant local assembly, free. &nbsp;Checked = AI weaves your fields into natural prose.</span></span>
+        </label>
+      </div>
+      <button class="btn-primary" id="buildBtn" onclick="buildAssembledPrompt()" style="width:100%;margin-bottom:10px;">Build My Coached Prompt</button>
+      <div id="buildStatus" style="display:none;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;color:#888;text-transform:uppercase;text-align:center;padding:6px 0;margin-bottom:18px;">Assembling your prompt with AI...</div>
+
+      <div id="assembledSection" style="display:none;">
+        <div class="label" style="margin-bottom:12px;">Your Coached Prompt</div>
+        <div class="coached-box">
+          <div class="coached-prompt-text" id="coachedText"></div>
+        </div>
+        <div style="background:transparent;border:none;padding:0;margin-top:4px;">
+          <div class="refinement-title">Refine further</div>
+          <div class="refinement-btns">
+            <button class="btn-refine" data-refine-type="shorter"   onclick="toggleRefine('shorter', this)">Make it shorter</button>
+            <button class="btn-refine" data-refine-type="formal"    onclick="toggleRefine('formal', this)">Make it more formal</button>
+            <button class="btn-refine" data-refine-type="casual"    onclick="toggleRefine('casual', this)">Make it more casual</button>
+            <button class="btn-refine" data-refine-type="reasoning" onclick="toggleRefine('reasoning', this)">Show your reasoning</button>
+            <button class="btn-refine" data-refine-type="language"  onclick="toggleRefine('language', this)">Simplify the language</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="export-panel fade-up">
+      <div class="export-title">Export &amp; Test</div>
+      <div class="export-row">
+        <button class="btn-export" onclick="copyCoached()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy Coached Prompt
+        </button>
+        <button class="btn-export" onclick="savePDF()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Save as PDF
+        </button>
+      </div>
+      <div class="ai-row-label">Test in your AI of choice</div>
+      <div class="ai-row">
+        <button class="btn-ai" onclick="openAI('claude')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.5"/><path d="M10 22l6-12 6 12M12.5 18h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Claude
+        </button>
+        <button class="btn-ai" onclick="openAI('chatgpt')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.5"/><path d="M10 16a6 6 0 0112 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          ChatGPT
+        </button>
+        <button class="btn-ai" onclick="openAI('gemini')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><polygon points="16,4 28,16 16,28 4,16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          Gemini
+        </button>
+        <button class="btn-ai" onclick="openAI('copilot')">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5"/><path d="M10 16h12M16 10v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Copilot
+        </button>
+      </div>
+    </div>
+
+    <div class="session-footer fade-up">
+      <em>Reads between the lines of a process document.</em>
+      <p style="margin-top:10px;font-size:0.72rem;font-style:normal;color:var(--muted);letter-spacing:0.04em;">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
+    </div>
+
+  </div><!-- /results -->
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// COACHING RULES — grounded in prompt engineering research
+// ═══════════════════════════════════════════════════════
+const RULES = [
+  {
+    id: 'action_verb',
+    name: 'Action Verb',
+    weight: 12,
+    check(p) {
+      const startsWithVerb = /^(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|give me|show me)/i;
+      const delegation = /\b(help me\s+(?:to\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|design|plan)|i need you to|act as\s+(?:a|an)\b|assist me\s+(?:with|in)|can you\s+(?:please\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|describe|identify|fix|improve)|please\s+(?:write|create|draft|summarize|analyze|explain|generate|list))\b/i;
+      const verbAnywhere = /\b(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan)\b/i;
+      if (startsWithVerb.test(p.trim()) || delegation.test(p)) return 'good';
+      if (verbAnywhere.test(p)) return 'weak';
+      return 'missing';
+    },
+    goodMsg: 'Contains a clear action directive — the model knows exactly what it needs to do.',
+    weakMsg: 'Action verb is buried. Lead with an imperative ("Write", "Analyze", "List") for better instruction-following.',
+    missingMsg: 'No action verb found anywhere. The model has to guess what you want done.',
+    research: 'OpenAI and Anthropic prompt guides both cite imperative-verb openers as the single highest-leverage fix for vague prompts. The model\'s instruction-tuning is anchored to action words.'
+  },
+  {
+    id: 'vagueness',
+    name: 'Specificity',
+    weight: 12,
+    check(p) {
+      const vague = /\b(something|stuff|whatever|anything|some kind|sort of|kind of|etc\.?|and so on)\b/i;
+      const vagueThings = /\bthings\b/i;
+      const specificThings = /\b\d+\s+things\b/i;
+      const vagueScope = /\b(all the important|some training|everything relevant|any key points?|all relevant|some useful|important things?|various topics?|key topics?|relevant information|the main (?:things?|points?|topics?))\b/i;
+      if (vague.test(p) || (vagueThings.test(p) && !specificThings.test(p))) return 'missing';
+      if (vagueScope.test(p)) return 'weak';
+      if (p.length < 40) return 'weak';
+      const wordCount = p.split(' ').filter(w => w.length > 0).length;
+      if (wordCount < 5) return 'weak';
+      const hasSpecificity = /\d/.test(p) || /\b(including|covering|specifically)\b/i.test(p) || p.includes(',') || (/\b(how to|about)\b/i.test(p) && (p.includes(',') || /\d/.test(p)));
+      if (hasSpecificity) return 'good';
+      return 'weak';
+    },
+    goodMsg: 'Specific enough that the model has a clear target.',
+    weakMsg: 'Vague scope phrase detected ("all the important topics", "everything relevant", etc.). Replace with the exact list of what you need.',
+    missingMsg: 'Vague filler words detected. The model can\'t act on "something" or "stuff".',
+    research: 'Wei et al. (2022) chain-of-thought research shows specificity reduces hallucination by giving the model a verifiable target rather than a semantic cloud.'
+  },
+  {
+    id: 'audience',
+    name: 'Audience',
+    weight: 8,
+    check(p) {
+      const hasAudience = /\b(for a|for an|for my|for me|for myself|i\'m the|i am the|to help me|so i can|i\'m a|i am a|audience|reader|beginner|expert|manager|team|client|customer|executive|engineer|developer|non-?technical|stakeholder)\b/i;
+      return hasAudience.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Audience is specified — the model can calibrate vocabulary and depth.',
+    weakMsg: 'No audience stated. The model will guess a middle-ground reader, often missing the mark.',
+    missingMsg: null,
+    research: 'Anthropic\'s Constitutional AI work shows audience specification shifts tone and complexity calibration. Without it, models default to a neutral register that often fits no one perfectly.'
+  },
+  {
+    id: 'format',
+    name: 'Output Format',
+    weight: 10,
+    check(p) {
+      const hasFormat = /\b(bullet|bulleted|numbered|list|table|paragraph|json|markdown|summary|outline|step.by.step|in \d+ (words|sentences|paragraphs|points)|as a|format|structure)\b/i;
+      return hasFormat.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Output format is defined — no guessing on structure.',
+    weakMsg: 'No format specified. The model will pick one, often verbose prose when you wanted bullets.',
+    missingMsg: null,
+    research: 'Zhou et al. (2023) "Large Language Models are Human-Level Prompt Engineers" found format constraints were the #2 most impactful prompt variable after task clarity.'
+  },
+  {
+    id: 'context',
+    name: 'Context',
+    weight: 12,
+    check(p) {
+      const words = p.split(' ').filter(w => w.length > 0);
+      if (words.length < 3) return 'weak';
+      const hasContext = /\b(we are|i am|i\'m|our|my|company|team|project|currently|working on|building|situation|background|context)\b/i;
+      if (hasContext.test(p)) return 'good';
+      if (p.length > 120) return 'weak';
+      return 'missing';
+    },
+    goodMsg: 'Context provided — the model can tailor the response to your situation.',
+    weakMsg: 'Limited context. Adding your situation, company, or project usually doubles relevance.',
+    missingMsg: 'No context. The model is working blind. A sentence about your situation dramatically improves output.',
+    research: 'Brown et al. (2020) GPT-3 few-shot paper established that in-context examples and situational priming are the primary mechanism for steering large models toward task-relevant outputs.'
+  },
+  {
+    id: 'negative_instructions',
+    name: 'Negative Instructions',
+    weight: 8,
+    check(p) {
+      const hasNeg = /\b(don\'t|do not|never|avoid|without|no (lists|bullets|headers|markdown|jargon|fluff|filler|intro|summary|preamble))\b/i;
+      return hasNeg.test(p) ? 'weak' : 'good';
+    },
+    goodMsg: 'No negative instructions detected — prompt is framed positively.',
+    weakMsg: 'Contains "don\'t" or "avoid" phrasing. Negative instructions are less reliable — models sometimes invert them under load.',
+    missingMsg: null,
+    research: 'Mishra et al. (2022) "Reframing Instructional Prompts to GPTk\'s Language" found that flipping negatives to positive constraints increased instruction-following accuracy by ~12% across benchmarks.'
+  },
+  {
+    id: 'length',
+    name: 'Length Constraint',
+    weight: 8,
+    check(p) {
+      const hasNumber = /\d/.test(p);
+      const hasUnit = /\b(words|pages|bullets|paragraphs|sentences|minutes|sections|items|points)\b/i.test(p);
+      if (hasNumber && hasUnit) return 'good';
+      const hasLength = /\b(in \d+|under \d+|about \d+|max \d+|no more than|at most|concise|brief|short|detailed|thorough|comprehensive|one.page|one page|\d+ words|\d+ sentences|\d+ paragraphs|\d+ bullet)\b/i;
+      if (!hasLength.test(p)) return 'weak';
+      return (hasNumber || hasUnit) ? 'good' : 'weak';
+    },
+    goodMsg: 'Length or depth is constrained — the model knows when to stop.',
+    weakMsg: 'No length constraint. Models often over-produce. Specify "in 3 bullets" or "under 150 words" to get tighter output.',
+    missingMsg: null,
+    research: 'Anthropic prompt engineering docs recommend explicit length tokens as one of the fastest ways to reduce padding and filler, which accounts for ~20-30% of raw model output on open-ended tasks.'
+  },
+  {
+    id: 'multitask',
+    name: 'Single Focus',
+    weight: 10,
+    check(p) {
+      const connectors = (p.match(/\b(and also|and then|additionally|furthermore|as well as|plus|also)\b/gi) || []).length;
+      const tasks = (p.match(/\b(write|create|analyze|summarize|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify)\b/gi) || []).length;
+      if (tasks > 2 || connectors > 1) return 'weak';
+      return 'good';
+    },
+    goodMsg: 'Single focused task — models perform significantly better on one clear objective.',
+    weakMsg: 'Multiple tasks detected. Models split attention and deliver mediocre results on each. Consider separate prompts.',
+    missingMsg: null,
+    research: 'Anthropic recommends breaking multi-task prompts into sequential sub-prompts. Liu et al. (2023) found accuracy drops ~18% when prompts contain 3+ distinct tasks vs. one.'
+  },
+  {
+    id: 'examples',
+    name: 'Examples',
+    weight: 10,
+    check(p) {
+      const hasExample = /\b(for example|e\.g\.|such as|like this|here\'s an example|sample|example:|input:|output:|e\.g:|e\.g,)\b/i;
+      return hasExample.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Includes an example — few-shot priming is one of the most reliable accuracy boosters.',
+    weakMsg: 'No example provided. Even one "for example" clause can cut ambiguity in half.',
+    missingMsg: null,
+    research: 'Brown et al. (2020) GPT-3 paper: few-shot examples are the highest-leverage prompting technique for instruction following, often outperforming fine-tuned smaller models.'
+  },
+  {
+    id: 'tone',
+    name: 'Tone',
+    weight: 10,
+    check(p) {
+      const hasTone = /\b(professional|casual|formal|informal|friendly|direct|concise|technical|plain|conversational|persuasive|neutral|serious|humorous|empathetic|confident|authoritative)\b/i;
+      return hasTone.test(p) ? 'good' : 'weak';
+    },
+    goodMsg: 'Tone is specified — the model can match your voice.',
+    weakMsg: 'No tone specified. The model defaults to a neutral academic tone that often sounds robotic.',
+    missingMsg: null,
+    research: 'Style and tone tokens are among the fastest interventions for output quality. Reynolds & McDonell (2021) showed tone modifiers reduce post-editing time by ~25% in writing tasks.'
+  },
+  {
+    id: 'data_grounding',
+    name: 'Data Grounding',
+    weight: 20,
+    check(p) {
+      const refsOwnData = /\b(our\s+(?:data|metrics|results|performance|numbers|report|campaign|analytics|stats|statistics|figures|findings|survey|study)|analyze\s+(?:our|the\s+following|my)\s+\w+|review\s+(?:our|the\s+following|my)\s+\w+|based\s+on\s+(?:our|my)\s+\w+)\b/i;
+      const hasNumbers = /\b\d+(?:[.,]\d+)?(?:\s*%|\s*k\b|\s*M\b|\s*million|\s*billion|\s*dollars?)|\$\s*\d|\d+\s*(?:users|clicks|conversions|sales|leads|impressions|sessions|visits|revenue|signups|downloads|views|responses?)\b/i;
+      const hasAttachedData = /\b(attached|below|above|the following|here is|here are|see table|see chart|see data|data:|metrics:|results:|the data shows|from the table|from the chart)\b/i;
+      if (refsOwnData.test(p) && !hasNumbers.test(p) && !hasAttachedData.test(p)) return 'missing';
+      return 'na';
+    },
+    goodMsg: 'Prompt references data and includes numbers or an explicit data source — well grounded.',
+    weakMsg: null,
+    missingMsg: 'This prompt asks AI to analyze your data — but no data is provided. Without source material, AI will fabricate plausible-sounding numbers. Paste your actual data into the prompt or instruct AI to ask you for it first.',
+    notApplicableMsg: 'This prompt isn\'t asking AI to analyze data, so no grounding is needed. If you want to add a data source or metrics, you can still include them.',
+    research: 'Retrieval-augmented generation (RAG) research consistently shows that LLMs without source material confabulate statistics at high rates. Providing even a raw data table dramatically reduces fabrication by giving the model a verifiable anchor.'
+  }
+];
+
+// ═══════════════════════
+// LIVE TIP ENGINE
+// ═══════════════════════
+const TIPS = [
+  { trigger: p => p.length > 0 && p.length < 20, msg: '<strong>Too short.</strong> Even a 10-word context sentence will dramatically improve results.' },
+  { trigger: p => /\b(something|stuff|things)\b/i.test(p), msg: '<strong>Vague word detected.</strong> Replace "something" or "stuff" with the actual deliverable.' },
+  { trigger: p => /\bdon\'t\b/i.test(p), msg: '<strong>Negative instruction.</strong> Try flipping "don\'t include X" to "focus only on Y" for more reliable results.' },
+  { trigger: p => p.length > 30 && !/\b(write|create|draft|summarize|analyze|list|generate|build|describe|explain|review|suggest|evaluate|outline|extract|identify|fix|improve|help|act as|assist|can you|please)\b/i.test(p), msg: '<strong>No action directive.</strong> Lead with what you want done: "Write", "Analyze", "Summarize", or "Help me create..."' },
+  { trigger: p => (p.match(/\b(and also|and then|additionally)\b/gi) || []).length > 1, msg: '<strong>Multiple tasks.</strong> Split into separate prompts for much better results on each.' },
+  { trigger: p => p.length > 60 && !/\b(bullet|list|table|paragraph|json|\d+ words|\d+ sentences)\b/i.test(p), msg: '<strong>No format specified.</strong> Add "as a bulleted list" or "in 3 paragraphs" to control output shape.' },
+  { trigger: p => p.length > 80 && !/\b(for a|for my|audience|beginner|expert|manager|team|client)\b/i.test(p), msg: '<strong>Who is this for?</strong> Adding "for a non-technical manager" or "for a sales team" focuses the output instantly.' },
+];
+
+const input = document.getElementById('promptInput');
+const liveTipEl = document.getElementById('liveTip');
+const charCountEl = document.getElementById('charCount');
+
+input.addEventListener('input', () => {
+  const p = input.value;
+  charCountEl.textContent = p.length + ' chars';
+  const tip = TIPS.find(t => t.trigger(p));
+  if (tip && p.length > 5) {
+    liveTipEl.innerHTML = '💡 ' + tip.msg;
+    liveTipEl.classList.add('visible');
+  } else {
+    liveTipEl.classList.remove('visible');
+  }
+});
+
+// ═══════════════════════
+// COACH ENGINE
+// ═══════════════════════
+function analyzePrompt() {
+  const raw = input.value.trim();
+  if (!raw) { showToast('Paste a prompt first'); return; }
+
+  const findings = RULES.map(r => ({ rule: r, status: r.check(raw) }));
+  window.originalFindings = findings;
+  const score = computeScore(findings);
+
+  renderScore(score, findings);
+  renderFindings(findings);
+  renderRewriteFields(raw, findings);
+
+  document.getElementById('assembledSection').style.display = 'none';
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function computeScore(findings) {
+  let earned = 0, total = 0;
+  findings.forEach(f => {
+    total += f.rule.weight;
+    if (f.status === 'good' || f.status === 'na') earned += f.rule.weight;
+    else if (f.status === 'weak') earned += f.rule.weight * 0.4;
+  });
+  return Math.round((earned / total) * 100);
+}
+
+function scoreLabel(s) {
+  if (s >= 85) return { label: 'Strong Prompt', color: 'var(--green)' };
+  if (s >= 65) return { label: 'Decent Prompt', color: 'var(--yellow)' };
+  if (s >= 40) return { label: 'Needs Work', color: 'var(--yellow)' };
+  return { label: 'Weak Prompt', color: 'var(--red)' };
+}
+
+function scoreSummary(s, findings) {
+  const missing = findings.filter(f => f.status === 'missing').map(f => f.rule.name.toLowerCase());
+  const weak = findings.filter(f => f.status === 'weak').map(f => f.rule.name.toLowerCase());
+  if (s >= 85) return 'This prompt is well-structured. Minor refinements possible.';
+  if (missing.length > 0) return 'Missing: ' + missing.slice(0,3).join(', ') + '. These gaps will produce generic or off-target results.';
+  if (weak.length > 0) return 'Weak on: ' + weak.slice(0,3).join(', ') + '. Fill in the fields below to tighten these.';
+  return 'Fill in the fields below to build your coached prompt.';
+}
+
+function renderScore(score, findings) {
+  const { label, color } = scoreLabel(score);
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreNum').style.color = color;
+  document.getElementById('scoreTitle').textContent = label;
+  document.getElementById('scoreTitle').style.color = color;
+  document.getElementById('scoreSummary').textContent = scoreSummary(score, findings);
+  const arc = document.getElementById('scoreArc');
+  const circumference = 314;
+  arc.style.strokeDashoffset = circumference - (score / 100) * circumference;
+  arc.style.stroke = color;
+}
+
+function renderFindings(findings) {
+  const el = document.getElementById('findingsList');
+  el.innerHTML = findings.map(f => {
+    let badgeClass, msg, badgeLabel;
+    if (f.status === 'na') {
+      badgeClass = 'badge-neutral';
+      msg = f.rule.notApplicableMsg || '';
+      badgeLabel = 'N/A';
+    } else if (f.status === 'good') {
+      badgeClass = 'badge-good';
+      msg = f.rule.goodMsg;
+      badgeLabel = 'good';
+    } else if (f.status === 'weak') {
+      badgeClass = 'badge-weak';
+      msg = f.rule.weakMsg || f.rule.missingMsg;
+      badgeLabel = 'weak';
+    } else {
+      badgeClass = 'badge-missing';
+      msg = f.rule.missingMsg;
+      badgeLabel = 'missing';
+    }
+    return `
+      <div class="finding">
+        <div class="finding-badge ${badgeClass}">${badgeLabel}</div>
+        <div class="finding-body">
+          <div class="finding-rule">${f.rule.name}</div>
+          <div class="finding-desc">${msg}</div>
+          <div class="finding-research">${f.rule.research}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════
+// REWRITE FIELDS
+// ═══════════════════════
+const COACH_FIELDS = {
+  action_verb: {
+    label: 'Opening Instruction',
+    type: 'input',
+    placeholder: 'e.g. "Act as an expert marketing coach. Write 3 paragraphs about creating content for beginners." or simply "Explain how to..."',
+    why: 'Start your prompt here. Tell the AI what to do and who to be. You can include a role like "Act as a [expert type]" followed by your task — "Write...", "Explain...", "List..." — or just lead with the task directly. This is the first thing the AI reads and it sets the direction for everything that follows.'
+  },
+  context: {
+    label: 'Your Situation',
+    type: 'textarea',
+    placeholder: 'e.g. "I\'m starting a small marketing business and I have no experience yet" or "I\'m a student trying to learn this for a class project"',
+    why: 'Give the AI one sentence about why you\'re asking. Are you a student? Starting a business? Trying to get better at your job? This one sentence changes everything about how the AI responds.'
+  },
+  audience: {
+    label: 'Who This Is For',
+    type: 'input',
+    placeholder: 'e.g. "For me — I\'m a complete beginner to marketing" or "For my small business team of 3 people"',
+    why: 'Tell the AI who will be reading the output. A beginner needs simpler language than an expert. Your boss needs a different tone than your team. Even "for me, I\'m just starting out" is enough to change how the AI responds.'
+  },
+  format: {
+    label: 'How You Want It Laid Out',
+    type: 'input',
+    placeholder: 'e.g. "Use bullet points with a bold heading for each one" or "Write it in 3 short paragraphs" or "Number each step"',
+    why: 'Tell the AI what the output should look like on the page. Without this, it will write one long wall of text. Do you want a list? Short paragraphs? Steps numbered 1-2-3? Say it here.'
+  },
+  length: {
+    label: 'How Long the Answer Should Be',
+    type: 'input',
+    placeholder: 'e.g. "No more than one page" or "Keep it under 200 words" or "Give me 5 bullet points maximum"',
+    why: 'AI will write as much as it possibly can unless you stop it. Set a limit so you get something you can actually read and use. Think about what would feel right — a quick summary or a detailed guide?'
+  },
+  tone: {
+    label: 'How It Should Sound',
+    type: 'input',
+    placeholder: 'e.g. "Friendly and encouraging, like a coach talking to a beginner" or "Simple and clear, like you\'re explaining to a 15 year old"',
+    why: 'Should the AI sound like a professor, a friendly coworker, or a coach talking to a teenager? If you don\'t say, it defaults to a flat textbook-style voice that can feel cold and hard to read.'
+  },
+  examples: {
+    label: 'An Example — Optional',
+    type: 'textarea',
+    placeholder: 'Optional — e.g. "Something like this: [paste an example of the kind of output you want]" — leave blank if you don\'t have one',
+    optionalNote: 'This field is optional. Skip it if you don\'t have an example — it will not block the coached prompt.',
+    why: 'If you can show the AI one example of what you\'re looking for, it will match that style much more closely. But skip this if you don\'t have one — your prompt will still build fine without it.'
+  },
+  negative_instructions: {
+    label: 'Negative Instructions',
+    type: 'textarea',
+    placeholder: 'Rewrite your constraint as a positive: instead of "don\'t be formal", write "use a conversational tone"',
+    why: 'Negative instructions are less reliable under model pressure — flip them to say what you want, not what you don\'t.'
+  },
+  multitask: {
+    label: 'Single Focus',
+    type: 'textarea',
+    placeholder: 'e.g. Separate your tasks: Prompt 1: "Analyze X" / Prompt 2: "Then write Y based on that analysis"',
+    why: 'Models split attention on multi-task prompts and deliver mediocre results on each. One objective = one prompt.'
+  },
+  data_grounding: {
+    label: 'Data',
+    type: 'textarea',
+    placeholder: 'Paste your actual data here, or write: "Ask me for the data before responding."',
+    why: 'AI will confabulate statistics without source material. Always give it the actual numbers or tell it to ask.'
+  },
+  vagueness: {
+    label: 'What Exactly You Need',
+    type: 'textarea',
+    placeholder: 'e.g. "Cover these 3 things: how to write a caption, how to pick a hashtag, and how to schedule posts" rather than "everything about marketing"',
+    why: 'Be as specific as possible about your topic. Instead of broad phrases like "marketing stuff" or "everything about X", say exactly what you want covered — the subject, the scope, any specific subtopics. The more precise you are, the less the AI has to guess.'
+  }
+};
+
+function escAttr(s) {
+  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+}
+
+let currentOriginalPrompt = '';
+
+function renderRewriteFields(raw, findings) {
+  currentOriginalPrompt = raw;
+  document.getElementById('originalPromptDisplay').textContent = raw;
+
+  const container = document.getElementById('coachFieldsContainer');
+  const notGood = findings.filter(f => f.status !== 'good' && f.status !== 'na');
+
+  if (notGood.length === 0) {
+    container.innerHTML = '';
+    document.getElementById('allGoodMsg').style.display = 'block';
+    document.getElementById('buildBtn').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('allGoodMsg').style.display = 'none';
+  document.getElementById('buildBtn').style.display = 'block';
+
+  container.innerHTML = notGood.map(f => {
+    const cfg = COACH_FIELDS[f.rule.id];
+    if (!cfg) return '';
+
+    if (f.rule.id === 'examples') {
+      return `
+      <div class="coach-field" data-field-id="examples">
+        <div class="coach-field-label">
+          An Example &#8212; Optional
+          <span class="finding-badge field-badge badge-neutral">OPTIONAL</span>
+        </div>
+        <div class="example-chips-row">
+          <button class="example-chip" data-chip="format" onclick="handleExampleChip(this, 'format')">Format</button>
+          <button class="example-chip" data-chip="tone" onclick="handleExampleChip(this, 'tone')">Tone</button>
+          <button class="example-chip" data-chip="inputoutput" onclick="handleExampleChip(this, 'inputoutput')">Input / Output</button>
+          <button class="example-chip" data-chip="match" onclick="handleExampleChip(this, 'match')">Match Something</button>
+        </div>
+        <div class="example-preview" style="display:none;">
+          <span class="example-preview-text"></span>
+          <button class="btn-use-example" onclick="useExamplePreview(this)">Use This As A Starting Point</button>
+        </div>
+        <textarea class="coach-field-input" data-criterion-name="An Example" data-rule-id="examples" rows="3" placeholder="Write your own example here, or leave it blank &#8212; this field is optional"></textarea>
+        <div class="coach-field-why" style="color:var(--gold);opacity:0.7;">&#9670; This field is optional. Skip it if you don&#39;t have an example &#8212; it will not block the coached prompt.</div>
+        <div class="coach-field-why">If you can show the AI one example of what you&#39;re looking for, it will match that style much more closely. But skip this if you don&#39;t have one &#8212; your prompt will still build fine without it.</div>
+      </div>`;
+    }
+
+    const badgeClass = f.status === 'weak' ? 'badge-weak' : 'badge-missing';
+    const inputEl = cfg.type === 'textarea'
+      ? `<textarea class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" data-rule-id="${f.rule.id}" rows="3" placeholder="${escAttr(cfg.placeholder)}"></textarea>`
+      : `<input type="text" class="coach-field-input" data-criterion-name="${escAttr(cfg.label)}" data-rule-id="${f.rule.id}" placeholder="${escAttr(cfg.placeholder)}">``;
+    const optionalLine = cfg.optionalNote
+      ? `<div class="coach-field-why" style="color:var(--gold);opacity:0.7;">&#9670; ${cfg.optionalNote}</div>`
+      : '';
+    return `
+      <div class="coach-field" data-field-id="${f.rule.id}">
+        <div class="coach-field-label">
+          ${cfg.label}
+          <span class="finding-badge field-badge ${badgeClass}">${f.status}</span>
+        </div>
+        ${inputEl}
+        ${optionalLine}
+        <div class="coach-field-why">${cfg.why}</div>
+      </div>`;
+  }).join('');
+
+  container.querySelectorAll('.coach-field-input').forEach(el => {
+    const ruleId = el.dataset.ruleId;
+    el.addEventListener('input', () => updateFieldBadge(ruleId));
+  });
+}
+
+function setBadgeStatus(ruleId, status) {
+  const fieldDiv = document.querySelector(`.coach-field[data-field-id="${ruleId}"]`);
+  if (!fieldDiv) return;
+  const badge = fieldDiv.querySelector('.field-badge');
+  if (!badge) return;
+
+  badge.classList.remove('badge-good', 'badge-weak', 'badge-missing', 'badge-neutral');
+  badge.classList.add(
+    status === 'good'    ? 'badge-good'    :
+    status === 'weak'    ? 'badge-weak'    :
+    status === 'na'      ? 'badge-neutral' :
+    'badge-missing'
+  );
+  badge.textContent = status === 'good' ? 'GOOD' : status === 'weak' ? 'WEAK' : status === 'missing' ? 'MISSING' : 'N/A';
+
+  if (status === 'good') {
+    fieldDiv.classList.add('field-resolved');
+  } else {
+    fieldDiv.classList.remove('field-resolved');
+  }
+}
+
+function updateFieldBadge(ruleId) {
+  if (ruleId === 'examples') return;
+  const field = document.querySelector(`[data-rule-id="${ruleId}"]`);
+  if (!field) return;
+  const value = field.value.trim();
+  if (!value) {
+    const originalFinding = (window.originalFindings || []).find(f => f.rule.id === ruleId);
+    if (!originalFinding) return;
+    setBadgeStatus(ruleId, originalFinding.status);
+    return;
+  }
+  const rule = RULES.find(r => r.id === ruleId);
+  if (!rule) return;
+  setBadgeStatus(ruleId, rule.check(value));
+}
+
+async function buildAssembledPrompt() {
+  const polishAI = document.getElementById('polishWithAI') && document.getElementById('polishWithAI').checked;
+  if (polishAI) {
+    const original = document.getElementById('promptInput').value.trim();
+    const fieldParts = [];
+    document.querySelectorAll('.coach-field-input').forEach(field => {
+      const val = field.value.trim();
+      if (val) fieldParts.push(field.dataset.criterionName + ': ' + val);
+    });
+    const buildBtn = document.getElementById('buildBtn');
+    const buildStatus = document.getElementById('buildStatus');
+    buildBtn.disabled = true;
+    buildStatus.style.display = 'block';
+    try {
+      const resp = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ max_tokens: 500, system: 'Take these prompt-coaching field answers and weave them into one natural, well-written prompt — not a bulleted list of the fields. Write in second person, as if the user wrote it. 100-200 words. No meta-commentary, no markdown formatting, start directly.', messages: [{ role: 'user', content: 'Original prompt: ' + original + '\n\nField answers:\n' + fieldParts.join('\n') }] })
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error?.message || data.error || 'API error');
+      const assembled = data.content[0].text.trim();
+      baseCoached = assembled;
+      resetRefineState();
+      document.getElementById('coachedText').textContent = assembled;
+      const assembledSection = document.getElementById('assembledSection');
+      assembledSection.style.display = 'block';
+      assembledSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showToast('Coached prompt assembled with AI');
+    } catch(err) {
+      showToast('AI unavailable — using local assembly');
+      runLocalAssembly();
+    } finally {
+      buildBtn.disabled = false;
+      buildStatus.style.display = 'none';
+    }
+    return;
+  }
+  runLocalAssembly();
+}
+
+function runLocalAssembly() {
+  const original = document.getElementById('promptInput').value.trim();
+  const additions = [];
+  let openingInstruction = '';
+
+  document.querySelectorAll('.coach-field-input').forEach(field => {
+    const val = field.value.trim();
+    if (!val) return;
+    if (field.dataset.ruleId === 'action_verb') {
+      openingInstruction = val;
+    } else {
+      additions.push(field.dataset.criterionName + ': ' + val);
+    }
+  });
+
+  let assembled;
+  if (openingInstruction) {
+    assembled = openingInstruction.replace(/\.\s*$/, '');
+    if (additions.length > 0) assembled += '\n\n' + additions.join('\n');
+  } else {
+    assembled = original;
+    if (additions.length > 0) {
+      assembled = original.replace(/\.\s*$/, '') + '.\n\n' + additions.join('\n');
+    }
+  }
+
+  baseCoached = assembled;
+  resetRefineState();
+  document.getElementById('coachedText').textContent = assembled;
+
+  const assembledSection = document.getElementById('assembledSection');
+  assembledSection.style.display = 'block';
+  assembledSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('Coached prompt assembled');
+}
+
+// ═══════════════════════
+// REFINEMENTS
+// ═══════════════════════
+let baseCoached = '';
+const REFINE_TYPES = ['shorter', 'formal', 'casual', 'reasoning', 'language'];
+const refineActive = Object.fromEntries(REFINE_TYPES.map(t => [t, false]));
+
+const REFINE_APPENDS = {
+  shorter:   '\nLength: Keep the entire response under 75 words.',
+  formal:    '\nTone: Use formal professional language. Avoid contractions and casual phrasing.',
+  casual:    '\nTone: Use a conversational approachable tone. Write like explaining to a colleague.',
+  reasoning: '\nReasoning: Before your final answer, briefly explain your thinking in 2-3 sentences.',
+  language:  '\nLanguage: Use plain language at an 8th grade reading level. No jargon unless defined.',
+};
+
+const REFINE_CHANGELOGS = {
+  shorter:   '<strong>Added length constraint:</strong> Limits response to 75 words — forces the model to prioritize only the most essential information.',
+  formal:    '<strong>Added tone instruction:</strong> Formal professional language — removes contractions and casual phrasing.',
+  casual:    '<strong>Added tone instruction:</strong> Conversational approachable tone — writes like explaining to a colleague.',
+  reasoning: '<strong>Added reasoning instruction:</strong> Model explains its thinking before the final answer — useful for checking logic.',
+  language:  '<strong>Added language instruction:</strong> Plain language at 8th grade level — no jargon unless defined.',
+};
+
+const REFINE_EXCLUSIVE = { formal: 'casual', casual: 'formal' };
+
+function resetRefineState() {
+  REFINE_TYPES.forEach(t => { refineActive[t] = false; });
+  document.querySelectorAll('.btn-refine').forEach(btn => {
+    setRefineButtonActive(btn, false);
+    btn.disabled = false;
+  });
+}
+
+function setRefineButtonActive(btn, active) {
+  if (active) {
+    btn.classList.add('active');
+    if (!btn.querySelector('.refine-tick')) {
+      const tick = document.createElement('span');
+      tick.className = 'refine-tick';
+      tick.textContent = ' ✓';
+      btn.appendChild(tick);
+    }
+  } else {
+    btn.classList.remove('active');
+    const tick = btn.querySelector('.refine-tick');
+    if (tick) tick.remove();
+  }
+}
+
+function updateCoachedText(text) {
+  document.getElementById('coachedText').textContent = text;
+}
+
+function applyActiveRefinements() {
+  let text = baseCoached;
+  for (const t of REFINE_TYPES) {
+    if (refineActive[t]) text += REFINE_APPENDS[t];
+  }
+  updateCoachedText(text);
+}
+
+function toggleRefine(type, btnEl) {
+  if (btnEl.disabled) return;
+
+  if (refineActive[type]) {
+    refineActive[type] = false;
+    setRefineButtonActive(btnEl, false);
+    const excl = REFINE_EXCLUSIVE[type];
+    if (excl) {
+      const exclBtn = document.querySelector(`.btn-refine[data-refine-type="${excl}"]`);
+      if (exclBtn) exclBtn.disabled = false;
+    }
+    showToast('Refinement removed');
+  } else {
+    const excl = REFINE_EXCLUSIVE[type];
+    if (excl) {
+      refineActive[excl] = false;
+      const exclBtn = document.querySelector(`.btn-refine[data-refine-type="${excl}"]`);
+      if (exclBtn) { setRefineButtonActive(exclBtn, false); exclBtn.disabled = true; }
+    }
+    refineActive[type] = true;
+    setRefineButtonActive(btnEl, true);
+    showToast('Refinement applied');
+  }
+
+  applyActiveRefinements();
+}
+
+// ═══════════════════════
+// EXPORT
+// ═══════════════════════
+function copyCoached() {
+  const text = document.getElementById('coachedText').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+}
+
+function savePDF() {
+  window.print();
+}
+
+const AI_URLS = {
+  claude:  'https://claude.ai/new',
+  chatgpt: 'https://chatgpt.com/',
+  gemini:  'https://gemini.google.com/app',
+  copilot: 'https://copilot.microsoft.com/'
+};
+
+function openAI(which) {
+  const text = document.getElementById('coachedText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Prompt copied — opening ' + which.charAt(0).toUpperCase() + which.slice(1));
+    setTimeout(() => window.open(AI_URLS[which], '_blank'), 400);
+  });
+}
+
+function clearAll() {
+  input.value = '';
+  charCountEl.textContent = '0 chars';
+  liveTipEl.classList.remove('visible');
+  document.getElementById('results').classList.remove('visible');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════
+// EXAMPLE CHIP SYSTEM
+// ═══════════════════════
+const EXAMPLE_CHIP_TEXTS = {
+  format: 'Structure it like a report with a bold header, 3 bullet points, and a one-sentence summary at the bottom — for example: "Header: [Topic] / Bullets: [Point 1], [Point 2], [Point 3] / Summary: [One sentence wrap-up]"',
+  tone: 'Write it the way a coach talks to a beginner — warm, simple, no jargon. For example: "Explain it like I\'m hearing this for the first time. Encouraging tone, short sentences, no technical terms unless you define them."',
+  inputoutput: 'Show the AI what goes in and what should come out. For example: "Given a list of 10 customer complaints, the output should be a grouped summary with 3 categories, each with a headline and 2-3 bullet points underneath."',
+  match: 'Paste something you already have that looks right. For example: "Format it similar to this: [paste a paragraph, email, report section, or any sample output you want to match in style or structure]"'
+};
+
+function handleExampleChip(chipEl, chipType) {
+  const fieldDiv = chipEl.closest('.coach-field');
+  const preview = fieldDiv.querySelector('.example-preview');
+  const previewText = fieldDiv.querySelector('.example-preview-text');
+  const allChips = fieldDiv.querySelectorAll('.example-chip');
+
+  if (chipEl.classList.contains('chip-active')) {
+    chipEl.classList.remove('chip-active');
+    preview.style.display = 'none';
+    return;
+  }
+
+  allChips.forEach(c => c.classList.remove('chip-active'));
+  chipEl.classList.add('chip-active');
+  previewText.textContent = EXAMPLE_CHIP_TEXTS[chipType];
+  preview.style.display = 'block';
+}
+
+function useExamplePreview(btnEl) {
+  const fieldDiv = btnEl.closest('.coach-field');
+  const preview = fieldDiv.querySelector('.example-preview');
+  const previewText = fieldDiv.querySelector('.example-preview-text');
+  const textarea = fieldDiv.querySelector('.coach-field-input');
+  const allChips = fieldDiv.querySelectorAll('.example-chip');
+
+  if (textarea) textarea.value = previewText.textContent;
+  preview.style.display = 'none';
+  allChips.forEach(c => c.classList.remove('chip-active'));
+  updateFieldBadge('examples');
+}
+
+function toggleExplainer() {
+  const p = document.querySelector('#scoringExplainer p');
+  const btn = document.getElementById('explainerToggleBtn');
+  const topRow = document.querySelector('.scoring-explainer-top');
+  if (!p || !btn) return;
+  if (p.classList.contains('collapsed')) {
+    p.classList.remove('collapsed');
+    btn.textContent = '×';
+    topRow.style.marginBottom = '10px';
+  } else {
+    p.classList.add('collapsed');
+    btn.textContent = '▼';
+    topRow.style.marginBottom = '0';
+  }
+}
+</script>
+</body>
+</html>
