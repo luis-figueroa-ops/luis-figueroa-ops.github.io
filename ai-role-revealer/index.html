@@ -168,6 +168,19 @@
     .step1-summary-row { font-size: 14px; color: var(--text-muted); line-height: 1.8; }
     .step1-summary-text { color: var(--text); white-space: pre-wrap; font-size: 15px; margin-top: 10px; line-height: 1.8; border-top: 1px solid var(--border); padding-top: 10px; }
 
+    /* Library panel */
+    .library-panel { background: #13131e; border: 1px solid #2e2e48; margin-top: 40px; margin-bottom: 40px; }
+    .library-panel-header { padding: 16px 24px; border-bottom: 1px solid #2e2e48; }
+    .library-panel-title { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+    .library-panel-body { }
+    .library-empty { padding: 20px 24px; font-size: 14px; color: var(--text-dim); font-style: italic; }
+    .library-entry { padding: 14px 24px; border-bottom: 1px solid #1e1e2e; display: flex; align-items: center; gap: 12px; }
+    .library-entry:last-child { border-bottom: none; }
+    .library-entry-meta { flex: 1; min-width: 0; }
+    .library-entry-label { font-size: 14px; color: var(--text-muted); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .library-entry-date { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+    .library-entry-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
     /* Hidden print area (screen: hidden) */
     #full-print-area { display: none; }
 
@@ -175,10 +188,26 @@
 
     /* Print — insights only */
     @media print {
-      body.print-insights .page-wrap > *:not(#insights-section):not(.nav) { display: none !important; }
+      body.print-insights { background: #fff !important; color: #000 !important; }
+      body.print-insights::before, body.print-insights::after { display: none !important; }
+      body.print-insights .page-wrap > *:not(#insights-section):not(#step1-section):not(.nav) { display: none !important; }
+      body.print-insights .nav { display: none !important; }
+      body.print-insights #step1-section { display: block !important; }
+      body.print-insights #step1-form { display: none !important; }
+      body.print-insights #step1-summary { display: block !important; }
       body.print-insights #insights-section { display: block !important; }
       body.print-insights .action-bar { display: none !important; }
       body.print-insights .insight-select-hint { display: none !important; }
+      body.print-insights .step1-summary-box { background: #f9f9f9 !important; border: 1px solid #ddd !important; }
+      body.print-insights .step1-summary-label { color: #888 !important; }
+      body.print-insights .step1-summary-row { color: #333 !important; }
+      body.print-insights .step1-summary-text { color: #222 !important; border-color: #ddd !important; }
+      body.print-insights .insights-header h2 { color: #111 !important; font-family: Georgia, serif; }
+      body.print-insights .insights-header p { color: #555 !important; }
+      body.print-insights .insight-card { background: #fff !important; border-color: #ddd !important; box-shadow: none !important; transform: none !important; }
+      body.print-insights .insight-title { color: #111 !important; font-family: Georgia, serif; }
+      body.print-insights .insight-body { color: #333 !important; }
+      body.print-insights .access-badge { background: #f5f5f5 !important; }
     }
 
     /* Print — full session (uses full-print-area) */
@@ -230,7 +259,7 @@
   <div class="progress-bar" id="progress-bar">
     <div class="progress-step active" id="prog-1"><div class="progress-dot"></div>Step 1 — Discover</div>
     <div class="progress-connector"></div>
-    <div class="progress-step" id="prog-2"><div class="progress-dot"></div>Step 2 — Build Prompt</div>
+    <div class="progress-step" id="prog-2"><div class="progress-dot"></div>Step 2 — Build Prompt <span style="font-size:11px;opacity:0.7;">(Optional)</span></div>
   </div>
   <div id="step1-section">
     <div id="step1-form">
@@ -288,6 +317,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
     <div id="insights-list"></div>
     <div class="action-bar" id="insights-action-bar">
       <button class="btn-action" onclick="printInsights()"><span>⬇</span> Save Insights PDF</button>
+      <button class="btn-action" onclick="saveToLibrary()"><span>☆</span> Save to Library</button>
       <div class="action-bar-divider"></div>
       <button class="reset-link" onclick="resetTool()">← Start Over</button>
     </div>
@@ -331,14 +361,27 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
     <div class="action-bar" style="margin-top:20px;">
       <button class="btn-action" id="copy-prompt-btn" onclick="copyCurrentPrompt(this)"><span>⍘</span> Copy Prompt</button>
       <button class="btn-action" onclick="printFullSession()"><span>⬇</span> Save Full Session PDF</button>
+      <button class="btn-action" onclick="saveToLibrary()"><span>☆</span> Save to Library</button>
       <button class="btn-action" id="brief-btn" onclick="generateManagerBrief()" style="display:none;"><span>⬇</span> Manager Brief</button>
       <div class="action-bar-divider"></div>
       <button class="reset-link" onclick="resetTool()">← Start Over</button>
+    </div>
+    <div id="bottom-switcher" style="display:none; margin-top:16px; padding:16px 20px; background:#13131e; border:1px solid #2e2e48;">
+      <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:12px;">Jump to another built prompt:</div>
+      <div id="bottom-switcher-buttons" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
     </div>
   </div>
 
   <!-- Hidden print area shared by full-session and manager brief -->
   <div id="full-print-area"></div>
+
+  <!-- My Library panel -->
+  <div class="library-panel" id="library-panel" style="display:none;">
+    <div class="library-panel-header">
+      <span class="library-panel-title">☆ My Library</span>
+    </div>
+    <div class="library-panel-body" id="library-panel-body"></div>
+  </div>
 
   <footer class="footer">
     <div class="footer-left">Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a> · <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>Augmenting Human Potential, One Workflow at a Time</div>
@@ -348,6 +391,7 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
 </div>
 <script>
   const SESSION_KEY = 'ai-role-revealer-session';
+  const LIBRARY_KEY = 'ai-role-revealer-library';
   let currentInsightIndex = 0, insights = [], promptStore = {}, sharedFields = { role: '', tone: '' };
   let comfortLevel = '', selectedTool = '', managerMode = false;
 
@@ -679,10 +723,33 @@ Respond ONLY in this JSON format (no markdown, no backticks):
       document.getElementById('current-prompt-area').style.display = 'block';
       document.getElementById('prompt-output-section').style.display = 'block';
       if (managerMode) document.getElementById('brief-btn').style.display = 'flex';
+      renderBottomSwitcher();
     } else {
       document.getElementById('prompt-output-section').style.display = 'none';
+      const bs = document.getElementById('bottom-switcher'); if (bs) bs.style.display = 'none';
     }
     setTimeout(() => { document.getElementById('step2-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+  }
+
+  function renderBottomSwitcher() {
+    const container = document.getElementById('bottom-switcher-buttons');
+    if (!container) return;
+    container.innerHTML = '';
+    const others = insights.map((ins, i) => i).filter(i => i !== currentInsightIndex && promptStore[i] && promptStore[i].promptText);
+    const wrapper = document.getElementById('bottom-switcher');
+    if (others.length === 0) { wrapper.style.display = 'none'; return; }
+    wrapper.style.display = 'block';
+    others.forEach(i => {
+      const color = INSIGHT_COLORS[i % INSIGHT_COLORS.length];
+      const btn = document.createElement('button');
+      btn.className = 'btn-action';
+      btn.style.borderColor = color + '55';
+      btn.style.color = color;
+      const title = insights[i].title;
+      btn.textContent = `${String(i+1).padStart(2,'0')} — ${title.length > 34 ? title.slice(0,34)+'…' : title}`;
+      btn.onclick = () => selectInsight(i);
+      container.appendChild(btn);
+    });
   }
 
   function saveCurrentPieceState(idx) {
@@ -756,7 +823,7 @@ Respond ONLY in this JSON format (no markdown, no backticks):
       badge.style.color = color;
       badge.style.background = color + '18';
 
-      saveSession(); renderSwitcherButtons();
+      saveSession(); renderSwitcherButtons(); renderBottomSwitcher();
       setTimeout(() => { document.getElementById('prompt-output-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
     } catch (err) { alert('Something went wrong: ' + err.message); }
     finally { btn.disabled = false; status.style.display = 'none'; }
@@ -776,12 +843,21 @@ Respond ONLY in this JSON format (no markdown, no backticks):
   function printFullSession() {
     const label = managerMode ? 'Gap' : 'Insight';
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const roleInput = document.getElementById('role-input').value.trim();
+    const printMode = managerMode ? 'Manager / Team Lead' : 'Employee';
+    const printComfort = comfortLevel || 'Not specified';
+    const printTool = selectedTool || 'Not specified';
 
     let html = `<div style="font-family: Georgia, serif; max-width: 720px; margin: 0 auto; padding: 24px;">
       <div style="border-bottom: 3px solid #222; padding-bottom: 16px; margin-bottom: 28px;">
         <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: #888; font-family: monospace; margin-bottom: 6px;">AI Role Revealer — Full Session</div>
         <div style="font-size: 22px; font-weight: bold; margin-bottom: 4px;">Insights &amp; Prompts</div>
         <div style="font-size: 12px; color: #666;">Generated ${dateStr}</div>
+      </div>
+      <div style="background:#f9f9f9;border:1px solid #ddd;padding:16px 20px;margin-bottom:28px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:#888;font-family:monospace;margin-bottom:8px;">Your Inputs</div>
+        <div style="font-size:12px;color:#555;margin-bottom:6px;"><strong>Mode:</strong> ${escapeHtml(printMode)} &nbsp;&middot;&nbsp; <strong>AI Comfort:</strong> ${escapeHtml(printComfort)} &nbsp;&middot;&nbsp; <strong>Tool:</strong> ${escapeHtml(printTool)}</div>
+        <div style="font-size:13px;color:#222;white-space:pre-wrap;border-top:1px solid #ddd;padding-top:8px;margin-top:4px;line-height:1.7;">${escapeHtml(roleInput)}</div>
       </div>`;
 
     insights.forEach((ins, i) => {
@@ -864,6 +940,7 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     document.getElementById('step2-section').style.display = 'none';
     document.getElementById('divider-2').style.display = 'none';
     document.getElementById('prompt-output-section').style.display = 'none';
+    const bsEl = document.getElementById('bottom-switcher'); if (bsEl) bsEl.style.display = 'none';
     document.getElementById('prog-1').classList.add('active'); document.getElementById('prog-1').classList.remove('done');
     document.getElementById('prog-2').classList.remove('active');
     ['p-role','p-need','p-context','p-audience','p-tone','p-format'].forEach(id => { document.getElementById(id).value = ''; });
@@ -879,6 +956,133 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // ── Library ───────────────────────────────────────────────────────────────────
+
+  function saveToLibrary() {
+    if (!insights || insights.length === 0) { alert('Generate insights first before saving to the library.'); return; }
+    try {
+      const lib = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+      const roleInput = document.getElementById('role-input').value.trim();
+      const entry = {
+        id: Date.now().toString(),
+        savedAt: new Date().toISOString(),
+        label: roleInput.slice(0, 40) + (roleInput.length > 40 ? '…' : ''),
+        roleInput, managerMode, comfortLevel, selectedTool,
+        insights: JSON.parse(JSON.stringify(insights)),
+        promptStore: JSON.parse(JSON.stringify(promptStore))
+      };
+      lib.unshift(entry);
+      localStorage.setItem(LIBRARY_KEY, JSON.stringify(lib));
+      renderLibraryPanel();
+      showLibraryToast('Saved to library');
+    } catch(e) { alert('Could not save to library.'); }
+  }
+
+  function loadLibraryEntry(id) {
+    try {
+      const lib = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+      const entry = lib.find(e => e.id === id);
+      if (!entry) return;
+      // Reset state
+      insights = []; promptStore = {}; sharedFields = { role: '', tone: '' }; currentInsightIndex = 0;
+      comfortLevel = entry.comfortLevel || '';
+      selectedTool = entry.selectedTool || '';
+      managerMode = entry.managerMode || false;
+      insights = entry.insights || [];
+      promptStore = entry.promptStore || {};
+      // Reset UI elements
+      document.getElementById('role-input').value = entry.roleInput || '';
+      document.getElementById('insights-list').innerHTML = '';
+      document.getElementById('insights-section').style.display = 'none';
+      document.getElementById('step1-form').style.display = 'block';
+      document.getElementById('step1-summary').style.display = 'none';
+      document.getElementById('step1-summary').innerHTML = '';
+      document.getElementById('step2-section').style.display = 'none';
+      document.getElementById('divider-2').style.display = 'none';
+      document.getElementById('prompt-output-section').style.display = 'none';
+      const bsLoad = document.getElementById('bottom-switcher'); if (bsLoad) bsLoad.style.display = 'none';
+      ['p-role','p-need','p-context','p-audience','p-tone','p-format'].forEach(id => { document.getElementById(id).value = ''; });
+      document.querySelectorAll('input[name="comfort"]').forEach(r => r.checked = false);
+      document.getElementById('tool-select').value = '';
+      document.getElementById('tool-other-input').value = '';
+      document.getElementById('tool-other-input').classList.add('hidden');
+      document.getElementById('prog-1').classList.add('active'); document.getElementById('prog-1').classList.remove('done');
+      document.getElementById('prog-2').classList.remove('active');
+      // Apply mode
+      if (managerMode) { applyManagerModeUI(); document.getElementById('mode-manager').classList.add('active'); document.getElementById('mode-employee').classList.remove('active'); }
+      else { applyEmployeeModeUI(); document.getElementById('mode-employee').classList.add('active'); document.getElementById('mode-manager').classList.remove('active'); }
+      // Restore comfort
+      if (comfortLevel) document.querySelectorAll('input[name="comfort"]').forEach(r => { if (r.value === comfortLevel) r.checked = true; });
+      // Restore tool
+      if (selectedTool) {
+        const knownTools = ['', 'Claude', 'ChatGPT', 'Microsoft Copilot', 'Gemini', 'Grok', 'Perplexity', '__other__'];
+        if (knownTools.includes(selectedTool)) {
+          document.getElementById('tool-select').value = selectedTool;
+        } else {
+          document.getElementById('tool-select').value = '__other__';
+          const oi = document.getElementById('tool-other-input');
+          oi.value = selectedTool; oi.classList.remove('hidden');
+        }
+      }
+      // Render insights
+      if (insights.length > 0) {
+        renderInsights(true);
+        const firstWithPrompt = Object.keys(promptStore).find(k => promptStore[k] && promptStore[k].promptText);
+        if (firstWithPrompt != null) selectInsight(parseInt(firstWithPrompt));
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch(e) { alert('Could not load library entry.'); }
+  }
+
+  function deleteLibraryEntry(id) {
+    if (!confirm('Delete this saved session?')) return;
+    try {
+      const lib = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+      localStorage.setItem(LIBRARY_KEY, JSON.stringify(lib.filter(e => e.id !== id)));
+      renderLibraryPanel();
+    } catch(e) {}
+  }
+
+  function renderLibraryPanel() {
+    try {
+      const lib = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+      const panel = document.getElementById('library-panel');
+      const body = document.getElementById('library-panel-body');
+      if (!lib.length) { panel.style.display = 'none'; return; }
+      panel.style.display = 'block';
+      body.innerHTML = lib.map(entry => {
+        const date = new Date(entry.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const promptCount = Object.values(entry.promptStore || {}).filter(p => p && p.promptText).length;
+        const modeLabel = entry.managerMode ? 'Manager' : 'Employee';
+        const insightCount = entry.insights ? entry.insights.length : 0;
+        const meta = `${modeLabel} · ${insightCount} insight${insightCount !== 1 ? 's' : ''}${promptCount ? ' · ' + promptCount + ' prompt' + (promptCount > 1 ? 's' : '') : ''}`;
+        return `<div class="library-entry">
+          <div class="library-entry-meta">
+            <div class="library-entry-label">${escapeHtml(entry.label || '(untitled)')}</div>
+            <div class="library-entry-date">${date} · ${escapeHtml(meta)}</div>
+          </div>
+          <div class="library-entry-actions">
+            <button class="btn-action" style="font-size:12px;padding:7px 14px;" onclick="loadLibraryEntry('${entry.id}')">Load</button>
+            <button class="btn-action" style="font-size:12px;padding:7px 14px;" onclick="deleteLibraryEntry('${entry.id}')">Delete</button>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(e) {}
+  }
+
+  function showLibraryToast(msg) {
+    let toast = document.getElementById('lib-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'lib-toast';
+      toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#13131e;border:1px solid var(--accent3);color:var(--accent3);font-family:var(--mono);font-size:13px;letter-spacing:0.08em;padding:10px 22px;z-index:9999;pointer-events:none;opacity:0;transition:opacity 0.2s;white-space:nowrap;';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+  }
+
   function updateProgress(step) {
     if (step >= 1.5) { document.getElementById('prog-1').classList.remove('active'); document.getElementById('prog-1').classList.add('done'); }
     if (step >= 2) { document.getElementById('prog-2').classList.add('active'); }
@@ -891,6 +1095,7 @@ Respond ONLY in this JSON format (no markdown, no backticks):
     if (saved && saved.insights && saved.insights.length > 0) {
       document.getElementById('resume-banner').classList.remove('hidden');
     }
+    renderLibraryPanel();
   });
 </script>
 </body>
