@@ -28,17 +28,16 @@
   }
   #game-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .back-nav { font-size: 11px; letter-spacing: 1px; }
-  .back-nav a {
-    color: #8888aa;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
+  .back-nav a { color: #8888aa; text-decoration: none; transition: color 0.2s; }
   .back-nav a:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
   .back-nav.hidden { visibility: hidden; pointer-events: none; }
   #hud { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
   #hud-left { display: flex; flex-direction: column; gap: 2px; }
   #score-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--accent); letter-spacing: 3px; opacity: 0.6; }
   #score { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent); text-shadow: 0 0 20px var(--accent); }
+  #hud-center { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  #level-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--warn); letter-spacing: 3px; opacity: 0.6; }
+  #level-display { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; color: var(--warn); text-shadow: 0 0 16px var(--warn); white-space: nowrap; }
   #hud-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
   #lives-display { display: flex; gap: 6px; }
   .life-pip { width: 10px; height: 10px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 8px var(--danger); transition: all 0.2s; }
@@ -91,6 +90,36 @@
   #boss-bar { height: 100%; background: var(--danger); box-shadow: 0 0 10px var(--danger); transition: width 0.1s; }
   #boss-label { font-family: 'Orbitron', sans-serif; font-size: 9px; color: var(--danger); letter-spacing: 3px; text-align: center; margin-bottom: 2px; display: none; }
   #boss-label.visible { display: block; }
+
+  /* ── Win screen ── */
+  #win-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    background: rgba(5,5,18,0.97); backdrop-filter: blur(6px); z-index: 30; padding: 16px;
+    overflow: hidden;
+  }
+  #win-overlay.show { display: flex; }
+  #win-title {
+    font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900;
+    letter-spacing: 5px; color: var(--warn);
+    text-shadow: 0 0 40px var(--warn), 0 0 80px rgba(255,204,0,0.4);
+    animation: pulse 1.5s ease-in-out infinite;
+    text-align: center;
+  }
+  #win-sub { font-size: 11px; color: #aaaacc; letter-spacing: 2px; text-align: center; }
+  #badge-canvas { display: block; }
+  #win-score-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #aaaacc; letter-spacing: 3px; }
+  #win-score-val { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: var(--accent); text-shadow: 0 0 24px var(--accent); }
+  #win-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 3px; color: var(--bg); background: var(--warn); border: none;
+    padding: 12px 28px; cursor: pointer;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: all 0.15s; box-shadow: 0 0 30px rgba(255,204,0,0.4);
+    -webkit-tap-highlight-color: transparent; margin-top: 4px;
+  }
+  #win-btn:active { background: #fff; transform: scale(0.97); }
+
   @keyframes flashIn {
     0%   { opacity:0; transform:translate(-50%,-50%) scale(0.8); }
     20%  { opacity:1; transform:translate(-50%,-50%) scale(1.05); }
@@ -125,6 +154,10 @@
       <div id="score-label">SCORE</div>
       <div id="score">0</div>
     </div>
+    <div id="hud-center">
+      <div id="level-label">LEVEL</div>
+      <div id="level-display">1 / 15</div>
+    </div>
     <div id="hud-right">
       <div style="display:flex;align-items:center;gap:10px;">
         <button id="pause-btn">⏸ PAUSE</button>
@@ -146,7 +179,7 @@
     <canvas id="canvas"></canvas>
     <div id="overlay">
       <div class="overlay-title" id="overlay-title">DODGE</div>
-      <div class="overlay-sub" id="overlay-sub">SURVIVE THE GRID</div>
+      <div class="overlay-sub" id="overlay-sub">SURVIVE THE GRID — 15 LEVELS</div>
       <div class="overlay-score-label" id="overlay-score-label" style="display:none">FINAL SCORE</div>
       <div class="overlay-score-val" id="overlay-score-val" style="display:none">0</div>
       <div id="name-input-wrap">
@@ -161,16 +194,28 @@
       <div id="tip">MOUSE, ARROW KEYS, or DRAG to move</div>
       <div id="tip2">🛡️ SHIELD - blocks one hit &nbsp;|&nbsp; ⏱️ SLOW-MO - halves speed</div>
     </div>
+
+    <!-- Win screen lives inside canvas-wrap so it overlays the canvas -->
+    <div id="win-overlay">
+      <div id="win-title">MISSION COMPLETE</div>
+      <div id="win-sub">ALL 15 LEVELS CLEARED — YOU ARE ELITE</div>
+      <canvas id="badge-canvas" width="200" height="200"></canvas>
+      <div id="win-score-label">FINAL SCORE</div>
+      <div id="win-score-val">0</div>
+      <button id="win-btn">PLAY AGAIN</button>
+    </div>
+
     <div id="level-flash"></div>
   </div>
 </div>
 
 <script>
-// ─── Fixed internal game resolution ───────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 const GW = 480, GH = 580;
+const MAX_LEVEL = 15;
+const SCORE_PER_LEVEL = 600;
 
 // ─── Device detection ─────────────────────────────────────────────────────────
-// pointer:coarse = touch primary device. pointer:fine = mouse primary device.
 const isMobile = window.matchMedia('(pointer: coarse)').matches;
 
 // ─── Canvas setup ─────────────────────────────────────────────────────────────
@@ -184,41 +229,26 @@ const backNav = document.getElementById('back-nav');
 canvas.width  = GW;
 canvas.height = GH;
 
-// cssToGame: how many game pixels per CSS pixel (inverse of visual scale)
-// Used to convert touch deltas correctly
 let cssToGame = 1;
 
 function resize() {
   const availW = window.innerWidth  - 4;
   const availH = window.innerHeight - 4;
-  // extraH accounts for non-canvas vertical chrome: the back-to-tools link,
-  // the HUD row, and flex gaps between game-wrapper children.
   const extraH = 100;
-
-  // Calculate what scale would be needed to fit
   const fitScale = Math.min(availW / GW, (availH - extraH) / GH);
-
-  // Desktop (mouse): never scale below 1, never scale at all
-  // Mobile (touch): scale to fit screen
   const scale = isMobile ? fitScale : 1;
-
   const cw = Math.floor(GW * scale);
   const ch = Math.floor(GH * scale);
-
   canvas.style.width  = cw + 'px';
   canvas.style.height = ch + 'px';
   hudEl.style.width   = cw + 'px';
   bbWrap.style.width  = cw + 'px';
   wrapper.style.width = cw + 'px';
-
-  // cssToGame = game pixels per CSS pixel
-  // e.g. if scale=0.7, canvas is 336 CSS px wide for 480 game px => 480/336 = 1.43 game px per CSS px
   cssToGame = GW / cw;
 }
 resize();
 window.addEventListener('resize', () => { if (!touchInProgress) resize(); });
 
-// Convert screen clientX/Y to internal game coordinates
 function screenToGame(clientX, clientY) {
   const r = canvas.getBoundingClientRect();
   return {
@@ -245,8 +275,7 @@ function playTone(freq, type, dur, vol, freqEnd) {
     osc.start(); osc.stop(ac.currentTime + dur);
   } catch(e) {}
 }
-// Play a burst of filtered white noise — the foundation of good space SFX
-function playNoise(dur, vol, filterType, filterFreqStart, filterFreqEnd, pitchLFOrate) {
+function playNoise(dur, vol, filterType, filterFreqStart, filterFreqEnd) {
   try {
     const ac = getAudio();
     const bufLen = ac.sampleRate * dur;
@@ -274,7 +303,6 @@ const SFX = {
   powerup: () => { playTone(440,'sine',0.08,0.2); playTone(660,'sine',0.12,0.2); playTone(880,'sine',0.18,0.2); },
   shield:  () => playTone(600,'sine',0.15,0.25,900),
   levelup: () => {
-    // Warp jump: deep sine thump + noise whoosh sweep upward
     playTone(55,'sine',0.5,0.18,80);
     playNoise(0.6, 0.12, 'bandpass', 300, 4000);
     playTone(880,'sine',0.4,0.06,1760);
@@ -282,19 +310,24 @@ const SFX = {
   boss:    () => { playTone(80,'sawtooth',0.8,0.35,60); playTone(60,'square',0.5,0.2,50); },
   bossdie: () => { playTone(500,'sawtooth',0.05,0.3); playTone(400,'sawtooth',0.05,0.3); playTone(300,'sawtooth',0.05,0.3); playTone(200,'sawtooth',0.4,0.3,50); },
   dodge:   () => { if (Math.random()>0.94) playTone(880,'sine',0.04,0.05,1200); },
-  // Near-miss: short noise burst filtered high->low, like something flying past
   whoosh:  () => playNoise(0.18, 0.08, 'bandpass', 3000, 400),
-  // Keyboard thrust: very brief low-filtered noise puff
-  thruster: () => playNoise(0.1, 0.05, 'lowpass', 280, 120)
+  thruster:() => playNoise(0.1, 0.05, 'lowpass', 280, 120),
+  // Victory fanfare: ascending chord stabs
+  victory: () => {
+    [0,0.12,0.24,0.38].forEach((t,i) => {
+      const freqs = [523,659,784,1047];
+      setTimeout(() => playTone(freqs[i],'sine',0.35,0.18), t*1000);
+    });
+    setTimeout(() => playNoise(0.6, 0.08, 'bandpass', 800, 4000), 480);
+  }
 };
 
-// ─── Space ambient engine hum (filtered noise, not oscillators) ───────────────
+// ─── Engine hum ───────────────────────────────────────────────────────────────
 let _engineHumNode = null, _engineHumGain = null;
 function startEngineHum() {
   try {
     if (_engineHumNode) return;
     const ac = getAudio();
-    // Looping white noise through a tight lowpass = smooth deep rumble
     const bufLen = ac.sampleRate * 2;
     const buf = ac.createBuffer(1, bufLen, ac.sampleRate);
     const data = buf.getChannelData(0);
@@ -303,7 +336,6 @@ function startEngineHum() {
     src.buffer = buf; src.loop = true;
     const filt = ac.createBiquadFilter();
     filt.type = 'lowpass'; filt.frequency.value = 120; filt.Q.value = 0.8;
-    // Slow LFO on filter cutoff gives breathing movement
     const lfo = ac.createOscillator(), lfoGain = ac.createGain();
     lfo.frequency.value = 0.3; lfoGain.gain.value = 30;
     lfo.connect(lfoGain); lfoGain.connect(filt.frequency);
@@ -363,15 +395,8 @@ let state    = 'idle';
 let score    = 0, lives = 3, frame = 0, animId = null, lastLevel = 1;
 const P      = { x:W/2, y:H-80, w:28, h:16, speed:5 };
 
-// Mouse
 let mx = W/2, my = H-80, mouseMoved = false;
-
-// Touch — store whether finger is down; position set directly each touchmove
-let touchActive = false;
-
-// Block resize from firing while finger is on screen (prevents canvasScale changing mid-drag)
-let touchInProgress = false;
-
+let touchActive = false, touchInProgress = false;
 let keys = {};
 let paused = false;
 const pauseBtn = document.getElementById('pause-btn');
@@ -384,15 +409,11 @@ function togglePause() {
     if (audioCtx) { if (paused) audioCtx.suspend(); else audioCtx.resume(); }
   } catch(e) {}
 }
-
 pauseBtn.addEventListener('click', togglePause);
 
 let shieldActive = false, shieldTimer = 0;
 let slowActive   = false, slowTimer   = 0;
 let powerups = [], obstacles = [];
-
-// Score per level threshold — raised to 600 so each level takes ~10 seconds at 60fps
-const SCORE_PER_LEVEL = 600;
 let baseSpeed = 1.6, spawnRate = 52;
 let bossActive = false, boss = null, bossHP = 0, bossMaxHP = 0, bossWaveLevel = 0;
 let particles = [];
@@ -401,20 +422,53 @@ let stars = Array.from({length:60}, () => ({
   r:Math.random()*1.5+0.3, s:Math.random()*0.4+0.1
 }));
 let gridOffset = 0;
+let touchTargetX = 0, touchTargetY = 0;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function getLevel()         { return Math.floor(score/SCORE_PER_LEVEL)+1; }
+// ─── Level / difficulty helpers ───────────────────────────────────────────────
+function getLevel() {
+  // Level is score-based but hard-capped at MAX_LEVEL
+  return Math.min(Math.floor(score / SCORE_PER_LEVEL) + 1, MAX_LEVEL);
+}
 function getSpeedMult()     { return slowActive ? 0.45 : 1; }
-function getObstacleSpeed() { return (baseSpeed+(getLevel()-1)*0.4)*getSpeedMult(); }
-function getSpawnRate()     { return Math.max(18, spawnRate-(getLevel()-1)*3); }
-function isBossLevel(l)     { return l>=6 && (l-6)%4===0; }
 
-// ─── Back nav visibility ──────────────────────────────────────────────────────
-function setBackNavVisible(visible) {
-  backNav.classList.toggle('hidden', !visible);
+// Obstacle speed ramps from 1.6 at L1 to ~5.8 at L15 in a gentle curve
+// Formula: base + (level-1) * step, capped at a max
+function getObstacleSpeed() {
+  const lvl = getLevel();
+  const speed = baseSpeed + (lvl - 1) * 0.3;
+  return speed * getSpeedMult();
 }
 
-// ─── Mouse input ──────────────────────────────────────────────────────────────
+// Spawn rate: starts at 52 frames, tightens to a floor of 16 at L15
+function getSpawnRate() {
+  const lvl = getLevel();
+  return Math.max(16, spawnRate - (lvl - 1) * 2.5 | 0);
+}
+
+function isBossLevel(l) { return l >= 6 && (l - 6) % 4 === 0; }
+// Boss levels at 15-level cap: 6, 10, 14 — three boss waves total
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function setBackNavVisible(visible) { backNav.classList.toggle('hidden', !visible); }
+
+// ─── HUD update ───────────────────────────────────────────────────────────────
+function updateHUD() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('level-display').textContent = getLevel() + ' / ' + MAX_LEVEL;
+  ['pip1','pip2','pip3'].forEach((id,i) => document.getElementById(id).classList.toggle('dead', i>=lives));
+}
+function updatePowerupUI() {
+  document.getElementById('pu-shield').classList.toggle('active', shieldActive);
+  document.getElementById('pu-slow').classList.toggle('active', slowActive);
+}
+function showLevelFlash(text, color) {
+  const el = document.getElementById('level-flash');
+  el.textContent=text; el.style.color=color||'var(--warn)';
+  el.style.textShadow=`0 0 30px ${color||'var(--warn)'}`;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+
+// ─── Input ────────────────────────────────────────────────────────────────────
 canvas.addEventListener('mousemove', e => {
   if (isMobile) return;
   const p = screenToGame(e.clientX, e.clientY);
@@ -422,7 +476,6 @@ canvas.addEventListener('mousemove', e => {
 });
 canvas.addEventListener('mouseleave', () => { mouseMoved = false; });
 
-// ─── Keyboard input ───────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); togglePause(); return; }
   keys[e.key] = true;
@@ -430,59 +483,34 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('keyup', e => { keys[e.key] = false; });
 
-// ─── Touch input ──────────────────────────────────────────────────────────────
-// Finger position stored in game coords. Ship moves toward it each frame in the
-// game loop, capped at the same rate as desktop: Math.min(dist, P.speed * 1.4)
-let touchTargetX = 0, touchTargetY = 0;
-
 if (isMobile) {
   canvas.addEventListener('touchstart', e => {
-    e.preventDefault();
-    touchInProgress = true;
+    e.preventDefault(); touchInProgress = true;
     if (state !== 'playing') return;
     const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
-    // Only set the target — never teleport the ship directly
-    touchTargetX = pos.x;
-    touchTargetY = pos.y;
-    touchActive = true;
-    mouseMoved  = false;
+    touchTargetX = pos.x; touchTargetY = pos.y;
+    touchActive = true; mouseMoved = false;
   }, { passive: false });
-
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
     if (state !== 'playing' || !touchActive) return;
-    const raw = e.touches[0];
-    const pos = screenToGame(raw.clientX, raw.clientY);
-    const dx = pos.x - P.x, dy = pos.y - P.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    const movePx = Math.min(dist, P.speed * 0.8);
-    console.log('[touch] raw=(' + raw.clientX.toFixed(1) + ',' + raw.clientY.toFixed(1) + ')'
-      + ' game=(' + pos.x.toFixed(1) + ',' + pos.y.toFixed(1) + ')'
-      + ' ship=(' + P.x.toFixed(1) + ',' + P.y.toFixed(1) + ')'
-      + ' dist=' + dist.toFixed(1)
-      + ' movePx=' + movePx.toFixed(2));
-    touchTargetX = pos.x;
-    touchTargetY = pos.y;
+    const pos = screenToGame(e.touches[0].clientX, e.touches[0].clientY);
+    touchTargetX = pos.x; touchTargetY = pos.y;
   }, { passive: false });
-
   canvas.addEventListener('touchend', e => {
-    e.preventDefault();
-    touchActive = false;
-    touchInProgress = false;
+    e.preventDefault(); touchActive = false; touchInProgress = false;
   }, { passive: false });
-
   canvas.addEventListener('touchcancel', e => {
-    e.preventDefault();
-    touchActive = false;
-    touchInProgress = false;
+    e.preventDefault(); touchActive = false; touchInProgress = false;
   }, { passive: false });
 }
 
 // ─── Buttons ──────────────────────────────────────────────────────────────────
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('player-name').addEventListener('keydown', e => { if(e.key==='Enter') startGame(); });
+document.getElementById('win-btn').addEventListener('click', startGame);
 
-// ─── Game functions ───────────────────────────────────────────────────────────
+// ─── Game flow ────────────────────────────────────────────────────────────────
 function startGame() {
   score=0; lives=3; frame=0; lastLevel=1;
   obstacles=[]; particles=[]; powerups=[];
@@ -497,6 +525,7 @@ function startGame() {
   document.getElementById('overlay-title').style.textShadow='0 0 40px var(--accent), 0 0 80px rgba(0,255,231,0.3)';
   document.getElementById('overlay-score-label').style.display='none';
   document.getElementById('overlay-score-val').style.display='none';
+  document.getElementById('win-overlay').classList.remove('show');
   paused=false; pauseBtn.style.display='block'; pauseBtn.textContent='⏸ PAUSE';
   updateHUD(); updatePowerupUI();
   document.getElementById('overlay').classList.add('hidden');
@@ -507,20 +536,195 @@ function startGame() {
   loop();
 }
 
-function updateHUD() {
-  document.getElementById('score').textContent = score;
-  ['pip1','pip2','pip3'].forEach((id,i) => document.getElementById(id).classList.toggle('dead', i>=lives));
+// ─── Win condition ────────────────────────────────────────────────────────────
+function showWinScreen() {
+  state = 'won';
+  stopEngineHum();
+  paused = false;
+  pauseBtn.style.display = 'none';
+  setBackNavVisible(true);
+  SFX.victory();
+
+  const playerName = document.getElementById('player-name').value || 'PILOT';
+  try { localStorage.setItem('dodge_pilot_name', playerName); } catch(e) {}
+  addToLB(playerName, score); // save to board even for wins
+
+  document.getElementById('win-score-val').textContent = score;
+  document.getElementById('win-overlay').classList.add('show');
+  drawBadge();
 }
-function updatePowerupUI() {
-  document.getElementById('pu-shield').classList.toggle('active', shieldActive);
-  document.getElementById('pu-slow').classList.toggle('active', slowActive);
+
+// ─── Animated space pilot badge ───────────────────────────────────────────────
+function drawBadge() {
+  const bc = document.getElementById('badge-canvas');
+  const bx = bc.getContext('2d');
+  const cx = 100, cy = 100, t = performance.now();
+  let badgeAnim = null;
+
+  const pilotName = (document.getElementById('player-name').value || 'PILOT').toUpperCase().slice(0,8);
+
+  function render(now) {
+    badgeAnim = requestAnimationFrame(render);
+    const elapsed = (now - t) / 1000;
+    bx.clearRect(0,0,200,200);
+
+    // Starfield behind badge
+    bx.save();
+    for (let i = 0; i < 30; i++) {
+      const sx = ((i * 73.7 + elapsed * 5) % 200);
+      const sy = ((i * 41.3 + elapsed * 2) % 200);
+      const sr = 0.6 + (i % 3) * 0.4;
+      const alpha = 0.3 + 0.4 * Math.sin(elapsed * 1.5 + i);
+      bx.fillStyle = `rgba(200,220,255,${alpha})`;
+      bx.beginPath(); bx.arc(sx, sy, sr, 0, Math.PI*2); bx.fill();
+    }
+    bx.restore();
+
+    // Outer ring glow (slow rotate)
+    const ringRot = elapsed * 0.4;
+    bx.save();
+    bx.translate(cx, cy); bx.rotate(ringRot);
+    // 12 tick marks around the ring
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      const pulse = 0.6 + 0.4 * Math.sin(elapsed * 2 + i * 0.5);
+      bx.strokeStyle = `rgba(255,204,0,${pulse})`;
+      bx.lineWidth = 2;
+      bx.beginPath();
+      bx.moveTo(Math.cos(a)*70, Math.sin(a)*70);
+      bx.lineTo(Math.cos(a)*78, Math.sin(a)*78);
+      bx.stroke();
+    }
+    bx.restore();
+
+    // Outer circle
+    const grad = bx.createRadialGradient(cx,cy,50,cx,cy,85);
+    grad.addColorStop(0, 'rgba(20,10,50,0.95)');
+    grad.addColorStop(1, 'rgba(5,5,20,0.98)');
+    bx.beginPath(); bx.arc(cx,cy,80,0,Math.PI*2);
+    bx.fillStyle = grad; bx.fill();
+
+    // Gold border with pulse
+    const glow = 0.7 + 0.3 * Math.sin(elapsed * 3);
+    bx.strokeStyle = `rgba(255,204,0,${glow})`;
+    bx.lineWidth = 3;
+    bx.shadowColor = '#ffcc00'; bx.shadowBlur = 12 * glow;
+    bx.beginPath(); bx.arc(cx,cy,80,0,Math.PI*2); bx.stroke();
+    bx.shadowBlur = 0;
+
+    // Inner accent ring
+    bx.strokeStyle = 'rgba(0,255,231,0.4)';
+    bx.lineWidth = 1;
+    bx.beginPath(); bx.arc(cx,cy,62,0,Math.PI*2); bx.stroke();
+
+    // Shield crest behind rocket
+    bx.save();
+    bx.translate(cx, cy + 6);
+    const shieldGrad = bx.createLinearGradient(0,-32,0,32);
+    shieldGrad.addColorStop(0, 'rgba(0,255,231,0.25)');
+    shieldGrad.addColorStop(1, 'rgba(0,100,180,0.15)');
+    bx.fillStyle = shieldGrad;
+    bx.beginPath();
+    bx.moveTo(0,-32); bx.lineTo(26,-16); bx.lineTo(26,10);
+    bx.quadraticCurveTo(26,30,0,38);
+    bx.quadraticCurveTo(-26,30,-26,10); bx.lineTo(-26,-16);
+    bx.closePath(); bx.fill();
+    bx.strokeStyle = 'rgba(0,255,231,0.5)'; bx.lineWidth = 1.5;
+    bx.stroke();
+    bx.restore();
+
+    // Rocket ship (same shape as game player, scaled up and centered)
+    const bob = Math.sin(elapsed * 2.2) * 3;
+    bx.save();
+    bx.translate(cx, cy - 4 + bob);
+    bx.shadowColor = '#00ffe7'; bx.shadowBlur = 16;
+    bx.fillStyle = '#00ffe7';
+    bx.beginPath();
+    bx.moveTo(0,-20); bx.lineTo(-12,12); bx.lineTo(-6,6);
+    bx.lineTo(0,14); bx.lineTo(6,6); bx.lineTo(12,12);
+    bx.closePath(); bx.fill();
+    // Cockpit
+    bx.fillStyle = '#ffffff'; bx.shadowBlur = 6;
+    bx.beginPath(); bx.ellipse(0,-5,3.5,5,0,0,Math.PI*2); bx.fill();
+    // Thruster flame flicker
+    const flicker = 0.5 + 0.5 * Math.sin(elapsed * 18);
+    bx.shadowColor = '#ffaa00'; bx.shadowBlur = 10;
+    bx.fillStyle = `rgba(255,${130+80*flicker|0},0,${0.7+0.3*flicker})`;
+    bx.beginPath();
+    bx.moveTo(-4,14); bx.lineTo(0,20+flicker*6); bx.lineTo(4,14);
+    bx.closePath(); bx.fill();
+    bx.shadowBlur = 0;
+    bx.restore();
+
+    // 3 orbit stars rotating around the badge
+    for (let i = 0; i < 3; i++) {
+      const oa = elapsed * 1.8 + (i / 3) * Math.PI * 2;
+      const ox = cx + Math.cos(oa) * 68;
+      const oy = cy + Math.sin(oa) * 68;
+      const sp = 0.7 + 0.3 * Math.sin(elapsed * 4 + i);
+      bx.fillStyle = `rgba(255,204,0,${sp})`;
+      bx.shadowColor = '#ffcc00'; bx.shadowBlur = 6;
+      bx.beginPath(); bx.arc(ox, oy, 3.5, 0, Math.PI*2); bx.fill();
+      bx.shadowBlur = 0;
+    }
+
+    // Text — ACE PILOT arc at top
+    bx.save();
+    bx.translate(cx, cy);
+    bx.font = "bold 9px 'Orbitron', sans-serif";
+    bx.fillStyle = '#ffcc00';
+    bx.textAlign = 'center'; bx.textBaseline = 'middle';
+    const topText = 'ACE PILOT';
+    const topRadius = 54;
+    const topStartAngle = -Math.PI / 2;
+    const charSpread = (Math.PI * 0.6) / (topText.length - 1);
+    for (let i = 0; i < topText.length; i++) {
+      const a = topStartAngle - (topText.length-1)/2*charSpread + i*charSpread;
+      bx.save();
+      bx.rotate(a);
+      bx.translate(0, -topRadius);
+      bx.rotate(Math.PI/2 + a);
+      bx.fillText(topText[i], 0, 0);
+      bx.restore();
+    }
+    bx.restore();
+
+    // "15 LEVELS" arc at bottom
+    bx.save();
+    bx.translate(cx, cy);
+    bx.font = "bold 8px 'Orbitron', sans-serif";
+    bx.fillStyle = 'rgba(0,255,231,0.85)';
+    bx.textAlign = 'center'; bx.textBaseline = 'middle';
+    const botText = '15 LEVELS';
+    const botRadius = 54;
+    const botStartAngle = Math.PI / 2;
+    const botCharSpread = (Math.PI * 0.55) / (botText.length - 1);
+    for (let i = 0; i < botText.length; i++) {
+      const a = botStartAngle - (botText.length-1)/2*botCharSpread + i*botCharSpread;
+      bx.save();
+      bx.rotate(a);
+      bx.translate(0, botRadius);
+      bx.rotate(-Math.PI/2 + a);
+      bx.fillText(botText[i], 0, 0);
+      bx.restore();
+    }
+    bx.restore();
+
+    // Pilot name at bottom center of badge
+    bx.font = "700 8px 'Orbitron', sans-serif";
+    bx.fillStyle = 'rgba(255,255,255,0.7)';
+    bx.textAlign = 'center'; bx.textBaseline = 'middle';
+    bx.fillText(pilotName, cx, cy + 48);
+
+    // Win overlay: stop old anim if overlay is hidden
+    if (!document.getElementById('win-overlay').classList.contains('show')) {
+      cancelAnimationFrame(badgeAnim);
+    }
+  }
+  render(performance.now());
 }
-function showLevelFlash(text, color) {
-  const el = document.getElementById('level-flash');
-  el.textContent=text; el.style.color=color||'var(--warn)';
-  el.style.textShadow=`0 0 30px ${color||'var(--warn)'}`;
-  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-}
+
+// ─── Game functions ───────────────────────────────────────────────────────────
 function spawnObstacle() {
   const types=['rect','diamond','bar'];
   const t=types[Math.floor(Math.random()*types.length)];
@@ -552,7 +756,7 @@ function spawnBoss(level) {
   document.getElementById('boss-bar-wrap').classList.add('visible');
   document.getElementById('boss-label').classList.add('visible');
   document.getElementById('boss-label').textContent = wn>=3?`⚠ BOSS WAVE ${wn} — ELITE`:`⚠ BOSS WAVE ${wn}`;
-  SFX.boss(); showLevelFlash(wn>=3?'ELITE BOSS!':`BOSS WAVE ${wn}!`,'#ff2d55');
+  SFX.boss(); showLevelFlash(wn>=3?'FINAL BOSS!':`BOSS WAVE ${wn}!`,'#ff2d55');
 }
 function updateBoss() {
   if (!boss) return;
@@ -606,7 +810,6 @@ function loop(ts) {
   _lastLoopTs = ts;
 
   if (paused) {
-    // Draw pause overlay on top of last frame
     ctx.fillStyle = 'rgba(13,13,28,0.72)';
     ctx.fillRect(0, 0, W, H);
     ctx.save();
@@ -618,7 +821,6 @@ function loop(ts) {
     ctx.shadowBlur = 0;
     ctx.font = "11px 'Share Tech Mono', monospace";
     ctx.fillStyle = '#aaaacc';
-    ctx.letterSpacing = '2px';
     ctx.fillText('SPACE / ⏸ TO RESUME', W/2, H/2 + 38);
     ctx.restore();
     return;
@@ -657,19 +859,29 @@ function loop(ts) {
       P.x = touchTargetX;
       P.y = touchTargetY;
     }
-    // Touch movement handled directly in touchmove (delta in screen px / canvasScale)
     mouseMoved=false;
-
     P.x=Math.max(P.w/2,Math.min(W-P.w/2,P.x));
     P.y=Math.max(P.h/2,Math.min(H-P.h/2,P.y));
 
     if(frame%getSpawnRate()===0) spawnObstacle();
-    score++; updateHUD(); SFX.dodge();
+
+    // Increment score — but stop once we've fully cleared MAX_LEVEL
+    if (getLevel() < MAX_LEVEL || score < MAX_LEVEL * SCORE_PER_LEVEL - 1) {
+      score++;
+    }
+    updateHUD(); SFX.dodge();
+
+    // Check win condition: score has reached the end of MAX_LEVEL
+    if (score >= MAX_LEVEL * SCORE_PER_LEVEL) {
+      showWinScreen();
+      return;
+    }
+
     const lvl=getLevel();
     if(lvl>lastLevel){
       lastLevel=lvl;
       if(isBossLevel(lvl)&&!bossActive) spawnBoss(lvl);
-      else { SFX.levelup(); showLevelFlash(`LEVEL ${lvl}`,'#ffcc00'); }
+      else { SFX.levelup(); showLevelFlash(`LEVEL ${lvl} / ${MAX_LEVEL}`,'#ffcc00'); }
     }
     if(bossActive&&boss) updateBoss();
   }
@@ -686,7 +898,6 @@ function loop(ts) {
     ctx.shadowBlur=0;
     const pw=P.w*0.7, ph=P.h*0.7;
     if(!paused&&state==='playing'&&checkAABB(P.x-pw/2,P.y-ph/2,pw,ph,obs.x,obs.y,obs.w,obs.h)){handlePlayerHit();return false;}
-    // Near-miss whoosh: obstacle just passed the ship's row and was close horizontally
     if(!paused&&state==='playing'&&obs.y>P.y&&obs.y-obs.speed*getSpeedMult()<=P.y){
       const nearX=Math.abs((obs.x+obs.w/2)-P.x)<60;
       if(nearX) SFX.whoosh();
@@ -719,7 +930,7 @@ function loop(ts) {
     ctx.globalAlpha=1; return p.life>0;
   });
 
-  if(state!=='dead'||frame%6<4){
+  if(state!=='dead'&&state!=='won'||frame%6<4){
     const px=P.x,py=P.y;
     if(shieldActive){
       ctx.strokeStyle=`rgba(68,136,255,${0.5+Math.sin(frame*0.15)*0.3})`;ctx.lineWidth=2;
@@ -738,7 +949,6 @@ function loop(ts) {
     ctx.beginPath();ctx.moveTo(px-5,py+P.h/2);ctx.lineTo(px,py+P.h/2+6+Math.sin(frame*0.5)*4);ctx.lineTo(px+5,py+P.h/2);ctx.stroke();
   }
 
-  // Mouse cursor — desktop only
   if(state==='playing'&&!isMobile){
     ctx.strokeStyle='rgba(0,255,231,0.35)';ctx.lineWidth=1;
     ctx.beginPath();ctx.arc(mx,my,10,0,Math.PI*2);ctx.stroke();
@@ -747,6 +957,7 @@ function loop(ts) {
   }
 }
 
+// ─── Game over ────────────────────────────────────────────────────────────────
 function showGameOver() {
   paused=false; pauseBtn.style.display='none';
   setBackNavVisible(true);
@@ -759,6 +970,7 @@ function showGameOver() {
   document.getElementById('overlay-sub').textContent='YOUR SHIP WAS DESTROYED';
   document.getElementById('overlay-score-label').style.display='block';
   document.getElementById('overlay-score-val').style.display='block';
+  document.getElementById('overlay-score-val').textContent=score;
   document.getElementById('name-input-wrap').style.display='flex';
   document.getElementById('leaderboard').style.display='block';
   document.getElementById('start-btn').textContent='PLAY AGAIN';
@@ -766,6 +978,7 @@ function showGameOver() {
   document.getElementById('overlay').classList.remove('hidden');
 }
 
+// ─── Idle loop ────────────────────────────────────────────────────────────────
 let _lastIdleTs = 0;
 function idleLoop(ts) {
   if(state!=='idle') return;
@@ -784,6 +997,7 @@ function idleLoop(ts) {
 }
 idleLoop();
 
+// ─── Restore saved pilot name ─────────────────────────────────────────────────
 try{const s=localStorage.getItem('dodge_pilot_name');if(s)document.getElementById('player-name').value=s;}catch(e){}
 const existing=loadLB();
 if(existing.length>0){document.getElementById('leaderboard').style.display='block';renderLB(existing,-1);}
