@@ -116,6 +116,7 @@
       z-index: 50;
       font-size: 0.72rem;
       letter-spacing: 1px;
+      display: none; /* hidden by default; shown only on title screen */
     }
     .back-nav a {
       color: #6868a0;
@@ -163,7 +164,7 @@
   </div>
 </div>
 
-<div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
+<div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
 
 <script>
 // ─────────────────────────────────────────────────────────
@@ -634,6 +635,15 @@ document.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); togglePause(); }
 });
 
+// ── showScreen: controls visibility of overlay screens AND back nav ──
+function showScreen(id) {
+  document.getElementById('startScreen').classList.remove('active');
+  document.getElementById('gameoverScreen').classList.remove('active');
+  // Show back nav only on the title screen; hide it during gameplay and game over
+  document.getElementById('backNav').style.display = (id === 'startScreen') ? 'block' : 'none';
+  if (id) document.getElementById(id).classList.add('active');
+}
+
 document.getElementById('startBtn').addEventListener('click', () => {
   getAudio();
   showScreen(null);
@@ -650,12 +660,6 @@ document.getElementById('restartBtn').addEventListener('click', () => {
   paused = false;
   startMusic();
 });
-
-function showScreen(id) {
-  document.getElementById('startScreen').classList.remove('active');
-  document.getElementById('gameoverScreen').classList.remove('active');
-  if (id) document.getElementById(id).classList.add('active');
-}
 
 showScreen('startScreen');
 
