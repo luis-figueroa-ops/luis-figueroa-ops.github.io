@@ -192,15 +192,12 @@ function uiScale()    { return Math.min(1, W / 500); }
 const DELTA_CAP  = 0.05;
 const MAX_HEALTH = 5;
 
-// Wave balance: 15 waves, tuned for fun-yet-challenging arc
-// Bugs: 8 -> 22; Spawn interval: 2.5s -> 0.55s; Speed: 1.0x -> 2.2x
-// Between-wave rest: 3.5s early, 2.5s late so the end stays intense
 function getWaveConfig(w) {
   const bugsNeeded       = Math.round(8 + (w - 1) * 1.0);
   const spawnInterval    = Math.max(0.55, 2.5 - (w - 1) * 0.14);
   const speedMult        = Math.min(2.2, 1.0 + (w - 1) * 0.085);
   const betweenWaveDelay = Math.max(2.5, 3.5 - (w - 1) * 0.07);
-  const isBossWave       = w % 5 === 0; // boss on waves 5, 10, 15
+  const isBossWave       = w % 5 === 0;
   return { bugsNeeded, spawnInterval, speedMult, betweenWaveDelay, isBossWave };
 }
 
@@ -353,13 +350,13 @@ function toggleMusic() {
   else stopMusic();
 }
 function getMuteRect() {
-  const s = uiScale(), sz = Math.round(28 * s);
+  const s = uiScale(), sz = Math.round(32 * s);
   return { x: W - 14 - sz, y: 14, w: sz, h: sz };
 }
 
 let paused = false;
 function getPauseRect() {
-  const s = uiScale(), sz = Math.round(28 * s), mr = getMuteRect();
+  const s = uiScale(), sz = Math.round(32 * s), mr = getMuteRect();
   return { x: mr.x - sz - 14, y: 14, w: sz, h: sz };
 }
 function togglePause() {
@@ -593,11 +590,9 @@ function triggerVictory() {
   document.getElementById('victoryScore').textContent   = score.toLocaleString();
   document.getElementById('victoryHiScore').textContent = hiScore.toLocaleString();
   document.getElementById('victoryKills').textContent   = totalKills.toLocaleString();
-  // Big aerosol spray can emoji
   document.getElementById('sprayCan').textContent = String.fromCodePoint(0x1F9F4);
   soundVictory();
   showScreen('victoryScreen');
-  // Fire a big burst of victory confetti on the canvas
   for (let i = 0; i < 100; i++) {
     const angle = Math.random() * Math.PI * 2, speed = 80 + Math.random() * 320;
     const colors = ['#ffd700','#00ffe7','#ff79c6','#a0ff80','#ff9944','#ffffff'];
@@ -670,7 +665,6 @@ function drawVictoryParticles(dt) {
     else { ctx.fillRect(p.x-p.size*t/2,p.y-p.size*t/2,p.size*t,p.size*t); }
     ctx.restore();
   }
-  // Keep spawning bursts while on victory screen
   if (victoryAnimT % 0.7 < dt * 2 && victoryParticles.length < 150) {
     const cx = W*0.15+Math.random()*W*0.7, cy = H*0.1+Math.random()*H*0.5;
     const colors = ['#ffd700','#00ffe7','#ff79c6','#a0ff80','#ff9944','#ffffff'];
@@ -843,104 +837,130 @@ function drawZapTexts() {
 }
 
 function drawHUD() {
-  const pad=14, s=uiScale();
+  const pad = 14, s = uiScale();
+
+  // --- Row heights (scaled) ---
+  const scoreNumH  = Math.round(42 * s);   // score number font size
+  const scoreLblH  = Math.round(18 * s);   // "SCORE" label font size
+  const hiH        = Math.round(24 * s);   // HI score font size
+  const waveH      = Math.round(28 * s);   // WAVE X / 15 font size
+  const bugsH      = Math.round(18 * s);   // bugs: X / Y font size
+  const barH       = 9;                    // progress bar height (px)
+  const barGap     = 6;                    // gap between bugs text and bar
+
   ctx.save();
 
-  // Score
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  ctx.font=`bold ${Math.round(28*s)}px Courier New`;
-  ctx.fillStyle='#ffe156'; ctx.shadowColor='#ffe156'; ctx.shadowBlur=18;
-  ctx.fillText(score.toLocaleString(),pad,pad); ctx.shadowBlur=0;
-  ctx.font=`bold ${Math.round(13*s)}px Courier New`;
-  ctx.fillStyle='#ffe15699'; ctx.fillText('SCORE',pad,pad+Math.round(32*s));
+  // --- SCORE (top-left) ---
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.font = `bold ${scoreNumH}px 'Courier New', monospace`;
+  ctx.fillStyle = '#ffe156'; ctx.shadowColor = '#ffe156'; ctx.shadowBlur = 18;
+  ctx.fillText(score.toLocaleString(), pad, pad);
+  ctx.shadowBlur = 0;
+  ctx.font = `bold ${scoreLblH}px 'Courier New', monospace`;
+  ctx.fillStyle = '#ffe15699';
+  ctx.fillText('SCORE', pad, pad + scoreNumH + 2);
 
-  // Hi score
-  ctx.textAlign='center'; ctx.font=`bold ${Math.round(16*s)}px Courier New`;
-  ctx.fillStyle='#ff79c6'; ctx.shadowColor='#ff79c6'; ctx.shadowBlur=12;
-  ctx.fillText(`HI ${hiScore.toLocaleString()}`,W/2,pad+2); ctx.shadowBlur=0;
+  // --- HI SCORE (top-center, but capped left of center to avoid WAVE overlap on mobile) ---
+  // On narrow screens (W < 500), push HI score to left-of-center so it doesn't collide with WAVE
+  const hiX = W < 420 ? W * 0.32 : W / 2;
+  ctx.textAlign = 'center';
+  ctx.font = `bold ${hiH}px 'Courier New', monospace`;
+  ctx.fillStyle = '#ff79c6'; ctx.shadowColor = '#ff79c6'; ctx.shadowBlur = 14;
+  ctx.fillText(`HI ${hiScore.toLocaleString()}`, hiX, pad + 2);
+  ctx.shadowBlur = 0;
 
-  // Wave counter "WAVE X / 15"
-  const pr=getPauseRect(), waveX=pr.x-16;
-  ctx.textAlign='right';
-  ctx.font=`bold ${Math.round(20*s)}px Courier New`;
-  ctx.fillStyle='#00ffe7'; ctx.shadowColor='#00ffe7'; ctx.shadowBlur=10;
-  ctx.fillText(`WAVE ${wave} / ${MAX_WAVES}`,waveX,pad); ctx.shadowBlur=0;
-  ctx.font=`${Math.round(11*s)}px Courier New`;
-  ctx.fillStyle='#00ffe766';
-  ctx.fillText(`bugs: ${killsThisWave} / ${bugsNeeded}`,waveX,pad+Math.round(24*s));
+  // --- WAVE X / 15 (top-right, left of pause button) ---
+  const pr = getPauseRect();
+  const waveX = pr.x - 12;
+  ctx.textAlign = 'right';
+  ctx.font = `bold ${waveH}px 'Courier New', monospace`;
+  ctx.fillStyle = '#00ffe7'; ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 12;
+  ctx.fillText(`WAVE ${wave} / ${MAX_WAVES}`, waveX, pad);
+  ctx.shadowBlur = 0;
 
-  // Wave bug-kill progress bar
-  const prog=bugsNeeded>0?Math.min(1,killsThisWave/bugsNeeded):0;
-  const bw=Math.round(110*s), bx=waveX-bw, by=pad+Math.round(38*s);
-  ctx.fillStyle='#0a1a2a'; ctx.fillRect(bx,by,bw,5);
-  const grd=ctx.createLinearGradient(bx,0,bx+bw,0);
-  grd.addColorStop(0,'#00ffe7'); grd.addColorStop(1,'#a000ff');
-  ctx.fillStyle=grd; ctx.fillRect(bx,by,bw*prog,5);
-  ctx.strokeStyle='#ffffff22'; ctx.lineWidth=1; ctx.strokeRect(bx,by,bw,5);
+  // --- bugs: X / Y (below WAVE) ---
+  const bugsY = pad + waveH + 4;
+  ctx.font = `bold ${bugsH}px 'Courier New', monospace`;
+  ctx.fillStyle = '#00ffe7bb';
+  ctx.fillText(`bugs: ${killsThisWave} / ${bugsNeeded}`, waveX, bugsY);
 
-  // Overall wave progress bar (thin strip at top)
-  const overallProg=(wave-1)/MAX_WAVES, opW=W-pad*2;
-  ctx.fillStyle='#0a0a20'; ctx.fillRect(pad,0,opW,3);
-  const ogrd=ctx.createLinearGradient(pad,0,pad+opW,0);
-  ogrd.addColorStop(0,'#00ffe7'); ogrd.addColorStop(0.5,'#a040ff'); ogrd.addColorStop(1,'#ffd700');
-  ctx.fillStyle=ogrd; ctx.fillRect(pad,0,opW*overallProg,3);
+  // --- Wave bug-kill progress bar (below bugs text) ---
+  const prog = bugsNeeded > 0 ? Math.min(1, killsThisWave / bugsNeeded) : 0;
+  const barW = Math.round(120 * s);
+  const barX = waveX - barW;
+  const barY = bugsY + bugsH + barGap;
+  ctx.fillStyle = '#0a1a2a';
+  ctx.fillRect(barX, barY, barW, barH);
+  const grd = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+  grd.addColorStop(0, '#00ffe7'); grd.addColorStop(1, '#a000ff');
+  ctx.fillStyle = grd;
+  ctx.fillRect(barX, barY, barW * prog, barH);
+  ctx.strokeStyle = '#ffffff22'; ctx.lineWidth = 1;
+  ctx.strokeRect(barX, barY, barW, barH);
 
-  // Boss wave alert
-  const cfg=getWaveConfig(wave);
-  if (cfg.isBossWave&&bossAlive) {
-    const pulse=0.7+Math.sin(animT*8)*0.3;
-    ctx.globalAlpha=pulse; ctx.textAlign='center'; ctx.textBaseline='top';
-    ctx.font=`bold ${Math.round(13*s)}px Courier New`;
-    ctx.fillStyle='#ff79c6'; ctx.shadowColor='#ff79c6'; ctx.shadowBlur=16;
-    ctx.fillText('⚠ BOSS WAVE ⚠',W/2,pad+Math.round(20*s));
-    ctx.shadowBlur=0; ctx.globalAlpha=1;
+  // --- Overall wave progress strip (top of screen) ---
+  const overallProg = (wave - 1) / MAX_WAVES, opW = W - pad * 2;
+  ctx.fillStyle = '#0a0a20'; ctx.fillRect(pad, 0, opW, 5);
+  const ogrd = ctx.createLinearGradient(pad, 0, pad + opW, 0);
+  ogrd.addColorStop(0, '#00ffe7'); ogrd.addColorStop(0.5, '#a040ff'); ogrd.addColorStop(1, '#ffd700');
+  ctx.fillStyle = ogrd; ctx.fillRect(pad, 0, opW * overallProg, 5);
+
+  // --- Boss wave alert ---
+  const cfg = getWaveConfig(wave);
+  if (cfg.isBossWave && bossAlive) {
+    const pulse = 0.7 + Math.sin(animT * 8) * 0.3;
+    ctx.globalAlpha = pulse; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.font = `bold ${Math.round(14 * s)}px 'Courier New', monospace`;
+    ctx.fillStyle = '#ff79c6'; ctx.shadowColor = '#ff79c6'; ctx.shadowBlur = 16;
+    ctx.fillText('⚠ BOSS WAVE ⚠', W / 2, pad + Math.round(26 * s));
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
   }
 
-  // Earned badges
-  if (earnedBadges.length>0) {
-    ctx.textAlign='center'; ctx.textBaseline='top';
-    ctx.font=`bold ${Math.round(14*s)}px Courier New`;
-    const badgeY=W<500?pad+Math.round(44*s):pad+Math.round(24*s);
-    const spacing=Math.round(130*s);
-    const startX=W/2-(earnedBadges.length*spacing)/2+spacing/2;
-    earnedBadges.forEach((b,i)=>{
-      const bx=startX+i*spacing;
-      ctx.fillStyle='#ffffff18';
-      ctx.beginPath(); ctx.roundRect(bx-spacing/2+2,badgeY-3,spacing-4,Math.round(22*s),5); ctx.fill();
-      ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=10;
-      ctx.fillText(b,bx,badgeY); ctx.shadowBlur=0;
+  // --- Earned badges row ---
+  if (earnedBadges.length > 0) {
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.font = `bold ${Math.round(14 * s)}px 'Courier New', monospace`;
+    const badgeY = W < 500 ? pad + Math.round(52 * s) : pad + Math.round(30 * s);
+    const spacing = Math.round(130 * s);
+    const startX = W / 2 - (earnedBadges.length * spacing) / 2 + spacing / 2;
+    earnedBadges.forEach((b, i) => {
+      const bx = startX + i * spacing;
+      ctx.fillStyle = '#ffffff18';
+      ctx.beginPath(); ctx.roundRect(bx - spacing / 2 + 2, badgeY - 3, spacing - 4, Math.round(22 * s), 5); ctx.fill();
+      ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 10;
+      ctx.fillText(b, bx, badgeY); ctx.shadowBlur = 0;
     });
   }
 
   ctx.restore();
 
-  // Wave clear banner
-  if (waveClearing&&bugs.length===0&&wave<MAX_WAVES) {
+  // --- Wave clear banner ---
+  if (waveClearing && bugs.length === 0 && wave < MAX_WAVES) {
     ctx.save();
-    ctx.font=`bold ${Math.round(24*s)}px Courier New`;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle='#00ffe7'; ctx.shadowColor='#00ffe7'; ctx.shadowBlur=24;
-    ctx.globalAlpha=0.9+Math.sin(animT*6)*0.1;
-    ctx.fillText(`WAVE ${wave} / ${MAX_WAVES} CLEAR!`,W/2,H*0.18);
+    ctx.font = `bold ${Math.round(26 * s)}px 'Courier New', monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#00ffe7'; ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 24;
+    ctx.globalAlpha = 0.9 + Math.sin(animT * 6) * 0.1;
+    ctx.fillText(`WAVE ${wave} / ${MAX_WAVES} CLEAR!`, W / 2, H * 0.18);
     ctx.restore();
   }
 }
 
 function drawMuteBtn() {
-  const mr=getMuteRect();
+  const mr = getMuteRect();
   ctx.save();
-  ctx.fillStyle='rgba(0,20,30,0.7)'; ctx.strokeStyle='#00ffe755'; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.roundRect(mr.x,mr.y,mr.w,mr.h,6); ctx.fill(); ctx.stroke();
-  ctx.font=`${Math.round(mr.w*0.65)}px serif`;
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(musicOn?'🔊':'🔇',mr.x+mr.w/2,mr.y+mr.h/2+1);
+  ctx.fillStyle = 'rgba(0,20,30,0.7)'; ctx.strokeStyle = '#00ffe755'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(mr.x, mr.y, mr.w, mr.h, 6); ctx.fill(); ctx.stroke();
+  ctx.font = `${Math.round(mr.w * 0.65)}px serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(musicOn ? '🔊' : '🔇', mr.x + mr.w / 2, mr.y + mr.h / 2 + 1);
   ctx.restore();
 }
 
 let lastTime = null;
 function loop(ts) {
-  if (lastTime===null) lastTime=ts;
-  let dt=(ts-lastTime)/1000; lastTime=ts; dt=Math.min(dt,DELTA_CAP);
+  if (lastTime === null) lastTime = ts;
+  let dt = (ts - lastTime) / 1000; lastTime = ts; dt = Math.min(dt, DELTA_CAP);
   update(dt); draw(dt); requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
