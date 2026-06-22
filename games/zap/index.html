@@ -888,12 +888,13 @@ function drawZapTexts() {
 function drawHUD() {
   const pad = 14, s = uiScale();
 
-  const scoreNumH = Math.round(42 * s);
-  const scoreLblH = Math.round(18 * s);
-  const hiH       = Math.round(24 * s);
-  const waveH     = Math.round(28 * s);
-  const bugsH     = Math.round(18 * s);
-  const barH      = 9;
+  const isMobile = W < 600;
+  const scoreNumH = isMobile ? Math.round(28 * s) : Math.round(42 * s);
+  const scoreLblH = isMobile ? Math.round(13 * s) : Math.round(18 * s);
+  const hiH       = isMobile ? Math.round(16 * s) : Math.round(24 * s);
+  const waveH     = isMobile ? Math.round(20 * s) : Math.round(28 * s);
+  const bugsH     = isMobile ? Math.round(11 * s) : Math.round(18 * s);
+  const barH      = isMobile ? 5 : 9;
   const barGap    = 6;
 
   ctx.save();
