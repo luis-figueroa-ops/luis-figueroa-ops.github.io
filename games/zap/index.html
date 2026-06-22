@@ -47,6 +47,12 @@
       text-transform: uppercase;
       margin-bottom: 22px;
     }
+    .screen p {
+      color: #8888bb;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      margin-bottom: 22px;
+    }
     .screen .score-display { font-size: 2rem; color: #ffe156; text-shadow: 0 0 16px #ffe15688; margin: 10px 0 4px; }
     .screen .hi-label { color: #7070a0; font-size: 0.76rem; letter-spacing: 2px; margin-bottom: 24px; }
     .screen .hi-score { color: #ff79c6; text-shadow: 0 0 10px #ff79c655; }
@@ -69,6 +75,43 @@
     #startScreen, #gameoverScreen, #victoryScreen { display: none; }
     #startScreen.active, #gameoverScreen.active, #victoryScreen.active { display: block; }
 
+    /* ── Desktop intro screen upscale ── */
+    @media (min-width: 768px) {
+      .screen {
+        max-width: 620px;
+        padding: 48px 64px;
+        border-radius: 16px;
+      }
+      .screen h1 {
+        font-size: 5rem;
+        letter-spacing: 12px;
+        margin-bottom: 10px;
+      }
+      .screen .sub {
+        font-size: 1.1rem;
+        letter-spacing: 4px;
+        margin-bottom: 30px;
+      }
+      .screen p {
+        font-size: 1.05rem;
+        line-height: 2;
+        margin-bottom: 30px;
+      }
+      .screen .score-display { font-size: 2.8rem; }
+      .screen .hi-label { font-size: 1rem; margin-bottom: 30px; }
+      .btn {
+        font-size: 1.25rem;
+        letter-spacing: 5px;
+        padding: 16px 52px;
+      }
+      .controls-hint {
+        font-size: 0.90rem;
+        letter-spacing: 2px;
+        margin-top: 24px;
+        line-height: 2;
+      }
+    }
+
     /* Victory screen */
     #victoryScreen {
       border-color: #ffd700;
@@ -80,6 +123,9 @@
       font-size: clamp(1.6rem, 8vw, 3rem);
       letter-spacing: 4px;
       margin-bottom: 6px;
+    }
+    @media (min-width: 768px) {
+      #victoryScreen h1 { font-size: 3.6rem; }
     }
     #victoryScreen .sub { color: #ff79c6; }
     .spray-can {
@@ -101,6 +147,9 @@
       font-size: 0.78rem;
       color: #c0c0e0;
       line-height: 2;
+    }
+    @media (min-width: 768px) {
+      .victory-stats { font-size: 1rem; padding: 16px 24px; }
     }
     .victory-stats span { color: #ffd700; font-weight: bold; }
     #victoryScreen .btn { border-color: #ffd700; color: #ffd700; box-shadow: 0 0 18px #ffd70033; }
@@ -127,7 +176,7 @@
   <div class="screen" id="startScreen">
     <h1>ZAP!</h1>
     <div class="sub">Bug Zapper</div>
-    <p style="color:#8888bb; font-size:0.82rem; line-height:1.8; margin-bottom:22px;">
+    <p>
       Bugs are swarming your snack table!<br>
       <strong style="color:#00ffe7">Tap directly on a bug</strong> to zap it.<br>
       Survive all <strong style="color:#ffd700">15 waves</strong> to claim victory!
@@ -839,14 +888,13 @@ function drawZapTexts() {
 function drawHUD() {
   const pad = 14, s = uiScale();
 
-  // --- Row heights (scaled) ---
-  const scoreNumH  = Math.round(42 * s);   // score number font size
-  const scoreLblH  = Math.round(18 * s);   // "SCORE" label font size
-  const hiH        = Math.round(24 * s);   // HI score font size
-  const waveH      = Math.round(28 * s);   // WAVE X / 15 font size
-  const bugsH      = Math.round(18 * s);   // bugs: X / Y font size
-  const barH       = 9;                    // progress bar height (px)
-  const barGap     = 6;                    // gap between bugs text and bar
+  const scoreNumH = Math.round(42 * s);
+  const scoreLblH = Math.round(18 * s);
+  const hiH       = Math.round(24 * s);
+  const waveH     = Math.round(28 * s);
+  const bugsH     = Math.round(18 * s);
+  const barH      = 9;
+  const barGap    = 6;
 
   ctx.save();
 
@@ -860,16 +908,26 @@ function drawHUD() {
   ctx.fillStyle = '#ffe15699';
   ctx.fillText('SCORE', pad, pad + scoreNumH + 2);
 
-  // --- HI SCORE (top-center, but capped left of center to avoid WAVE overlap on mobile) ---
-  // On narrow screens (W < 500), push HI score to left-of-center so it doesn't collide with WAVE
-  const hiX = W < 420 ? W * 0.32 : W / 2;
-  ctx.textAlign = 'center';
+  // --- HI SCORE ---
+  // Measure score text width to anchor HI score just right of it, avoiding WAVE collision
+  ctx.font = `bold ${scoreNumH}px 'Courier New', monospace`;
+  const scoreW = ctx.measureText(score.toLocaleString()).width;
+  // On wide screens center it; on narrow screens pin it right of score block with a gap
+  let hiX, hiAlign;
+  if (W >= 600) {
+    hiX = W / 2; hiAlign = 'center';
+  } else {
+    // anchor left edge just past score block, display left-aligned
+    hiX = pad + scoreW + 18;
+    hiAlign = 'left';
+  }
+  ctx.textAlign = hiAlign;
   ctx.font = `bold ${hiH}px 'Courier New', monospace`;
   ctx.fillStyle = '#ff79c6'; ctx.shadowColor = '#ff79c6'; ctx.shadowBlur = 14;
   ctx.fillText(`HI ${hiScore.toLocaleString()}`, hiX, pad + 2);
   ctx.shadowBlur = 0;
 
-  // --- WAVE X / 15 (top-right, left of pause button) ---
+  // --- WAVE X / 15 (top-right) ---
   const pr = getPauseRect();
   const waveX = pr.x - 12;
   ctx.textAlign = 'right';
@@ -878,13 +936,13 @@ function drawHUD() {
   ctx.fillText(`WAVE ${wave} / ${MAX_WAVES}`, waveX, pad);
   ctx.shadowBlur = 0;
 
-  // --- bugs: X / Y (below WAVE) ---
+  // --- bugs: X / Y ---
   const bugsY = pad + waveH + 4;
   ctx.font = `bold ${bugsH}px 'Courier New', monospace`;
   ctx.fillStyle = '#00ffe7bb';
   ctx.fillText(`bugs: ${killsThisWave} / ${bugsNeeded}`, waveX, bugsY);
 
-  // --- Wave bug-kill progress bar (below bugs text) ---
+  // --- Wave bug-kill progress bar ---
   const prog = bugsNeeded > 0 ? Math.min(1, killsThisWave / bugsNeeded) : 0;
   const barW = Math.round(120 * s);
   const barX = waveX - barW;
@@ -898,7 +956,7 @@ function drawHUD() {
   ctx.strokeStyle = '#ffffff22'; ctx.lineWidth = 1;
   ctx.strokeRect(barX, barY, barW, barH);
 
-  // --- Overall wave progress strip (top of screen) ---
+  // --- Overall wave progress strip ---
   const overallProg = (wave - 1) / MAX_WAVES, opW = W - pad * 2;
   ctx.fillStyle = '#0a0a20'; ctx.fillRect(pad, 0, opW, 5);
   const ogrd = ctx.createLinearGradient(pad, 0, pad + opW, 0);
@@ -916,7 +974,7 @@ function drawHUD() {
     ctx.shadowBlur = 0; ctx.globalAlpha = 1;
   }
 
-  // --- Earned badges row ---
+  // --- Earned badges ---
   if (earnedBadges.length > 0) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     ctx.font = `bold ${Math.round(14 * s)}px 'Courier New', monospace`;
