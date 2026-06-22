@@ -34,6 +34,7 @@
     transition: color 0.2s;
   }
   .back-nav a:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
+  .back-nav.hidden { visibility: hidden; pointer-events: none; }
   #hud { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
   #hud-left { display: flex; flex-direction: column; gap: 2px; }
   #score-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--accent); letter-spacing: 3px; opacity: 0.6; }
@@ -118,7 +119,7 @@
 </head>
 <body>
 <div id="game-wrapper">
-  <div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
+  <div class="back-nav" id="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
   <div id="hud">
     <div id="hud-left">
       <div id="score-label">SCORE</div>
@@ -178,6 +179,7 @@ const ctx     = canvas.getContext('2d');
 const wrapper = document.getElementById('game-wrapper');
 const hudEl   = document.getElementById('hud');
 const bbWrap  = document.getElementById('boss-bar-wrap');
+const backNav = document.getElementById('back-nav');
 
 canvas.width  = GW;
 canvas.height = GH;
@@ -280,7 +282,7 @@ const SFX = {
   boss:    () => { playTone(80,'sawtooth',0.8,0.35,60); playTone(60,'square',0.5,0.2,50); },
   bossdie: () => { playTone(500,'sawtooth',0.05,0.3); playTone(400,'sawtooth',0.05,0.3); playTone(300,'sawtooth',0.05,0.3); playTone(200,'sawtooth',0.4,0.3,50); },
   dodge:   () => { if (Math.random()>0.94) playTone(880,'sine',0.04,0.05,1200); },
-  // Near-miss: short noise burst filtered high→low, like something flying past
+  // Near-miss: short noise burst filtered high->low, like something flying past
   whoosh:  () => playNoise(0.18, 0.08, 'bandpass', 3000, 400),
   // Keyboard thrust: very brief low-filtered noise puff
   thruster: () => playNoise(0.1, 0.05, 'lowpass', 280, 120)
@@ -407,6 +409,11 @@ function getObstacleSpeed() { return (baseSpeed+(getLevel()-1)*0.4)*getSpeedMult
 function getSpawnRate()     { return Math.max(18, spawnRate-(getLevel()-1)*3); }
 function isBossLevel(l)     { return l>=6 && (l-6)%4===0; }
 
+// ─── Back nav visibility ──────────────────────────────────────────────────────
+function setBackNavVisible(visible) {
+  backNav.classList.toggle('hidden', !visible);
+}
+
 // ─── Mouse input ──────────────────────────────────────────────────────────────
 canvas.addEventListener('mousemove', e => {
   if (isMobile) return;
@@ -493,6 +500,7 @@ function startGame() {
   paused=false; pauseBtn.style.display='block'; pauseBtn.textContent='⏸ PAUSE';
   updateHUD(); updatePowerupUI();
   document.getElementById('overlay').classList.add('hidden');
+  setBackNavVisible(false);
   state='playing';
   if (animId) cancelAnimationFrame(animId);
   startEngineHum();
@@ -741,6 +749,7 @@ function loop(ts) {
 
 function showGameOver() {
   paused=false; pauseBtn.style.display='none';
+  setBackNavVisible(true);
   const playerName=document.getElementById('player-name').value||'PILOT';
   try{localStorage.setItem('dodge_pilot_name',playerName);}catch(e){}
   const entries=addToLB(playerName,score);
@@ -750,7 +759,6 @@ function showGameOver() {
   document.getElementById('overlay-sub').textContent='YOUR SHIP WAS DESTROYED';
   document.getElementById('overlay-score-label').style.display='block';
   document.getElementById('overlay-score-val').style.display='block';
-  document.getElementById('overlay-score-val').textContent=score;
   document.getElementById('name-input-wrap').style.display='flex';
   document.getElementById('leaderboard').style.display='block';
   document.getElementById('start-btn').textContent='PLAY AGAIN';
