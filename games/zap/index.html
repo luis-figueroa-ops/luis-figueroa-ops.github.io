@@ -157,9 +157,10 @@
 
     .back-nav {
       position: fixed; left: 14px; bottom: 14px; z-index: 50;
-      font-size: 0.72rem; letter-spacing: 1px; display: none;
+      font-size: 0.85rem; letter-spacing: 1px; display: block;
     }
-    .back-nav a { color: #6868a0; text-decoration: none; transition: color 0.2s; }
+    .copyright { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 50; font-size: 11px; letter-spacing: 1px; color: #a0a0cc; white-space: nowrap; pointer-events: none; font-family: 'Courier New', monospace; }
+    .back-nav a { color: #a0a0cc; text-decoration: none; transition: color 0.2s; }
     .back-nav a:hover { color: #00ffe7; text-shadow: 0 0 8px #00ffe788; }
   </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
@@ -214,6 +215,7 @@
     </div>
   </div>
 </div>
+<div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
 <div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
 
 <script>
@@ -521,7 +523,7 @@ document.addEventListener('keydown', e => { if (e.key === ' ') { e.preventDefaul
 
 function showScreen(id) {
   ['startScreen','gameoverScreen','victoryScreen'].forEach(s => document.getElementById(s).classList.remove('active'));
-  document.getElementById('backNav').style.display = (id === 'startScreen') ? 'block' : 'none';
+  document.getElementById('backNav').style.display = (id === null) ? 'none' : 'block';
   if (id) document.getElementById(id).classList.add('active');
 }
 
