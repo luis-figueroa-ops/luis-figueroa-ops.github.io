@@ -64,6 +64,22 @@ header {
   animation: fadeUp 0.7s ease both;
 }
 
+.header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.header-logo {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
 .eyebrow {
   font-family: 'Share Tech Mono', monospace;
   font-size: 16px;
@@ -94,11 +110,18 @@ h1 span { color: var(--gold); }
   opacity: 0.8;
 }
 
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  padding-bottom: 6px;
+}
+
 .header-links {
   display: flex;
   gap: 20px;
   align-items: center;
-  padding-bottom: 6px;
 }
 
 .header-links a {
@@ -115,6 +138,28 @@ h1 span { color: var(--gold); }
 
 .header-links a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 .header-links .divider { width: 1px; height: 14px; background: var(--border); }
+
+.header-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-qr img {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  border: 1px solid rgba(184,150,62,0.3);
+}
+
+.header-qr span {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
 
 .intro {
   position: relative; z-index: 10;
@@ -382,6 +427,9 @@ footer {
 
 @media (max-width: 700px) {
   header { flex-direction: column; align-items: flex-start; gap: 24px; padding: 36px 28px 32px; }
+  .header-left { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .header-logo { width: 72px; height: 72px; }
+  .header-right { align-items: flex-start; }
   .intro, .section { padding-left: 28px; padding-right: 28px; }
   footer { flex-direction: column; gap: 16px; padding: 28px; }
   .cards { grid-template-columns: 1fr; }
@@ -392,17 +440,33 @@ footer {
 
 <header>
   <div class="header-left">
-    <div class="eyebrow">Luis Figueroa</div>
-    <h1>Operations,<br><span>Augmented</span></h1>
-    <p class="tagline">Augmenting Human Potential, One Workflow at a Time</p>
+    <img
+      class="header-logo"
+      src="https://luis-figueroa-ops.github.io/images/Untitled%20design.png"
+      alt="Luis Figueroa - Technology & Operations logo"
+    />
+    <div>
+      <div class="eyebrow">Luis Figueroa</div>
+      <h1>Operations,<br><span>Augmented</span></h1>
+      <p class="tagline">Augmenting Human Potential, One Workflow at a Time</p>
+    </div>
   </div>
-  <nav class="header-links">
-    <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>
-    <div class="divider"></div>
-    <a href="https://www.luis-portfolio.com" target="_blank">Portfolio</a>
-    <div class="divider"></div>
-    <a href="https://github.com/luis-figueroa-ops" target="_blank">GitHub</a>
-  </nav>
+  <div class="header-right">
+    <nav class="header-links">
+      <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>
+      <div class="divider"></div>
+      <a href="https://www.luis-portfolio.com" target="_blank">Portfolio</a>
+      <div class="divider"></div>
+      <a href="https://github.com/luis-figueroa-ops" target="_blank">GitHub</a>
+    </nav>
+    <div class="header-qr">
+      <img
+        src="https://luis-figueroa-ops.github.io/images/luis_portfolio_qr_v4.png"
+        alt="QR code - scan to visit luis-figueroa-ops.github.io"
+      />
+      <span>Scan to visit</span>
+    </div>
+  </div>
 </header>
 
 <div class="intro">
