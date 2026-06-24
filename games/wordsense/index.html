@@ -641,15 +641,18 @@ function getApiKey() { return ''; }
 // ═══════════════════════════════════════════
 function initMainScreen() {
   const hasSaved = loadState();
+  const hasProgress = hasSaved && (state.gamesPlayed > 0 || (state.pool && state.pool.length > 0));
 
-  if (hasSaved && state.gamesPlayed > 0) {
-    // Returning player
+  if (hasProgress) {
+    // Returning player - always show main screen with banner, never auto-launch
     const banner = document.getElementById('returning-banner');
     const statsRow = document.getElementById('returning-stats');
     banner.style.display = 'block';
     statsRow.style.display = 'grid';
-    document.getElementById('returning-msg').textContent =
-      `You've played ${state.gamesPlayed} game${state.gamesPlayed !== 1 ? 's' : ''} and learned ${state.totalWordsLearned} words. Pick up where you left off or start fresh.`;
+    const gamesMsg = state.gamesPlayed > 0
+      ? `You've played ${state.gamesPlayed} game${state.gamesPlayed !== 1 ? 's' : ''} and learned ${state.totalWordsLearned} words. Pick up where you left off or start fresh.`
+      : `You have a word pool ready to go. Jump back in or start fresh.`;
+    document.getElementById('returning-msg').textContent = gamesMsg;
     document.getElementById('rs-games').textContent = state.gamesPlayed;
     document.getElementById('rs-words').textContent = state.totalWordsLearned;
     document.getElementById('rs-level').textContent = state.level;
