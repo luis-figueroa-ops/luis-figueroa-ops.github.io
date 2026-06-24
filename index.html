@@ -259,6 +259,7 @@ h1 span { color: var(--gold); }
 .card:nth-child(3) { animation-delay: 0.35s; }
 .card:nth-child(4) { animation-delay: 0.45s; }
 .card:nth-child(5) { animation-delay: 0.55s; }
+.card:nth-child(6) { animation-delay: 0.65s; }
 
 .api-section { border-bottom: 1px solid var(--border); padding-bottom: 48px; }
 
@@ -324,21 +325,6 @@ h1 span { color: var(--gold); }
 .step-text a { color: var(--gold-light); text-decoration: none; border-bottom: 1px solid rgba(184,150,62,0.4); transition: border-color 0.2s, color 0.2s; }
 .step-text a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 .step-text code { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--gold); background: rgba(184,150,62,0.1); padding: 1px 6px; border-radius: 2px; letter-spacing: 1px; }
-
-.api-dodge-note {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 15px;
-  letter-spacing: 2px;
-  color: var(--white);
-  opacity: 0.65;
-  text-transform: uppercase;
-  margin-top: 6px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.api-dodge-note strong { color: var(--gold); font-weight: 400; }
 
 .cards-divider {
   grid-column: 1 / -1;
@@ -499,6 +485,18 @@ footer {
       <div class="card-footer">
         <span class="card-cta">Play Now</span>
         <span class="card-type">HTML / Canvas</span>
+      </div>
+    </a>
+
+    <a class="card" href="./games/wordsense/index.html" target="_blank">
+      <div class="card-tag">Side Builds</div>
+      <div class="card-title">WordSense</div>
+      <div class="card-desc">
+        Build vocabulary the way reading does — through context, not memorization. Each round drops you into a real passage with one word highlighted. Figure out what it means from the clues around it. Adaptive difficulty, four levels, and a word bank that tracks what you've earned.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Play Now</span>
+        <span class="card-type">HTML / Claude API</span>
       </div>
     </a>
 
