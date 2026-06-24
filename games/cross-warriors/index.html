@@ -18,6 +18,11 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;font-family:'Press Start 2P',monospace;}
 #gameCanvas{display:block;cursor:crosshair;touch-action:none;}
+
+.back-nav { position: fixed; left: 14px; top: 14px; z-index: 200; font-size: 14px; letter-spacing: 1px; }
+.back-nav a { color: #a0a0cc; text-decoration: none; font-family: 'Press Start 2P', monospace; font-size: 8px; transition: color 0.2s; }
+.back-nav a:hover { color: #FFD700; }
+.copyright { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 200; font-size: 12px; letter-spacing: 1px; color: #a0a0cc; white-space: nowrap; pointer-events: none; font-family: 'Press Start 2P', monospace; font-size: 7px; }
 </style>
 </head>
 <body>
@@ -1180,5 +1185,8 @@ function loop(ts) {
 }
 requestAnimationFrame(ts=>{ GS.lastTime=ts; requestAnimationFrame(loop); });
 </script>
+
+<div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
+<div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
 </body>
 </html>
