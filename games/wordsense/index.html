@@ -318,7 +318,7 @@ body {
   font-size: 13px; color: #7a5a10; margin-top: 0.5rem;
 }
 
-/* ── RESPONSIVE ── */
+/* ── MOBILE ── */
 @media (max-width: 480px) {
   body { padding: 1rem 0.75rem 2.5rem; }
   .main-hero .game-title { font-size: 34px; }
@@ -330,6 +330,53 @@ body {
   .mascot-actions { flex-direction: column; }
   .returning-banner .btn-row { flex-direction: column; }
   .returning-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── DESKTOP ── */
+@media (min-width: 769px) {
+  .wrap { max-width: 860px; padding: 2.5rem 2rem 4rem; }
+  .main-hero .game-title { font-size: 64px; }
+  .main-hero .tagline { font-size: 22px; margin-top: 0.5rem; }
+  .stat-num { font-size: 32px; }
+  .stat-lbl { font-size: 13px; }
+  .stat { padding: 0.75rem 0.5rem; }
+  .level-label { font-size: 15px; }
+  .pip { height: 7px; }
+  .level-badge { font-size: 14px; padding: 5px 14px; margin-bottom: 1.25rem; }
+  .round-meta { font-size: 14px; margin-bottom: 1rem; }
+  .passage { font-size: 20px; line-height: 2; }
+  .q-label { font-size: 16px; margin: 1.25rem 0 1rem; }
+  .cbtn { font-size: 17px; padding: 0.9rem 1.1rem; min-height: 62px; }
+  .feedback { font-size: 17px; padding: 1.1rem 1.25rem; }
+  .next-btn { font-size: 17px; padding: 1rem; margin-top: 1.25rem; }
+  .game-card { padding: 2rem; }
+  .loading-round { font-size: 17px; padding: 2.5rem; }
+  .bank-title { font-size: 15px; }
+  .bword { font-size: 15px; padding: 5px 14px; }
+  .retry-note { font-size: 14px; }
+  .done-score { font-size: 72px; }
+  .done-sub { font-size: 18px; }
+  .done-actions button { font-size: 17px; padding: 0.9rem; }
+  .badge-icon { font-size: 80px; }
+  .badge-title { font-size: 30px; }
+  .badge-level { font-size: 16px; }
+  .badge-desc { font-size: 18px; }
+  .badge-btn { font-size: 18px; padding: 1rem; }
+  .mascot-title { font-size: 32px; }
+  .mascot-sub { font-size: 18px; }
+  .mascot-actions button { font-size: 17px; }
+  .pool-card h2, .pool-transition h2 { font-size: 24px; }
+  .pool-card p, .pool-transition p { font-size: 17px; }
+  .progress-label, #transition-label { font-size: 15px; }
+  .returning-banner h3 { font-size: 18px; }
+  .returning-banner p { font-size: 16px; }
+  .btn-continue, .btn-secondary { font-size: 16px; padding: 0.8rem; }
+  .rstat-num { font-size: 28px; }
+  .rstat-lbl { font-size: 13px; }
+  .info-card h3 { font-size: 18px; }
+  .info-card p { font-size: 16px; }
+  .btn-play { font-size: 20px; padding: 1.1rem; }
+  .storage-note { font-size: 14px; }
 }
 </style>
 </head>
