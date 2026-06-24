@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WordSense</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f4f0;
+  --card: #ffffff;
+  --border: #e0ddd6;
+  --border-soft: #ede9e2;
+  --text: #1a1a18;
+  --text-soft: #666660;
+  --text-muted: #999992;
+  --blue: #3a6fd8;
+  --blue-bg: #e8eef9;
+  --green: #1a5c32;
+  --green-bg: #eaf6ee;
+  --green-border: #7dc99a;
+  --red: #7a1a1a;
+  --red-bg: #fceaea;
+  --red-border: #e8a0a0;
+  --gold: #b8860b;
+  --gold-bg: #fdf6e3;
+  --gold-border: #e6c84a;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 20px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.wrap { width: 100%; max-width: 600px; }
+
+/* ── SCREENS ── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── SETUP ── */
+.setup-card {
+  background: var(--card);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem;
+  margin-top: 1rem;
+}
+.setup-card h2 { font-size: 15px; font-weight: 600; margin-bottom: 0.4rem; }
+.setup-card p { font-size: 13px; color: var(--text-soft); line-height: 1.6; margin-bottom: 1rem; }
+.setup-card input {
+  width: 100%; padding: 0.7rem 0.9rem;
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; font-family: inherit;
+  margin-bottom: 0.75rem; outline: none;
+  background: var(--bg);
+}
+.setup-card input:focus { border-color: var(--blue); }
+.btn-primary {
+  width: 100%; padding: 0.8rem;
+  font-size: 15px; font-weight: 500;
+  cursor: pointer; border-radius: var(--radius-sm);
+  background: var(--blue); border: none;
+  font-family: inherit; color: #fff;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.88; }
+.setup-note { font-size: 11px; color: var(--text-muted); margin-top: 0.5rem; text-align: center; }
+
+/* ── MAIN SCREEN ── */
+.main-hero { text-align: center; padding: 2.5rem 1rem 2rem; }
+.main-hero .game-title { font-size: 42px; font-weight: 700; letter-spacing: -1px; color: var(--text); }
+.main-hero .tagline { font-size: 16px; color: var(--text-soft); margin-top: 0.3rem; font-style: italic; }
+
+.returning-banner {
+  background: var(--gold-bg);
+  border: 0.5px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+.returning-banner h3 { font-size: 14px; font-weight: 600; color: var(--gold); margin-bottom: 0.25rem; }
+.returning-banner p { font-size: 13px; color: var(--text-soft); margin-bottom: 0.75rem; }
+.returning-banner .btn-row { display: flex; gap: 8px; }
+.btn-secondary {
+  flex: 1; padding: 0.65rem 0.5rem;
+  font-size: 13px; cursor: pointer;
+  border-radius: var(--radius-sm);
+  background: var(--card); border: 0.5px solid var(--border);
+  font-family: inherit; color: var(--text);
+  transition: background 0.12s;
+}
+.btn-secondary:hover { background: var(--bg); }
+.btn-continue {
+  flex: 2; padding: 0.65rem 0.5rem;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border-radius: var(--radius-sm);
+  background: var(--gold); border: none;
+  font-family: inherit; color: #fff;
+  transition: opacity 0.15s;
+}
+.btn-continue:hover { opacity: 0.88; }
+
+.returning-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-bottom: 1.25rem; display: none;
+}
+.rstat { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.6rem 0.4rem; text-align: center; }
+.rstat-num { font-size: 20px; font-weight: 500; }
+.rstat-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; margin-top: 1px; }
+
+.info-card {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+.info-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+.info-card p { font-size: 13px; color: var(--text-soft); line-height: 1.7; margin-bottom: 1rem; }
+.info-card p:last-child { margin-bottom: 0; }
+.info-divider { border: none; border-top: 0.5px solid var(--border-soft); margin: 1rem 0; }
+
+.play-btn-wrap { margin: 1.5rem 0 0.5rem; }
+.btn-play {
+  width: 100%; padding: 1rem;
+  font-size: 17px; font-weight: 600;
+  cursor: pointer; border-radius: var(--radius);
+  background: var(--blue); border: none;
+  font-family: inherit; color: #fff;
+  letter-spacing: 0.2px;
+  transition: opacity 0.15s;
+}
+.btn-play:hover { opacity: 0.88; }
+
+.storage-note {
+  font-size: 11px; color: var(--text-muted);
+  text-align: center; line-height: 1.5; margin-top: 0.5rem;
+}
+
+/* ── LOADING POOL ── */
+.pool-card {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 2.5rem 1.5rem;
+  text-align: center; margin-top: 1rem;
+}
+.pool-card h2 { font-size: 18px; font-weight: 500; margin-bottom: 0.5rem; }
+.pool-card p { font-size: 13px; color: var(--text-soft); margin-bottom: 1.5rem; }
+.progress-bar-wrap { background: var(--border-soft); border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 0.5rem; }
+.progress-bar { height: 100%; background: var(--blue); border-radius: 4px; width: 0%; transition: width 0.4s ease; }
+.progress-label { font-size: 12px; color: var(--text-muted); }
+
+/* ── GAME SCREEN ── */
+.topbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
+.stat { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.55rem 0.4rem; text-align: center; }
+.stat-num { font-size: 20px; font-weight: 500; }
+.stat-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; margin-top: 1px; }
+
+.level-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.1rem; }
+.level-label { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.pips { display: flex; gap: 5px; flex: 1; }
+.pip { height: 5px; border-radius: 3px; flex: 1; background: var(--border-soft); transition: background 0.3s; }
+.pip.on { background: var(--blue); }
+
+.game-card {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+.round-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 0.75rem; }
+.level-badge {
+  display: inline-block; font-size: 11px; font-weight: 500;
+  padding: 3px 10px; border-radius: var(--radius-pill);
+  margin-bottom: 1rem; background: var(--blue-bg); color: var(--blue);
+}
+.passage { font-size: 15px; line-height: 1.9; color: var(--text); }
+.target {
+  background: var(--blue-bg); color: var(--blue);
+  border-radius: 4px; padding: 1px 7px; font-weight: 500;
+}
+.q-label { font-size: 12px; color: var(--text-muted); margin: 1rem 0 0.75rem; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 420px) { .choices { grid-template-columns: 1fr; } }
+.cbtn {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 0.7rem 0.9rem;
+  font-size: 13px; color: var(--text); cursor: pointer;
+  text-align: left; line-height: 1.45; font-family: inherit;
+  transition: background 0.12s; min-height: 48px;
+}
+.cbtn:hover:not(:disabled) { background: var(--bg); }
+.cbtn:disabled { cursor: default; }
+.cbtn.correct { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+.cbtn.wrong { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+.cbtn.reveal { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+
+.feedback {
+  border-radius: var(--radius-sm); padding: 0.9rem 1rem;
+  margin-top: 1rem; font-size: 13px; line-height: 1.65; display: none;
+}
+.feedback.show { display: block; }
+.feedback.correct { background: var(--green-bg); color: var(--green); }
+.feedback.wrong { background: var(--red-bg); color: var(--red); }
+
+.next-btn {
+  margin-top: 1rem; width: 100%; padding: 0.8rem;
+  font-size: 14px; cursor: pointer; border-radius: var(--radius-sm);
+  background: var(--card); border: 0.5px solid var(--border);
+  font-family: inherit; color: var(--text); display: none;
+  transition: background 0.12s;
+}
+.next-btn:hover { background: var(--bg); }
+.next-btn.show { display: block; }
+
+.loading-round { text-align: center; padding: 2rem 1rem; color: var(--text-soft); font-size: 14px; }
+.spinner {
+  display: inline-block; width: 20px; height: 20px;
+  border: 2px solid var(--border); border-top-color: var(--blue);
+  border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 0.75rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── WORD BANK ── */
+.bank { margin-top: 1.25rem; }
+.bank-title { font-size: 12px; color: var(--text-muted); margin-bottom: 0.5rem; }
+.bank-words { display: flex; flex-wrap: wrap; gap: 6px; }
+.bword {
+  background: var(--bg); border: 0.5px solid var(--border);
+  border-radius: var(--radius-pill); padding: 3px 11px;
+  font-size: 12px; color: var(--text);
+}
+.bword.missed { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+.retry-note { font-size: 11px; color: var(--text-muted); margin-top: 0.35rem; }
+
+/* ── GAME OVER ── */
+.done-card {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 2rem 1.5rem;
+  text-align: center; margin-top: 1rem;
+}
+.done-score { font-size: 52px; font-weight: 600; color: var(--text); }
+.done-sub { font-size: 14px; color: var(--text-soft); margin-top: 0.4rem; }
+.done-actions { display: flex; gap: 8px; margin-top: 1.5rem; }
+.done-actions button {
+  flex: 1; padding: 0.75rem; font-size: 14px; font-weight: 500;
+  cursor: pointer; border-radius: var(--radius-sm); font-family: inherit;
+}
+.btn-next-game { background: var(--blue); border: none; color: #fff; }
+.btn-next-game:hover { opacity: 0.88; }
+.btn-home { background: var(--card); border: 0.5px solid var(--border); color: var(--text); }
+.btn-home:hover { background: var(--bg); }
+
+/* ── BADGE CELEBRATION ── */
+.badge-screen {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 2.5rem 1.5rem;
+  text-align: center; margin-top: 1rem;
+}
+.badge-icon { font-size: 64px; margin-bottom: 0.75rem; animation: pop 0.4s ease; }
+@keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+.badge-title { font-size: 22px; font-weight: 700; color: var(--text); }
+.badge-level { font-size: 13px; color: var(--blue); font-weight: 500; margin-top: 0.25rem; }
+.badge-desc { font-size: 14px; color: var(--text-soft); line-height: 1.6; margin-top: 0.75rem; }
+.badge-btn {
+  margin-top: 1.5rem; width: 100%; padding: 0.8rem;
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  border-radius: var(--radius-sm); background: var(--blue);
+  border: none; font-family: inherit; color: #fff;
+}
+.badge-btn:hover { opacity: 0.88; }
+
+/* ── MASCOT / 25 GAMES ── */
+.mascot-screen {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 2.5rem 1.5rem;
+  text-align: center; margin-top: 1rem;
+}
+.mascot-svg { margin: 0 auto 1rem; display: block; animation: float 2s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.mascot-title { font-size: 24px; font-weight: 700; color: var(--text); }
+.mascot-sub { font-size: 14px; color: var(--text-soft); line-height: 1.6; margin-top: 0.5rem; }
+.mascot-actions { display: flex; gap: 8px; margin-top: 1.5rem; }
+.mascot-actions button {
+  flex: 1; padding: 0.8rem; font-size: 14px; font-weight: 500;
+  cursor: pointer; border-radius: var(--radius-sm); font-family: inherit;
+}
+
+/* ── POOL TRANSITION ── */
+.pool-transition {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 2rem 1.5rem;
+  text-align: center; margin-top: 1rem;
+}
+.pool-transition h2 { font-size: 18px; font-weight: 600; margin-bottom: 0.5rem; }
+.pool-transition p { font-size: 13px; color: var(--text-soft); margin-bottom: 1.5rem; line-height: 1.6; }
+
+/* ── ERR ── */
+.err-box {
+  background: #fff8e8; border: 0.5px solid #e8d8a0;
+  border-radius: var(--radius-sm); padding: 0.9rem 1rem;
+  font-size: 13px; color: #7a5a10; margin-top: 0.5rem;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  body { padding: 1rem 0.75rem 2.5rem; }
+  .main-hero .game-title { font-size: 34px; }
+  .main-hero .tagline { font-size: 14px; }
+  .topbar { gap: 6px; }
+  .stat-num { font-size: 18px; }
+  .done-score { font-size: 42px; }
+  .done-actions { flex-direction: column; }
+  .mascot-actions { flex-direction: column; }
+  .returning-banner .btn-row { flex-direction: column; }
+  .returning-stats { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ══ MAIN SCREEN ══ -->
+  <div class="screen active" id="screen-main">
+    <div class="main-hero">
+      <div class="game-title">WordSense</div>
+      <div class="tagline">Your brain on words.</div>
+    </div>
+
+    <div class="returning-banner" id="returning-banner">
+      <h3>Welcome back.</h3>
+      <p id="returning-msg">Your progress is saved. Pick up where you left off or start fresh.</p>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="startFresh()">Start fresh</button>
+        <button class="btn-continue" onclick="continueSaved()">Continue</button>
+      </div>
+    </div>
+
+    <div class="returning-stats" id="returning-stats">
+      <div class="rstat"><div class="rstat-num" id="rs-games">0</div><div class="rstat-lbl">Games</div></div>
+      <div class="rstat"><div class="rstat-num" id="rs-words">0</div><div class="rstat-lbl">Learned</div></div>
+      <div class="rstat"><div class="rstat-num" id="rs-level">1</div><div class="rstat-lbl">Level</div></div>
+      <div class="rstat"><div class="rstat-num" id="rs-best">0</div><div class="rstat-lbl">Best</div></div>
+    </div>
+
+    <div class="info-card">
+      <h3>What is WordSense?</h3>
+      <p>Most people learn vocabulary by memorizing definitions. WordSense takes a different approach - the same one your brain uses when you read. Every word is presented inside a real passage, and your job is to figure out what it means from the context around it. No flashcards. No definitions handed to you. Just your brain doing what it does best - reading between the lines.</p>
+      <hr class="info-divider">
+      <h3>Why it works</h3>
+      <p>Reading builds vocabulary naturally because words appear in context, not in isolation. WordSense recreates that same experience as a game. Every passage is generated fresh by AI, every word is chosen to match your current level, and every session is short enough to fit in a break but meaningful enough to stick.</p>
+      <hr class="info-divider">
+      <h3>How to play</h3>
+      <p>Each round shows you a short passage with one word highlighted. Read the passage, then choose what you think the highlighted word means. The answer is always somewhere in the passage - you just have to find it. Get three right in a row and the difficulty goes up. Miss two and it steps back. Your progress saves automatically so you can pick up exactly where you left off.</p>
+    </div>
+
+    <div class="play-btn-wrap">
+      <button class="btn-play" id="play-btn" onclick="handlePlay()">Play</button>
+    </div>
+    <div class="storage-note">Progress saves automatically to this browser. Clearing your browser cache or switching browsers will reset your progress.</div>
+  </div>
+
+  <!-- ══ POOL LOADING SCREEN ══ -->
+  <div class="screen" id="screen-loading">
+    <div class="pool-card">
+      <h2>Building your word pool...</h2>
+      <p>WordSense is generating fresh passages tailored to your level. This takes about 30 seconds and won't happen again for two full games.</p>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+      <div class="progress-label" id="progress-label">Starting...</div>
+    </div>
+  </div>
+
+  <!-- ══ POOL TRANSITION SCREEN ══ -->
+  <div class="screen" id="screen-pool-transition">
+    <div class="pool-transition">
+      <h2>New words incoming.</h2>
+      <p>You've completed two games with this word set. WordSense is now generating a fresh pool of words at your current level. The challenge goes up from here.</p>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="transition-bar"></div></div>
+      <div class="progress-label" id="transition-label">Generating...</div>
+    </div>
+  </div>
+
+  <!-- ══ GAME SCREEN ══ -->
+  <div class="screen" id="screen-game">
+    <div class="topbar">
+      <div class="stat"><div class="stat-num" id="s-correct">0</div><div class="stat-lbl">Correct</div></div>
+      <div class="stat"><div class="stat-num" id="s-streak">0</div><div class="stat-lbl">Streak</div></div>
+      <div class="stat"><div class="stat-num" id="s-level">1</div><div class="stat-lbl">Level</div></div>
+      <div class="stat"><div class="stat-num" id="s-bank">0</div><div class="stat-lbl">Learned</div></div>
+    </div>
+    <div class="level-bar">
+      <span class="level-label">level progress</span>
+      <div class="pips" id="pips"></div>
+    </div>
+    <div class="game-card">
+      <div class="loading-round" id="round-loader"><div class="spinner"></div><br>generating passage...</div>
+      <div id="question-area" style="display:none;">
+        <div class="round-meta" id="round-meta"></div>
+        <div class="level-badge" id="level-badge"></div>
+        <p class="passage" id="passage"></p>
+        <p class="q-label" id="q-label"></p>
+        <div class="choices" id="choices"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="next-btn" id="next-btn">Next word</button>
+      </div>
+    </div>
+    <div class="bank" id="bank" style="display:none;">
+      <div class="bank-title">word bank</div>
+      <div class="bank-words" id="bank-words"></div>
+      <div class="retry-note" id="retry-note"></div>
+    </div>
+  </div>
+
+  <!-- ══ GAME OVER SCREEN ══ -->
+  <div class="screen" id="screen-done">
+    <div class="done-card">
+      <div class="done-score" id="done-score"></div>
+      <div class="done-sub" id="done-sub"></div>
+      <div style="margin-top:1.25rem; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;" id="done-stats-row"></div>
+      <div class="done-actions">
+        <button class="btn-home" onclick="goHome()">Home</button>
+        <button class="btn-next-game" onclick="nextGame()">Next game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BADGE SCREEN ══ -->
+  <div class="screen" id="screen-badge">
+    <div class="badge-screen">
+      <div class="badge-icon" id="badge-icon"></div>
+      <div class="badge-title" id="badge-title"></div>
+      <div class="badge-level" id="badge-level"></div>
+      <div class="badge-desc" id="badge-desc"></div>
+      <button class="badge-btn" onclick="afterBadge()">Keep going</button>
+    </div>
+  </div>
+
+  <!-- ══ MASCOT SCREEN ══ -->
+  <div class="screen" id="screen-mascot">
+    <div class="mascot-screen">
+      <svg class="mascot-svg" width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+        <!-- Graduation cap -->
+        <rect x="28" y="28" width="84" height="12" rx="3" fill="#1a1a18"/>
+        <polygon points="70,10 110,28 70,32 30,28" fill="#1a1a18"/>
+        <line x1="110" y1="28" x2="115" y2="48" stroke="#1a1a18" stroke-width="2.5"/>
+        <circle cx="115" cy="51" r="4" fill="#b8860b"/>
+        <!-- Brain head -->
+        <ellipse cx="70" cy="82" rx="38" ry="36" fill="#fde8e8"/>
+        <ellipse cx="70" cy="82" rx="38" ry="36" fill="none" stroke="#e8a0a0" stroke-width="1.5"/>
+        <!-- Brain folds -->
+        <path d="M48,70 Q55,62 62,70 Q69,78 76,70 Q83,62 90,70" fill="none" stroke="#e8a0a0" stroke-width="2" stroke-linecap="round"/>
+        <path d="M44,82 Q52,74 60,82 Q68,90 76,82 Q84,74 92,82" fill="none" stroke="#e8a0a0" stroke-width="2" stroke-linecap="round"/>
+        <!-- Glasses frames -->
+        <rect x="44" y="88" width="20" height="14" rx="7" fill="none" stroke="#1a1a18" stroke-width="2"/>
+        <rect x="76" y="88" width="20" height="14" rx="7" fill="none" stroke="#1a1a18" stroke-width="2"/>
+        <line x1="64" y1="95" x2="76" y2="95" stroke="#1a1a18" stroke-width="2"/>
+        <line x1="36" y1="95" x2="44" y2="95" stroke="#1a1a18" stroke-width="1.5"/>
+        <line x1="96" y1="95" x2="104" y2="95" stroke="#1a1a18" stroke-width="1.5"/>
+        <!-- Eyes -->
+        <circle cx="54" cy="95" r="3.5" fill="#3a6fd8"/>
+        <circle cx="86" cy="95" r="3.5" fill="#3a6fd8"/>
+        <!-- Smile -->
+        <path d="M58,108 Q70,118 82,108" fill="none" stroke="#1a1a18" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="mascot-title">WordSense Graduate.</div>
+      <div class="mascot-sub">25 games in. Your vocabulary has genuinely grown. That's not a small thing - most people never make it this far. Keep going and see how deep it goes.</div>
+      <div class="mascot-actions">
+        <button class="btn-home" onclick="goHome()">Home</button>
+        <button class="btn-next-game" onclick="nextGame()">Keep playing</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end wrap -->
+
+<script>
+// ═══════════════════════════════════════════
+// CONSTANTS & CONFIG
+// ═══════════════════════════════════════════
+const ROUNDS_PER_GAME = 8;
+const STREAK_UP = 3;
+const STREAK_DOWN = 2;
+const POOL_SIZE = 50; // 4 batches of 50 = 200
+const GAMES_PER_POOL = 2;
+const STORAGE_KEY = 'wordsense_v1';
+
+const LEVEL_NAMES = [
+  "Level 1 - direct clue",
+  "Level 2 - one step removed",
+  "Level 3 - full passage reasoning",
+  "Level 4 - figurative use"
+];
+
+const LEVEL_WORD_POOLS = [
+  ["laconic","tenacious","amiable","meticulous","candid","verbose","eloquent","pragmatic","shrewd","affable","resolute","diligent","vivid","pensive","erratic"],
+  ["ambiguous","paramount","corroborate","arduous","benevolent","immutable","astute","lament","somber","aloof","fervent","lucid","reticent","steadfast","wary"],
+  ["obfuscate","propitious","equivocal","magnanimous","perfidious","esoteric","sanguine","recalcitrant","loquacious","perspicacious","didactic","ephemeral","insidious","nefarious","ostentatious"],
+  ["inveterate","sophistry","pellucid","pugnacious","mendacious","sycophantic","obdurate","circumlocution","mercurial","solipsistic","inimical","quixotic","tendentious","vituperative","ineffable"]
+];
+
+const BADGES = [
+  { at: 5,  icon: "⚡", title: "Spark",    desc: "Something just woke up in there. The neurons are firing." },
+  { at: 10, icon: "🔍", title: "Curious",  desc: "You're asking the right questions. That's where it starts." },
+  { at: 15, icon: "🧠", title: "Thinker",  desc: "You're not just guessing anymore. You're reasoning." },
+  { at: 20, icon: "📖", title: "Scholar",  desc: "Real depth now. Words are starting to feel like tools, not tests." },
+  { at: 25, icon: "🎓", title: "Wordsmith",desc: "You've built something here. Language is yours to use." }
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let state = {
+  apiKey: '',
+  level: 1,
+  streak: 0,
+  streakDown: 0,
+  correct: 0,
+  roundNum: 0,
+  gamesPlayed: 0,
+  gamesInPool: 0,
+  totalWordsLearned: 0,
+  bestScore: 0,
+  bankedWords: {},
+  missedQueue: [],
+  usedWordsThisPool: [],
+  pool: [],          // array of question objects
+  poolIndex: 0,
+  isEvenPool: false, // even = same words new passages
+  currentWord: '',
+  answered: false,
+  pendingBadge: null,
+  afterBadgeAction: null
+};
+
+// ═══════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════
+function saveState() {
+  try {
+    const toSave = { ...state };
+    delete toSave.answered;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      state = { ...state, ...saved };
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+function clearState() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+// ═══════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════
+// SETUP & KEY
+// ═══════════════════════════════════════════
+function getApiKey() { return ''; }
+
+// ═══════════════════════════════════════════
+// MAIN SCREEN
+// ═══════════════════════════════════════════
+function initMainScreen() {
+  const hasSaved = loadState();
+
+  if (hasSaved && state.gamesPlayed > 0) {
+    // Returning player
+    const banner = document.getElementById('returning-banner');
+    const statsRow = document.getElementById('returning-stats');
+    banner.style.display = 'block';
+    statsRow.style.display = 'grid';
+    document.getElementById('returning-msg').textContent =
+      `You've played ${state.gamesPlayed} game${state.gamesPlayed !== 1 ? 's' : ''} and learned ${state.totalWordsLearned} words. Pick up where you left off or start fresh.`;
+    document.getElementById('rs-games').textContent = state.gamesPlayed;
+    document.getElementById('rs-words').textContent = state.totalWordsLearned;
+    document.getElementById('rs-level').textContent = state.level;
+    document.getElementById('rs-best').textContent = state.bestScore;
+    document.getElementById('play-btn').style.display = 'none';
+  } else {
+    document.getElementById('returning-banner').style.display = 'none';
+    document.getElementById('returning-stats').style.display = 'none';
+    document.getElementById('play-btn').style.display = 'block';
+  }
+
+  showScreen('screen-main');
+}
+
+function handlePlay() {
+  startNewGame(false);
+}
+
+function continueSaved() {
+  // If we have a pool ready, go to game, otherwise generate
+  if (state.pool && state.pool.length > 0 && state.poolIndex < state.pool.length) {
+    startGameSession();
+  } else {
+    generatePool(false);
+  }
+}
+
+function startFresh() {
+  clearState();
+  state = {
+    apiKey: '',
+    level: 1, streak: 0, streakDown: 0,
+    correct: 0, roundNum: 0,
+    gamesPlayed: 0, gamesInPool: 0,
+    totalWordsLearned: 0, bestScore: 0,
+    bankedWords: {}, missedQueue: [],
+    usedWordsThisPool: [], pool: [], poolIndex: 0,
+    isEvenPool: false, currentWord: '', answered: false,
+    pendingBadge: null, afterBadgeAction: null
+  };
+  generatePool(false);
+}
+
+function startNewGame(isTransition) {
+  state.correct = 0;
+  state.roundNum = 0;
+  state.answered = false;
+  state.bankedWords = {};
+  state.missedQueue = [];
+  document.getElementById('bank').style.display = 'none';
+  document.getElementById('bank-words').innerHTML = '';
+
+  // Check if we need a new pool
+  if (!state.pool || state.pool.length === 0 || state.poolIndex >= state.pool.length) {
+    if (state.gamesInPool >= GAMES_PER_POOL) {
+      // Time for a new pool
+      state.gamesInPool = 0;
+      state.isEvenPool = !state.isEvenPool;
+      generatePool(true);
+    } else {
+      generatePool(false);
+    }
+  } else {
+    startGameSession();
+  }
+}
+
+// ═══════════════════════════════════════════
+// POOL GENERATION
+// ═══════════════════════════════════════════
+async function generatePool(isTransition) {
+  const screen = isTransition ? 'screen-pool-transition' : 'screen-loading';
+  showScreen(screen);
+
+  const barId = isTransition ? 'transition-bar' : 'progress-bar';
+  const labelId = isTransition ? 'transition-label' : 'progress-label';
+
+  setProgress(barId, labelId, 5, 'Choosing words for your level...');
+
+  const wordPool = LEVEL_WORD_POOLS[state.level - 1] || LEVEL_WORD_POOLS[LEVEL_WORD_POOLS.length - 1];
+  let words;
+
+  if (state.isEvenPool && state.usedWordsThisPool.length > 0) {
+    // Even pool - reuse same words, fresh passages
+    words = [...state.usedWordsThisPool];
+  } else {
+    // Odd pool - fresh words
+    const available = wordPool.filter(w => !state.usedWordsThisPool.includes(w));
+    const src = available.length >= 12 ? available : wordPool;
+    words = shuffleArr([...src]).slice(0, 20);
+    state.usedWordsThisPool = words;
+  }
+
+  setProgress(barId, labelId, 15, 'Generating passages (this takes ~30 seconds)...');
+
+  // Generate in 4 batches of 5
+  const allQuestions = [];
+  const batchSize = 5;
+  const totalBatches = 4;
+
+  for (let b = 0; b < totalBatches; b++) {
+    const batchWords = words.slice(b * batchSize, b * batchSize + batchSize);
+    if (batchWords.length === 0) break;
+    try {
+      const batch = await generateBatch(batchWords);
+      allQuestions.push(...batch);
+    } catch(e) {
+      console.error('Batch error', e);
+    }
+    const pct = 15 + ((b + 1) / totalBatches) * 80;
+    setProgress(barId, labelId, pct, `Generated ${allQuestions.length} passages...`);
+  }
+
+  if (allQuestions.length === 0) {
+    alert('Could not generate questions. Please check your API key and try again.');
+    showScreen('screen-main');
+    return;
+  }
+
+  state.pool = shuffleArr(allQuestions);
+  state.poolIndex = 0;
+  setProgress(barId, labelId, 100, 'Ready!');
+  saveState();
+
+  setTimeout(() => startGameSession(), 600);
+}
+
+async function generateBatch(words) {
+  const levelInstruction = getLevelInstruction();
+  const prompt = `You are generating questions for a vocabulary game called WordSense at difficulty level ${state.level} (1=easiest, 4=hardest).
+
+CRITICAL RULE - NEVER put the word's definition inside the passage. The passage must show meaning through action, situation, consequence, or contrast - NEVER by stating "which means", "that is", "in other words", or by defining the word mid-sentence. The player must DEDUCE the meaning, not be told it.
+
+${levelInstruction}
+
+Generate one question for EACH of these words: ${words.join(', ')}
+
+Wrong answer difficulty:
+- Level 1: Clearly unrelated options
+- Level 2: Plausible but distinguishable on reflection
+- Level 3: Close in meaning, requiring careful distinction
+- Level 4: Near-synonyms differing in nuance only
+
+Return ONLY a valid JSON array, no markdown, no preamble:
+[
+  {
+    "word": "the target word",
+    "passage": "2-3 sentence passage using the word exactly once. NEVER define it mid-sentence.",
+    "correct_definition": "concise plain-language definition under 8 words",
+    "wrong_choices": ["option1","option2","option3"],
+    "explanation": "1-2 sentences referencing the passage to explain the answer"
+  }
+]`;
+
+  const res = await fetch("https://career-tools-proxy.figueroaluisd.workers.dev", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 4000,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err?.error?.message || `API ${res.status}`);
+  }
+
+  const data = await res.json();
+  const raw = (data.content||[]).map(b=>b.text||'').join('');
+  const start = raw.indexOf('['), end = raw.lastIndexOf(']');
+  if (start === -1 || end === -1) throw new Error('No JSON array');
+  const parsed = JSON.parse(raw.slice(start, end+1));
+
+  // Validation pass - reject any passage that contains a definition signal
+  const badPatterns = /which means|that is|in other words|meaning |defined as|refers to/i;
+  return parsed.filter(q => q.word && q.passage && !badPatterns.test(q.passage));
+}
+
+function getLevelInstruction() {
+  const instructions = [
+    "Level 1: Show the word's meaning through the character's clear actions, reactions, or outcomes. The context clue should be unmistakable but never a direct definition.",
+    "Level 2: The clue requires one inference - connect the word to a cause, consequence, or comparison nearby in the passage.",
+    "Level 3: Meaning must be deduced by combining multiple elements across the passage. No single sentence gives it away.",
+    "Level 4: Use the word in a figurative or unusual way. The player must reason carefully about tone, irony, or extended meaning."
+  ];
+  return instructions[state.level - 1] || instructions[0];
+}
+
+function setProgress(barId, labelId, pct, label) {
+  const bar = document.getElementById(barId);
+  const lbl = document.getElementById(labelId);
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = label;
+}
+
+// ═══════════════════════════════════════════
+// GAME SESSION
+// ═══════════════════════════════════════════
+function startGameSession() {
+  state.correct = 0;
+  state.roundNum = 0;
+  state.answered = false;
+  state.bankedWords = {};
+  state.missedQueue = [];
+  document.getElementById('bank').style.display = 'none';
+  document.getElementById('bank-words').innerHTML = '';
+  updateStats();
+  showScreen('screen-game');
+  loadRound();
+}
+
+function loadRound() {
+  if (state.roundNum >= ROUNDS_PER_GAME) {
+    endGame();
+    return;
+  }
+
+  state.answered = false;
+  document.getElementById('round-loader').style.display = 'block';
+  document.getElementById('question-area').style.display = 'none';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  // Draw from missed queue or pool
+  let question = null;
+  if (state.missedQueue.length > 0 && Math.random() < 0.35) {
+    question = state.missedQueue.shift();
+  } else if (state.poolIndex < state.pool.length) {
+    question = state.pool[state.poolIndex++];
+  } else {
+    // Pool exhausted mid-game - pick any remaining
+    question = state.pool[Math.floor(Math.random() * state.pool.length)];
+  }
+
+  state.currentWord = question.word;
+  renderRound(question);
+  saveState();
+}
+
+function renderRound(q) {
+  document.getElementById('round-loader').style.display = 'none';
+  document.getElementById('question-area').style.display = 'block';
+  document.getElementById('round-meta').textContent = `Round ${state.roundNum + 1} of ${ROUNDS_PER_GAME}`;
+  document.getElementById('level-badge').textContent = LEVEL_NAMES[state.level - 1];
+
+  const re = new RegExp(`\\b(${q.word})\\b`, 'i');
+  const highlighted = q.passage.replace(re, '<span class="target">$1</span>');
+  document.getElementById('passage').innerHTML = highlighted;
+  document.getElementById('q-label').textContent = `What does "${q.word}" mean?`;
+
+  const all = shuffleArr([q.correct_definition, ...q.wrong_choices]);
+  const ci = all.indexOf(q.correct_definition);
+
+  const el = document.getElementById('choices');
+  el.innerHTML = '';
+  all.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'cbtn';
+    btn.textContent = c;
+    btn.onclick = () => handleAnswer(i, ci, q);
+    el.appendChild(btn);
+  });
+
+  updateStats();
+}
+
+function handleAnswer(idx, ci, q) {
+  if (state.answered) return;
+  state.answered = true;
+  state.roundNum++;
+
+  const btns = document.querySelectorAll('.cbtn');
+  btns.forEach(b => b.disabled = true);
+  btns[ci].className = 'cbtn reveal';
+  const fb = document.getElementById('feedback');
+
+  if (idx === ci) {
+    state.correct++;
+    state.streak++;
+    state.streakDown = 0;
+    btns[idx].className = 'cbtn correct';
+    fb.className = 'feedback correct show';
+    fb.innerHTML = `<strong>Correct.</strong> ${q.explanation}`;
+    state.bankedWords[q.word] = 'correct';
+
+    if (state.streak >= STREAK_UP && state.level < 4) {
+      state.level++;
+      state.streak = 0;
+      fb.innerHTML += `<br><br><strong>Level up.</strong> ${LEVEL_NAMES[state.level - 1].split(' - ')[1].charAt(0).toUpperCase() + LEVEL_NAMES[state.level - 1].split(' - ')[1].slice(1)}.`;
+    }
+  } else {
+    state.streak = 0;
+    state.streakDown++;
+    btns[idx].className = 'cbtn wrong';
+    fb.className = 'feedback wrong show';
+    fb.innerHTML = `<strong>Not quite.</strong> ${q.explanation}`;
+    state.bankedWords[q.word] = 'missed';
+
+    // Store full question object for retry
+    const missedQ = { ...q };
+    state.missedQueue.push(missedQ);
+
+    if (state.streakDown >= STREAK_DOWN && state.level > 1) {
+      state.level--;
+      state.streakDown = 0;
+      fb.innerHTML += `<br><br>Stepping back to level ${state.level} to reinforce the foundation.`;
+    }
+  }
+
+  updateStats();
+  updateBank();
+  document.getElementById('next-btn').className = 'next-btn show';
+  document.getElementById('next-btn').onclick = loadRound;
+  saveState();
+}
+
+// ═══════════════════════════════════════════
+// END GAME
+// ═══════════════════════════════════════════
+function endGame() {
+  state.gamesPlayed++;
+  state.gamesInPool++;
+
+  const newlyLearned = Object.values(state.bankedWords).filter(v => v === 'correct').length;
+  state.totalWordsLearned += newlyLearned;
+  if (state.correct > state.bestScore) state.bestScore = state.correct;
+
+  saveState();
+
+  // Check mascot milestone
+  if (state.gamesPlayed === 25) {
+    state.afterBadgeAction = 'mascot';
+    showScreen('screen-mascot');
+    return;
+  }
+
+  // Check badge milestone
+  const badge = BADGES.find(b => b.at === state.gamesPlayed);
+  if (badge) {
+    showBadge(badge, 'done');
+    return;
+  }
+
+  showDoneScreen();
+}
+
+function showDoneScreen() {
+  const pct = state.correct / ROUNDS_PER_GAME;
+  document.getElementById('done-score').textContent = `${state.correct} / ${ROUNDS_PER_GAME}`;
+  document.getElementById('done-sub').textContent =
+    pct === 1 ? 'Perfect. Your context instincts are sharp.' :
+    pct >= 0.75 ? `Strong round. Level ${state.level} and climbing.` :
+    pct >= 0.5 ? 'Good foundation. Keep building.' :
+    'Context takes reps. Come back tomorrow.';
+
+  const statsRow = document.getElementById('done-stats-row');
+  statsRow.innerHTML = `
+    <span style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:4px 12px;border-radius:20px;border:0.5px solid var(--border);">Games played: ${state.gamesPlayed}</span>
+    <span style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:4px 12px;border-radius:20px;border:0.5px solid var(--border);">Words learned: ${state.totalWordsLearned}</span>
+    <span style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:4px 12px;border-radius:20px;border:0.5px solid var(--border);">Best score: ${state.bestScore} / ${ROUNDS_PER_GAME}</span>
+  `;
+  showScreen('screen-done');
+}
+
+// ═══════════════════════════════════════════
+// BADGES
+// ═══════════════════════════════════════════
+function showBadge(badge, afterAction) {
+  state.afterBadgeAction = afterAction;
+  document.getElementById('badge-icon').textContent = badge.icon;
+  document.getElementById('badge-title').textContent = badge.title;
+  document.getElementById('badge-level').textContent = `${badge.at} games played`;
+  document.getElementById('badge-desc').textContent = badge.desc;
+  showScreen('screen-badge');
+}
+
+function afterBadge() {
+  if (state.afterBadgeAction === 'mascot') {
+    showScreen('screen-mascot');
+  } else {
+    showDoneScreen();
+  }
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function goHome() {
+  initMainScreen();
+}
+
+function nextGame() {
+  // Check if we need a new pool
+  if (state.gamesInPool >= GAMES_PER_POOL || !state.pool || state.poolIndex >= state.pool.length) {
+    state.gamesInPool = 0;
+    state.isEvenPool = !state.isEvenPool;
+    state.pool = [];
+    state.poolIndex = 0;
+    generatePool(true);
+  } else {
+    state.correct = 0;
+    state.roundNum = 0;
+    state.answered = false;
+    state.bankedWords = {};
+    state.missedQueue = [];
+    startGameSession();
+  }
+}
+
+// ═══════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════
+function updateStats() {
+  document.getElementById('s-correct').textContent = state.correct;
+  document.getElementById('s-streak').textContent = Math.max(0, state.streak);
+  document.getElementById('s-level').textContent = state.level;
+  const learned = Object.values(state.bankedWords).filter(v => v === 'correct').length;
+  document.getElementById('s-bank').textContent = learned;
+  updatePips();
+}
+
+function updatePips() {
+  const el = document.getElementById('pips');
+  if (!el) return;
+  el.innerHTML = '';
+  for (let i = 0; i < STREAK_UP; i++) {
+    const p = document.createElement('div');
+    p.className = 'pip' + (i < Math.min(Math.max(0, state.streak), STREAK_UP) ? ' on' : '');
+    el.appendChild(p);
+  }
+}
+
+function updateBank() {
+  const words = Object.keys(state.bankedWords);
+  if (!words.length) return;
+  document.getElementById('bank').style.display = 'block';
+  document.getElementById('bank-words').innerHTML = words.map(w =>
+    `<span class="bword${state.bankedWords[w] === 'missed' ? ' missed' : ''}">${w}</span>`
+  ).join('');
+  const missed = words.filter(w => state.bankedWords[w] === 'missed');
+  document.getElementById('retry-note').textContent = missed.length
+    ? `${missed.length} word${missed.length > 1 ? 's' : ''} will come back around.`
+    : '';
+}
+
+function shuffleArr(a) {
+  const arr = [...a];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  initMainScreen();
+});
+</script>
+</body>
+</html>
