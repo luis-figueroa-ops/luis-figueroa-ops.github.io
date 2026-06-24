@@ -27,10 +27,11 @@
     pointer-events: none; z-index: 100;
   }
   #game-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .back-nav { font-size: 11px; letter-spacing: 1px; }
+  .back-nav { position: fixed; left: 14px; bottom: 14px; z-index: 50; font-size: 14px; letter-spacing: 1px; }
   .back-nav a { color: #8888aa; text-decoration: none; transition: color 0.2s; }
   .back-nav a:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
   .back-nav.hidden { visibility: hidden; pointer-events: none; }
+  .copyright { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 50; font-size: 11px; letter-spacing: 1px; color: #4a4a6a; white-space: nowrap; pointer-events: none; }
   #hud { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
   #hud-left { display: flex; flex-direction: column; gap: 2px; }
   #score-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--accent); letter-spacing: 3px; opacity: 0.6; }
@@ -147,6 +148,7 @@
 </style>
 </head>
 <body>
+<div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
 <div id="game-wrapper">
   <div class="back-nav" id="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
   <div id="hud">
