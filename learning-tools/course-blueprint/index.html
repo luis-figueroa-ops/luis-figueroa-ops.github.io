@@ -412,9 +412,38 @@ select option { background: var(--surface2); }
 }
 .polish-error.visible { display: block; }
 
+/* ── Fixed chrome ── */
+.fixed-back {
+  position: fixed;
+  left: 14px;
+  top: 14px;
+  z-index: 200;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #a0a0cc;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.fixed-back:hover { color: var(--green); }
+
+.fixed-copyright {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #a0a0cc;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 /* ── Print ── */
 @media print {
-  .site-header, .hero, .build-btn, .action-row, .polish-row { display: none !important; }
+  .site-header, .hero, .build-btn, .action-row, .polish-row, .fixed-back, .fixed-copyright { display: none !important; }
   body { background: white; color: #111; }
   .main { padding: 0; max-width: 100%; }
   .form-card { background: #fafafa; border: 1px solid #ddd; padding: 24px; margin-bottom: 20px; }
@@ -439,6 +468,8 @@ select option { background: var(--surface2); }
 </style>
 </head>
 <body>
+
+<a class="fixed-back" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
 
 <header class="site-header">
   <a class="back-link" href="/">Luis Figueroa</a>
@@ -529,6 +560,8 @@ select option { background: var(--surface2); }
   </div>
 
 </main>
+
+<p class="fixed-copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
 
 <script>
   var basePrompt = '';
