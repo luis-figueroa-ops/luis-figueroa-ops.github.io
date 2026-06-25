@@ -40,7 +40,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Hero ── */
 .hero {
   padding: 56px 56px 40px;
   max-width: 800px;
@@ -83,9 +82,61 @@ h1 em { color: var(--green); font-style: normal; }
   opacity: 0.7;
   line-height: 1.7;
   max-width: 520px;
+  margin-bottom: 24px;
 }
 
-/* ── Main ── */
+.overview-box {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--green);
+  padding: 20px 24px;
+  max-width: 680px;
+}
+
+.overview-box p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 14px;
+}
+
+.overview-box p:last-child { margin-bottom: 0; }
+
+.overview-phases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.overview-phase {
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  padding: 10px 12px;
+}
+
+.overview-phase-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.overview-phase-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 3px;
+}
+
+.overview-phase-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 .main {
   padding: 0 56px 80px;
   max-width: 860px;
@@ -95,7 +146,6 @@ h1 em { color: var(--green); font-style: normal; }
   gap: 24px;
 }
 
-/* ── Form ── */
 .form-card {
   background: var(--surface);
   border: 1px solid var(--border-soft);
@@ -191,7 +241,6 @@ select option { background: var(--surface2); }
 .build-btn:hover { background: var(--green-light); transform: translateY(-1px); }
 .build-btn:active { transform: translateY(0); }
 
-/* ── Output ── */
 .output-section {
   display: none;
   flex-direction: column;
@@ -285,7 +334,6 @@ select option { background: var(--surface2); }
   text-transform: uppercase;
 }
 
-/* ── Action row ── */
 .action-row { display: flex; gap: 12px; flex-wrap: wrap; }
 
 .btn {
@@ -307,7 +355,6 @@ select option { background: var(--surface2); }
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--green); }
 .btn-outline:hover { background: var(--green-dim); }
 
-/* ── Polish toggle ── */
 .polish-row {
   background: var(--surface);
   border: 1px solid var(--border-soft);
@@ -382,7 +429,6 @@ select option { background: var(--surface2); }
 }
 .polish-error.visible { display: block; }
 
-/* ── Fixed chrome ── */
 .fixed-back {
   position: fixed;
   left: 14px;
@@ -411,7 +457,6 @@ select option { background: var(--surface2); }
   pointer-events: none;
 }
 
-/* ── Print ── */
 @media print {
   .hero, .build-btn, .action-row, .polish-row, .fixed-back, .fixed-copyright { display: none !important; }
   body { background: white; color: #111; }
@@ -426,13 +471,13 @@ select option { background: var(--surface2); }
   .badge-enhanced { border-color: #333; color: #333; background: #f0f0f0; }
 }
 
-/* ── Mobile ── */
 @media (max-width: 660px) {
   .hero { padding: 36px 20px 28px; }
   .main { padding: 0 20px 60px; }
   .form-card, .output-card { padding: 24px 20px; }
   .polish-row { padding: 16px 20px; }
   .form-grid { grid-template-columns: 1fr; }
+  .overview-phases { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
@@ -443,7 +488,33 @@ select option { background: var(--surface2); }
 <section class="hero">
   <div class="eyebrow">Learning Tools</div>
   <h1>15-Minute<br><em>Course Blueprint</em></h1>
-  <p class="hero-sub">Fill in four fields. Get a complete, ready-to-paste prompt that turns any AI into your personal learning coach for 15 minutes.</p>
+  <p class="hero-sub">Fill in four fields. Your AI determines how many sessions you need, then walks you through them one at a time - 15 minutes each, at your own pace.</p>
+
+  <div class="overview-box">
+    <p>This tool builds a complete, ready-to-paste prompt that turns any AI - Claude, ChatGPT, Gemini, or anything else - into your personal learning coach. Your AI analyzes the complexity of your topic and creates a full session roadmap before teaching you anything. Then it works through the sessions with you one at a time, each built on a proven four-phase structure.</p>
+    <div class="overview-phases">
+      <div class="overview-phase">
+        <div class="overview-phase-num">Phase 1</div>
+        <div class="overview-phase-name">Teach</div>
+        <div class="overview-phase-desc">Core concept in plain language with a real example from your world</div>
+      </div>
+      <div class="overview-phase">
+        <div class="overview-phase-num">Phase 2</div>
+        <div class="overview-phase-name">Apply</div>
+        <div class="overview-phase-desc">One exercise to attempt on your own - the struggle is the learning</div>
+      </div>
+      <div class="overview-phase">
+        <div class="overview-phase-num">Phase 3</div>
+        <div class="overview-phase-name">Evaluate & Coach</div>
+        <div class="overview-phase-desc">Your attempt reviewed, mistakes diagnosed, the why explained</div>
+      </div>
+      <div class="overview-phase">
+        <div class="overview-phase-num">Phase 4</div>
+        <div class="overview-phase-name">Advance & Connect</div>
+        <div class="overview-phase-desc">Key insight, next session preview, and a reusable prompt to keep</div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <main class="main">
@@ -459,7 +530,7 @@ select option { background: var(--surface2); }
 
       <div class="form-group full">
         <label for="goal">What is your goal?</label>
-        <span class="hint">What do you want to be able to do after this session?</span>
+        <span class="hint">What do you want to be able to do after completing this course?</span>
         <textarea id="goal" placeholder="e.g. Write a query that ranks salespeople by revenue within each region"></textarea>
       </div>
 
@@ -481,7 +552,7 @@ select option { background: var(--surface2); }
     </div>
     <button class="build-btn" onclick="handleBuild()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      Build My Session Prompt
+      Build My Course Prompt
     </button>
   </div>
 
@@ -489,7 +560,7 @@ select option { background: var(--surface2); }
 
     <div class="output-card">
       <div class="output-header">
-        <span class="output-label">Your Session Prompt</span>
+        <span class="output-label">Your Course Prompt</span>
         <span class="badge-enhanced" id="badgeEnhanced">&#10022; AI Enhanced</span>
       </div>
       <div class="prompt-wrapper">
@@ -516,7 +587,7 @@ select option { background: var(--surface2); }
         <span class="toggle-name">Polish with AI</span>
       </label>
       <div class="polish-info">
-        <p>Searches the web for current information on your topic, then rewrites the prompt with specific examples and sharper exercises. One call to Claude &mdash; no API key required.</p>
+        <p>Searches the web for current information on your topic, then rewrites the prompt with specific examples and sharper exercises. One call to Claude - no API key required.</p>
         <div class="polish-error" id="polishError"></div>
       </div>
     </div>
@@ -532,23 +603,18 @@ select option { background: var(--surface2); }
   var enhancedPrompt = '';
 
   function assemblePrompt(topic, goal, level, context) {
-    return 'You are my personal learning coach. I have 15 minutes. Run a structured learning session with me on the following:\n\n'
+    return 'You are my personal learning coach. I want to learn the following:\n\n'
       + 'TOPIC: ' + topic + '\n'
       + 'GOAL: ' + goal + '\n'
       + 'MY LEVEL: ' + level + '\n'
       + 'MY CONTEXT: ' + context + '\n\n'
-      + 'Follow this structure:\n\n'
-      + '── 1. CONCEPT EXPLANATION (3–4 min) ──────────────────\n'
-      + 'Explain the topic in plain language. Use a concrete example drawn directly from my context above — not a generic textbook example.\n\n'
-      + '── 2. GUIDED EXERCISE (5 min) ────────────────────\n'
-      + 'Give me one hands-on exercise I can attempt right now, specific to my goal and context. Present it clearly, then STOP and wait for me to share my attempt before continuing.\n\n'
-      + '── 3. COACHING MY ATTEMPT (4 min) ────────────────\n'
-      + 'After I share my attempt, give specific feedback: what I got right, what to correct, and one follow-up challenge to push my thinking further.\n\n'
-      + '── 4. CLOSING SUMMARY (2 min) ───────────────────\n'
-      + 'Summarize the single most important insight from this session in 2–3 sentences. Then give me one reusable prompt I can copy and save to continue learning this topic on my own:\n\n'
-      + '"[Reusable prompt here]"\n\n'
-      + '───────────────────────────────────────────────────\n'
-      + 'Start now with Step 1.';
+      + 'Before we begin, analyze the complexity of this topic relative to my goal and current level. Determine how many 15-minute sessions I will realistically need to reach my goal and give each session a short title. Show me this roadmap clearly before anything else so I know what I am committing to.\n\n'
+      + 'Then begin Session 1 immediately using this structure:\n\n'
+      + '1. Explain the core concept in plain language in under 150 words. Use one concrete example drawn directly from my context - not a generic example.\n\n'
+      + '2. Give me one hands-on exercise specific to my goal and context. Show me exactly how to set it up, then stop and wait for my attempt before continuing.\n\n'
+      + '3. After I share my attempt, tell me what I got right, diagnose any mistakes, and explain the why behind each one.\n\n'
+      + '4. Close the session with the single most important insight in 2-3 sentences. Tell me what the next session will cover. Give me one reusable prompt I can save to pick up where we left off.\n\n'
+      + 'Start now with the session roadmap.';
   }
 
   function handleBuild() {
@@ -602,8 +668,8 @@ select option { background: var(--surface2); }
     var topic = document.getElementById('topic').value.trim();
     overlay.classList.add('visible');
 
-    var userMessage = 'Search the web for current, specific information about the topic: "' + topic + '" — key concepts, real-world frameworks, common misconceptions, and practical examples.\n\n'
-      + 'Then use what you find to rewrite the following learning session prompt. Keep the exact same four-part structure (Concept Explanation, Guided Exercise, Coaching, Closing Summary), but make it more grounded: replace generic placeholders with specific, accurate details, concrete real-world examples, and a sharper exercise drawn from actual practice.\n\n'
+    var userMessage = 'Search the web for current, specific information about the topic: "' + topic + '" - key concepts, real-world frameworks, common misconceptions, and practical examples relevant to today.\n\n'
+      + 'Then use what you find to rewrite the following learning course prompt. Keep the exact same structure (session roadmap determination, then Session 1 with its four steps), but make it more grounded: replace generic language with specific, accurate details, concrete real-world examples, and a sharper exercise drawn from actual current practice.\n\n'
       + 'Return ONLY the improved prompt text, ready to paste into any AI assistant. Do not add any introduction, preamble, or commentary outside the prompt itself.\n\n'
       + 'Original prompt:\n' + basePrompt;
 
@@ -630,7 +696,7 @@ select option { background: var(--surface2); }
         .join('')
         .trim();
 
-      if (!text) throw new Error('No response received — try again.');
+      if (!text) throw new Error('No response received - try again.');
 
       enhancedPrompt = text;
       promptBox.textContent = enhancedPrompt;
