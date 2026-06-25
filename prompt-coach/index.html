@@ -74,7 +74,6 @@ body {
   transition: color 0.2s;
 }
 .topbar-back:hover { color: var(--gold); }
-.copyright-fixed { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 200; font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 1px; color: var(--muted); white-space: nowrap; pointer-events: none; opacity: 0.6; }
 
 /* ── HERO ── */
 .hero {
@@ -457,9 +456,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   border-left: 3px solid var(--gold-border);
   transition: border-left-color 0.2s;
 }
-.coach-field:focus-within {
-  border-left-color: var(--gold);
-}
+.coach-field:focus-within { border-left-color: var(--gold); }
 .coach-field-label {
   font-family: 'Share Tech Mono', monospace;
   font-size: 21px;
@@ -486,13 +483,9 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   transition: border-color 0.2s;
 }
 .coach-field input[type="text"]:focus,
-.coach-field textarea:focus {
-  border-color: var(--gold);
-}
+.coach-field textarea:focus { border-color: var(--gold); }
 .coach-field input[type="text"]::placeholder,
-.coach-field textarea::placeholder {
-  color: rgba(240,237,230,0.3);
-}
+.coach-field textarea::placeholder { color: rgba(240,237,230,0.3); }
 .coach-field-why {
   font-size: 23px;
   color: var(--muted);
@@ -864,15 +857,78 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   gap: 8px;
 }
 .btn-save-library:hover { background: rgba(201,168,76,0.25); }
+
+/* ── AI NOTICE ── */
+.ai-notice {
+  max-width: 1200px;
+  margin: 0 auto 28px;
+  padding: 14px 48px;
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  text-align: center;
+}
+.ai-notice-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+/* ── SITE FOOTER ── */
+.site-footer {
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  padding: 28px 48px;
+  border-top: 1px solid var(--gold-border);
+  text-align: center;
+}
+.site-footer-built {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.site-footer-built a {
+  color: var(--gold);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.site-footer-built a:hover { color: #dbb85c; }
+.site-footer-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.site-footer-desc {
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.site-footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  opacity: 0.6;
+}
 </style>
 </head>
 <body>
 
 <a class="topbar-back" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
-<div class="copyright-fixed">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
 <div class="topbar">
   <span class="topbar-brand">Prompt Coach</span>
-  
 </div>
 
 <div class="hero">
@@ -966,7 +1022,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
           <span class="ai-toggle-track"><span class="ai-toggle-thumb"></span></span>
           <span class="ai-toggle-label">Polish with AI <span style="opacity:0.6;font-weight:normal;">(optional)</span></span>
         </label>
-        <span class="polish-note">Unchecked: your fields stay as a clear, labeled list — instant and free, good for your own quick reference. Checked: AI rewrites them into one natural prompt that reads like you wrote it yourself — better when you're sharing it with someone else or pasting it somewhere it shouldn't look like a filled-in template.</span>
+        <span class="polish-note">Unchecked: your fields stay as a clear, labeled list — instant and free, good for your own quick reference. Checked: AI searches for current best practices on your topic, then rewrites your fields into one natural prompt that reads like you wrote it yourself — better when you're sharing it or pasting somewhere it shouldn't look like a filled-in template.</span>
       </div>
       <button class="btn-primary" id="buildBtn" onclick="buildAssembledPrompt()" style="width:100%;margin-top:4px;margin-bottom:28px;">Build My Coached Prompt</button>
 
@@ -1042,6 +1098,21 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   </div><!-- /results -->
 
 </div><!-- /main -->
+
+<!-- AI NOTICE -->
+<div class="ai-notice">
+  <span class="ai-notice-label">AI Notice:</span> AI-enhanced output is generated automatically and may contain inaccuracies. Review before use. Results depend on web availability at the time of the request. Output is a starting point - verify any specific facts, examples, or claims before using them in a real context. Luis Figueroa is not responsible for results generated by third-party AI.
+</div>
+
+<!-- SITE FOOTER -->
+<div class="site-footer">
+  <div class="site-footer-built">
+    Built by <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">Luis Figueroa</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
+  </div>
+  <div class="site-footer-tagline">Augmenting Human Potential, One Workflow at a Time</div>
+  <div class="site-footer-desc">A tool built by an ops professional who reads between the lines of every process document.</div>
+  <div class="site-footer-copy">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1611,18 +1682,26 @@ async function buildAssembledPrompt() {
     const fieldSummary = Object.entries(fieldValues).map(([k, v]) => `${k}: ${v}`).join('\n');
     const content = `Original prompt: ${original}\n\nCoaching fields filled in:\n${fieldSummary}`;
 
+    // ── CHANGE 1: web search added so Polish with AI always uses current information ──
     try {
       const res = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          max_tokens: 600,
-          system: `Take these prompt-coaching field answers and weave them into one natural, well-written prompt — not a bulleted list of the fields. Write in second person, as if the user wrote it. 100-200 words. No meta-commentary, no markdown formatting, start directly.`,
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1500,
+          tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+          system: `You are a prompt engineering expert. First search the web for the most current best practices, frameworks, and techniques relevant to the topic in the user's prompt. Then use what you find to weave the coaching field answers into one natural, well-written prompt — not a bulleted list of the fields. The prompt should reflect current, accurate context for the topic. Write in second person, as if the user wrote it. 100-200 words. No meta-commentary, no markdown formatting, start directly with the prompt itself.`,
           messages: [{ role: 'user', content }]
         })
       });
       const data = await res.json();
-      const assembled = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : null;
+      const assembled = (data.content || [])
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('')
+        .trim();
+
       if (assembled) {
         baseCoached = assembled;
         resetRefineState();
@@ -1642,7 +1721,7 @@ async function buildAssembledPrompt() {
     showToast('AI unavailable — using local assembly');
   }
 
-  // Local assembly
+  // Local assembly fallback
   let openingLine = '';
   if (roleInstruction && openingInstruction) {
     openingLine = roleInstruction.replace(/\.\s*$/, '') + '. ' + openingInstruction.replace(/\.\s*$/, '');
@@ -1861,7 +1940,7 @@ function useExamplePreview(btnEl) {
 }
 
 // ═══════════════════════════════════════
-// SCORE HISTORY (PR2)
+// SCORE HISTORY
 // ═══════════════════════════════════════
 function appendScoreHistory(score) {
   const key = 'prompt-coach-score-history';
@@ -1908,7 +1987,7 @@ function clearScoreHistory() {
 }
 
 // ═══════════════════════════════════════
-// PROMPT LIBRARY (PR2)
+// PROMPT LIBRARY
 // ═══════════════════════════════════════
 const LIBRARY_KEY = 'prompt-coach-library';
 
