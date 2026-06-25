@@ -1,1 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>15-Minute Course Blueprint — Luis Figueroa</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2128;
+  --green: #4ade80;
+  --green-light: #86efac;
+  --green-dim: rgba(74,222,128,0.1);
+  --border: rgba(74,222,128,0.2);
+  --border-soft: rgba(255,255,255,0.07);
+  --white: #e6edf3;
+  --muted: #7d8590;
+  --red: #f85149;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Header ── */
+.site-header {
+  padding: 20px 56px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.back-link {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.back-link::before { content: '←'; }
+.back-link:hover { color: var(--green); }
+
+.header-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 56px 56px 40px;
+  max-width: 800px;
+}
+
+.eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5.5vw, 62px);
+  letter-spacing: 2px;
+  line-height: 1;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+h1 em { color: var(--green); font-style: normal; }
+
+.hero-sub {
+  font-size: 17px;
+  color: var(--white);
+  opacity: 0.7;
+  line-height: 1.7;
+  max-width: 520px;
+}
+
+/* ── Main ── */
+.main {
+  padding: 0 56px 80px;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Form ── */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  padding: 40px;
+}
+
+.form-section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 28px;
+  margin-bottom: 28px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+
+label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: -2px;
+}
+
+input[type="text"],
+textarea,
+select {
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  padding: 12px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus { border-color: rgba(74,222,128,0.45); }
+
+input::placeholder,
+textarea::placeholder { color: rgba(125,133,144,0.45); }
+
+textarea { resize: vertical; min-height: 88px; }
+
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237d8590' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+select option { background: var(--surface2); }
+
+.build-btn {
+  width: 100%;
+  padding: 15px 32px;
+  background: var(--green);
+  color: #0d1117;
+  border: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.build-btn:hover { background: var(--green-light); transform: translateY(-1px); }
+.build-btn:active { transform: translateY(0); }
+
+/* ── Output ── */
+.output-section {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeUp 0.4s ease both;
+}
+.output-section.visible { display: flex; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.output-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 36px 40px;
+}
+
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.output-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.badge-enhanced {
+  display: none;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  background: var(--green-dim);
+  border: 1px solid var(--border);
+  color: var(--green);
+}
+.badge-enhanced.visible { display: inline-block; }
+
+.prompt-wrapper { position: relative; }
+
+.prompt-box {
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  padding: 24px 28px;
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--white);
+  white-space: pre-wrap;
+  min-height: 160px;
+  word-break: break-word;
+}
+
+.loading-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(13,17,23,0.88);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.loading-overlay.visible { display: flex; }
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border: 2px solid rgba(255,255,255,0.08);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-msg {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+/* ── Action row ── */
+.action-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn {
+  padding: 10px 22px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-primary { background: var(--green); color: #0d1117; }
+.btn-primary:hover { background: var(--green-light); }
+.btn-primary.copied { background: #22c55e; }
+
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--green); }
+.btn-outline:hover { background: var(--green-dim); }
+
+/* ── Polish toggle ── */
+.polish-row {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  padding: 20px 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  cursor: pointer;
+  padding-top: 2px;
+}
+
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 11px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.toggle input:checked + .toggle-track { background: var(--green); }
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  pointer-events: none;
+}
+.toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+.toggle-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--white);
+  text-transform: uppercase;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.polish-info { flex: 1; min-width: 200px; }
+.polish-info p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+.polish-error {
+  display: none;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--red);
+  width: 100%;
+  margin-top: 8px;
+}
+.polish-error.visible { display: block; }
+
+/* ── Print ── */
+@media print {
+  .site-header, .hero, .build-btn, .action-row, .polish-row { display: none !important; }
+  body { background: white; color: #111; }
+  .main { padding: 0; max-width: 100%; }
+  .form-card { background: #fafafa; border: 1px solid #ddd; padding: 24px; margin-bottom: 20px; }
+  .output-section { display: flex !important; }
+  .output-card { background: #fafafa; border: 1px solid #ddd; padding: 24px; }
+  .prompt-box { background: white; border: 1px solid #ddd; color: #111; font-size: 13px; }
+  input, textarea, select { background: white; color: #111; border: 1px solid #ccc; }
+  label, .form-section-label, .output-label { color: #555; }
+  .loading-overlay { display: none !important; }
+  .badge-enhanced { border-color: #333; color: #333; background: #f0f0f0; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 660px) {
+  .site-header { padding: 16px 20px; }
+  .hero { padding: 36px 20px 28px; }
+  .main { padding: 0 20px 60px; }
+  .form-card, .output-card { padding: 24px 20px; }
+  .polish-row { padding: 16px 20px; }
+  .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="back-link" href="/">Luis Figueroa</a>
+  <span class="header-label">Learning Tools</span>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Learning Tools</div>
+  <h1>15-Minute<br><em>Course Blueprint</em></h1>
+  <p class="hero-sub">Fill in four fields. Get a complete, ready-to-paste prompt that turns any AI into your personal learning coach for 15 minutes.</p>
+</section>
+
+<main class="main">
+
+  <div class="form-card">
+    <div class="form-section-label">Your Learning Context</div>
+    <div class="form-grid">
+
+      <div class="form-group full">
+        <label for="topic">What do you want to learn?</label>
+        <input type="text" id="topic" placeholder="e.g. SQL window functions, pricing psychology, VLOOKUP in Excel" />
+      </div>
+
+      <div class="form-group full">
+        <label for="goal">What is your goal?</label>
+        <span class="hint">What do you want to be able to do after this session?</span>
+        <textarea id="goal" placeholder="e.g. Write a query that ranks salespeople by revenue within each region"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="level">What is your current level?</label>
+        <select id="level">
+          <option value="Complete beginner">Complete beginner</option>
+          <option value="Some familiarity">Some familiarity</option>
+          <option value="Intermediate">Intermediate</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="context">What is your real-life context?</label>
+        <span class="hint">Your role, industry, or the specific situation this applies to.</span>
+        <textarea id="context" placeholder="e.g. I run sales ops reports in Salesforce and want to stop exporting everything to Excel"></textarea>
+      </div>
+
+    </div>
+    <button class="build-btn" onclick="handleBuild()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Build My Session Prompt
+    </button>
+  </div>
+
+  <div class="output-section" id="outputSection">
+
+    <div class="output-card">
+      <div class="output-header">
+        <span class="output-label">Your Session Prompt</span>
+        <span class="badge-enhanced" id="badgeEnhanced">&#10022; AI Enhanced</span>
+      </div>
+      <div class="prompt-wrapper">
+        <div class="prompt-box" id="promptBox"></div>
+        <div class="loading-overlay" id="loadingOverlay">
+          <div class="spinner"></div>
+          <div class="loading-msg">Searching &amp; enhancing&hellip;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn btn-primary" id="copyBtn" onclick="handleCopy()">Copy Prompt</button>
+      <button class="btn btn-outline" onclick="window.print()">Save as PDF</button>
+    </div>
+
+    <div class="polish-row">
+      <label class="toggle-group" for="polishToggle">
+        <div class="toggle">
+          <input type="checkbox" id="polishToggle" onchange="handlePolishToggle(this.checked)" />
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </div>
+        <span class="toggle-name">Polish with AI</span>
+      </label>
+      <div class="polish-info">
+        <p>Searches the web for current information on your topic, then rewrites the prompt with specific examples and sharper exercises. One call to Claude &mdash; no API key required.</p>
+        <div class="polish-error" id="polishError"></div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  var basePrompt = '';
+  var enhancedPrompt = '';
+
+  function assemblePrompt(topic, goal, level, context) {
+    return 'You are my personal learning coach. I have 15 minutes. Run a structured learning session with me on the following:\n\n'
+      + 'TOPIC: ' + topic + '\n'
+      + 'GOAL: ' + goal + '\n'
+      + 'MY LEVEL: ' + level + '\n'
+      + 'MY CONTEXT: ' + context + '\n\n'
+      + 'Follow this structure:\n\n'
+      + '── 1. CONCEPT EXPLANATION (3–4 min) ──────────────────\n'
+      + 'Explain the topic in plain language. Use a concrete example drawn directly from my context above — not a generic textbook example.\n\n'
+      + '── 2. GUIDED EXERCISE (5 min) ────────────────────\n'
+      + 'Give me one hands-on exercise I can attempt right now, specific to my goal and context. Present it clearly, then STOP and wait for me to share my attempt before continuing.\n\n'
+      + '── 3. COACHING MY ATTEMPT (4 min) ────────────────\n'
+      + 'After I share my attempt, give specific feedback: what I got right, what to correct, and one follow-up challenge to push my thinking further.\n\n'
+      + '── 4. CLOSING SUMMARY (2 min) ───────────────────\n'
+      + 'Summarize the single most important insight from this session in 2–3 sentences. Then give me one reusable prompt I can copy and save to continue learning this topic on my own:\n\n'
+      + '"[Reusable prompt here]"\n\n'
+      + '───────────────────────────────────────────────────\n'
+      + 'Start now with Step 1.';
+  }
+
+  function handleBuild() {
+    var topic   = document.getElementById('topic').value.trim();
+    var goal    = document.getElementById('goal').value.trim();
+    var level   = document.getElementById('level').value;
+    var context = document.getElementById('context').value.trim();
+
+    if (!topic || !goal || !context) {
+      var missing = [];
+      if (!topic)   missing.push('"What do you want to learn"');
+      if (!goal)    missing.push('"What is your goal"');
+      if (!context) missing.push('"What is your real-life context"');
+      alert('Please fill in ' + missing.join(' and ') + ' before building your prompt.');
+      return;
+    }
+
+    basePrompt     = assemblePrompt(topic, goal, level, context);
+    enhancedPrompt = '';
+
+    document.getElementById('polishToggle').checked = false;
+    document.getElementById('badgeEnhanced').classList.remove('visible');
+    document.getElementById('polishError').classList.remove('visible');
+    document.getElementById('promptBox').textContent = basePrompt;
+    document.getElementById('outputSection').classList.add('visible');
+    document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function handlePolishToggle(checked) {
+    if (!basePrompt) return;
+
+    var errorEl   = document.getElementById('polishError');
+    var badge     = document.getElementById('badgeEnhanced');
+    var promptBox = document.getElementById('promptBox');
+    var overlay   = document.getElementById('loadingOverlay');
+
+    errorEl.classList.remove('visible');
+
+    if (!checked) {
+      promptBox.textContent = basePrompt;
+      badge.classList.remove('visible');
+      return;
+    }
+
+    if (enhancedPrompt) {
+      promptBox.textContent = enhancedPrompt;
+      badge.classList.add('visible');
+      return;
+    }
+
+    var topic = document.getElementById('topic').value.trim();
+    overlay.classList.add('visible');
+
+    var userMessage = 'Search the web for current, specific information about the topic: "' + topic + '" — key concepts, real-world frameworks, common misconceptions, and practical examples.\n\n'
+      + 'Then use what you find to rewrite the following learning session prompt. Keep the exact same four-part structure (Concept Explanation, Guided Exercise, Coaching, Closing Summary), but make it more grounded: replace generic placeholders with specific, accurate details, concrete real-world examples, and a sharper exercise drawn from actual practice.\n\n'
+      + 'Return ONLY the improved prompt text, ready to paste into any AI assistant. Do not add any introduction, preamble, or commentary outside the prompt itself.\n\n'
+      + 'Original prompt:\n' + basePrompt;
+
+    fetch('https://career-tools-proxy.figueroaluisd.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    })
+    .then(function(resp) {
+      if (!resp.ok) {
+        return resp.text().then(function(t) { throw new Error(t || 'Server responded with ' + resp.status); });
+      }
+      return resp.json();
+    })
+    .then(function(data) {
+      var text = (data.content || [])
+        .filter(function(b) { return b.type === 'text'; })
+        .map(function(b) { return b.text; })
+        .join('')
+        .trim();
+
+      if (!text) throw new Error('No response received — try again.');
+
+      enhancedPrompt = text;
+      promptBox.textContent = enhancedPrompt;
+      badge.classList.add('visible');
+    })
+    .catch(function(err) {
+      document.getElementById('polishToggle').checked = false;
+      promptBox.textContent = basePrompt;
+      badge.classList.remove('visible');
+      errorEl.textContent = 'Enhancement failed: ' + (err.message || 'check your connection and try again.');
+      errorEl.classList.add('visible');
+    })
+    .finally(function() {
+      overlay.classList.remove('visible');
+    });
+  }
+
+  function handleCopy() {
+    var text = document.getElementById('promptBox').textContent;
+    if (!text) return;
+
+    var btn = document.getElementById('copyBtn');
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy Prompt';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    } else {
+      var range = document.createRange();
+      range.selectNodeContents(document.getElementById('promptBox'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    }
+  }
+</script>
+
+</body>
+</html>
