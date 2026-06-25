@@ -355,6 +355,13 @@ select option { background: var(--surface2); }
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--green); }
 .btn-outline:hover { background: var(--green-dim); }
 
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--muted);
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--white); }
+
 .polish-row {
   background: var(--surface);
   border: 1px solid var(--border-soft);
@@ -505,12 +512,12 @@ select option { background: var(--surface2); }
       </div>
       <div class="overview-phase">
         <div class="overview-phase-num">Phase 3</div>
-        <div class="overview-phase-name">Evaluate & Coach</div>
+        <div class="overview-phase-name">Evaluate &amp; Coach</div>
         <div class="overview-phase-desc">Your attempt reviewed, mistakes diagnosed, the why explained</div>
       </div>
       <div class="overview-phase">
         <div class="overview-phase-num">Phase 4</div>
-        <div class="overview-phase-name">Advance & Connect</div>
+        <div class="overview-phase-name">Advance &amp; Connect</div>
         <div class="overview-phase-desc">Key insight, next session preview, and a reusable prompt to keep</div>
       </div>
     </div>
@@ -575,6 +582,7 @@ select option { background: var(--surface2); }
     <div class="action-row">
       <button class="btn btn-primary" id="copyBtn" onclick="handleCopy()">Copy Prompt</button>
       <button class="btn btn-outline" onclick="handleSavePDF()">Save as PDF</button>
+      <button class="btn btn-ghost" onclick="handleStartOver()">&#8635; Start Over</button>
     </div>
 
     <div class="polish-row">
@@ -641,6 +649,28 @@ select option { background: var(--surface2); }
     document.getElementById('promptBox').textContent = basePrompt;
     document.getElementById('outputSection').classList.add('visible');
     document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function handleStartOver() {
+    basePrompt     = '';
+    enhancedPrompt = '';
+
+    document.getElementById('topic').value   = '';
+    document.getElementById('goal').value    = '';
+    document.getElementById('context').value = '';
+    document.getElementById('level').selectedIndex = 0;
+
+    document.getElementById('polishToggle').checked = false;
+    document.getElementById('badgeEnhanced').classList.remove('visible');
+    document.getElementById('polishError').classList.remove('visible');
+    document.getElementById('promptBox').textContent = '';
+    document.getElementById('outputSection').classList.remove('visible');
+
+    var copyBtn = document.getElementById('copyBtn');
+    copyBtn.textContent = 'Copy Prompt';
+    copyBtn.classList.remove('copied');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function handleSavePDF() {
