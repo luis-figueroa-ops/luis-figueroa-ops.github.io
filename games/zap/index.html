@@ -75,7 +75,6 @@
     #startScreen, #gameoverScreen, #victoryScreen { display: none; }
     #startScreen.active, #gameoverScreen.active, #victoryScreen.active { display: block; }
 
-    /* ── Desktop intro screen upscale ── */
     @media (min-width: 768px) {
       .screen {
         max-width: 620px;
@@ -112,7 +111,6 @@
       }
     }
 
-    /* Victory screen */
     #victoryScreen {
       border-color: #ffd700;
       box-shadow: 0 0 60px #ffd70077, inset 0 0 40px #1a0a0055;
@@ -180,7 +178,7 @@
     <p>
       Bugs are swarming your snack table!<br>
       <strong style="color:#00ffe7">Tap directly on a bug</strong> to zap it.<br>
-      Survive all <strong style="color:#ffd700">15 waves</strong> to claim victory!
+      Survive all <strong style="color:#ffd700">20 waves</strong> to claim victory!
     </p>
     <button class="btn" id="startBtn">START GAME</button>
     <div class="controls-hint">
@@ -193,13 +191,13 @@
     <h1>ZAPPED</h1>
     <div class="sub">Snack table overrun!</div>
     <div class="score-display" id="finalScore">0</div>
-    <div class="hi-label">WAVE <span id="finalWave">1</span> / 15 &nbsp;|&nbsp; HIGH SCORE <span class="hi-score" id="hiScoreDisplay">0</span></div>
+    <div class="hi-label">WAVE <span id="finalWave">1</span> / 20 &nbsp;|&nbsp; HIGH SCORE <span class="hi-score" id="hiScoreDisplay">0</span></div>
     <button class="btn" id="restartBtn">PLAY AGAIN</button>
   </div>
 
   <div class="screen" id="victoryScreen">
     <h1>EXTERMINATED!</h1>
-    <div class="sub">All 15 waves cleared!</div>
+    <div class="sub">All 20 waves cleared!</div>
     <span class="spray-can" id="sprayCan">🪣</span>
     <div style="color:#ffd700; font-size:0.72rem; letter-spacing:2px; margin-bottom:8px;">
       ✨ THE SNACK TABLE IS SAFE FOREVER ✨
@@ -219,8 +217,16 @@
 <div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
 
 <script>
-// ZAP! Bug Zapper - 15-Wave Edition
-const MAX_WAVES = 15;
+// ZAP! Bug Zapper — 20-Wave Edition
+// Wave scaling redesign:
+//   Waves  1-5:  intro ramp — reasonable bugs, generous delays, speed builds slowly
+//   Waves  6-10: mid tier — faster spawns, more bug types, tighter windows
+//   Waves 11-15: hard tier — near-cap speed, swarm density, first double-boss pools
+//   Waves 16-20: nightmare tier — max speed, max density, brutal swarm compositions
+// Boss waves: 5, 10, 15, 20 (every 5th)
+// Badges: 5, 10, 15, 20
+
+const MAX_WAVES = 20;
 const canvas = document.getElementById('c');
 const ctx    = canvas.getContext('2d');
 
@@ -243,12 +249,28 @@ function uiScale()    { return Math.min(1, W / 500); }
 const DELTA_CAP  = 0.05;
 const MAX_HEALTH = 5;
 
+// ─── Wave config ─────────────────────────────────────────────────────────────
+// bugs:  8 → 28 over 20 waves (smooth linear ramp)
+// spawn: 2.5s → 0.45s (extended floor gives nightmare-tier feel)
+// speed: 1.0x → 2.6x (extra headroom beyond old 2.2 cap)
+// delay: starts 4.0s, floors at 3.0s waves 1-10; drops to 2.0s floor waves 11-20
+//        (longer breathers early, tighter breathers late)
 function getWaveConfig(w) {
-  const bugsNeeded       = Math.round(8 + (w - 1) * 1.0);
-  const spawnInterval    = Math.max(0.55, 2.5 - (w - 1) * 0.14);
-  const speedMult        = Math.min(2.2, 1.0 + (w - 1) * 0.085);
-  const betweenWaveDelay = Math.max(2.5, 3.5 - (w - 1) * 0.07);
-  const isBossWave       = w % 5 === 0;
+  const t = (w - 1) / (MAX_WAVES - 1); // 0..1
+
+  const bugsNeeded    = Math.round(8 + t * 20);                          // 8 → 28
+  const spawnInterval = Math.max(0.45, 2.5 - t * 2.2);                  // 2.5s → 0.45s
+  const speedMult     = Math.min(2.6, 1.0 + t * 1.6);                   // 1.0x → 2.6x
+
+  // Between-wave delay: generous early (4.0s), tightens mid, floors at 2.0s late
+  let betweenWaveDelay;
+  if (w <= 10) {
+    betweenWaveDelay = Math.max(3.0, 4.0 - (w - 1) * 0.10);             // 4.0 → 3.1
+  } else {
+    betweenWaveDelay = Math.max(2.0, 3.0 - (w - 11) * 0.10);            // 3.0 → 2.1
+  }
+
+  const isBossWave = w % 5 === 0;
   return { bugsNeeded, spawnInterval, speedMult, betweenWaveDelay, isBossWave };
 }
 
@@ -266,12 +288,18 @@ const BUG_DEFS = {
   mosquito:  { emoji: '\u{1F99F}', hp: 1, speed: 130, score: 25,  size: 22, sineAmp: 28, sineFreq: 2.4 },
   beetle:    { emoji: '\u{1FAB2}', hp: 3, speed: 70,  score: 50,  size: 28, sineAmp: 18, sineFreq: 1.2 },
   cockroach: { emoji: '\u{1FAB3}', hp: 2, speed: 100, score: 40,  size: 26, sineAmp: 14, sineFreq: 1.8 },
+  hornet:    { emoji: '\u{1F41D}', hp: 3, speed: 145, score: 75,  size: 24, sineAmp: 30, sineFreq: 3.2 }, // unlocks wave 13
+  spider:    { emoji: '\u{1F577}', hp: 4, speed: 80,  score: 90,  size: 26, sineAmp: 8,  sineFreq: 0.8 }, // unlocks wave 16
   boss:      { emoji: '\u{1F997}', hp: 5, speed: 55,  score: 200, size: 52, sineAmp: 40, sineFreq: 0.9 },
+  megaboss:  { emoji: '\u{1F997}', hp: 8, speed: 48,  score: 400, size: 64, sineAmp: 50, sineFreq: 0.7 }, // waves 15, 20
 };
+
+// Hornet uses bee emoji but different stats — distinguish via type string
+// Spider renders with its own emoji
 
 const TABLE_FOOD = ['🍎','🍊','🍇','🍕','🧁','🍫','🥤','🍿','🍓','🥪'];
 
-// --- Audio ---
+// ─── Audio ───────────────────────────────────────────────────────────────────
 let audioCtx = null;
 function getAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -350,7 +378,7 @@ function soundVictory() {
   playNote(130, 'square', now + 0.7, 0.5, 0.12);
 }
 
-// --- Music ---
+// ─── Music ───────────────────────────────────────────────────────────────────
 let musicOn = true, musicRunning = false, musicStopFlag = false, musicTimeout = null, nextBarStart = 0;
 const BPM = 132, BEAT = 60 / BPM;
 const BASS_NOTES   = [87.3,87.3,130.8,87.3,110.0,87.3,116.5,87.3];
@@ -416,7 +444,7 @@ function togglePause() {
   if (paused) stopMusic(); else if (musicOn) startMusic();
 }
 
-// --- Game State ---
+// ─── Game State ───────────────────────────────────────────────────────────────
 let state = 'title';
 let score, hiScore, wave, tableHealth;
 let bugs, zapFlashes, particles, zapTexts;
@@ -428,8 +456,16 @@ let badge = null, earnedBadges = [];
 let aimX = -1, aimY = -1;
 let victoryParticles = [], victoryAnimT = 0;
 
-function loadHiScore() { return parseInt(localStorage.getItem('zap_hi') || '0', 10); }
-function saveHiScore(s) { localStorage.setItem('zap_hi', String(s)); }
+// ─── Badge definitions (4 unique — one per boss wave) ─────────────────────────
+const BADGES = [
+  '🔥 Bug Slayer!',       // wave 5
+  '⚡ Zap Master!',       // wave 10
+  '💀 Swarm Breaker!',    // wave 15
+  '👑 Apex Exterminator!',// wave 20
+];
+
+function loadHiScore() { return parseInt(localStorage.getItem('zap_hi20') || '0', 10); }
+function saveHiScore(s) { localStorage.setItem('zap_hi20', String(s)); }
 
 function initGame() {
   score = 0; hiScore = loadHiScore(); wave = 1; tableHealth = MAX_HEALTH;
@@ -450,33 +486,72 @@ function startWave(w) {
 
 function waveIsClear() { return waveClearing && bugs.length === 0; }
 
+// ─── Spawn pool per wave ──────────────────────────────────────────────────────
+// Tiers:
+//   1-4:   fly only
+//   5:     boss wave
+//   6-8:   + bee, mosquito
+//   9:     + cockroach
+//   10:    boss wave
+//   11-12: + beetle
+//   13-14: + hornet (replaces some flies)
+//   15:    mega-boss wave
+//   16-17: + spider
+//   18-20: nightmare mix (all types, heavy weight on tanky/fast)
 function spawnBug() {
   if (bossAlive) return;
   const cfg = getWaveConfig(wave);
+
+  // Boss spawns mid-wave
   if (cfg.isBossWave && bugsSpawned === Math.floor(bugsNeeded / 2) && !bossAlive) {
-    createBug('boss'); bossAlive = true; return;
+    const isMega = wave >= 15;
+    createBug(isMega ? 'megaboss' : 'boss');
+    bossAlive = true;
+    return;
   }
-  let pool = ['fly'];
-  if (wave >= 2)  pool.push('bee');
-  if (wave >= 3)  pool.push('mosquito', 'mosquito');
-  if (wave >= 5)  pool.push('cockroach');
-  if (wave >= 7)  pool.push('beetle');
-  if (wave >= 10) pool.push('cockroach', 'beetle');
-  if (wave >= 13) pool.push('mosquito', 'mosquito', 'mosquito');
+
+  let pool;
+  if (wave <= 4) {
+    pool = ['fly','fly','fly','fly','fly'];
+  } else if (wave <= 6) {
+    pool = ['fly','fly','fly','bee','mosquito'];
+  } else if (wave <= 8) {
+    pool = ['fly','fly','bee','bee','mosquito','mosquito'];
+  } else if (wave === 9) {
+    pool = ['fly','bee','mosquito','mosquito','cockroach','cockroach'];
+  } else if (wave <= 11) {
+    pool = ['bee','mosquito','cockroach','cockroach','beetle'];
+  } else if (wave <= 12) {
+    pool = ['bee','mosquito','mosquito','cockroach','beetle','beetle'];
+  } else if (wave <= 14) {
+    pool = ['mosquito','mosquito','cockroach','beetle','beetle','hornet','hornet'];
+  } else if (wave === 15) {
+    pool = ['mosquito','cockroach','beetle','hornet','hornet'];
+  } else if (wave <= 17) {
+    pool = ['mosquito','mosquito','cockroach','beetle','hornet','hornet','spider'];
+  } else {
+    // Waves 18-20: nightmare
+    pool = ['mosquito','mosquito','cockroach','beetle','hornet','hornet','spider','spider','spider'];
+  }
+
   createBug(pool[Math.floor(Math.random() * pool.length)]);
 }
 
 function createBug(type) {
-  const def = BUG_DEFS[type], isBoss = type === 'boss';
-  const margin = isBoss ? 80 : 40;
+  const def = BUG_DEFS[type], isBossType = type === 'boss' || type === 'megaboss';
+  const margin = isBossType ? 80 : 40;
   const y = margin + Math.random() * (H - margin * 2);
+
+  // Nightmare tier (wave 16+): erratic movement scaled up
+  const erraticScale = wave >= 16 ? 1.6 : wave >= 11 ? 1.2 : 1.0;
+
   bugs.push({
     type, x: -def.size, y, originY: y,
     hp: def.hp, maxHp: def.hp,
     speed: def.speed * currentSpeedMult,
     emoji: def.emoji, size: def.size, score: def.score,
     sineAmp: def.sineAmp, sineFreq: def.sineFreq,
-    erraticAmp: wave >= 8 ? 12 + Math.random() * 18 : 0,
+    erraticAmp: wave >= 8 ? (12 + Math.random() * 18) * erraticScale : 0,
     erraticFreq: 3 + Math.random() * 2,
     t: Math.random() * Math.PI * 2, flashTimer: 0,
   });
@@ -539,7 +614,7 @@ document.getElementById('victoryRestartBtn').addEventListener('click', () => {
 
 showScreen('startScreen');
 
-// --- Update ---
+// ─── Update ───────────────────────────────────────────────────────────────────
 function update(dt) {
   if (state !== 'playing' || paused) return;
 
@@ -564,7 +639,7 @@ function update(dt) {
       tableHealth--; soundDamage();
       spawnHitParticles(tableX - 20, b.y, '#ff4444');
       spawnZapText(tableX - 60, b.y - 24, '🍎 STOLEN!', '#ff4444');
-      if (b.type === 'boss') bossAlive = false;
+      if (b.type === 'boss' || b.type === 'megaboss') bossAlive = false;
       bugs.splice(i, 1);
       if (tableHealth <= 0) { gameOver(); return; }
       continue;
@@ -595,15 +670,14 @@ function update(dt) {
       soundWaveClear();
       spawnZapText(W / 2, H * 0.4, `WAVE ${wave} / ${MAX_WAVES} CLEAR! +${waveBonus}`, '#00ffe7');
 
+      // Badge on every boss wave (5, 10, 15, 20)
       if (wave % 5 === 0 && wave < MAX_WAVES) {
-        const BADGES = ['🔥 Bug Slayer!', '⚡ Zap Master!'];
         const idx = (wave / 5 - 1) % BADGES.length;
         badge = { text: BADGES[idx], timer: 3.0 };
         earnedBadges.push(BADGES[idx]);
       }
 
       if (wave >= MAX_WAVES) { triggerVictory(); return; }
-      nextWaveDelay = getWaveConfig(wave + 1).betweenWaveDelay;
       startWave(wave + 1);
     }
   }
@@ -612,14 +686,15 @@ function update(dt) {
 function hitBug(bug) {
   if (!bugs.includes(bug)) return;
   bug.hp--; bug.flashTimer = 0.12;
-  const isBoss = bug.type === 'boss', hitColor = isBoss ? '#ff79c6' : '#00ffe7';
+  const isBossType = bug.type === 'boss' || bug.type === 'megaboss';
+  const hitColor = isBossType ? '#ff79c6' : '#00ffe7';
   if (bug.hp <= 0) {
     score += bug.score; killsThisWave++; totalKills++;
     if (score > hiScore) { hiScore = score; saveHiScore(hiScore); }
-    soundKill(isBoss);
+    soundKill(isBossType);
     spawnHitParticles(bug.x, bug.y, hitColor);
     spawnZapText(bug.x - 20, bug.y - 30, `ZAP! +${bug.score}`, hitColor);
-    if (isBoss) bossAlive = false;
+    if (isBossType) bossAlive = false;
     bugs.splice(bugs.indexOf(bug), 1);
   } else {
     soundHit(); spawnHitParticles(bug.x, bug.y, '#ffaa00');
@@ -680,7 +755,7 @@ function buildArcSegments(x1, y1, x2, y2) {
   return segs;
 }
 
-// --- Draw ---
+// ─── Draw ─────────────────────────────────────────────────────────────────────
 let animT = 0;
 
 function draw(dt) {
@@ -690,6 +765,13 @@ function draw(dt) {
   bg.addColorStop(0,'#05050f'); bg.addColorStop(0.7,'#07071a'); bg.addColorStop(1,'#0f0c1a');
   ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
   for (let y = 0; y < H; y += 4) { ctx.fillStyle='rgba(0,0,0,0.06)'; ctx.fillRect(0,y,W,2); }
+
+  // Nightmare tier tint (waves 16-20)
+  if (state === 'playing' && wave >= 16) {
+    const intensity = Math.min(1, (wave - 15) / 5) * 0.08;
+    ctx.fillStyle = `rgba(80,0,0,${intensity + Math.sin(animT * 2) * 0.02})`;
+    ctx.fillRect(0, 0, W, H);
+  }
 
   if (state === 'playing') {
     drawTable(); drawTurret(); drawBugs(); drawZapFlashes();
@@ -835,14 +917,18 @@ function drawTurret() {
 
 function drawBugs() {
   for (const b of bugs) {
+    const isMega = b.type === 'megaboss';
     ctx.save(); ctx.translate(b.x,b.y);
     const ringAlpha=0.18+Math.sin(animT*3+b.t)*0.08;
-    ctx.strokeStyle=b.type==='boss'?'#ff79c6':'#00ffe7'; ctx.lineWidth=1.5; ctx.globalAlpha=ringAlpha;
+    ctx.strokeStyle=isMega?'#ffd700':b.type==='boss'?'#ff79c6':'#00ffe7'; ctx.lineWidth=isMega?2.5:1.5; ctx.globalAlpha=ringAlpha;
     ctx.beginPath(); ctx.arc(0,0,Math.max(getTapRadius(b),b.size*0.65),0,Math.PI*2); ctx.stroke();
     ctx.globalAlpha=1;
     if (b.flashTimer>0) { ctx.shadowColor='#ffffff'; ctx.shadowBlur=30; }
     if (b.type==='boss') { ctx.shadowColor='#ff79c6'; ctx.shadowBlur=20+Math.sin(animT*5)*8; }
-    ctx.font=`${b.size}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    if (isMega) { ctx.shadowColor='#ffd700'; ctx.shadowBlur=28+Math.sin(animT*6)*12; }
+    // Render emoji — megaboss gets scaled up beyond its already-large size
+    const displaySize = isMega ? b.size * 1.1 : b.size;
+    ctx.font=`${displaySize}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.scale(-1,1); ctx.fillText(b.emoji,0,0); ctx.scale(-1,1); ctx.shadowBlur=0;
     if (b.maxHp>1) {
       const bw=b.size+8,bh=5,bx=-(b.size+8)/2,by=-b.size/2-12,f=b.hp/b.maxHp;
@@ -901,7 +987,7 @@ function drawHUD() {
 
   ctx.save();
 
-  // --- SCORE (top-left) ---
+  // Score (top-left)
   ctx.textAlign = 'left'; ctx.textBaseline = 'top';
   ctx.font = `bold ${scoreNumH}px 'Courier New', monospace`;
   ctx.fillStyle = '#ffe156'; ctx.shadowColor = '#ffe156'; ctx.shadowBlur = 18;
@@ -911,16 +997,13 @@ function drawHUD() {
   ctx.fillStyle = '#ffe15699';
   ctx.fillText('SCORE', pad, pad + scoreNumH + 2);
 
-  // --- HI SCORE ---
-  // Measure score text width to anchor HI score just right of it, avoiding WAVE collision
+  // Hi score
   ctx.font = `bold ${scoreNumH}px 'Courier New', monospace`;
   const scoreW = ctx.measureText(score.toLocaleString()).width;
-  // On wide screens center it; on narrow screens pin it right of score block with a gap
   let hiX, hiAlign;
   if (W >= 600) {
     hiX = W / 2; hiAlign = 'center';
   } else {
-    // anchor left edge just past score block, display left-aligned
     hiX = pad + scoreW + 18;
     hiAlign = 'left';
   }
@@ -930,22 +1013,28 @@ function drawHUD() {
   ctx.fillText(`HI ${hiScore.toLocaleString()}`, hiX, pad + 2);
   ctx.shadowBlur = 0;
 
-  // --- WAVE X / 15 (top-right) ---
+  // Wave X / 20 (top-right)
   const pr = getPauseRect();
   const waveX = pr.x - 12;
   ctx.textAlign = 'right';
   ctx.font = `bold ${waveH}px 'Courier New', monospace`;
-  ctx.fillStyle = '#00ffe7'; ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 12;
+
+  // Nightmare tier: wave label pulses red
+  const isNightmare = wave >= 16;
+  const waveColor = isNightmare
+    ? `hsl(${360 + Math.sin(animT * 6) * 10}, 100%, 65%)`
+    : '#00ffe7';
+  ctx.fillStyle = waveColor; ctx.shadowColor = waveColor; ctx.shadowBlur = 12;
   ctx.fillText(`WAVE ${wave} / ${MAX_WAVES}`, waveX, pad);
   ctx.shadowBlur = 0;
 
-  // --- bugs: X / Y ---
+  // bugs: X / Y
   const bugsY = pad + waveH + 4;
   ctx.font = `bold ${bugsH}px 'Courier New', monospace`;
   ctx.fillStyle = '#00ffe7bb';
   ctx.fillText(`bugs: ${killsThisWave} / ${bugsNeeded}`, waveX, bugsY);
 
-  // --- Wave bug-kill progress bar ---
+  // Wave bug-kill progress bar
   const prog = bugsNeeded > 0 ? Math.min(1, killsThisWave / bugsNeeded) : 0;
   const barW = Math.round(120 * s);
   const barX = waveX - barW;
@@ -959,25 +1048,27 @@ function drawHUD() {
   ctx.strokeStyle = '#ffffff22'; ctx.lineWidth = 1;
   ctx.strokeRect(barX, barY, barW, barH);
 
-  // --- Overall wave progress strip ---
+  // Overall wave progress strip (top of screen)
   const overallProg = (wave - 1) / MAX_WAVES, opW = W - pad * 2;
   ctx.fillStyle = '#0a0a20'; ctx.fillRect(pad, 0, opW, 5);
   const ogrd = ctx.createLinearGradient(pad, 0, pad + opW, 0);
-  ogrd.addColorStop(0, '#00ffe7'); ogrd.addColorStop(0.5, '#a040ff'); ogrd.addColorStop(1, '#ffd700');
+  ogrd.addColorStop(0, '#00ffe7'); ogrd.addColorStop(0.5, '#a040ff'); ogrd.addColorStop(0.75, '#ff4444'); ogrd.addColorStop(1, '#ffd700');
   ctx.fillStyle = ogrd; ctx.fillRect(pad, 0, opW * overallProg, 5);
 
-  // --- Boss wave alert ---
+  // Boss wave alert
   const cfg = getWaveConfig(wave);
   if (cfg.isBossWave && bossAlive) {
     const pulse = 0.7 + Math.sin(animT * 8) * 0.3;
     ctx.globalAlpha = pulse; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     ctx.font = `bold ${Math.round(14 * s)}px 'Courier New', monospace`;
-    ctx.fillStyle = '#ff79c6'; ctx.shadowColor = '#ff79c6'; ctx.shadowBlur = 16;
-    ctx.fillText('⚠ BOSS WAVE ⚠', W / 2, pad + Math.round(26 * s));
+    const bossLabel = wave >= 15 ? '⚠ MEGA-BOSS WAVE ⚠' : '⚠ BOSS WAVE ⚠';
+    ctx.fillStyle = wave >= 15 ? '#ffd700' : '#ff79c6';
+    ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 16;
+    ctx.fillText(bossLabel, W / 2, pad + Math.round(26 * s));
     ctx.shadowBlur = 0; ctx.globalAlpha = 1;
   }
 
-  // --- Earned badges ---
+  // Earned badges strip
   if (earnedBadges.length > 0) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     ctx.font = `bold ${Math.round(14 * s)}px 'Courier New', monospace`;
@@ -995,7 +1086,7 @@ function drawHUD() {
 
   ctx.restore();
 
-  // --- Wave clear banner ---
+  // Wave clear banner
   if (waveClearing && bugs.length === 0 && wave < MAX_WAVES) {
     ctx.save();
     ctx.font = `bold ${Math.round(26 * s)}px 'Courier New', monospace`;
@@ -1003,6 +1094,16 @@ function drawHUD() {
     ctx.fillStyle = '#00ffe7'; ctx.shadowColor = '#00ffe7'; ctx.shadowBlur = 24;
     ctx.globalAlpha = 0.9 + Math.sin(animT * 6) * 0.1;
     ctx.fillText(`WAVE ${wave} / ${MAX_WAVES} CLEAR!`, W / 2, H * 0.18);
+    ctx.restore();
+  }
+
+  // Nightmare tier warning banner
+  if (state === 'playing' && wave >= 16 && !waveClearing) {
+    ctx.save();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `bold ${Math.round(11 * s)}px 'Courier New', monospace`;
+    ctx.fillStyle = `rgba(255,80,80,${0.5 + Math.sin(animT * 4) * 0.3})`;
+    ctx.fillText('-- NIGHTMARE TIER --', W / 2, H - 28);
     ctx.restore();
   }
 }
