@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>15-Minute Course Blueprint — Luis Figueroa</title>
+<title>15-Minute Course Blueprint</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -574,7 +574,7 @@ select option { background: var(--surface2); }
 
     <div class="action-row">
       <button class="btn btn-primary" id="copyBtn" onclick="handleCopy()">Copy Prompt</button>
-      <button class="btn btn-outline" onclick="window.print()">Save as PDF</button>
+      <button class="btn btn-outline" onclick="handleSavePDF()">Save as PDF</button>
     </div>
 
     <div class="polish-row">
@@ -641,6 +641,18 @@ select option { background: var(--surface2); }
     document.getElementById('promptBox').textContent = basePrompt;
     document.getElementById('outputSection').classList.add('visible');
     document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function handleSavePDF() {
+    var topic = document.getElementById('topic').value.trim();
+    var originalTitle = document.title;
+    if (topic) {
+      document.title = 'Course Blueprint - ' + topic;
+    }
+    window.print();
+    setTimeout(function() {
+      document.title = originalTitle;
+    }, 1000);
   }
 
   function handlePolishToggle(checked) {
