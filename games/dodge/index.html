@@ -92,7 +92,7 @@
   #boss-label { font-family: 'Orbitron', sans-serif; font-size: 9px; color: var(--danger); letter-spacing: 3px; text-align: center; margin-bottom: 2px; display: none; }
   #boss-label.visible { display: block; }
 
-  /* ── Win screen ── */
+  /* Win screen */
   #win-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
@@ -158,7 +158,7 @@
     </div>
     <div id="hud-center">
       <div id="level-label">LEVEL</div>
-      <div id="level-display">1 / 15</div>
+      <div id="level-display">1 / 20</div>
     </div>
     <div id="hud-right">
       <div style="display:flex;align-items:center;gap:10px;">
@@ -181,7 +181,7 @@
     <canvas id="canvas"></canvas>
     <div id="overlay">
       <div class="overlay-title" id="overlay-title">DODGE</div>
-      <div class="overlay-sub" id="overlay-sub">SURVIVE THE GRID — 15 LEVELS</div>
+      <div class="overlay-sub" id="overlay-sub">SURVIVE THE GRID — 20 LEVELS</div>
       <div class="overlay-score-label" id="overlay-score-label" style="display:none">FINAL SCORE</div>
       <div class="overlay-score-val" id="overlay-score-val" style="display:none">0</div>
       <div id="name-input-wrap">
@@ -197,10 +197,10 @@
       <div id="tip2">🛡️ SHIELD - blocks one hit &nbsp;|&nbsp; ⏱️ SLOW-MO - halves speed</div>
     </div>
 
-    <!-- Win screen lives inside canvas-wrap so it overlays the canvas -->
+    <!-- Win screen -->
     <div id="win-overlay">
       <div id="win-title">MISSION COMPLETE</div>
-      <div id="win-sub">ALL 15 LEVELS CLEARED — YOU ARE ELITE</div>
+      <div id="win-sub">ALL 20 LEVELS CLEARED — YOU ARE ELITE</div>
       <canvas id="badge-canvas" width="200" height="200"></canvas>
       <div id="win-score-label">FINAL SCORE</div>
       <div id="win-score-val">0</div>
@@ -214,7 +214,7 @@
 <script>
 // ─── Constants ────────────────────────────────────────────────────────────────
 const GW = 480, GH = 580;
-const MAX_LEVEL = 15;
+const MAX_LEVEL = 20;
 const SCORE_PER_LEVEL = 600;
 
 // ─── Device detection ─────────────────────────────────────────────────────────
@@ -314,7 +314,6 @@ const SFX = {
   dodge:   () => { if (Math.random()>0.94) playTone(880,'sine',0.04,0.05,1200); },
   whoosh:  () => playNoise(0.18, 0.08, 'bandpass', 3000, 400),
   thruster:() => playNoise(0.1, 0.05, 'lowpass', 280, 120),
-  // Victory fanfare: ascending chord stabs
   victory: () => {
     [0,0.12,0.24,0.38].forEach((t,i) => {
       const freqs = [523,659,784,1047];
@@ -428,27 +427,35 @@ let touchTargetX = 0, touchTargetY = 0;
 
 // ─── Level / difficulty helpers ───────────────────────────────────────────────
 function getLevel() {
-  // Level is score-based but hard-capped at MAX_LEVEL
   return Math.min(Math.floor(score / SCORE_PER_LEVEL) + 1, MAX_LEVEL);
 }
-function getSpeedMult()     { return slowActive ? 0.45 : 1; }
+function getSpeedMult() { return slowActive ? 0.45 : 1; }
 
-// Obstacle speed ramps from 1.6 at L1 to ~5.8 at L15 in a gentle curve
-// Formula: base + (level-1) * step, capped at a max
+// Obstacle speed ramp:
+// L1-L14: 1.6 + (lvl-1) * 0.30  — same curve as original through L14 (max ~5.5)
+// L15-L20: continues at a flattened 0.15/level so endgame stays brutal but fair
+// L15 = 5.66, L16 = 5.81, L17 = 5.96, L18 = 6.11, L19 = 6.26, L20 = 6.41
 function getObstacleSpeed() {
   const lvl = getLevel();
-  const speed = baseSpeed + (lvl - 1) * 0.3;
+  let speed;
+  if (lvl <= 14) {
+    speed = baseSpeed + (lvl - 1) * 0.30;
+  } else {
+    const base14 = baseSpeed + 13 * 0.30; // speed at L14
+    speed = base14 + (lvl - 14) * 0.15;
+  }
   return speed * getSpeedMult();
 }
 
-// Spawn rate: starts at 52 frames, tightens to a floor of 16 at L15
+// Spawn rate: starts at 52 frames, tightens to a floor of 14 at L20
+// L1=52, ramps ~2.0/level, floor lowered from 16 to 14 to add extra pressure in final stretch
 function getSpawnRate() {
   const lvl = getLevel();
-  return Math.max(16, spawnRate - (lvl - 1) * 2.5 | 0);
+  return Math.max(14, spawnRate - (lvl - 1) * 2.0 | 0);
 }
 
+// Boss levels: 6, 10, 14, 18 — four boss waves across 20 levels
 function isBossLevel(l) { return l >= 6 && (l - 6) % 4 === 0; }
-// Boss levels at 15-level cap: 6, 10, 14 — three boss waves total
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function setBackNavVisible(visible) { backNav.classList.toggle('hidden', !visible); }
@@ -549,7 +556,7 @@ function showWinScreen() {
 
   const playerName = document.getElementById('player-name').value || 'PILOT';
   try { localStorage.setItem('dodge_pilot_name', playerName); } catch(e) {}
-  addToLB(playerName, score); // save to board even for wins
+  addToLB(playerName, score);
 
   document.getElementById('win-score-val').textContent = score;
   document.getElementById('win-overlay').classList.add('show');
@@ -582,19 +589,18 @@ function drawBadge() {
     }
     bx.restore();
 
-    // Outer ring glow (slow rotate)
+    // Outer ring glow (slow rotate) — 20 tick marks for 20 levels
     const ringRot = elapsed * 0.4;
     bx.save();
     bx.translate(cx, cy); bx.rotate(ringRot);
-    // 12 tick marks around the ring
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
+    for (let i = 0; i < 20; i++) {
+      const a = (i / 20) * Math.PI * 2;
       const pulse = 0.6 + 0.4 * Math.sin(elapsed * 2 + i * 0.5);
       bx.strokeStyle = `rgba(255,204,0,${pulse})`;
-      bx.lineWidth = 2;
+      bx.lineWidth = i % 5 === 0 ? 2.5 : 1.5; // accent every 5th tick (quarters)
       bx.beginPath();
       bx.moveTo(Math.cos(a)*70, Math.sin(a)*70);
-      bx.lineTo(Math.cos(a)*78, Math.sin(a)*78);
+      bx.lineTo(Math.cos(a)*(i % 5 === 0 ? 80 : 78), Math.sin(a)*(i % 5 === 0 ? 80 : 78));
       bx.stroke();
     }
     bx.restore();
@@ -635,7 +641,7 @@ function drawBadge() {
     bx.stroke();
     bx.restore();
 
-    // Rocket ship (same shape as game player, scaled up and centered)
+    // Rocket ship
     const bob = Math.sin(elapsed * 2.2) * 3;
     bx.save();
     bx.translate(cx, cy - 4 + bob);
@@ -658,9 +664,9 @@ function drawBadge() {
     bx.shadowBlur = 0;
     bx.restore();
 
-    // 3 orbit stars rotating around the badge
-    for (let i = 0; i < 3; i++) {
-      const oa = elapsed * 1.8 + (i / 3) * Math.PI * 2;
+    // 4 orbit stars (one per boss wave at 20 levels)
+    for (let i = 0; i < 4; i++) {
+      const oa = elapsed * 1.8 + (i / 4) * Math.PI * 2;
       const ox = cx + Math.cos(oa) * 68;
       const oy = cy + Math.sin(oa) * 68;
       const sp = 0.7 + 0.3 * Math.sin(elapsed * 4 + i);
@@ -691,13 +697,13 @@ function drawBadge() {
     }
     bx.restore();
 
-    // "15 LEVELS" arc at bottom
+    // "20 LEVELS" arc at bottom
     bx.save();
     bx.translate(cx, cy);
     bx.font = "bold 8px 'Orbitron', sans-serif";
     bx.fillStyle = 'rgba(0,255,231,0.85)';
     bx.textAlign = 'center'; bx.textBaseline = 'middle';
-    const botText = '15 LEVELS';
+    const botText = '20 LEVELS';
     const botRadius = 54;
     const botStartAngle = Math.PI / 2;
     const botCharSpread = (Math.PI * 0.55) / (botText.length - 1);
@@ -718,7 +724,6 @@ function drawBadge() {
     bx.textAlign = 'center'; bx.textBaseline = 'middle';
     bx.fillText(pilotName, cx, cy + 48);
 
-    // Win overlay: stop old anim if overlay is hidden
     if (!document.getElementById('win-overlay').classList.contains('show')) {
       cancelAnimationFrame(badgeAnim);
     }
@@ -752,13 +757,19 @@ function getBossWaveNum(l) { return Math.floor((l-6)/4)+1; }
 function spawnBoss(level) {
   bossActive=true;
   const wn=getBossWaveNum(level);
+  // HP: 6, 9, 12, 15 for waves 1-4
   bossHP=bossMaxHP=6+wn*3;
+  // Size grows slightly each wave
   boss={ x:W/2-40,y:60,w:80+wn*6,h:30+wn*4,vx:1.8+wn*0.9,vy:0,
          phase:0,shootTimer:0,waveNum:wn,projectiles:[] };
   document.getElementById('boss-bar-wrap').classList.add('visible');
   document.getElementById('boss-label').classList.add('visible');
-  document.getElementById('boss-label').textContent = wn>=3?`⚠ BOSS WAVE ${wn} — ELITE`:`⚠ BOSS WAVE ${wn}`;
-  SFX.boss(); showLevelFlash(wn>=3?'FINAL BOSS!':`BOSS WAVE ${wn}!`,'#ff2d55');
+  // Label escalates: wave 4 gets a special callout
+  const labels = ['⚠ BOSS WAVE 1', '⚠ BOSS WAVE 2', '⚠ BOSS WAVE 3', '⚠ FINAL BOSS'];
+  document.getElementById('boss-label').textContent = labels[Math.min(wn-1, 3)];
+  SFX.boss();
+  const flashLabels = ['BOSS WAVE 1!', 'BOSS WAVE 2!', 'BOSS WAVE 3!', 'FINAL BOSS!'];
+  showLevelFlash(flashLabels[Math.min(wn-1, 3)], '#ff2d55');
 }
 function updateBoss() {
   if (!boss) return;
@@ -766,10 +777,13 @@ function updateBoss() {
   if (boss.x<=0||boss.x+boss.w>=W){boss.vx*=-1;boss.x=Math.max(0,Math.min(W-boss.w,boss.x));}
   boss.phase+=0.03; boss.y=60+Math.sin(boss.phase)*20;
   boss.shootTimer++;
-  const wn=boss.waveNum||1, si=Math.max(20,60-wn*8);
+  const wn=boss.waveNum||1, si=Math.max(18,60-wn*8);
   if (boss.shootTimer>=si) {
     boss.shootTimer=0;
-    const cx=boss.x+boss.w/2, ns=Math.min(5,1+wn), sp=0.28;
+    const cx=boss.x+boss.w/2;
+    // Projectile count: wave 1=2, wave 2=3, wave 3=4, wave 4=5
+    const ns=Math.min(5,1+wn);
+    const sp=0.28;
     const angles=Array.from({length:ns},(_,i)=>Math.PI/2+(i-(ns-1)/2)*sp);
     const ps=(2.5+wn*0.6)*getSpeedMult();
     angles.forEach(a=>boss.projectiles.push({x:cx,y:boss.y+boss.h,vx:Math.cos(a)*ps*0.4,vy:Math.sin(a)*ps,r:7}));
@@ -867,13 +881,13 @@ function loop(ts) {
 
     if(frame%getSpawnRate()===0) spawnObstacle();
 
-    // Increment score — but stop once we've fully cleared MAX_LEVEL
+    // Score increment — stop ticking once MAX_LEVEL fully cleared
     if (getLevel() < MAX_LEVEL || score < MAX_LEVEL * SCORE_PER_LEVEL - 1) {
       score++;
     }
     updateHUD(); SFX.dodge();
 
-    // Check win condition: score has reached the end of MAX_LEVEL
+    // Win condition
     if (score >= MAX_LEVEL * SCORE_PER_LEVEL) {
       showWinScreen();
       return;
