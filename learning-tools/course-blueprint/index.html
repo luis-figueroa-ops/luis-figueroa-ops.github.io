@@ -40,38 +40,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Header ── */
-.site-header {
-  padding: 20px 56px;
-  border-bottom: 1px solid var(--border-soft);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.back-link {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 2px;
-  color: var(--muted);
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.back-link::before { content: '←'; }
-.back-link:hover { color: var(--green); }
-
-.header-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--muted);
-  text-transform: uppercase;
-}
-
 /* ── Hero ── */
 .hero {
   padding: 56px 56px 40px;
@@ -443,7 +411,7 @@ select option { background: var(--surface2); }
 
 /* ── Print ── */
 @media print {
-  .site-header, .hero, .build-btn, .action-row, .polish-row, .fixed-back, .fixed-copyright { display: none !important; }
+  .hero, .build-btn, .action-row, .polish-row, .fixed-back, .fixed-copyright { display: none !important; }
   body { background: white; color: #111; }
   .main { padding: 0; max-width: 100%; }
   .form-card { background: #fafafa; border: 1px solid #ddd; padding: 24px; margin-bottom: 20px; }
@@ -458,7 +426,6 @@ select option { background: var(--surface2); }
 
 /* ── Mobile ── */
 @media (max-width: 660px) {
-  .site-header { padding: 16px 20px; }
   .hero { padding: 36px 20px 28px; }
   .main { padding: 0 20px 60px; }
   .form-card, .output-card { padding: 24px 20px; }
@@ -470,11 +437,6 @@ select option { background: var(--surface2); }
 <body>
 
 <a class="fixed-back" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
-
-<header class="site-header">
-  <a class="back-link" href="/">Luis Figueroa</a>
-  <span class="header-label">Learning Tools</span>
-</header>
 
 <section class="hero">
   <div class="eyebrow">Learning Tools</div>
@@ -561,7 +523,7 @@ select option { background: var(--surface2); }
 
 </main>
 
-<p class="fixed-copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
+<p class="fixed-copyright">Copyright &copy; 2026 Luis Figueroa - All Rights Reserved</p>
 
 <script>
   var basePrompt = '';
