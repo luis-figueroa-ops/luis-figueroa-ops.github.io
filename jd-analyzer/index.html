@@ -329,9 +329,19 @@
       display: flex;
       gap: 10px;
       margin-bottom: 16px;
+      margin-top: 20px;
     }
 
-    .chat-input-row input { flex: 1; }
+    .chat-input-row input {
+      flex: 1;
+      border: 2px solid #B8963E !important;
+      background-color: #1e3060 !important;
+    }
+
+    .chat-input-row input:focus {
+      border-color: #d4a94a !important;
+      box-shadow: 0 0 0 3px rgba(184, 150, 62, 0.15);
+    }
 
     .send-btn {
       padding: 12px 20px;
@@ -548,7 +558,6 @@
     </div>
 
     <div class="chat-section" id="chatSection">
-      <div class="chat-divider">Ask a follow-up question</div>
       <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-input-row">
         <input type="text" id="followUpInput" placeholder="Ask anything about this role..." />
