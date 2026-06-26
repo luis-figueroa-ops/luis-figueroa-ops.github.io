@@ -307,7 +307,7 @@
     .chat-bubble ul li { margin-bottom: 6px; line-height: 1.6; }
     .chat-bubble strong { color: #ffffff; font-weight: 600; }
     .chat-bubble h2 { color: #B8963E; font-size: 1.15rem; margin: 16px 0 8px 0; }
-    .chat-bubble h3 { color: #ccd6f6; font-size: 1.05rem; margin: 14px 0 6px 0; }
+    .chat-bubble h3 { color: #B8963E; font-size: 1.2rem; font-weight: 700; margin: 20px 0 8px 0; }
 
     /* Streaming cursor blink */
     .streaming-cursor {
@@ -767,10 +767,10 @@
                 rawText += parsed.delta.text;
                 if (onChunk) onChunk(parsed.delta.text);
 
-                // Update display: show raw text with cursor while streaming
-                // Remove cursor, update text, re-append cursor
+                // Update display: render markdown incrementally while streaming
+                // Remove cursor, render markdown, re-append cursor
                 if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
-                targetElement.textContent = rawText;
+                targetElement.innerHTML = renderMarkdown(rawText);
                 targetElement.appendChild(cursor);
 
                 // Auto-scroll as content grows
