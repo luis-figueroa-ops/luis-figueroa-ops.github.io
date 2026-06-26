@@ -165,11 +165,15 @@ h1 span { color: var(--gold); }
 .intro {
   position: relative; z-index: 10;
   padding: 40px 64px;
+  border-bottom: 1px solid var(--border);
+  animation: fadeUp 0.7s 0.1s ease both;
+}
+
+.intro-top {
   display: flex;
   align-items: center;
   gap: 16px;
-  border-bottom: 1px solid var(--border);
-  animation: fadeUp 0.7s 0.1s ease both;
+  margin-bottom: 28px;
 }
 
 .intro-bar { width: 3px; height: 48px; background: linear-gradient(to bottom, var(--gold), transparent); flex-shrink: 0; }
@@ -184,6 +188,38 @@ h1 span { color: var(--gold); }
 }
 
 .intro-text strong { color: var(--white); font-weight: 500; }
+
+.why-built {
+  border-top: 1px solid var(--border);
+  padding-top: 28px;
+}
+
+.why-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.why-text {
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.8;
+  max-width: 860px;
+  opacity: 0.78;
+}
+
+.why-text a {
+  color: var(--gold-light);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(184,150,62,0.4);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.why-text a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
 .section {
   position: relative; z-index: 10;
@@ -508,12 +544,21 @@ footer {
 </header>
 
 <div class="intro">
-  <div class="intro-bar"></div>
-  <p class="intro-text">
-    Sales Operations professional at the <strong>intersection of process, systems, and AI.</strong>
-    This is where I build in public - tools that solve real problems,
-    experiments that document what's possible when operations thinking meets modern AI.
-  </p>
+  <div class="intro-top">
+    <div class="intro-bar"></div>
+    <p class="intro-text">
+      Sales Operations professional at the <strong>intersection of process, systems, and AI.</strong>
+      This is where I build in public - tools that solve real problems,
+      experiments that document what's possible when operations thinking meets modern AI.
+    </p>
+  </div>
+
+  <div class="why-built">
+    <div class="why-label">Why I Built This</div>
+    <p class="why-text">
+      Every tool here started as a personal pain point during my own career transition after a layoff. I built micro-learning courses to sharpen skills I kept seeing in job descriptions - change management and project coordination, SQL and Power BI alongside Excel I already knew, and Python basics to hold my own in conversations where some experience was expected. Separately, I used AI to help me document years of work I had never formally written down - feeding it the history of what I actually did so it could help me articulate the business process areas I operated in: process management and improvement, change management and adoption, channel and partner operations, and budget and financial operations support - and ultimately the commercial value those contributions created. Because it is almost impossible to pull years of experience out of your head on the fly in a way that lands with a hiring manager unless you have documented it as you went. From those sessions I produced real artifacts - presentations that walk through my work story and completed Power BI dashboards. If you want to see the outcomes and the work behind them, visit my <a href="https://www.luis-portfolio.com" target="_blank">Operations &amp; Technology portfolio</a>. These tools are the result of that same process: think-tanks designed to kick-start ideas and help you see angles you had not considered, not final answers. I share them on <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>, including my featured section, because problem-solving should not stop when your employment status does.
+    </p>
+  </div>
 </div>
 
 <section class="section" style="border-bottom: 1px solid var(--border); padding-bottom: 48px;">
