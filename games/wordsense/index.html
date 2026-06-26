@@ -385,20 +385,20 @@ body {
   font-size: 13px; letter-spacing: 0.3px;
 }
 @media (max-width: 768px) {
-  .back-nav { position: static; display: block; padding: 12px 0 4px 0; }
+  .back-nav { display: none; }
 }
 .back-nav a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-family: inherit; }
 .back-nav a:hover { color: var(--blue); }
 .copyright { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 50; font-size: 12px; letter-spacing: 0.3px; color: var(--text-muted); white-space: nowrap; pointer-events: none; font-family: inherit; }
 @media (max-width: 768px) {
-  .copyright { position: static; transform: none; display: block; text-align: center; margin-top: 1.5rem; white-space: normal; padding: 0 1rem 1rem; }
+  .copyright { display: none; }
 }
 </style>
 </head>
 <body>
 <div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
 <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
-<div class="wrap">
+<div class="wrap"><a href="https://luis-figueroa-ops.github.io/" style="display:block;font-size:13px;color:#999992;text-decoration:none;margin-bottom:8px;">← Back to Tools</a>
 
   <!-- ══ MAIN SCREEN ══ -->
   <div class="screen active" id="screen-main">
@@ -551,6 +551,7 @@ body {
     </div>
   </div>
 
+<p style="text-align:center;font-size:11px;color:#999992;margin-top:1.5rem;padding-bottom:1rem;">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
 </div><!-- end wrap -->
 
 <script>
