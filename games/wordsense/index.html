@@ -318,6 +318,12 @@ body {
   font-size: 13px; color: #7a5a10; margin-top: 0.5rem;
 }
 
+/* ── MOBILE NAV & COPYRIGHT (all phones) ── */
+@media (max-width: 768px) {
+  .back-nav { position: static; display: block; padding: 12px 0 4px 0; margin-bottom: 0; }
+  .copyright { position: static; transform: none; display: block; text-align: center; margin-top: 1.5rem; white-space: normal; padding: 0 1rem 1rem; }
+}
+
 /* ── MOBILE ── */
 @media (max-width: 480px) {
   body { padding: 1rem 0.75rem 2.5rem; }
@@ -331,7 +337,7 @@ body {
   .returning-banner .btn-row { flex-direction: column; }
   .returning-stats { grid-template-columns: repeat(2, 1fr); }
   .back-nav { position: static; display: block; padding: 12px 0 4px 0; margin-bottom: 0; }
-  .copyright { display: none; }
+  .copyright { position: static; transform: none; display: block; text-align: center; margin-top: 1.5rem; white-space: normal; padding: 0 1rem 1rem; }
 }
 
 /* ── DESKTOP ── */
