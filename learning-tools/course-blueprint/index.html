@@ -516,8 +516,27 @@ select option { background: var(--surface2); }
   h1 { font-size: clamp(36px, 7vw, 56px); }
   .hero-sub { font-size: 15px; }
   .fixed-copyright { display: none; }
-  .fixed-back { position: static; display: block; padding: 12px 0 0 0; margin-bottom: 8px; }
+  .fixed-back { display: none; }
+  .mobile-back-link {
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #a0a0cc;
+    text-decoration: none;
+    padding: 10px 0 8px;
+  }
+  .mobile-copyright {
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #a0a0cc;
+    padding: 1rem 0 2rem;
+  }
 }
+.mobile-back-link { display: none; }
+.mobile-copyright { display: none; }
 </style>
 </head>
 <body>
@@ -556,7 +575,7 @@ select option { background: var(--surface2); }
   </div>
 </section>
 
-<main class="main">
+<main class="main"><a class="mobile-back-link" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
 
   <div class="form-card">
     <div class="form-section-label">Your Learning Context</div>
@@ -634,6 +653,7 @@ select option { background: var(--surface2); }
 
   </div>
 
+<p class="mobile-copyright">Copyright &copy; 2026 Luis Figueroa - All Rights Reserved</p>
 </main>
 
 <div class="ai-notice">
