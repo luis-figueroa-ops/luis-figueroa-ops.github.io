@@ -261,7 +261,26 @@
     /* Hidden print area (screen: hidden) */
     #full-print-area { display: none; }
 
-    @media (max-width: 520px) { .card { padding: 20px 16px; } .action-bar { flex-direction: column; align-items: stretch; } .insight-switcher-buttons { flex-direction: column; } .comfort-group { flex-direction: column; } }
+    @media (max-width: 520px) { .card { padding: 20px 16px; } .action-bar { flex-direction: column; align-items: stretch; } .insight-switcher-buttons { flex-direction: column; } .comfort-group { flex-direction: column; }
+      .page-wrap { padding: 24px 16px 60px; }
+      h1 { font-size: clamp(28px, 8vw, 40px); }
+      .subtitle { font-size: 15px; }
+      textarea { font-size: 16px; min-height: 120px; }
+      .api-input { font-size: 16px; }
+      .tool-select { font-size: 15px; }
+      .mode-toggle { flex-direction: column; }
+      .mode-btn { border-right: none !important; border-bottom: 1px solid var(--border); }
+      .insight-card { padding: 18px 16px; }
+      .insight-title { font-size: 17px; }
+      .insight-body { font-size: 14px; }
+      .btn-primary { width: 100%; min-height: 44px; }
+      .prompt-output-box { font-size: 14px; padding: 18px; }
+      .action-bar { padding: 14px 16px; }
+      .nav { margin-bottom: 32px; }
+      .library-entry { flex-direction: column; align-items: flex-start; }
+      .library-entry-actions { margin-top: 8px; }
+      .switch-btn { width: 100%; text-align: left; }
+    }
 
     /* Print — insights only */
     @media print {

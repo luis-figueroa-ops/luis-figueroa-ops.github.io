@@ -509,6 +509,28 @@
       .print-header h1 { font-size: 1.3rem; color: #1B2A4A; margin-bottom: 4px; }
       .print-header p { font-size: 0.75rem; color: #555; font-style: italic; }
     }
+
+    @media (max-width: 768px) {
+      body { padding: 20px 12px; }
+      .container { width: 100%; }
+      .header h1 { font-size: 1.6rem; }
+      .header .tagline { font-size: 1rem; }
+      .header .sub { font-size: 0.9rem; }
+      textarea { height: 180px; font-size: 16px; }
+      input[type="text"] { font-size: 16px; }
+      #analyzeBtn { font-size: 0.95rem; min-height: 44px; }
+      .action-buttons { flex-direction: column; }
+      .action-btn { width: 100%; min-height: 44px; }
+      .chat-bubble.user { margin-left: 0; }
+      .chat-input-row { flex-direction: column; }
+      .chat-input-row input { width: 100%; }
+      .send-btn { width: 100%; min-height: 44px; }
+      .bottom-actions { flex-direction: column; }
+      .theme-buttons { flex-wrap: wrap; }
+      .theme-btn { font-size: 0.85rem; padding: 8px 12px; }
+      .output { padding: 20px 16px; }
+      .chat-bubble { padding: 14px 16px; font-size: 1rem; }
+    }
   </style>
 </head>
 <body>
