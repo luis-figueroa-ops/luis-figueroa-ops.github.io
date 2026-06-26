@@ -85,7 +85,6 @@
     .hint a { color: #B8963E; text-decoration: none; }
     .hint a:hover { text-decoration: underline; }
 
-    /* Clear button row */
     .clear-row {
       display: flex;
       justify-content: flex-end;
@@ -180,7 +179,6 @@
     .action-btn.copied { background-color: #2a4a2a; border-color: #4caf50; color: #4caf50; }
     .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* Theme buttons container */
     .theme-container {
       display: none;
       margin-top: 20px;
@@ -311,6 +309,22 @@
     .chat-bubble h2 { color: #B8963E; font-size: 1.15rem; margin: 16px 0 8px 0; }
     .chat-bubble h3 { color: #ccd6f6; font-size: 1.05rem; margin: 14px 0 6px 0; }
 
+    /* Streaming cursor blink */
+    .streaming-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background-color: #B8963E;
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: blink 0.7s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
     .chat-input-row {
       display: flex;
       gap: 10px;
@@ -342,7 +356,6 @@
       flex-wrap: wrap;
     }
 
-    /* Start Over button */
     .start-over-row {
       display: flex;
       justify-content: center;
@@ -390,7 +403,6 @@
 
     .loading.visible { display: block; }
 
-    /* AI Disclaimer */
     .ai-disclaimer {
       margin-top: 28px;
       padding: 14px 18px;
@@ -450,7 +462,6 @@
       }
 
       .output h3 { color: #1B2A4A !important; font-size: 0.95rem; }
-
       .output p, .output ul, .output li { color: #000000; }
       .output strong { color: #000000; }
 
@@ -478,12 +489,11 @@
       .chat-bubble li { color: #000000 !important; }
 
       .chat-bubble strong { color: #000000 !important; }
-
-      .chat-bubble h2,
-      .chat-bubble h3 { color: #1B2A4A !important; }
-
+      .chat-bubble h2, .chat-bubble h3 { color: #1B2A4A !important; }
       .chat-bubble .bubble-label { color: #1B2A4A !important; }
       .chat-bubble.user .bubble-label { color: #555555 !important; }
+
+      .streaming-cursor { display: none !important; }
 
       .print-header { display: block !important; text-align: center; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 3px solid #B8963E; }
       .print-header h1 { font-size: 1.3rem; color: #1B2A4A; margin-bottom: 4px; }
@@ -618,14 +628,12 @@
 
     jdInput.addEventListener('input', checkInputs);
 
-    // Clear button — resets textarea only
     clearBtn.addEventListener('click', () => {
       jdInput.value = '';
       checkInputs();
       jdInput.focus();
     });
 
-    // Start Over — full reset
     startOverBtn.addEventListener('click', () => {
       conversationHistory = [];
       chatMessages.innerHTML = '';
@@ -643,7 +651,6 @@
       outputContent.innerHTML = '';
       jdInput.value = '';
       checkInputs();
-
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => { jdInput.focus(); }, 400);
     });
@@ -712,6 +719,80 @@
     printBtnTop.addEventListener('click', () => window.print());
     printBtnBottom.addEventListener('click', () => window.print());
 
+    // -------------------------------------------------------
+    // STREAMING: reads SSE chunks and feeds text incrementally
+    // into a target DOM element, then renders markdown at the end.
+    // -------------------------------------------------------
+    async function streamClaude(targetElement, onChunk, onDone, onError) {
+      const cursor = document.createElement('span');
+      cursor.className = 'streaming-cursor';
+      targetElement.appendChild(cursor);
+
+      try {
+        const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            max_tokens: 2000,
+            system: SYSTEM_PROMPT,
+            messages: conversationHistory
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let rawText = '';
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // keep incomplete line in buffer
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(jsonStr);
+              if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                rawText += parsed.delta.text;
+                if (onChunk) onChunk(parsed.delta.text);
+
+                // Update display: show raw text with cursor while streaming
+                // Remove cursor, update text, re-append cursor
+                if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+                targetElement.textContent = rawText;
+                targetElement.appendChild(cursor);
+
+                // Auto-scroll as content grows
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+              }
+            } catch (_) {
+              // incomplete JSON chunk, skip
+            }
+          }
+        }
+
+        // Done streaming — remove cursor, render final markdown
+        if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+        targetElement.innerHTML = renderMarkdown(rawText);
+        if (onDone) onDone(rawText);
+
+      } catch (err) {
+        if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+        if (onError) onError(err);
+      }
+    }
+
     const SYSTEM_PROMPT = `You are an experienced operations professional who reads job descriptions with a sharp, structured eye. Your job is to give candidates an honest, specific read on what a role actually is - cutting through vague language to identify what's really being asked for, who will actually succeed here, and what questions to ask.
 
 For the FIRST message (the initial job description analysis), always structure your response using exactly these five sections in this order:
@@ -728,8 +809,17 @@ One paragraph. Cut through the title and describe what this person will spend 80
 ## Who This Role Is Really For
 One paragraph. Describe the actual experience level, background, and working style this role requires - not what the title suggests, but what the JD reveals.
 
-## The One Question to Ask in the Interview
-One specific, sharp question the candidate should ask based on what is missing or unclear in this JD. Make it a question that reveals how the team actually operates.
+## Types of Questions to Ask in the Interview
+Four questions total, split into two types. Label each type clearly.
+
+**Role-Specific Questions (2):** These come directly from what this JD reveals — the gaps, the red flags, the unstated expectations, the language doing too much work. Each question should reveal something real about how the team operates, where decision-making actually sits, or what the day-to-day reality looks like behind the posting. After each question, write one sentence explaining why this question works for this specific role.
+
+**You're Evaluating Too (2):** These are grounded in what hiring managers consistently respond well to — not because they sound clever, but because they signal a candidate who is assessing fit, not just chasing an offer. These two questions should always be included, adapted to the context of this specific JD and role:
+1. A version of: "What would make someone in this role struggle in the first 90 days, and what separates the people who succeed from those who don't?" — frame it to the specific function or team dynamic this JD reveals.
+2. A version of: "What has been the most meaningful change or improvement you have made to this team or function since you have been in this role?" — frame it toward what the JD signals about the hiring manager's mandate or what they are trying to build.
+After each question, write one sentence explaining why this question lands.
+
+Note for the user after all four questions: These are thinking models, not scripts. Use them to shape your own questions in your own voice based on how the interview unfolds.
 
 ---
 
@@ -760,30 +850,18 @@ Every line of a job description is a symptom of a business problem the company i
 
 STANDING REMINDER: Never fabricate or assume the user's personal work history. All examples are illustrative patterns the user must adapt to their own real experience.
 
+GO DEEPER AND TELL ME ABOUT YOURSELF — RESEARCH GROUNDING:
+When responding to Go Deeper theme drill-downs or the Tell Me About Yourself Bridge, ground your response in current, relevant thinking about that competency or interview approach. Reference what practitioners, researchers, and hiring professionals actually emphasize today about that skill area — not just general knowledge. If the competency involves a fast-moving area (AI in operations, change management in hybrid environments, modern sales ops tools, current interview coaching methodology), reflect what the current landscape looks like, not just foundational principles. Make the response feel informed by what is actually happening in that domain right now, not just what has always been true.
+
 ---
 
 For ALL OTHER FOLLOW-UP messages, respond conversationally and directly. Build on the analysis you already gave. Reference specific details from the JD and prior conversation. Stay in your role as an experienced ops professional giving honest career advice.
 
 Be direct, specific, and practical. Never generic. Write like someone who has actually worked in operations and can read between the lines of a process document.`;
 
-    async function callClaude() {
-      const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          max_tokens: 1500,
-          system: SYSTEM_PROMPT,
-          messages: conversationHistory
-        })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || 'API request failed');
-      return data.content[0].text;
-    }
-
+    // -------------------------------------------------------
+    // INITIAL ANALYSIS — streams into the main output panel
+    // -------------------------------------------------------
     analyzeBtn.addEventListener('click', async () => {
       const jd = jdInput.value.trim();
 
@@ -807,34 +885,46 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         content: `Please analyze this job description:\n\n${jd}`
       });
 
-      try {
-        const result = await callClaude();
-        conversationHistory.push({ role: 'assistant', content: result });
-        outputContent.innerHTML = renderMarkdown(result);
-        output.classList.add('visible');
-        chatSection.classList.add('visible');
+      // Show output panel immediately so streaming has a place to go
+      outputContent.innerHTML = '';
+      output.classList.add('visible');
+      loading.classList.remove('visible');
 
-        requestAnimationFrame(() => {
+      await streamClaude(
+        outputContent,
+        null, // onChunk — not needed separately
+        (rawText) => {
+          // onDone
+          conversationHistory.push({ role: 'assistant', content: rawText });
+          chatSection.classList.add('visible');
+          analyzeBtn.disabled = false;
           requestAnimationFrame(() => {
-            output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            requestAnimationFrame(() => {
+              output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
           });
-        });
-
-      } catch (err) {
-        errorBox.textContent = `Something went wrong: ${err.message}. Please try again.`;
-        errorBox.classList.add('visible');
-        conversationHistory = [];
-        requestAnimationFrame(() => {
+        },
+        (err) => {
+          // onError
+          output.classList.remove('visible');
+          errorBox.textContent = `Something went wrong: ${err.message}. Please try again.`;
+          errorBox.classList.add('visible');
+          conversationHistory = [];
+          analyzeBtn.disabled = false;
+          loading.classList.remove('visible');
           requestAnimationFrame(() => {
-            errorBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            requestAnimationFrame(() => {
+              errorBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
           });
-        });
-      } finally {
-        loading.classList.remove('visible');
-        analyzeBtn.disabled = false;
-      }
+        }
+      );
     });
 
+    // -------------------------------------------------------
+    // GO DEEPER — theme extraction (non-streaming, JSON response)
+    // then theme drill-downs stream into chat bubbles
+    // -------------------------------------------------------
     goDeepBtn.addEventListener('click', async () => {
       if (goDeepUsed || requestInFlight) return;
 
@@ -845,17 +935,52 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
 
       conversationHistory.push({ role: 'user', content: themeRequest });
 
+      // Theme extraction doesn't need streaming — it's JSON
       try {
-        const result = await callClaude();
-        conversationHistory.push({ role: 'assistant', content: result });
+        const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            max_tokens: 2000,
+            system: SYSTEM_PROMPT,
+            messages: conversationHistory
+          })
+        });
+
+        // Worker now streams, so we need to collect the full text for JSON parsing
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let rawText = '';
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(jsonStr);
+              if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                rawText += parsed.delta.text;
+              }
+            } catch (_) {}
+          }
+        }
+
+        conversationHistory.push({ role: 'assistant', content: rawText });
 
         let themes = [];
         try {
-          const cleaned = result.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
+          const cleaned = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
           themes = JSON.parse(cleaned);
           if (!Array.isArray(themes)) throw new Error('not an array');
         } catch (_) {
-          themes = result.split('\n')
+          themes = rawText.split('\n')
             .map(l => l.replace(/^[\s\-\*\d\.\["]+|[\]",\s]+$/g, '').trim())
             .filter(l => l.length > 2 && l.length < 80);
         }
@@ -872,7 +997,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         themeContainer.classList.add('visible');
         goDeepUsed = true;
         goDeepBtn.textContent = 'Go Deeper \u2713';
-
         themeContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       } catch (err) {
@@ -886,6 +1010,9 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       }
     });
 
+    // -------------------------------------------------------
+    // THEME DRILL-DOWN — streams into a chat bubble
+    // -------------------------------------------------------
     async function handleThemeClick(btn, theme) {
       if (requestInFlight) return;
 
@@ -895,31 +1022,40 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       conversationHistory.push({ role: 'user', content: message });
       addChatBubble('user', message);
 
-      const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
+      // Create streaming bubble
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble assistant';
+      const label = document.createElement('div');
+      label.className = 'bubble-label';
+      label.textContent = 'Analysis';
+      const content = document.createElement('div');
+      bubble.appendChild(label);
+      bubble.appendChild(content);
+      chatMessages.appendChild(bubble);
+      bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-      try {
-        const result = await callClaude();
-        conversationHistory.push({ role: 'assistant', content: result });
-
-        thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('.bubble-label').textContent = 'Analysis';
-        thinkingBubble.querySelector('div:last-child').innerHTML = renderMarkdown(result);
-        thinkingBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-        btn.classList.add('viewed');
-        if (!btn.textContent.startsWith('\u2713 ')) {
-          btn.textContent = '\u2713 ' + btn.textContent;
+      await streamClaude(
+        content,
+        null,
+        (rawText) => {
+          conversationHistory.push({ role: 'assistant', content: rawText });
+          btn.classList.add('viewed');
+          if (!btn.textContent.startsWith('\u2713 ')) {
+            btn.textContent = '\u2713 ' + btn.textContent;
+          }
+          unlockUI();
+        },
+        (err) => {
+          content.innerHTML = `Something went wrong: ${err.message}. Try again.`;
+          conversationHistory.pop();
+          unlockUI();
         }
-
-      } catch (err) {
-        thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
-        conversationHistory.pop();
-      } finally {
-        unlockUI();
-      }
+      );
     }
 
+    // -------------------------------------------------------
+    // TELL ME ABOUT YOURSELF — streams into a chat bubble
+    // -------------------------------------------------------
     tmaybBtn.addEventListener('click', async () => {
       if (requestInFlight) return;
 
@@ -930,26 +1066,35 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       conversationHistory.push({ role: 'user', content: message });
       addChatBubble('user', 'Tell Me About Yourself Bridge');
 
-      const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble assistant';
+      const label = document.createElement('div');
+      label.className = 'bubble-label';
+      label.textContent = 'Analysis';
+      const content = document.createElement('div');
+      bubble.appendChild(label);
+      bubble.appendChild(content);
+      chatMessages.appendChild(bubble);
+      bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-      try {
-        const result = await callClaude();
-        conversationHistory.push({ role: 'assistant', content: result });
-
-        thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('.bubble-label').textContent = 'Analysis';
-        thinkingBubble.querySelector('div:last-child').innerHTML = renderMarkdown(result);
-        thinkingBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-      } catch (err) {
-        thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
-        conversationHistory.pop();
-      } finally {
-        unlockUI();
-      }
+      await streamClaude(
+        content,
+        null,
+        (rawText) => {
+          conversationHistory.push({ role: 'assistant', content: rawText });
+          unlockUI();
+        },
+        (err) => {
+          content.innerHTML = `Something went wrong: ${err.message}. Try again.`;
+          conversationHistory.pop();
+          unlockUI();
+        }
+      );
     });
 
+    // -------------------------------------------------------
+    // FOLLOW-UP CHAT — streams into a chat bubble
+    // -------------------------------------------------------
     async function sendFollowUp() {
       if (requestInFlight) return;
       const userMessage = followUpInput.value.trim();
@@ -961,25 +1106,31 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       conversationHistory.push({ role: 'user', content: userMessage });
       addChatBubble('user', userMessage);
 
-      const thinkingBubble = addChatBubble('assistant', 'Thinking...', true);
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble assistant';
+      const label = document.createElement('div');
+      label.className = 'bubble-label';
+      label.textContent = 'Analysis';
+      const content = document.createElement('div');
+      bubble.appendChild(label);
+      bubble.appendChild(content);
+      chatMessages.appendChild(bubble);
+      bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-      try {
-        const result = await callClaude();
-        conversationHistory.push({ role: 'assistant', content: result });
-
-        thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('.bubble-label').textContent = 'Analysis';
-        thinkingBubble.querySelector('div:last-child').innerHTML = renderMarkdown(result);
-        thinkingBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-      } catch (err) {
-        thinkingBubble.className = 'chat-bubble assistant';
-        thinkingBubble.querySelector('div:last-child').innerHTML = `Something went wrong: ${err.message}. Try again.`;
-        conversationHistory.pop();
-      } finally {
-        unlockUI();
-        followUpInput.focus();
-      }
+      await streamClaude(
+        content,
+        null,
+        (rawText) => {
+          conversationHistory.push({ role: 'assistant', content: rawText });
+          unlockUI();
+          followUpInput.focus();
+        },
+        (err) => {
+          content.innerHTML = `Something went wrong: ${err.message}. Try again.`;
+          conversationHistory.pop();
+          unlockUI();
+        }
+      );
     }
 
     sendBtn.addEventListener('click', sendFollowUp);
