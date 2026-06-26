@@ -318,12 +318,6 @@ body {
   font-size: 13px; color: #7a5a10; margin-top: 0.5rem;
 }
 
-/* ── MOBILE NAV & COPYRIGHT (all phones) ── */
-@media (max-width: 768px) {
-  .back-nav { position: static; display: block; padding: 12px 0 4px 0; margin-bottom: 0; }
-  .copyright { position: static; transform: none; display: block; text-align: center; margin-top: 1.5rem; white-space: normal; padding: 0 1rem 1rem; }
-}
-
 /* ── MOBILE ── */
 @media (max-width: 480px) {
   body { padding: 1rem 0.75rem 2.5rem; }
@@ -336,8 +330,6 @@ body {
   .mascot-actions { flex-direction: column; }
   .returning-banner .btn-row { flex-direction: column; }
   .returning-stats { grid-template-columns: repeat(2, 1fr); }
-  .back-nav { position: static; display: block; padding: 12px 0 4px 0; margin-bottom: 0; }
-  .copyright { position: static; transform: none; display: block; text-align: center; margin-top: 1.5rem; white-space: normal; padding: 0 1rem 1rem; }
 }
 
 /* ── DESKTOP ── */
@@ -392,9 +384,15 @@ body {
   position: fixed; left: 14px; top: 14px; z-index: 50;
   font-size: 13px; letter-spacing: 0.3px;
 }
+@media (max-width: 768px) {
+  .back-nav { position: static; display: block; padding: 12px 0 4px 0; }
+}
 .back-nav a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-family: inherit; }
 .back-nav a:hover { color: var(--blue); }
 .copyright { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 50; font-size: 12px; letter-spacing: 0.3px; color: var(--text-muted); white-space: nowrap; pointer-events: none; font-family: inherit; }
+@media (max-width: 768px) {
+  .copyright { position: static; transform: none; display: block; text-align: center; margin-top: 1.5rem; white-space: normal; padding: 0 1rem 1rem; }
+}
 </style>
 </head>
 <body>
