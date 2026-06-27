@@ -52,9 +52,6 @@ body {
   padding: 20px 48px;
   border-bottom: 1px solid var(--gold-border);
   background: rgba(14,14,14,0.95);
-  position: sticky;
-  top: 0;
-  z-index: 100;
   backdrop-filter: blur(8px);
 }
 .topbar-brand {
@@ -64,7 +61,7 @@ body {
   color: var(--gold);
 }
 .topbar-back {
-  position: fixed; left: 14px; top: 14px; z-index: 200;
+  position: absolute; left: 14px; top: 14px; z-index: 200;
   font-family: 'Share Tech Mono', monospace;
   font-size: 14px;
   letter-spacing: 2px;
