@@ -85,6 +85,32 @@ body {
 .btn-primary:hover { opacity: 0.88; }
 .setup-note { font-size: 11px; color: var(--text-muted); margin-top: 0.5rem; text-align: center; }
 
+/* ── BACK NAV ── */
+.back-nav {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.75rem;
+}
+.back-nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+  font-family: inherit;
+}
+.back-nav a:hover { color: var(--blue); }
+
+/* Desktop: absolute top-left */
+@media (min-width: 769px) {
+  .back-nav {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    z-index: 50;
+    margin-bottom: 0;
+  }
+}
+
 /* ── MAIN SCREEN ── */
 .main-hero { text-align: center; padding: 2.5rem 1rem 2rem; }
 .main-hero .game-title { font-size: 42px; font-weight: 700; letter-spacing: -1px; color: var(--text); }
@@ -378,27 +404,13 @@ body {
   .btn-play { font-size: 20px; padding: 1.1rem; }
   .storage-note { font-size: 14px; }
 }
-
-/* ── BACK NAV & COPYRIGHT ── */
-.back-nav {
-  position: absolute; left: 14px; top: 14px; z-index: 50;
-  font-size: 13px; letter-spacing: 0.3px;
-}
-@media (max-width: 768px) {
-  .back-nav { display: none; }
-}
-.back-nav a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-family: inherit; }
-.back-nav a:hover { color: var(--blue); }
-.copyright { display: none; }
-@media (max-width: 768px) {
-  .copyright { display: none; }
-}
 </style>
 </head>
 <body>
-<div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
-<div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
 <div class="wrap">
+
+  <!-- BACK NAV: renders inline on mobile, absolute on desktop via CSS -->
+  <div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">- Back to Tools</a></div>
 
   <!-- ══ MAIN SCREEN ══ -->
   <div class="screen active" id="screen-main">
@@ -551,7 +563,8 @@ body {
     </div>
   </div>
 
-<p style="text-align:center;font-size:11px;color:#999992;margin-top:1.5rem;padding-bottom:1rem;">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
+  <p style="text-align:center;font-size:11px;color:#999992;margin-top:1.5rem;padding-bottom:1rem;">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
+
 </div><!-- end wrap -->
 
 <script>
@@ -604,9 +617,9 @@ let state = {
   bankedWords: {},
   missedQueue: [],
   usedWordsThisPool: [],
-  pool: [],          // array of question objects
+  pool: [],
   poolIndex: 0,
-  isEvenPool: false, // even = same words new passages
+  isEvenPool: false,
   currentWord: '',
   answered: false,
   pendingBadge: null,
@@ -662,7 +675,6 @@ function initMainScreen() {
   const hasProgress = hasSaved && (state.gamesPlayed > 0 || (state.pool && state.pool.length > 0));
 
   if (hasProgress) {
-    // Returning player - always show main screen with banner, never auto-launch
     const banner = document.getElementById('returning-banner');
     const statsRow = document.getElementById('returning-stats');
     banner.style.display = 'block';
@@ -690,7 +702,6 @@ function handlePlay() {
 }
 
 function continueSaved() {
-  // If we have a pool ready, go to game, otherwise generate
   if (state.pool && state.pool.length > 0 && state.poolIndex < state.pool.length) {
     startGameSession();
   } else {
@@ -723,10 +734,8 @@ function startNewGame(isTransition) {
   document.getElementById('bank').style.display = 'none';
   document.getElementById('bank-words').innerHTML = '';
 
-  // Check if we need a new pool
   if (!state.pool || state.pool.length === 0 || state.poolIndex >= state.pool.length) {
     if (state.gamesInPool >= GAMES_PER_POOL) {
-      // Time for a new pool
       state.gamesInPool = 0;
       state.isEvenPool = !state.isEvenPool;
       generatePool(true);
@@ -754,10 +763,8 @@ async function generatePool(isTransition) {
   let words;
 
   if (state.isEvenPool && state.usedWordsThisPool.length > 0) {
-    // Even pool - reuse same words, fresh passages
     words = [...state.usedWordsThisPool];
   } else {
-    // Odd pool - fresh words
     const available = wordPool.filter(w => !state.usedWordsThisPool.includes(w));
     const src = available.length >= 12 ? available : wordPool;
     words = shuffleArr([...src]).slice(0, 20);
@@ -766,7 +773,6 @@ async function generatePool(isTransition) {
 
   setProgress(barId, labelId, 15, 'Generating passages (this takes ~30 seconds)...');
 
-  // Generate in 4 batches of 5
   const allQuestions = [];
   const batchSize = 5;
   const totalBatches = 4;
@@ -848,7 +854,6 @@ Return ONLY a valid JSON array, no markdown, no preamble:
   if (start === -1 || end === -1) throw new Error('No JSON array');
   const parsed = JSON.parse(raw.slice(start, end+1));
 
-  // Validation pass - reject any passage that contains a definition signal
   const badPatterns = /which means|that is|in other words|meaning |defined as|refers to/i;
   return parsed.filter(q => q.word && q.passage && !badPatterns.test(q.passage));
 }
@@ -898,14 +903,12 @@ function loadRound() {
   document.getElementById('feedback').className = 'feedback';
   document.getElementById('next-btn').className = 'next-btn';
 
-  // Draw from missed queue or pool
   let question = null;
   if (state.missedQueue.length > 0 && Math.random() < 0.35) {
     question = state.missedQueue.shift();
   } else if (state.poolIndex < state.pool.length) {
     question = state.pool[state.poolIndex++];
   } else {
-    // Pool exhausted mid-game - pick any remaining
     question = state.pool[Math.floor(Math.random() * state.pool.length)];
   }
 
@@ -973,7 +976,6 @@ function handleAnswer(idx, ci, q) {
     fb.innerHTML = `<strong>Not quite.</strong> ${q.explanation}`;
     state.bankedWords[q.word] = 'missed';
 
-    // Store full question object for retry
     const missedQ = { ...q };
     state.missedQueue.push(missedQ);
 
@@ -1004,14 +1006,12 @@ function endGame() {
 
   saveState();
 
-  // Check mascot milestone
   if (state.gamesPlayed === 25) {
     state.afterBadgeAction = 'mascot';
     showScreen('screen-mascot');
     return;
   }
 
-  // Check badge milestone
   const badge = BADGES.find(b => b.at === state.gamesPlayed);
   if (badge) {
     showBadge(badge, 'done');
@@ -1067,7 +1067,6 @@ function goHome() {
 }
 
 function nextGame() {
-  // Check if we need a new pool
   if (state.gamesInPool >= GAMES_PER_POOL || !state.pool || state.poolIndex >= state.pool.length) {
     state.gamesInPool = 0;
     state.isEvenPool = !state.isEvenPool;
