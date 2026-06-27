@@ -381,7 +381,7 @@ body {
 
 /* ── BACK NAV & COPYRIGHT ── */
 .back-nav {
-  position: fixed; left: 14px; top: 14px; z-index: 50;
+  position: absolute; left: 14px; top: 14px; z-index: 50;
   font-size: 13px; letter-spacing: 0.3px;
 }
 @media (max-width: 768px) {
@@ -389,7 +389,7 @@ body {
 }
 .back-nav a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-family: inherit; }
 .back-nav a:hover { color: var(--blue); }
-.copyright { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 50; font-size: 12px; letter-spacing: 0.3px; color: var(--text-muted); white-space: nowrap; pointer-events: none; font-family: inherit; }
+.copyright { display: none; }
 @media (max-width: 768px) {
   .copyright { display: none; }
 }
@@ -398,7 +398,7 @@ body {
 <body>
 <div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
 <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
-<div class="wrap"><a href="https://luis-figueroa-ops.github.io/" style="display:block;font-size:13px;color:#999992;text-decoration:none;margin-bottom:8px;">← Back to Tools</a>
+<div class="wrap">
 
   <!-- ══ MAIN SCREEN ══ -->
   <div class="screen active" id="screen-main">
