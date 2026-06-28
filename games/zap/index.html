@@ -219,13 +219,8 @@
 
 <script>
 // ZAP! Bug Zapper — 20-Wave Edition
-// Wave scaling redesign:
-//   Waves  1-5:  intro ramp — reasonable bugs, generous delays, speed builds slowly
-//   Waves  6-10: mid tier — faster spawns, more bug types, tighter windows
-//   Waves 11-15: hard tier — near-cap speed, swarm density, first double-boss pools
-//   Waves 16-20: nightmare tier — max speed, max density, brutal swarm compositions
-// Boss waves: 5, 10, 15, 20 (every 5th)
-// Badges: 5, 10, 15, 20
+// Wave scaling: quadratic ease-in curve — challenge kicks in by wave 6-7
+// Boss waves: 5, 10, 15, 20 | Badges: 5, 10, 15, 20
 
 const MAX_WAVES = 20;
 const canvas = document.getElementById('c');
@@ -250,18 +245,24 @@ function uiScale()    { return Math.min(1, W / 500); }
 const DELTA_CAP  = 0.05;
 const MAX_HEALTH = 5;
 
+// CHANGE 1: Quadratic ease-in curve — ramps challenge much earlier
 function getWaveConfig(w) {
-  const t = (w - 1) / (MAX_WAVES - 1);
+  const tLin = (w - 1) / (MAX_WAVES - 1);
+  // Quadratic ease-in: slow start but accelerates fast — challenge at wave 6-7 not 12-13
+  const t = tLin * tLin;
 
-  const bugsNeeded    = Math.round(8 + t * 20);
-  const spawnInterval = Math.max(0.45, 2.5 - t * 2.2);
-  const speedMult     = Math.min(2.6, 1.0 + t * 1.6);
+  // Bugs: 10 on wave 1, up to 28 by wave 20
+  const bugsNeeded = Math.round(10 + t * 18);
+  // Spawn interval: starts at 1.8s (not 2.5s), drops to 0.42s
+  const spawnInterval = Math.max(0.42, 1.8 - t * 1.4);
+  // Speed: starts at 1.3x (not 1.0x), caps at 2.8x
+  const speedMult = Math.min(2.8, 1.3 + t * 1.5);
 
   let betweenWaveDelay;
   if (w <= 10) {
-    betweenWaveDelay = Math.max(3.0, 4.0 - (w - 1) * 0.10);
+    betweenWaveDelay = Math.max(2.5, 3.5 - (w - 1) * 0.10);
   } else {
-    betweenWaveDelay = Math.max(2.0, 3.0 - (w - 11) * 0.10);
+    betweenWaveDelay = Math.max(1.8, 2.8 - (w - 11) * 0.10);
   }
 
   const isBossWave = w % 5 === 0;
@@ -288,7 +289,8 @@ const BUG_DEFS = {
   megaboss:  { emoji: '\u{1F997}', hp: 8, speed: 48,  score: 400, size: 64, sineAmp: 50, sineFreq: 0.7 },
 };
 
-const TABLE_FOOD = ['🍎','🍊','🍇','🍕','🧁','🍫','🥤','🍿','🍓','🥪'];
+// CHANGE 2: Table food — fruit, pizza, chicken leg, rice bowl, dessert
+const TABLE_FOOD = ['🍇', '🥗', '🍗', '🍚', '🧁', '🍫', '🥤', '🍿', '🍓', '🥪'];
 
 // ─── Audio ───────────────────────────────────────────────────────────────────
 let audioCtx = null;
@@ -443,7 +445,8 @@ let waveClearing, nextWaveDelay;
 let spawnTimer, spawnInterval, currentSpeedMult;
 let bugsSpawned, killsThisWave, bugsNeeded, totalKills;
 let bossAlive;
-let badge = null, earnedBadges = [];
+// CHANGE 3: badge = current popup; lastEarnedBadge = single persistent top display (replaces, not accumulates)
+let badge = null, lastEarnedBadge = null;
 let aimX = -1, aimY = -1;
 let victoryParticles = [], victoryAnimT = 0;
 
@@ -459,7 +462,8 @@ function saveHiScore(s) { localStorage.setItem('zap_hi20', String(s)); }
 
 function initGame() {
   score = 0; hiScore = loadHiScore(); wave = 1; tableHealth = MAX_HEALTH;
-  bugs = []; zapFlashes = []; particles = []; zapTexts = []; earnedBadges = [];
+  bugs = []; zapFlashes = []; particles = []; zapTexts = [];
+  lastEarnedBadge = null;
   totalKills = 0; waveClearing = false; spawnTimer = 0; bossAlive = false;
   victoryParticles = []; victoryAnimT = 0;
   aimX = getTurretX() + 40; aimY = H * 0.5;
@@ -629,6 +633,7 @@ function update(dt) {
     if (p.life <= 0) { particles.splice(i, 1); continue; }
     p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 120 * dt;
   }
+  // CHANGE 3: badge popup timer
   if (badge) { badge.timer -= dt; if (badge.timer <= 0) badge = null; }
   for (let i = zapTexts.length - 1; i >= 0; i--) {
     const z = zapTexts[i]; z.life -= dt;
@@ -647,8 +652,10 @@ function update(dt) {
 
       if (wave % 5 === 0 && wave < MAX_WAVES) {
         const idx = (wave / 5 - 1) % BADGES.length;
-        badge = { text: BADGES[idx], timer: 3.0 };
-        earnedBadges.push(BADGES[idx]);
+        const badgeText = BADGES[idx];
+        // CHANGE 3: popup is semi-transparent; top bar shows only the latest badge (replaces previous)
+        badge = { text: badgeText, timer: 3.0 };
+        lastEarnedBadge = badgeText;
       }
 
       if (wave >= MAX_WAVES) { triggerVictory(); return; }
@@ -785,13 +792,17 @@ function drawVictoryParticles(dt) {
   }
 }
 
+// CHANGE 3: Badge popup — semi-transparent so bugs show through underneath
 function drawBadge() {
   if (!badge) return;
   const t = badge.timer, alpha = t>2.5?(3.0-t)/0.5:t<0.5?t/0.5:1, s = W<500?0.85:1;
-  ctx.save(); ctx.globalAlpha = alpha;
+  ctx.save();
+  // Semi-transparent: 0.72 max alpha so gameplay stays visible
+  ctx.globalAlpha = alpha * 0.72;
   const bw=Math.min(W*0.82,420*s),bh=72*s,bx=(W-bw)/2,by=H*0.28;
-  ctx.fillStyle='#1a003a'; ctx.strokeStyle='#ffcc00'; ctx.lineWidth=3;
+  ctx.fillStyle='rgba(20,0,50,0.82)'; ctx.strokeStyle='#ffcc00'; ctx.lineWidth=3;
   ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,14); ctx.fill(); ctx.stroke();
+  ctx.globalAlpha = alpha;
   ctx.fillStyle='#ffcc00'; ctx.font=`bold ${Math.round(26*s)}px sans-serif`;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.shadowColor='#ffcc00'; ctx.shadowBlur=16;
@@ -1032,19 +1043,18 @@ function drawHUD() {
     ctx.shadowBlur = 0; ctx.globalAlpha = 1;
   }
 
-  if (earnedBadges.length > 0) {
+  // CHANGE 3: Show only the most recently earned badge at top — single pill, replaces previous
+  if (lastEarnedBadge) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.font = `bold ${Math.round(14 * s)}px 'Courier New', monospace`;
+    ctx.font = `bold ${Math.round(13 * s)}px 'Courier New', monospace`;
     const badgeY = W < 500 ? pad + Math.round(52 * s) : pad + Math.round(30 * s);
-    const spacing = Math.round(130 * s);
-    const startX = W / 2 - (earnedBadges.length * spacing) / 2 + spacing / 2;
-    earnedBadges.forEach((b, i) => {
-      const bx = startX + i * spacing;
-      ctx.fillStyle = '#ffffff18';
-      ctx.beginPath(); ctx.roundRect(bx - spacing / 2 + 2, badgeY - 3, spacing - 4, Math.round(22 * s), 5); ctx.fill();
-      ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 10;
-      ctx.fillText(b, bx, badgeY); ctx.shadowBlur = 0;
-    });
+    const textW = ctx.measureText(lastEarnedBadge).width;
+    const pillW = textW + 20, pillH = Math.round(22 * s);
+    const pillX = W / 2 - pillW / 2;
+    ctx.fillStyle = '#ffffff12';
+    ctx.beginPath(); ctx.roundRect(pillX, badgeY - 3, pillW, pillH, 5); ctx.fill();
+    ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 10;
+    ctx.fillText(lastEarnedBadge, W / 2, badgeY); ctx.shadowBlur = 0;
   }
 
   ctx.restore();
