@@ -45,8 +45,8 @@
       background: var(--bg);
       color: var(--white);
       font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.7;
+      font-size: 17px;
+      line-height: 1.75;
       min-height: 100vh;
       overflow-x: hidden;
     }
@@ -214,6 +214,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
     }
 
     /* ── MODE TABS ── */
@@ -229,10 +230,10 @@
     }
 
     .mode-tab {
-      padding: 14px 20px;
+      padding: 16px 24px;
       font-family: var(--font-body);
-      font-size: 13px;
-      letter-spacing: 0.3px;
+      font-size: 15px;
+      letter-spacing: 0.2px;
       text-transform: none;
       color: var(--muted);
       cursor: pointer;
@@ -247,7 +248,7 @@
     .mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
     /* ── CONTENT PANEL ── */
-    .content-panel { flex: 1; padding: 36px 40px 80px; max-width: 860px; }
+    .content-panel { flex: 1; padding: 48px 56px 80px; max-width: 900px; }
 
     /* ── EMPTY STATE ── */
     .empty-state {
@@ -255,41 +256,41 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 60vh;
+      min-height: 70vh;
       text-align: center;
-      padding: 40px;
+      padding: 60px 40px;
     }
 
     .empty-icon {
-      font-size: 48px;
-      margin-bottom: 20px;
+      font-size: 56px;
+      margin-bottom: 24px;
       opacity: 0.4;
     }
 
     .empty-title {
       font-family: var(--font-display);
-      font-size: 36px;
-      letter-spacing: 2px;
+      font-size: 52px;
+      letter-spacing: 3px;
       color: var(--white);
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .empty-sub {
-      font-size: 15px;
+      font-size: 17px;
       color: var(--muted);
-      max-width: 400px;
-      line-height: 1.7;
-      margin-bottom: 28px;
+      max-width: 420px;
+      line-height: 1.75;
+      margin-bottom: 32px;
     }
 
     /* ── SECTION HEADERS ── */
     .section-eyebrow {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 3px;
       color: var(--accent);
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -305,37 +306,37 @@
 
     .section-title {
       font-family: var(--font-display);
-      font-size: clamp(32px, 4vw, 48px);
+      font-size: clamp(40px, 5vw, 60px);
       letter-spacing: 2px;
       color: var(--white);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .section-title span { color: var(--accent); }
 
     .section-sub {
-      font-size: 15px;
+      font-size: 17px;
       color: var(--muted);
-      max-width: 560px;
+      max-width: 580px;
       line-height: 1.75;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
     }
 
     /* ── CARDS ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border-soft);
-      padding: 28px;
-      margin-bottom: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
     }
 
     .card-label {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 3px;
       color: var(--muted);
       text-transform: uppercase;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .card-accent {
@@ -350,11 +351,11 @@
     label {
       display: block;
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 3px;
       color: var(--accent);
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     input[type="text"],
@@ -365,8 +366,8 @@
       border: 1px solid var(--border-soft);
       color: var(--white);
       font-family: var(--font-body);
-      font-size: 15px;
-      padding: 12px 14px;
+      font-size: 16px;
+      padding: 14px 16px;
       outline: none;
       transition: border-color 0.2s;
     }
@@ -378,24 +379,24 @@
     input[type="text"]::placeholder,
     textarea::placeholder { color: var(--muted); }
 
-    textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
+    textarea { resize: vertical; min-height: 130px; line-height: 1.7; }
 
     select {
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a99' stroke-width='2' fill='none'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 14px center;
-      padding-right: 36px;
+      padding-right: 40px;
       cursor: pointer;
     }
 
     select option { background: var(--surface2); }
 
     .hint {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--muted);
-      margin-top: 6px;
-      line-height: 1.5;
+      margin-top: 8px;
+      line-height: 1.6;
     }
 
     .form-row {
@@ -415,10 +416,10 @@
       background: var(--accent);
       color: var(--bg);
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      padding: 13px 28px;
+      padding: 15px 32px;
       border: none;
       cursor: pointer;
       transition: opacity 0.15s, transform 0.1s;
@@ -436,10 +437,10 @@
       color: var(--accent);
       border: 1px solid var(--accent-border);
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      padding: 11px 24px;
+      padding: 13px 28px;
       cursor: pointer;
       transition: all 0.15s;
     }
@@ -456,7 +457,7 @@
       border: none;
       color: var(--muted);
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 2px;
       text-transform: uppercase;
       cursor: pointer;
@@ -471,10 +472,10 @@
       color: var(--red);
       border: 1px solid rgba(248,81,73,0.3);
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      padding: 8px 16px;
+      padding: 10px 20px;
       cursor: pointer;
       transition: all 0.15s;
     }
@@ -548,14 +549,14 @@
     }
 
     .competency-name {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
       color: var(--white);
       margin-bottom: 4px;
     }
 
     .competency-question {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--muted);
       font-style: italic;
       line-height: 1.5;
@@ -587,17 +588,17 @@
 
     .detail-label {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 2px;
       color: var(--accent);
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .detail-body {
-      font-size: 13px;
+      font-size: 15px;
       color: var(--muted);
-      line-height: 1.7;
+      line-height: 1.75;
     }
 
     .scoring-pill {
@@ -747,21 +748,21 @@
 
     /* ── DISCLAIMER / FOOTER ── */
     .page-footer {
-      margin-top: 48px;
-      padding-top: 24px;
+      margin-top: 64px;
+      padding-top: 32px;
       border-top: 1px solid var(--border-soft);
     }
 
     .disclaimer {
-      padding: 14px 18px;
+      padding: 16px 20px;
       background: rgba(255,255,255,0.02);
       border: 1px solid var(--border-soft);
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.5px;
       color: var(--muted);
       line-height: 1.8;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .disclaimer strong { color: var(--white); font-weight: 500; }
@@ -772,20 +773,21 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 12px;
     }
 
-    .footer-left { font-size: 13px; color: var(--muted); }
+    .footer-left { font-size: 14px; color: var(--muted); }
     .footer-left a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
     .footer-left a:hover { color: var(--accent); }
 
     .copyright {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 1px;
       color: var(--muted);
       width: 100%;
       text-align: center;
-      margin-top: 8px;
+      padding-bottom: 24px;
     }
 
     /* ── MOBILE MENU TOGGLE ── */
@@ -875,28 +877,139 @@
     .save-indicator.visible { display: flex; }
 
     /* ── MOBILE BREAKPOINTS ── */
+    /* Tablet / large mobile */
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
       .sidebar-toggle { display: block; }
       .main-content { margin-left: 0; }
-      .content-panel { padding: 24px 20px 60px; }
+      .content-panel { padding: 32px 24px 60px; }
       .competency-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       .role-type-grid { grid-template-columns: repeat(2, 1fr); }
       .mode-tabs { padding: 0 16px; overflow-x: auto; }
-      .mode-tab { padding: 14px 16px; font-size: 10px; }
+      .mode-tab { padding: 14px 18px; font-size: 14px; }
+      .section-title { font-size: clamp(36px, 8vw, 52px); }
+      .empty-title { font-size: 40px; }
     }
 
+    /* Mobile */
     @media (max-width: 600px) {
-      .content-panel { padding: 20px 16px 60px; }
+      .content-panel { padding: 24px 16px 60px; }
       .card { padding: 20px 16px; }
-      .btn-primary, .btn-secondary { width: 100%; justify-content: center; min-height: 44px; }
-      .btn-row { flex-direction: column; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; min-height: 48px; }
+      .btn-row { flex-direction: column; align-items: stretch; }
       .role-type-grid { grid-template-columns: 1fr 1fr; }
       .modal { padding: 24px 20px; }
       .footer-meta { flex-direction: column; align-items: flex-start; }
+      .mode-tab { padding: 12px 14px; font-size: 13px; }
+      .section-title { font-size: clamp(32px, 10vw, 44px); }
+      .empty-title { font-size: 36px; }
+      .empty-sub { font-size: 15px; }
     }
+    /* ── HOW IT WORKS BOX ── */
+    .how-it-works {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 32px;
+      border: 1px solid var(--border-soft);
+      background: var(--surface);
+      text-align: left;
+    }
+
+    .how-it-works-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .how-it-works-header:hover { background: var(--surface2); }
+
+    .how-it-works-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .how-it-works-chevron {
+      font-size: 12px;
+      color: var(--muted);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .how-it-works.open .how-it-works-chevron { transform: rotate(180deg); }
+
+    .how-it-works-body {
+      display: none;
+      padding: 0 20px 20px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .how-it-works.open .how-it-works-body { display: block; }
+
+    .how-it-works-intro {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.75;
+      padding-top: 16px;
+      margin-bottom: 20px;
+    }
+
+    .how-it-works-mode {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 16px;
+      align-items: flex-start;
+    }
+
+    .how-it-works-mode:last-of-type { margin-bottom: 20px; }
+
+    .how-mode-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      padding: 3px 8px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .how-mode-content {}
+
+    .how-mode-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .how-mode-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .how-it-works-note {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      line-height: 1.8;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .how-it-works-note strong { color: var(--white); font-weight: 500; }
+
   </style>
 </head>
 <body>
@@ -982,9 +1095,54 @@
           <div class="empty-title">Ready to Prep</div>
           <div class="empty-sub">Create a session for each role you're interviewing for. Your work saves automatically and stays private to your browser.</div>
           <button class="btn-primary" id="emptyNewSessionBtn">+ Create Your First Session</button>
-          <div style="margin-top: 16px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 1px; line-height: 1.8; text-align: center; max-width: 380px;">
+          <div style="margin-top: 16px; font-family: var(--font-mono); font-size: 14px; color: var(--muted); letter-spacing: 0.5px; line-height: 1.8; text-align: center; max-width: 420px;">
             Data lives in your browser. Clear cache = clear data.<br>Use Export regularly to back up your library.
           </div>
+
+          <!-- How it works collapsible -->
+          <div class="how-it-works" id="howItWorks">
+            <div class="how-it-works-header" id="howItWorksToggle">
+              <span class="how-it-works-label">How this tool works</span>
+              <span class="how-it-works-chevron">&#9660;</span>
+            </div>
+            <div class="how-it-works-body">
+              <p class="how-it-works-intro">
+                This tool helps you prep for interviews through three connected modes that build on each other.
+                Each role you apply for gets its own session — your work saves automatically.
+              </p>
+
+              <div class="how-it-works-mode">
+                <div class="how-mode-num">01</div>
+                <div class="how-mode-content">
+                  <div class="how-mode-title">Pre-Interview</div>
+                  <div class="how-mode-desc">Paste the job description. Get the competency map — not just what the JD says, but what the hiring manager is actually evaluating underneath each question — and the methodology behind a strong answer for each one.</div>
+                </div>
+              </div>
+
+              <div class="how-it-works-mode">
+                <div class="how-mode-num">02</div>
+                <div class="how-mode-content">
+                  <div class="how-mode-title">Post-Interview</div>
+                  <div class="how-mode-desc">Enter questions that were actually asked in a past interview. Get a reverse-engineered read on what each question was really testing, what a strong answer looks like, and what most candidates miss.</div>
+                </div>
+              </div>
+
+              <div class="how-it-works-mode">
+                <div class="how-mode-num">03</div>
+                <div class="how-mode-content">
+                  <div class="how-mode-title">Story Translation</div>
+                  <div class="how-mode-desc">Describe a real experience from your work history. The tool maps it to the competencies of the target role and translates it into the language and framing that lands with hiring managers — using the SOAR framework.</div>
+                </div>
+              </div>
+
+              <div class="how-it-works-note">
+                <strong>Think tank, not a script.</strong> Hiring managers often take conversations off-JD.
+                Use the competency map to internalize the thinking — so you can respond live,
+                not recite a prepared answer.
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- PRE-INTERVIEW MODE -->
@@ -1154,6 +1312,26 @@
             </div>
             <div class="hint" style="margin-top: 12px;">Archiving keeps the session in your library but marks it as complete. Deleting is permanent.</div>
           </div>
+        </div>
+
+        <!-- Footer lives inside content-panel so it respects sidebar offset -->
+        <div class="page-footer" id="siteFooter">
+          <div class="disclaimer">
+            <strong>AI Notice:</strong> Output is generated automatically and may contain inaccuracies.
+            Review before use. Results depend on information available at time of request.
+            Output is a starting point — verify any specific facts before acting on them.
+            Luis Figueroa is not responsible for results generated by third-party AI.
+          </div>
+          <div class="footer-meta">
+            <div class="footer-left">
+              Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a>
+              &nbsp;·&nbsp;
+              <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>
+              Augmenting Human Potential, One Workflow at a Time
+            </div>
+            <div class="footer-left">HTML / Claude API</div>
+          </div>
+          <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
         </div>
 
       </div><!-- end content-panel -->
@@ -2000,30 +2178,16 @@ Return JSON only, no markdown:
     }
   }
 
+  // ════════════════════════════════════════════════
+  // HOW IT WORKS TOGGLE
+  // ════════════════════════════════════════════════
+  document.getElementById('howItWorksToggle').addEventListener('click', () => {
+    document.getElementById('howItWorks').classList.toggle('open');
+  });
+
   init();
   </script>
 
-  <!-- Footer inside content panel — rendered after content -->
-  <div id="footerPlaceholder">
-    <div class="page-footer">
-      <div class="disclaimer">
-        <strong>AI Notice:</strong> Output is generated automatically and may contain inaccuracies.
-        Review before use. Results depend on information available at time of request.
-        Output is a starting point — verify any specific facts before acting on them.
-        Luis Figueroa is not responsible for results generated by third-party AI.
-      </div>
-      <div class="footer-meta">
-        <div class="footer-left">
-          Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a>
-          &nbsp;·&nbsp;
-          <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>
-          Augmenting Human Potential, One Workflow at a Time
-        </div>
-        <div class="footer-left" style="font-size: 12px;">HTML / Claude API</div>
-      </div>
-      <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
-    </div>
-  </div>
 
 </body>
 </html>
