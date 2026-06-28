@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interview Prep — Operations, Augmented</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YCMXSWXHTN');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:            #0b0f1a;
+      --surface:       #111827;
+      --surface2:      #1a2236;
+      --surface3:      #1f2a40;
+      --accent:        #4A9EFF;
+      --accent-dim:    rgba(74,158,255,0.10);
+      --accent-border: rgba(74,158,255,0.22);
+      --accent-glow:   rgba(74,158,255,0.15);
+      --white:         #e8edf5;
+      --muted:         #6b7a99;
+      --border-soft:   rgba(255,255,255,0.07);
+      --red:           #f85149;
+      --yellow:        #f0c14b;
+      --green:         #3fb950;
+      --font-display:  'Bebas Neue', sans-serif;
+      --font-body:     'DM Sans', sans-serif;
+      --font-mono:     'Share Tech Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── BACK NAV ── */
+    .back-nav { position: fixed; top: 14px; left: 14px; z-index: 300; }
+    .back-nav a {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .back-nav a:hover { color: var(--accent); }
+
+    /* ── LAYOUT ── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 200;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 56px 20px 20px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .sidebar-brand {
+      font-family: var(--font-display);
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-brand span { color: var(--accent); }
+
+    .sidebar-tagline {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .sidebar-section {
+      padding: 16px 20px 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .session-list { flex: 1; overflow-y: auto; padding: 0 12px; }
+
+    .session-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: background 0.15s;
+      border: 1px solid transparent;
+    }
+
+    .session-item:hover { background: var(--surface2); }
+
+    .session-item.active {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+    }
+
+    .session-item-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .session-item.active .session-item-name { color: var(--accent); }
+
+    .session-item-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .session-item-status {
+      display: inline-block;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+
+    .status-active    { background: rgba(74,158,255,0.15); color: var(--accent); }
+    .status-archived  { background: rgba(107,122,153,0.15); color: var(--muted); }
+
+    .sidebar-actions {
+      padding: 16px;
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-new-session {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-new-session:hover { opacity: 0.88; }
+
+    .btn-export {
+      width: 100%;
+      padding: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: 1px solid var(--border-soft);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-export:hover { border-color: var(--accent-border); color: var(--accent); }
+
+    /* ── MAIN CONTENT ── */
+    .main-content {
+      margin-left: 280px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── MODE TABS ── */
+    .mode-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-soft);
+      background: var(--surface);
+      padding: 0 32px;
+      gap: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .mode-tab {
+      padding: 16px 24px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .mode-tab:hover { color: var(--white); }
+    .mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── CONTENT PANEL ── */
+    .content-panel { flex: 1; padding: 36px 40px 80px; max-width: 860px; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .empty-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 400px;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-eyebrow::before {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 48px);
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+
+    .section-title span { color: var(--accent); }
+
+    .section-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .card-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .card-accent {
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      border-left: 3px solid var(--accent);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+
+    /* ── FORM ELEMENTS ── */
+    label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border-soft);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 15px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus { border-color: var(--accent); }
+
+    input[type="text"]::placeholder,
+    textarea::placeholder { color: var(--muted); }
+
+    textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a99' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    select option { background: var(--surface2); }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 13px 28px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .btn-primary:hover:not(:disabled) { opacity: 0.88; }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 11px 24px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+    }
+
+    .btn-secondary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+
+    .btn-ghost:hover { color: var(--accent); }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid rgba(248,81,73,0.3);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-danger:hover { background: rgba(248,81,73,0.1); }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── LOADING ── */
+    .dot-pulse { display: inline-flex; gap: 4px; align-items: center; }
+    .dot-pulse span {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: dpulse 1.2s infinite;
+    }
+    .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
+    .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dpulse {
+      0%,80%,100% { opacity: 0.2; transform: scale(0.8); }
+      40%          { opacity: 1;   transform: scale(1);   }
+    }
+
+    .status-line {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── COMPETENCY CARDS ── */
+    .competency-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .competency-card {
+      background: var(--surface2);
+      border: 1px solid var(--border-soft);
+      border-left: 3px solid var(--accent);
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .competency-card:hover {
+      border-color: var(--accent);
+      background: var(--surface3);
+    }
+
+    .competency-card.expanded {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .competency-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .competency-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .competency-question {
+      font-size: 13px;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .competency-expand-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .competency-detail {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .competency-detail.visible { display: block; }
+
+    .detail-section {
+      margin-bottom: 12px;
+    }
+
+    .detail-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .detail-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .scoring-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin: 3px 4px 3px 0;
+    }
+
+    .pill-blue   { background: rgba(74,158,255,0.12); color: var(--accent); border: 1px solid var(--accent-border); }
+    .pill-yellow { background: rgba(240,193,75,0.12); color: var(--yellow); border: 1px solid rgba(240,193,75,0.3); }
+    .pill-green  { background: rgba(63,185,80,0.12);  color: var(--green);  border: 1px solid rgba(63,185,80,0.3); }
+    .pill-red    { background: rgba(248,81,73,0.12);  color: var(--red);    border: 1px solid rgba(248,81,73,0.3); }
+
+    /* ── STORY CARDS ── */
+    .story-card {
+      background: var(--surface2);
+      border: 1px solid var(--border-soft);
+      padding: 20px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .story-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .story-card-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .story-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .story-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+    }
+
+    /* ── POST-INTERVIEW QUESTION CARDS ── */
+    .question-card {
+      background: var(--surface2);
+      border: 1px solid var(--border-soft);
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    .question-text {
+      font-size: 15px;
+      color: var(--white);
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
+    .question-analysis {
+      display: none;
+    }
+
+    .question-analysis.visible {
+      display: block;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.visible { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--accent-border);
+      padding: 32px;
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+
+    .modal-body {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      padding: 12px 24px;
+      z-index: 600;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.visible { opacity: 1; }
+
+    /* ── DISCLAIMER / FOOTER ── */
+    .page-footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .disclaimer {
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-soft);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .disclaimer strong { color: var(--white); font-weight: 500; }
+
+    .footer-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .footer-left { font-size: 13px; color: var(--muted); }
+    .footer-left a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-left a:hover { color: var(--accent); }
+
+    .copyright {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      width: 100%;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ── MOBILE MENU TOGGLE ── */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 10px;
+      right: 14px;
+      z-index: 300;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--border-soft); margin: 28px 0; }
+
+    /* ── PROFILE STRIP ── */
+    .profile-strip {
+      background: var(--surface2);
+      border: 1px solid var(--border-soft);
+      border-left: 3px solid var(--yellow);
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .profile-strip-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+      text-transform: uppercase;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .profile-strip-text {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── ROLE TYPE BADGES ── */
+    .role-type-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .role-type-btn {
+      padding: 12px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border-soft);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .role-type-btn:hover { border-color: var(--accent-border); color: var(--white); }
+    .role-type-btn.selected { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+
+    /* ── SAVED ANSWER INDICATOR ── */
+    .save-indicator {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--green);
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .save-indicator.visible { display: flex; }
+
+    /* ── MOBILE BREAKPOINTS ── */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-toggle { display: block; }
+      .main-content { margin-left: 0; }
+      .content-panel { padding: 24px 20px 60px; }
+      .competency-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .role-type-grid { grid-template-columns: repeat(2, 1fr); }
+      .mode-tabs { padding: 0 16px; overflow-x: auto; }
+      .mode-tab { padding: 14px 16px; font-size: 10px; }
+    }
+
+    @media (max-width: 600px) {
+      .content-panel { padding: 20px 16px 60px; }
+      .card { padding: 20px 16px; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; min-height: 44px; }
+      .btn-row { flex-direction: column; }
+      .role-type-grid { grid-template-columns: 1fr 1fr; }
+      .modal { padding: 24px 20px; }
+      .footer-meta { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Back Nav -->
+  <nav class="back-nav">
+    <a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a>
+  </nav>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">☰ Sessions</button>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+      <div class="modal-title" id="modalTitle">Confirm</div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="modalCancel">Cancel</button>
+        <button class="btn-danger" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Session Modal -->
+  <div class="modal-overlay" id="newSessionModal">
+    <div class="modal">
+      <div class="modal-title">New Session</div>
+      <div class="modal-body">Give this session a name so you can find it later. A good name includes the company and role.</div>
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="sessionNameInput">Session Name</label>
+        <input type="text" id="sessionNameInput" placeholder="e.g. Metronet — Commercial Process Specialist" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="newSessionCancel">Cancel</button>
+        <button class="btn-primary" id="newSessionCreate">Create Session</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">Interview <span>Prep</span></div>
+        <div class="sidebar-tagline">Operations, Augmented</div>
+      </div>
+      <div class="sidebar-section">Sessions</div>
+      <div class="session-list" id="sessionList">
+        <div style="padding: 20px 12px; font-size: 13px; color: var(--muted); font-style: italic;">
+          No sessions yet. Create one to get started.
+        </div>
+      </div>
+      <div class="sidebar-actions">
+        <button class="btn-new-session" id="newSessionBtn">+ New Session</button>
+        <button class="btn-export" id="exportBtn">↓ Export Library</button>
+        <input type="file" id="importFile" accept=".json" style="display:none;" />
+        <button class="btn-export" id="importBtn">↑ Import Library</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+      <!-- Mode Tabs -->
+      <div class="mode-tabs" id="modeTabs" style="display:none;">
+        <button class="mode-tab active" data-mode="pre">Pre-Interview</button>
+        <button class="mode-tab" data-mode="post">Post-Interview</button>
+        <button class="mode-tab" data-mode="story">Story Translation</button>
+        <button class="mode-tab" data-mode="notes">Session Notes</button>
+      </div>
+
+      <!-- Content Panels -->
+      <div class="content-panel" id="contentPanel">
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">🎯</div>
+          <div class="empty-title">Ready to Prep</div>
+          <div class="empty-sub">Create a session for each role you're interviewing for. Your work saves automatically and stays private to your browser.</div>
+          <button class="btn-primary" id="emptyNewSessionBtn">+ Create Your First Session</button>
+          <div style="margin-top: 16px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 1px; line-height: 1.8; text-align: center; max-width: 380px;">
+            Data lives in your browser. Clear cache = clear data.<br>Use Export regularly to back up your library.
+          </div>
+        </div>
+
+        <!-- PRE-INTERVIEW MODE -->
+        <div id="mode-pre" style="display:none;">
+          <div class="section-eyebrow">Mode 01</div>
+          <div class="section-title">Pre-<span>Interview</span></div>
+          <div class="section-sub">Paste the job description. Get the competency map, likely questions, methodology behind strong answers, and what the interviewer is actually scoring.</div>
+
+          <div id="preForm">
+            <div class="card">
+              <div class="card-label">Role Setup</div>
+
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="companyName">Company</label>
+                  <input type="text" id="companyName" placeholder="e.g. Metronet" />
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="roleTitle">Role Title</label>
+                  <input type="text" id="roleTitle" placeholder="e.g. Commercial Process Specialist" />
+                </div>
+              </div>
+
+              <div style="margin-top: 16px; margin-bottom: 8px;">
+                <label>Role Type <span style="color: var(--muted); font-size: 10px;">(select the closest match)</span></label>
+                <div class="role-type-grid" id="roleTypeGrid">
+                  <button class="role-type-btn" data-type="operations">Operations</button>
+                  <button class="role-type-btn" data-type="project_management">Project Mgmt</button>
+                  <button class="role-type-btn" data-type="sales_revops">Sales / RevOps</button>
+                  <button class="role-type-btn" data-type="enablement">Enablement</button>
+                  <button class="role-type-btn" data-type="it_technical">IT / Technical</button>
+                  <button class="role-type-btn" data-type="customer_success">Customer Success</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-label">Job Description</div>
+              <textarea id="jdInput" placeholder="Paste the full job description here. The more complete it is, the more specific the analysis." style="min-height: 200px;"></textarea>
+              <div class="hint">Tip: include the full JD including qualifications and additional requirements — every line is a signal.</div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" id="analyzeJDBtn">Analyze This JD</button>
+              <div class="status-line" id="preStatus" style="display:none;">
+                <div class="dot-pulse"><span></span><span></span><span></span></div>
+                <span>Decoding the role...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pre-Interview Results -->
+          <div id="preResults" style="display:none; margin-top: 32px;">
+
+            <div class="card-accent" id="businessProblemCard" style="margin-bottom: 24px;">
+              <div class="detail-label">What This Role Is Actually Solving For</div>
+              <div id="businessProblemText" style="font-size: 14px; color: var(--white); line-height: 1.8;"></div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <div class="section-eyebrow" style="margin-bottom: 6px;">Competency Map</div>
+              <div style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Click any competency to see the methodology and scoring layers.</div>
+              <div class="competency-grid" id="competencyGrid"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-accent" id="disclaimerCard">
+              <div class="detail-label">Think Tank Disclaimer</div>
+              <div style="font-size: 13px; color: var(--muted); line-height: 1.75;">
+                This analysis is based on the job description as written. Hiring managers often discuss things that aren't in the JD — use this as preparation scaffolding, not a script. The best use is to internalize the competency map so you can think on your feet when the conversation goes somewhere unexpected.
+              </div>
+            </div>
+
+            <div class="btn-row" style="margin-top: 24px;">
+              <button class="btn-secondary" id="reanalyzeBtn">Re-analyze</button>
+              <button class="btn-ghost" id="goToStoryModeBtn">Build Your Stories →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- POST-INTERVIEW MODE -->
+        <div id="mode-post" style="display:none;">
+          <div class="section-eyebrow">Mode 02</div>
+          <div class="section-title">Post-<span>Interview</span></div>
+          <div class="section-sub">Enter questions that were actually asked. Get a reverse-engineered read on what each one was scoring and where your answer could have been stronger.</div>
+
+          <div class="card">
+            <div class="card-label">Questions From the Interview</div>
+            <div id="postQuestionsList"></div>
+            <button class="btn-secondary" id="addQuestionBtn" style="margin-top: 8px;">+ Add Question</button>
+          </div>
+
+          <div class="btn-row" style="margin-bottom: 24px;">
+            <button class="btn-primary" id="analyzeQuestionsBtn">Analyze These Questions</button>
+            <div class="status-line" id="postStatus" style="display:none;">
+              <div class="dot-pulse"><span></span><span></span><span></span></div>
+              <span>Reverse-engineering the interview...</span>
+            </div>
+          </div>
+
+          <div id="postResults"></div>
+        </div>
+
+        <!-- STORY TRANSLATION MODE -->
+        <div id="mode-story" style="display:none;">
+          <div class="section-eyebrow">Mode 03</div>
+          <div class="section-title">Story <span>Translation</span></div>
+          <div class="section-sub">Describe a real experience from your background. The tool maps it to the competencies this role requires and shows you how to articulate it in the language the interviewer is listening for.</div>
+
+          <div id="storyProfileNote" class="profile-strip" style="display:none;">
+            <div class="profile-strip-label">From Pre-Interview</div>
+            <div class="profile-strip-text" id="storyProfileNoteText"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-label">Your Experience</div>
+            <div class="form-group">
+              <label for="storyTitle">Story Title</label>
+              <input type="text" id="storyTitle" placeholder="e.g. Promo Correction Process Build" />
+            </div>
+            <div class="form-group">
+              <label for="storyInput">Describe What Happened</label>
+              <textarea id="storyInput" placeholder="What was the situation? What did you do? What was the result? Be specific — include systems used, teams involved, and measurable outcomes if you have them. Don't worry about framing it as a perfect answer yet. Just describe it the way you'd tell a colleague." style="min-height: 160px;"></textarea>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" id="translateStoryBtn">Translate This Story</button>
+              <div class="status-line" id="storyStatus" style="display:none;">
+                <div class="dot-pulse"><span></span><span></span><span></span></div>
+                <span>Mapping to competencies...</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="storyResult" style="display:none; margin-top: 8px;"></div>
+
+          <div class="divider"></div>
+
+          <div>
+            <div class="section-eyebrow" style="margin-bottom: 8px;">Story Library</div>
+            <div style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Stories you've translated in this session. Reusable across any role.</div>
+            <div id="storyLibrary"></div>
+          </div>
+        </div>
+
+        <!-- SESSION NOTES MODE -->
+        <div id="mode-notes" style="display:none;">
+          <div class="section-eyebrow">Session Notes</div>
+          <div class="section-title">Notes & <span>Context</span></div>
+          <div class="section-sub">Capture anything about this role, company, or interview that doesn't fit elsewhere. These notes stay with this session.</div>
+
+          <div class="card">
+            <div class="card-label">Session Notes</div>
+            <textarea id="sessionNotesInput" placeholder="Company research, interviewer names, things to remember, follow-up questions, anything..." style="min-height: 300px;"></textarea>
+            <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <div class="save-indicator visible" id="notesSaveIndicator">
+                ✓ Auto-saved
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 0;">
+            <div class="card-label">Session Actions</div>
+            <div class="btn-row">
+              <button class="btn-secondary" id="archiveSessionBtn">Archive Session</button>
+              <button class="btn-danger" id="deleteSessionBtn">Delete Session</button>
+            </div>
+            <div class="hint" style="margin-top: 12px;">Archiving keeps the session in your library but marks it as complete. Deleting is permanent.</div>
+          </div>
+        </div>
+
+      </div><!-- end content-panel -->
+    </div><!-- end main-content -->
+  </div><!-- end app -->
+
+  <script>
+  // ════════════════════════════════════════════════
+  // CONSTANTS
+  // ════════════════════════════════════════════════
+  const WORKER_URL   = 'https://career-tools-proxy.figueroaluisd.workers.dev/';
+  const STORAGE_KEY  = 'interview-prep-v1';
+  const PROFILE_KEY  = 'interview-prep-profile-v1';
+
+  const ROLE_TYPE_LABELS = {
+    operations:       'Operations',
+    project_management: 'Project Management',
+    sales_revops:     'Sales / Revenue Operations',
+    enablement:       'Enablement & Training',
+    it_technical:     'IT / Technical',
+    customer_success: 'Customer Success & Support'
+  };
+
+  // ════════════════════════════════════════════════
+  // STATE
+  // ════════════════════════════════════════════════
+  let library = [];          // all sessions
+  let activeSessionId = null;
+  let selectedRoleType = '';
+  let postQuestions = [];    // current post-interview question inputs
+  let currentMode = 'pre';
+  let pendingConfirm = null;
+  let notesDebounce = null;
+
+  // ════════════════════════════════════════════════
+  // STORAGE
+  // ════════════════════════════════════════════════
+  function saveLibrary() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(library)); } catch(e) {}
+  }
+
+  function loadLibrary() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; }
+  }
+
+  function getSession(id) { return library.find(s => s.id === id); }
+
+  function updateSession(id, updates) {
+    const idx = library.findIndex(s => s.id === id);
+    if (idx === -1) return;
+    library[idx] = { ...library[idx], ...updates, updatedAt: Date.now() };
+    saveLibrary();
+  }
+
+  // ════════════════════════════════════════════════
+  // API
+  // ════════════════════════════════════════════════
+  async function callClaude(systemPrompt, userMessage, maxTokens = 2000) {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.content[0].text.trim();
+  }
+
+  async function callClaudeJSON(systemPrompt, userMessage, maxTokens = 2000) {
+    const raw = await callClaude(systemPrompt, userMessage, maxTokens);
+    const match = raw.match(/\{[\s\S]*\}/) || raw.match(/\[[\s\S]*\]/);
+    try { return JSON.parse(match ? match[0] : raw); }
+    catch(e) { throw new Error('Could not parse response. Please try again.'); }
+  }
+
+  // ════════════════════════════════════════════════
+  // TOAST
+  // ════════════════════════════════════════════════
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2400);
+  }
+
+  // ════════════════════════════════════════════════
+  // MODAL
+  // ════════════════════════════════════════════════
+  function showConfirm(title, body, onConfirm) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').textContent = body;
+    document.getElementById('confirmModal').classList.add('visible');
+    pendingConfirm = onConfirm;
+  }
+
+  document.getElementById('modalCancel').addEventListener('click', () => {
+    document.getElementById('confirmModal').classList.remove('visible');
+    pendingConfirm = null;
+  });
+
+  document.getElementById('modalConfirm').addEventListener('click', () => {
+    document.getElementById('confirmModal').classList.remove('visible');
+    if (pendingConfirm) { pendingConfirm(); pendingConfirm = null; }
+  });
+
+  // ════════════════════════════════════════════════
+  // SIDEBAR
+  // ════════════════════════════════════════════════
+  document.getElementById('sidebarToggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  function renderSidebar() {
+    const list = document.getElementById('sessionList');
+    if (library.length === 0) {
+      list.innerHTML = '<div style="padding: 20px 12px; font-size: 13px; color: var(--muted); font-style: italic;">No sessions yet. Create one to get started.</div>';
+      return;
+    }
+    list.innerHTML = library
+      .sort((a, b) => b.updatedAt - a.updatedAt)
+      .map(s => `
+        <div class="session-item ${s.id === activeSessionId ? 'active' : ''}" data-id="${s.id}">
+          <div class="session-item-name">
+            ${escapeHtml(s.name)}
+            <span class="session-item-status ${s.status === 'archived' ? 'status-archived' : 'status-active'}">${s.status}</span>
+          </div>
+          <div class="session-item-meta">${s.roleTitle ? escapeHtml(s.roleTitle) : 'No role set'}</div>
+        </div>
+      `).join('');
+
+    list.querySelectorAll('.session-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.dataset.id;
+        if (id === activeSessionId) return;
+        // Check for unsaved work — auto-save handles it but check notes
+        switchSession(id);
+        document.getElementById('sidebar').classList.remove('open');
+      });
+    });
+  }
+
+  // ════════════════════════════════════════════════
+  // SESSION MANAGEMENT
+  // ════════════════════════════════════════════════
+  function createSession(name) {
+    const id = 'session_' + Date.now();
+    const session = {
+      id, name,
+      status: 'active',
+      company: '',
+      roleTitle: '',
+      roleType: '',
+      jd: '',
+      businessProblem: '',
+      competencies: [],
+      postQuestions: [],
+      postAnalysis: [],
+      stories: [],
+      notes: '',
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    library.unshift(session);
+    saveLibrary();
+    return id;
+  }
+
+  function switchSession(id) {
+    activeSessionId = id;
+    const session = getSession(id);
+    if (!session) return;
+
+    // Update tab visibility
+    document.getElementById('modeTabs').style.display = 'flex';
+    document.getElementById('emptyState').style.display = 'none';
+
+    // Load session into pre-interview form
+    document.getElementById('companyName').value = session.company || '';
+    document.getElementById('roleTitle').value = session.roleTitle || '';
+    document.getElementById('jdInput').value = session.jd || '';
+    document.getElementById('sessionNotesInput').value = session.notes || '';
+
+    // Role type
+    selectedRoleType = session.roleType || '';
+    document.querySelectorAll('.role-type-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.type === selectedRoleType);
+    });
+
+    // Reset to pre mode
+    switchMode('pre');
+
+    // Render pre results if they exist
+    if (session.competencies && session.competencies.length > 0) {
+      renderPreResults(session);
+    } else {
+      document.getElementById('preForm').style.display = 'block';
+      document.getElementById('preResults').style.display = 'none';
+    }
+
+    // Render post questions
+    postQuestions = session.postQuestions ? [...session.postQuestions] : [];
+    renderPostQuestions();
+    if (session.postAnalysis && session.postAnalysis.length > 0) {
+      renderPostAnalysis(session.postAnalysis);
+    }
+
+    // Render stories
+    renderStoryLibrary(session.stories || []);
+
+    // Update story profile note
+    if (session.company || session.roleTitle) {
+      document.getElementById('storyProfileNote').style.display = 'flex';
+      document.getElementById('storyProfileNoteText').textContent =
+        `Competencies loaded from: ${[session.roleTitle, session.company].filter(Boolean).join(' @ ')}`;
+    }
+
+    renderSidebar();
+  }
+
+  function switchMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+    ['pre','post','story','notes'].forEach(m => {
+      document.getElementById('mode-' + m).style.display = m === mode ? 'block' : 'none';
+    });
+  }
+
+  // ════════════════════════════════════════════════
+  // NEW SESSION FLOW
+  // ════════════════════════════════════════════════
+  function openNewSessionModal() {
+    document.getElementById('sessionNameInput').value = '';
+    document.getElementById('newSessionModal').classList.add('visible');
+    setTimeout(() => document.getElementById('sessionNameInput').focus(), 100);
+  }
+
+  document.getElementById('newSessionBtn').addEventListener('click', openNewSessionModal);
+  document.getElementById('emptyNewSessionBtn').addEventListener('click', openNewSessionModal);
+
+  document.getElementById('newSessionCancel').addEventListener('click', () => {
+    document.getElementById('newSessionModal').classList.remove('visible');
+  });
+
+  document.getElementById('newSessionCreate').addEventListener('click', () => {
+    const name = document.getElementById('sessionNameInput').value.trim();
+    if (!name) { document.getElementById('sessionNameInput').focus(); return; }
+    document.getElementById('newSessionModal').classList.remove('visible');
+    const id = createSession(name);
+    switchSession(id);
+    renderSidebar();
+    showToast('Session created');
+  });
+
+  document.getElementById('sessionNameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('newSessionCreate').click();
+  });
+
+  // ════════════════════════════════════════════════
+  // MODE TABS
+  // ════════════════════════════════════════════════
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => { if (activeSessionId) switchMode(tab.dataset.mode); });
+  });
+
+  // ════════════════════════════════════════════════
+  // ROLE TYPE SELECTION
+  // ════════════════════════════════════════════════
+  document.querySelectorAll('.role-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedRoleType = btn.dataset.type;
+      document.querySelectorAll('.role-type-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      if (activeSessionId) {
+        updateSession(activeSessionId, { roleType: selectedRoleType });
+      }
+    });
+  });
+
+  // ════════════════════════════════════════════════
+  // AUTO-SAVE FORM FIELDS
+  // ════════════════════════════════════════════════
+  ['companyName','roleTitle','jdInput'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      if (!activeSessionId) return;
+      updateSession(activeSessionId, {
+        company: document.getElementById('companyName').value,
+        roleTitle: document.getElementById('roleTitle').value,
+        jd: document.getElementById('jdInput').value
+      });
+      renderSidebar();
+    });
+  });
+
+  document.getElementById('sessionNotesInput').addEventListener('input', () => {
+    if (!activeSessionId) return;
+    clearTimeout(notesDebounce);
+    notesDebounce = setTimeout(() => {
+      updateSession(activeSessionId, { notes: document.getElementById('sessionNotesInput').value });
+    }, 800);
+  });
+
+  // ════════════════════════════════════════════════
+  // PRE-INTERVIEW ANALYSIS
+  // ════════════════════════════════════════════════
+  document.getElementById('analyzeJDBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+
+    const jd = document.getElementById('jdInput').value.trim();
+    const company = document.getElementById('companyName').value.trim();
+    const roleTitle = document.getElementById('roleTitle').value.trim();
+    const roleType = selectedRoleType;
+
+    if (jd.length < 100) { showToast('Paste the full job description first'); return; }
+
+    const btn = document.getElementById('analyzeJDBtn');
+    const status = document.getElementById('preStatus');
+    btn.disabled = true;
+    status.style.display = 'flex';
+
+    try {
+      const systemPrompt = `You are an expert interview preparation coach specializing in competency-based interview analysis. Your job is to decode job descriptions from the perspective of what the hiring organization is actually trying to solve — not just what the JD says on the surface.
+
+You return structured JSON only. No markdown, no preamble, no backticks.
+
+Your analysis must include:
+1. A business problem summary — what organizational pain point this role is actually solving for
+2. A competency map — the 5-6 underlying competencies being tested (not just skills listed, but the behavioral competencies a hiring manager would build their interview questions around)
+3. For each competency: the surface question that would be asked, the methodology behind a strong answer, and the 3 scoring layers the interviewer tracks simultaneously
+4. A role-context note about the specific company/industry context that should inform how answers are framed
+
+Role type context provided: ${ROLE_TYPE_LABELS[roleType] || 'General Operations'}
+
+Return this exact JSON structure:
+{
+  "businessProblem": "2-3 sentences describing what pain point or gap this role is solving for",
+  "roleContextNote": "1-2 sentences about company/industry context relevant to how to frame answers",
+  "competencies": [
+    {
+      "name": "Competency name (5 words max)",
+      "surfaceQuestion": "The likely interview question",
+      "methodology": "The expert framework or methodology behind a strong answer (2-3 sentences)",
+      "scoringLayers": ["Layer 1: what they score", "Layer 2: what they score", "Layer 3: what they score"],
+      "weakAnswer": "What a weak answer looks like",
+      "strongAnswer": "What a strong answer looks like"
+    }
+  ]
+}`;
+
+      const userMessage = `Company: ${company || 'Not specified'}
+Role: ${roleTitle || 'Not specified'}
+Role Type: ${ROLE_TYPE_LABELS[roleType] || 'Not specified'}
+
+Job Description:
+${jd}`;
+
+      const result = await callClaudeJSON(systemPrompt, userMessage, 2500);
+
+      updateSession(activeSessionId, {
+        company,
+        roleTitle,
+        roleType,
+        jd,
+        businessProblem: result.businessProblem,
+        roleContextNote: result.roleContextNote,
+        competencies: result.competencies
+      });
+
+      renderPreResults(getSession(activeSessionId));
+      renderSidebar();
+      showToast('Analysis complete');
+
+    } catch(err) {
+      showToast('Error: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      status.style.display = 'none';
+    }
+  });
+
+  function renderPreResults(session) {
+    document.getElementById('preForm').style.display = 'none';
+    document.getElementById('preResults').style.display = 'block';
+
+    document.getElementById('businessProblemText').innerHTML =
+      `<div>${escapeHtml(session.businessProblem || '')}</div>` +
+      (session.roleContextNote ? `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--accent-border); color: var(--muted); font-size: 13px;">${escapeHtml(session.roleContextNote)}</div>` : '');
+
+    const grid = document.getElementById('competencyGrid');
+    grid.innerHTML = '';
+
+    (session.competencies || []).forEach((comp, i) => {
+      const card = document.createElement('div');
+      card.className = 'competency-card';
+      card.innerHTML = `
+        <div class="competency-card-header">
+          <div>
+            <div class="competency-name">${escapeHtml(comp.name)}</div>
+            <div class="competency-question">"${escapeHtml(comp.surfaceQuestion)}"</div>
+          </div>
+          <button class="competency-expand-btn" data-idx="${i}">+</button>
+        </div>
+        <div class="competency-detail" id="comp-detail-${i}">
+          <div class="detail-section">
+            <div class="detail-label">Methodology</div>
+            <div class="detail-body">${escapeHtml(comp.methodology)}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">What They're Scoring</div>
+            <div>${(comp.scoringLayers || []).map(l => `<span class="scoring-pill pill-blue">${escapeHtml(l)}</span>`).join('')}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label" style="color: var(--red);">Weak Answer Looks Like</div>
+            <div class="detail-body">${escapeHtml(comp.weakAnswer || '')}</div>
+          </div>
+          <div class="detail-section" style="margin-bottom:0;">
+            <div class="detail-label" style="color: var(--green);">Strong Answer Looks Like</div>
+            <div class="detail-body">${escapeHtml(comp.strongAnswer || '')}</div>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+
+      card.querySelector('.competency-expand-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const detail = document.getElementById('comp-detail-' + i);
+        const isOpen = detail.classList.contains('visible');
+        detail.classList.toggle('visible', !isOpen);
+        card.classList.toggle('expanded', !isOpen);
+        e.target.textContent = isOpen ? '+' : '−';
+      });
+    });
+  }
+
+  document.getElementById('reanalyzeBtn').addEventListener('click', () => {
+    document.getElementById('preForm').style.display = 'block';
+    document.getElementById('preResults').style.display = 'none';
+  });
+
+  document.getElementById('goToStoryModeBtn').addEventListener('click', () => {
+    switchMode('story');
+  });
+
+  // ════════════════════════════════════════════════
+  // POST-INTERVIEW MODE
+  // ════════════════════════════════════════════════
+  function renderPostQuestions() {
+    const list = document.getElementById('postQuestionsList');
+    list.innerHTML = '';
+
+    if (postQuestions.length === 0) {
+      list.innerHTML = '<div style="font-size: 13px; color: var(--muted); font-style: italic; margin-bottom: 16px;">No questions added yet. Click Add Question to start.</div>';
+      return;
+    }
+
+    postQuestions.forEach((q, i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start;';
+      row.innerHTML = `
+        <div style="flex: 1;">
+          <input type="text" value="${escapeHtml(q)}" placeholder="Enter a question that was asked..." data-idx="${i}" class="post-q-input" />
+        </div>
+        <button class="btn-ghost" data-idx="${i}" class="remove-q-btn" style="margin-top: 12px;">✕</button>
+      `;
+      list.appendChild(row);
+
+      row.querySelector('.post-q-input').addEventListener('input', (e) => {
+        postQuestions[i] = e.target.value;
+        if (activeSessionId) updateSession(activeSessionId, { postQuestions });
+      });
+
+      row.querySelector('[data-idx="' + i + '"].btn-ghost') || row.querySelector('button').addEventListener('click', () => {
+        postQuestions.splice(i, 1);
+        if (activeSessionId) updateSession(activeSessionId, { postQuestions });
+        renderPostQuestions();
+      });
+    });
+
+    // Wire remove buttons
+    list.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx);
+        postQuestions.splice(idx, 1);
+        if (activeSessionId) updateSession(activeSessionId, { postQuestions });
+        renderPostQuestions();
+      });
+    });
+  }
+
+  document.getElementById('addQuestionBtn').addEventListener('click', () => {
+    postQuestions.push('');
+    renderPostQuestions();
+    // Focus last input
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('.post-q-input');
+      if (inputs.length) inputs[inputs.length - 1].focus();
+    }, 50);
+  });
+
+  document.getElementById('analyzeQuestionsBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const validQs = postQuestions.filter(q => q.trim().length > 5);
+    if (validQs.length === 0) { showToast('Add at least one question first'); return; }
+
+    const session = getSession(activeSessionId);
+    const btn = document.getElementById('analyzeQuestionsBtn');
+    const status = document.getElementById('postStatus');
+    btn.disabled = true;
+    status.style.display = 'flex';
+
+    try {
+      const systemPrompt = `You are an expert at reverse-engineering interview questions to reveal what the interviewer was actually assessing. For each question provided, decode:
+1. What competency was being tested
+2. What the interviewer was really scoring (3 layers)
+3. What a strong answer would have included
+4. What common answers miss
+5. How to improve next time
+
+Return JSON only, no markdown:
+{
+  "analyses": [
+    {
+      "question": "the original question",
+      "competency": "competency being tested",
+      "whatTheyScored": ["scoring layer 1", "scoring layer 2", "scoring layer 3"],
+      "strongAnswerIncludes": "what a strong answer covers",
+      "commonMiss": "what most candidates miss",
+      "nextTimeFramework": "the methodology or framework to use next time"
+    }
+  ]
+}`;
+
+      const roleContext = session ? `Role: ${session.roleTitle || 'Not specified'} at ${session.company || 'Not specified'}. Role type: ${ROLE_TYPE_LABELS[session.roleType] || 'General'}. ` : '';
+      const userMessage = roleContext + 'Questions asked:\n' + validQs.map((q, i) => `${i+1}. ${q}`).join('\n');
+
+      const result = await callClaudeJSON(systemPrompt, userMessage, 2500);
+      updateSession(activeSessionId, { postAnalysis: result.analyses });
+      renderPostAnalysis(result.analyses);
+      showToast('Analysis complete');
+
+    } catch(err) {
+      showToast('Error: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      status.style.display = 'none';
+    }
+  });
+
+  function renderPostAnalysis(analyses) {
+    const container = document.getElementById('postResults');
+    container.innerHTML = '';
+
+    if (!analyses || analyses.length === 0) return;
+
+    const header = document.createElement('div');
+    header.innerHTML = '<div class="section-eyebrow" style="margin-bottom: 16px;">What They Were Actually Scoring</div>';
+    container.appendChild(header);
+
+    analyses.forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.innerHTML = `
+        <div class="question-text">"${escapeHtml(a.question)}"</div>
+        <div style="margin-bottom: 10px;">
+          <span class="scoring-pill pill-blue">${escapeHtml(a.competency)}</span>
+        </div>
+        <div class="question-analysis visible">
+          <div class="detail-section">
+            <div class="detail-label">Scoring Layers</div>
+            <div>${(a.whatTheyScored || []).map(l => `<span class="scoring-pill pill-yellow">${escapeHtml(l)}</span>`).join('')}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label" style="color: var(--green);">Strong Answer Includes</div>
+            <div class="detail-body">${escapeHtml(a.strongAnswerIncludes || '')}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label" style="color: var(--red);">What Most Candidates Miss</div>
+            <div class="detail-body">${escapeHtml(a.commonMiss || '')}</div>
+          </div>
+          <div class="detail-section" style="margin-bottom:0;">
+            <div class="detail-label">Next Time — Use This Framework</div>
+            <div class="detail-body">${escapeHtml(a.nextTimeFramework || '')}</div>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // ════════════════════════════════════════════════
+  // STORY TRANSLATION
+  // ════════════════════════════════════════════════
+  document.getElementById('translateStoryBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const storyText = document.getElementById('storyInput').value.trim();
+    const storyTitle = document.getElementById('storyTitle').value.trim();
+
+    if (storyText.length < 80) { showToast('Describe the experience in more detail'); return; }
+
+    const session = getSession(activeSessionId);
+    const btn = document.getElementById('translateStoryBtn');
+    const status = document.getElementById('storyStatus');
+    btn.disabled = true;
+    status.style.display = 'flex';
+
+    try {
+      const competencyContext = session && session.competencies && session.competencies.length > 0
+        ? 'Competencies from the target role: ' + session.competencies.map(c => c.name).join(', ') + '. '
+        : '';
+
+      const systemPrompt = `You are an expert at helping professionals translate their real work experience into the language of competency-based interviews. Given a description of a professional experience, you:
+1. Identify which competencies it demonstrates
+2. Show how to frame it using the SOAR method (Situation, Obstacles, Actions, Results)
+3. Suggest the specific language that maps to what interviewers are listening for
+4. Identify any gaps that weaken the story and how to address them
+
+Return JSON only, no markdown:
+{
+  "competenciesProved": ["competency 1", "competency 2", "competency 3"],
+  "soarFramework": {
+    "situation": "How to frame the situation (1-2 sentences)",
+    "obstacles": "The specific challenges to name (emphasize this — it's where most people underinvest)",
+    "actions": "The specific actions in language interviewers listen for",
+    "results": "How to quantify or qualify the outcome"
+  },
+  "keyLanguage": "The specific phrases and framing that will land in an interview context",
+  "gaps": "What's currently missing from this story that would strengthen it",
+  "bestUsedFor": "Which types of interview questions this story answers best"
+}`;
+
+      const userMessage = competencyContext + 'Story title: ' + (storyTitle || 'Untitled') + '\n\n' + storyText;
+
+      const result = await callClaudeJSON(systemPrompt, userMessage, 2000);
+
+      // Save story to session
+      const story = {
+        id: 'story_' + Date.now(),
+        title: storyTitle || 'Untitled Story',
+        rawText: storyText,
+        competencies: result.competenciesProved || [],
+        soar: result.soarFramework || {},
+        keyLanguage: result.keyLanguage || '',
+        gaps: result.gaps || '',
+        bestUsedFor: result.bestUsedFor || '',
+        createdAt: Date.now()
+      };
+
+      const stories = [...(session.stories || []), story];
+      updateSession(activeSessionId, { stories });
+
+      renderStoryResult(result);
+      renderStoryLibrary(stories);
+      showToast('Story translated and saved');
+
+      // Clear input for next story
+      document.getElementById('storyTitle').value = '';
+      document.getElementById('storyInput').value = '';
+
+    } catch(err) {
+      showToast('Error: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      status.style.display = 'none';
+    }
+  });
+
+  function renderStoryResult(result) {
+    const container = document.getElementById('storyResult');
+    container.style.display = 'block';
+    container.innerHTML = `
+      <div class="card-accent" style="margin-bottom: 20px;">
+        <div class="detail-label" style="margin-bottom: 10px;">Competencies This Story Proves</div>
+        <div>${(result.competenciesProved || []).map(c => `<span class="scoring-pill pill-blue">${escapeHtml(c)}</span>`).join('')}</div>
+      </div>
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-label">SOAR Framework</div>
+        <div class="detail-section">
+          <div class="detail-label">Situation</div>
+          <div class="detail-body">${escapeHtml(result.soarFramework?.situation || '')}</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">Obstacles</div>
+          <div class="detail-body">${escapeHtml(result.soarFramework?.obstacles || '')}</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">Actions</div>
+          <div class="detail-body">${escapeHtml(result.soarFramework?.actions || '')}</div>
+        </div>
+        <div class="detail-section" style="margin-bottom:0;">
+          <div class="detail-label">Results</div>
+          <div class="detail-body">${escapeHtml(result.soarFramework?.results || '')}</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-label">Key Language to Use</div>
+        <div style="font-size: 14px; color: var(--white); line-height: 1.8;">${escapeHtml(result.keyLanguage || '')}</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div class="card" style="border-left: 3px solid var(--red); margin-bottom: 0;">
+          <div class="detail-label" style="color: var(--red);">Story Gaps to Address</div>
+          <div class="detail-body">${escapeHtml(result.gaps || '')}</div>
+        </div>
+        <div class="card" style="border-left: 3px solid var(--green); margin-bottom: 0;">
+          <div class="detail-label" style="color: var(--green);">Best Used For</div>
+          <div class="detail-body">${escapeHtml(result.bestUsedFor || '')}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderStoryLibrary(stories) {
+    const container = document.getElementById('storyLibrary');
+    if (!stories || stories.length === 0) {
+      container.innerHTML = '<div style="font-size: 13px; color: var(--muted); font-style: italic;">No stories yet. Translate your first experience above.</div>';
+      return;
+    }
+
+    container.innerHTML = stories.slice().reverse().map(s => `
+      <div class="story-card">
+        <div class="story-card-header">
+          <div class="story-card-title">${escapeHtml(s.title)}</div>
+        </div>
+        <div style="font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px;">${escapeHtml(s.bestUsedFor || '')}</div>
+        <div class="story-tags">
+          ${(s.competencies || []).map(c => `<span class="story-tag">${escapeHtml(c)}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ════════════════════════════════════════════════
+  // SESSION NOTES — ARCHIVE / DELETE
+  // ════════════════════════════════════════════════
+  document.getElementById('archiveSessionBtn').addEventListener('click', () => {
+    if (!activeSessionId) return;
+    showConfirm(
+      'Archive Session',
+      'This marks the session as complete and moves it to the bottom of your list. Your data stays intact.',
+      () => {
+        updateSession(activeSessionId, { status: 'archived' });
+        renderSidebar();
+        showToast('Session archived');
+      }
+    );
+  });
+
+  document.getElementById('deleteSessionBtn').addEventListener('click', () => {
+    if (!activeSessionId) return;
+    const session = getSession(activeSessionId);
+    showConfirm(
+      'Delete Session',
+      `Delete "${session?.name}"? This cannot be undone. All analysis, stories, and notes in this session will be permanently removed.`,
+      () => {
+        library = library.filter(s => s.id !== activeSessionId);
+        saveLibrary();
+        activeSessionId = null;
+        document.getElementById('modeTabs').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'flex';
+        ['pre','post','story','notes'].forEach(m => {
+          document.getElementById('mode-' + m).style.display = 'none';
+        });
+        renderSidebar();
+        showToast('Session deleted');
+      }
+    );
+  });
+
+  // ════════════════════════════════════════════════
+  // EXPORT / IMPORT
+  // ════════════════════════════════════════════════
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const data = { exportedAt: new Date().toISOString(), sessions: library };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'interview-prep-library-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Library exported');
+  });
+
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        const imported = data.sessions || (Array.isArray(data) ? data : []);
+        if (imported.length === 0) { showToast('No sessions found in file'); return; }
+        showConfirm(
+          'Import Library',
+          `Import ${imported.length} session(s)? Existing sessions will be kept. Duplicate IDs will be skipped.`,
+          () => {
+            const existingIds = new Set(library.map(s => s.id));
+            const newSessions = imported.filter(s => !existingIds.has(s.id));
+            library = [...newSessions, ...library];
+            saveLibrary();
+            renderSidebar();
+            showToast(`Imported ${newSessions.length} session(s)`);
+          }
+        );
+      } catch(err) {
+        showToast('Could not read file');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  // ════════════════════════════════════════════════
+  // UTILITY
+  // ════════════════════════════════════════════════
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ════════════════════════════════════════════════
+  // INIT
+  // ════════════════════════════════════════════════
+  function init() {
+    library = loadLibrary();
+    renderSidebar();
+
+    // If sessions exist, auto-load the most recent one
+    if (library.length > 0) {
+      const mostRecent = library.slice().sort((a, b) => b.updatedAt - a.updatedAt)[0];
+      switchSession(mostRecent.id);
+    }
+  }
+
+  init();
+  </script>
+
+  <!-- Footer inside content panel — rendered after content -->
+  <div style="display:none;" id="footerPlaceholder">
+    <div class="page-footer">
+      <div class="disclaimer">
+        <strong>AI Notice:</strong> Output is generated automatically and may contain inaccuracies.
+        Review before use. Results depend on information available at time of request.
+        Output is a starting point — verify any specific facts before acting on them.
+        Luis Figueroa is not responsible for results generated by third-party AI.
+      </div>
+      <div class="footer-meta">
+        <div class="footer-left">
+          Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a>
+          &nbsp;·&nbsp;
+          <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>
+          Augmenting Human Potential, One Workflow at a Time
+        </div>
+        <div class="footer-left" style="font-size: 12px;">HTML / Claude API</div>
+      </div>
+      <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+    </div>
+  </div>
+
+</body>
+</html>
