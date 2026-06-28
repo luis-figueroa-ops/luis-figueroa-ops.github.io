@@ -26,7 +26,6 @@
       --accent:        #4A9EFF;
       --accent-dim:    rgba(74,158,255,0.10);
       --accent-border: rgba(74,158,255,0.22);
-      --accent-glow:   rgba(74,158,255,0.15);
       --white:         #e8edf5;
       --muted:         #6b7a99;
       --border-soft:   rgba(255,255,255,0.07);
@@ -48,11 +47,15 @@
       font-size: 17px;
       line-height: 1.75;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
     /* ── BACK NAV ── */
-    .back-nav { position: fixed; top: 14px; left: 14px; z-index: 300; }
+    .back-nav {
+      padding: 20px 48px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
     .back-nav a {
       font-family: var(--font-mono);
       font-size: 12px;
@@ -63,178 +66,101 @@
       transition: color 0.2s;
     }
     .back-nav a:hover { color: var(--accent); }
+    .back-nav-right {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
 
-    /* ── LAYOUT ── */
-    .app { display: flex; min-height: 100vh; }
+    /* ── PAGE WRAP ── */
+    .page-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 48px 80px;
+    }
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: 280px;
-      flex-shrink: 0;
-      background: var(--surface);
-      border-right: 1px solid var(--border-soft);
+    /* ── HERO ── */
+    .hero { margin-bottom: 48px; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
       display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      z-index: 200;
-      transition: transform 0.3s ease;
+      align-items: center;
+      gap: 10px;
     }
-
-    .sidebar-header {
-      padding: 56px 20px 20px;
-      border-bottom: 1px solid var(--border-soft);
-    }
-
-    .sidebar-brand {
-      font-family: var(--font-display);
-      font-size: 26px;
-      letter-spacing: 2px;
-      color: var(--white);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .sidebar-brand span { color: var(--accent); }
-
-    .sidebar-tagline {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 2px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .sidebar-section {
-      padding: 16px 20px 8px;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 2px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .session-list { flex: 1; overflow-y: auto; padding: 0 12px; }
-
-    .session-item {
-      padding: 10px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 4px;
-      transition: background 0.15s;
-      border: 1px solid transparent;
-    }
-
-    .session-item:hover { background: var(--surface2); }
-
-    .session-item.active {
-      background: var(--accent-dim);
-      border-color: var(--accent-border);
-    }
-
-    .session-item-name {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--white);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 2px;
-    }
-
-    .session-item.active .session-item-name { color: var(--accent); }
-
-    .session-item-meta {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: 1px;
-    }
-
-    .session-item-status {
-      display: inline-block;
-      font-size: 9px;
-      padding: 1px 6px;
-      border-radius: 20px;
-      font-family: var(--font-mono);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-left: 6px;
-    }
-
-    .status-active    { background: rgba(74,158,255,0.15); color: var(--accent); }
-    .status-archived  { background: rgba(107,122,153,0.15); color: var(--muted); }
-
-    .sidebar-actions {
-      padding: 16px;
-      border-top: 1px solid var(--border-soft);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .btn-new-session {
-      width: 100%;
-      padding: 10px;
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
       background: var(--accent);
-      color: var(--bg);
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(52px, 7vw, 80px);
+      letter-spacing: 3px;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+    h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 580px;
+      line-height: 1.75;
+    }
+
+    /* ── SESSION BAR ── */
+    .session-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .session-bar-label {
       font-family: var(--font-mono);
       font-size: 11px;
       letter-spacing: 2px;
-      text-transform: uppercase;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-
-    .btn-new-session:hover { opacity: 0.88; }
-
-    .btn-export {
-      width: 100%;
-      padding: 8px;
-      background: transparent;
       color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 2px;
       text-transform: uppercase;
-      border: 1px solid var(--border-soft);
-      cursor: pointer;
-      transition: all 0.15s;
+      flex-shrink: 0;
     }
-
-    .btn-export:hover { border-color: var(--accent-border); color: var(--accent); }
-
-    /* ── MAIN CONTENT ── */
-    .main-content {
-      margin-left: 280px;
+    .session-name-display {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--white);
       flex: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+    .session-name-display.empty { color: var(--muted); font-style: italic; }
+    .session-bar-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
 
     /* ── MODE TABS ── */
     .mode-tabs {
       display: flex;
       border-bottom: 1px solid var(--border-soft);
-      background: var(--surface);
-      padding: 0 32px;
+      margin-bottom: 36px;
       gap: 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      overflow-x: auto;
     }
-
     .mode-tab {
-      padding: 16px 24px;
+      padding: 14px 24px;
       font-family: var(--font-body);
       font-size: 15px;
-      letter-spacing: 0.2px;
-      text-transform: none;
       color: var(--muted);
       cursor: pointer;
       border: none;
@@ -243,102 +169,53 @@
       transition: all 0.2s;
       white-space: nowrap;
     }
-
     .mode-tab:hover { color: var(--white); }
     .mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-    /* ── CONTENT PANEL ── */
-    .content-panel { flex: 1; padding: 48px 56px 80px; max-width: 900px; }
-
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 70vh;
-      text-align: center;
-      padding: 60px 40px;
-    }
-
-    .empty-icon {
-      font-size: 56px;
-      margin-bottom: 24px;
-      opacity: 0.4;
-    }
-
-    .empty-title {
-      font-family: var(--font-display);
-      font-size: 52px;
-      letter-spacing: 3px;
-      color: var(--white);
-      margin-bottom: 16px;
-    }
-
-    .empty-sub {
-      font-size: 17px;
-      color: var(--muted);
-      max-width: 420px;
-      line-height: 1.75;
-      margin-bottom: 32px;
-    }
 
     /* ── SECTION HEADERS ── */
     .section-eyebrow {
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 12px;
       letter-spacing: 3px;
       color: var(--accent);
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-
-    .section-eyebrow::before {
-      content: '';
-      display: block;
-      width: 16px;
-      height: 1px;
-      background: var(--accent);
-    }
-
+    .section-eyebrow::before { content: ''; display: block; width: 16px; height: 1px; background: var(--accent); }
     .section-title {
       font-family: var(--font-display);
-      font-size: clamp(40px, 5vw, 60px);
+      font-size: clamp(36px, 5vw, 52px);
       letter-spacing: 2px;
       color: var(--white);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-
     .section-title span { color: var(--accent); }
-
     .section-sub {
-      font-size: 17px;
+      font-size: 16px;
       color: var(--muted);
-      max-width: 580px;
+      max-width: 600px;
       line-height: 1.75;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
 
     /* ── CARDS ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border-soft);
-      padding: 32px;
-      margin-bottom: 24px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
     }
-
     .card-label {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       letter-spacing: 3px;
       color: var(--muted);
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
-
     .card-accent {
       background: var(--accent-dim);
       border: 1px solid var(--accent-border);
@@ -351,676 +228,259 @@
     label {
       display: block;
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       letter-spacing: 3px;
       color: var(--accent);
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-
-    input[type="text"],
-    textarea,
-    select {
+    input[type="text"], textarea, select {
       width: 100%;
       background: var(--surface2);
       border: 1px solid var(--border-soft);
       color: var(--white);
       font-family: var(--font-body);
       font-size: 16px;
-      padding: 14px 16px;
+      padding: 13px 16px;
       outline: none;
       transition: border-color 0.2s;
     }
-
-    input[type="text"]:focus,
-    textarea:focus,
-    select:focus { border-color: var(--accent); }
-
-    input[type="text"]::placeholder,
-    textarea::placeholder { color: var(--muted); }
-
-    textarea { resize: vertical; min-height: 130px; line-height: 1.7; }
-
-    select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a99' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 40px;
-      cursor: pointer;
-    }
-
-    select option { background: var(--surface2); }
-
-    .hint {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 8px;
-      line-height: 1.6;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
+    input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    input[type="text"]::placeholder, textarea::placeholder { color: var(--muted); }
+    textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
+    .hint { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
     .form-group { margin-bottom: 20px; }
 
     /* ── BUTTONS ── */
     .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--accent);
-      color: var(--bg);
-      font-family: var(--font-mono);
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 15px 32px;
-      border: none;
-      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: var(--bg);
+      font-family: var(--font-mono); font-size: 13px;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 14px 28px; border: none; cursor: pointer;
       transition: opacity 0.15s, transform 0.1s;
     }
-
     .btn-primary:hover:not(:disabled) { opacity: 0.88; }
     .btn-primary:active { transform: translateY(1px); }
     .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: transparent;
-      color: var(--accent);
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--accent);
       border: 1px solid var(--accent-border);
-      font-family: var(--font-mono);
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 13px 28px;
-      cursor: pointer;
-      transition: all 0.15s;
+      font-family: var(--font-mono); font-size: 12px;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 11px 22px; cursor: pointer; transition: all 0.15s;
     }
-
-    .btn-secondary:hover:not(:disabled) {
-      background: var(--accent-dim);
-      border-color: var(--accent);
-    }
-
+    .btn-secondary:hover:not(:disabled) { background: var(--accent-dim); border-color: var(--accent); }
     .btn-secondary:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .btn-ghost {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      padding: 4px 0;
-      transition: color 0.2s;
+      background: none; border: none; color: var(--muted);
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; padding: 6px 0; transition: color 0.2s;
     }
-
     .btn-ghost:hover { color: var(--accent); }
 
-    .btn-danger {
-      background: transparent;
-      color: var(--red);
-      border: 1px solid rgba(248,81,73,0.3);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: all 0.15s;
+    .btn-sm {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); color: var(--muted);
+      border: 1px solid var(--border-soft);
+      font-family: var(--font-mono); font-size: 10px;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 7px 14px; cursor: pointer; transition: all 0.15s;
+      white-space: nowrap;
     }
+    .btn-sm:hover { border-color: var(--accent-border); color: var(--accent); }
+    .btn-sm.accent { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .btn-sm.accent:hover { opacity: 0.88; }
 
+    .btn-danger {
+      background: transparent; color: var(--red);
+      border: 1px solid rgba(248,81,73,0.3);
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 8px 16px; cursor: pointer; transition: all 0.15s;
+    }
     .btn-danger:hover { background: rgba(248,81,73,0.1); }
 
-    .btn-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+    .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
     /* ── LOADING ── */
     .dot-pulse { display: inline-flex; gap: 4px; align-items: center; }
-    .dot-pulse span {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: dpulse 1.2s infinite;
-    }
+    .dot-pulse span { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: dpulse 1.2s infinite; }
     .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
     .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes dpulse {
-      0%,80%,100% { opacity: 0.2; transform: scale(0.8); }
-      40%          { opacity: 1;   transform: scale(1);   }
-    }
+    @keyframes dpulse { 0%,80%,100% { opacity: 0.2; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+    .status-line { font-family: var(--font-mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
 
-    .status-line {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 1px;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* ── COMPETENCY CARDS ── */
-    .competency-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
+    /* ── COMPETENCY GRID ── */
+    .competency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
     .competency-card {
+      background: var(--surface2); border: 1px solid var(--border-soft);
+      border-left: 3px solid var(--accent); padding: 18px 20px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .competency-card:hover { border-color: var(--accent); background: var(--surface3); }
+    .competency-card.expanded { border-color: var(--accent); background: var(--accent-dim); }
+    .competency-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .competency-name { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 4px; }
+    .competency-question { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.5; }
+    .competency-expand-btn { background: none; border: none; color: var(--accent); font-size: 18px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; }
+    .competency-detail { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+    .competency-detail.visible { display: block; }
+
+    /* ── DETAIL SECTIONS ── */
+    .detail-section { margin-bottom: 12px; }
+    .detail-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+    .detail-body { font-size: 14px; color: var(--muted); line-height: 1.75; }
+
+    /* ── PILLS ── */
+    .scoring-pill { display: inline-block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; padding: 3px 10px; border-radius: 20px; margin: 3px 4px 3px 0; }
+    .pill-blue   { background: rgba(74,158,255,0.12);  color: var(--accent); border: 1px solid var(--accent-border); }
+    .pill-yellow { background: rgba(240,193,75,0.12);  color: var(--yellow); border: 1px solid rgba(240,193,75,0.3); }
+    .pill-green  { background: rgba(63,185,80,0.12);   color: var(--green);  border: 1px solid rgba(63,185,80,0.3); }
+    .pill-red    { background: rgba(248,81,73,0.12);   color: var(--red);    border: 1px solid rgba(248,81,73,0.3); }
+
+    /* ── STORY CARDS ── */
+    .story-card { background: var(--surface2); border: 1px solid var(--border-soft); padding: 20px; margin-bottom: 14px; }
+    .story-card-title { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 6px; }
+    .story-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .story-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; padding: 3px 10px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+
+    /* ── RESULT OUTPUT BOX ── */
+    .output-box {
       background: var(--surface2);
       border: 1px solid var(--border-soft);
       border-left: 3px solid var(--accent);
-      padding: 18px 20px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .competency-card:hover {
-      border-color: var(--accent);
-      background: var(--surface3);
-    }
-
-    .competency-card.expanded {
-      border-color: var(--accent);
-      background: var(--accent-dim);
-    }
-
-    .competency-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .competency-name {
+      padding: 24px;
       font-size: 15px;
-      font-weight: 500;
+      line-height: 1.8;
       color: var(--white);
-      margin-bottom: 4px;
-    }
-
-    .competency-question {
-      font-size: 14px;
-      color: var(--muted);
-      font-style: italic;
-      line-height: 1.5;
-    }
-
-    .competency-expand-btn {
-      background: none;
-      border: none;
-      color: var(--accent);
-      font-size: 18px;
-      cursor: pointer;
-      flex-shrink: 0;
-      padding: 0;
-      line-height: 1;
-    }
-
-    .competency-detail {
-      display: none;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-soft);
-    }
-
-    .competency-detail.visible { display: block; }
-
-    .detail-section {
+      white-space: pre-wrap;
+      word-break: break-word;
       margin-bottom: 12px;
     }
 
-    .detail-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .detail-body {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.75;
-    }
-
-    .scoring-pill {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 1px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      margin: 3px 4px 3px 0;
-    }
-
-    .pill-blue   { background: rgba(74,158,255,0.12); color: var(--accent); border: 1px solid var(--accent-border); }
-    .pill-yellow { background: rgba(240,193,75,0.12); color: var(--yellow); border: 1px solid rgba(240,193,75,0.3); }
-    .pill-green  { background: rgba(63,185,80,0.12);  color: var(--green);  border: 1px solid rgba(63,185,80,0.3); }
-    .pill-red    { background: rgba(248,81,73,0.12);  color: var(--red);    border: 1px solid rgba(248,81,73,0.3); }
-
-    /* ── STORY CARDS ── */
-    .story-card {
-      background: var(--surface2);
-      border: 1px solid var(--border-soft);
-      padding: 20px;
-      margin-bottom: 14px;
-      position: relative;
-    }
-
-    .story-card-header {
+    /* ── OUTPUT ACTION BAR ── */
+    .output-actions {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .story-card-title {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--white);
-    }
-
-    .story-tags {
-      display: flex;
+      gap: 10px;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .story-tag {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 1px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: 1px solid var(--accent-border);
-    }
-
-    /* ── POST-INTERVIEW QUESTION CARDS ── */
-    .question-card {
-      background: var(--surface2);
-      border: 1px solid var(--border-soft);
-      padding: 20px;
-      margin-bottom: 14px;
-    }
-
-    .question-text {
-      font-size: 15px;
-      color: var(--white);
-      margin-bottom: 14px;
-      line-height: 1.6;
-    }
-
-    .question-analysis {
-      display: none;
-    }
-
-    .question-analysis.visible {
-      display: block;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-soft);
+      margin-bottom: 24px;
     }
 
     /* ── MODAL ── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 500;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.visible { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--accent-border); padding: 32px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-family: var(--font-display); font-size: 32px; letter-spacing: 2px; color: var(--white); margin-bottom: 12px; }
+    .modal-body { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
 
-    .modal {
-      background: var(--surface);
-      border: 1px solid var(--accent-border);
-      padding: 32px;
-      max-width: 480px;
-      width: 100%;
+    /* ── LIBRARY MODAL ── */
+    .library-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: var(--surface2);
+      border: 1px solid var(--border-soft); margin-bottom: 8px;
+      cursor: pointer; transition: all 0.15s; gap: 12px;
     }
+    .library-item:hover { border-color: var(--accent-border); }
+    .library-item-name { font-size: 14px; font-weight: 500; color: var(--white); margin-bottom: 2px; }
+    .library-item-meta { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .library-item-status { font-family: var(--font-mono); font-size: 9px; padding: 2px 8px; border-radius: 20px; flex-shrink: 0; }
+    .status-active { background: rgba(74,158,255,0.15); color: var(--accent); }
+    .status-archived { background: rgba(107,122,153,0.15); color: var(--muted); }
 
-    .modal-title {
-      font-family: var(--font-display);
-      font-size: 28px;
-      letter-spacing: 2px;
-      color: var(--white);
-      margin-bottom: 10px;
-    }
-
-    .modal-body {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 24px;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-    }
+    /* ── HOW IT WORKS ── */
+    .how-it-works { border: 1px solid var(--border-soft); background: var(--surface); margin-bottom: 32px; }
+    .how-it-works-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; user-select: none; }
+    .how-it-works-header:hover { background: var(--surface2); }
+    .how-it-works-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    .how-it-works-chevron { font-size: 11px; color: var(--muted); transition: transform 0.2s; }
+    .how-it-works.open .how-it-works-chevron { transform: rotate(180deg); }
+    .how-it-works-body { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border-soft); }
+    .how-it-works.open .how-it-works-body { display: block; }
+    .how-it-works-intro { font-size: 15px; color: var(--muted); line-height: 1.75; padding-top: 16px; margin-bottom: 20px; }
+    .how-mode { display: flex; gap: 14px; margin-bottom: 14px; align-items: flex-start; }
+    .how-mode-num { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--accent); background: var(--accent-dim); border: 1px solid var(--accent-border); padding: 3px 8px; flex-shrink: 0; margin-top: 2px; }
+    .how-mode-title { font-size: 14px; font-weight: 500; color: var(--white); margin-bottom: 3px; }
+    .how-mode-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .how-note { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.5px; color: var(--muted); line-height: 1.8; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+    .how-note strong { color: var(--white); }
 
     /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--surface);
-      border: 1px solid var(--accent-border);
-      color: var(--accent);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 2px;
-      padding: 12px 24px;
-      z-index: 600;
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--accent-border); color: var(--accent); font-family: var(--font-mono); font-size: 12px; letter-spacing: 2px; padding: 12px 24px; z-index: 600; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
     .toast.visible { opacity: 1; }
-
-    /* ── DISCLAIMER / FOOTER ── */
-    .page-footer {
-      margin-top: 64px;
-      padding-top: 32px;
-      border-top: 1px solid var(--border-soft);
-    }
-
-    .disclaimer {
-      padding: 16px 20px;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border-soft);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      line-height: 1.8;
-      margin-bottom: 24px;
-    }
-
-    .disclaimer strong { color: var(--white); font-weight: 500; }
-
-    .footer-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .footer-left { font-size: 14px; color: var(--muted); }
-    .footer-left a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
-    .footer-left a:hover { color: var(--accent); }
-
-    .copyright {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 1px;
-      color: var(--muted);
-      width: 100%;
-      text-align: center;
-      padding-bottom: 24px;
-    }
-
-    /* ── MOBILE MENU TOGGLE ── */
-    .sidebar-toggle {
-      display: none;
-      position: fixed;
-      top: 10px;
-      right: 14px;
-      z-index: 300;
-      background: var(--surface);
-      border: 1px solid var(--border-soft);
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 1px;
-      padding: 8px 12px;
-      cursor: pointer;
-    }
 
     /* ── DIVIDER ── */
     .divider { height: 1px; background: var(--border-soft); margin: 28px 0; }
 
-    /* ── PROFILE STRIP ── */
-    .profile-strip {
-      background: var(--surface2);
-      border: 1px solid var(--border-soft);
-      border-left: 3px solid var(--yellow);
-      padding: 14px 20px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-    }
-
-    .profile-strip-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 2px;
-      color: var(--yellow);
-      text-transform: uppercase;
-      white-space: nowrap;
-      margin-top: 2px;
-    }
-
-    .profile-strip-text {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    /* ── ROLE TYPE BADGES ── */
-    .role-type-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .role-type-btn {
-      padding: 12px 10px;
-      background: var(--surface2);
-      border: 1px solid var(--border-soft);
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
+    /* ── ROLE TYPE GRID ── */
+    .role-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .role-type-btn { padding: 11px 8px; background: var(--surface2); border: 1px solid var(--border-soft); color: var(--muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; text-align: center; cursor: pointer; transition: all 0.15s; }
     .role-type-btn:hover { border-color: var(--accent-border); color: var(--white); }
     .role-type-btn.selected { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
 
-    /* ── SAVED ANSWER INDICATOR ── */
-    .save-indicator {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 1px;
-      color: var(--green);
-      display: none;
-      align-items: center;
-      gap: 6px;
+    /* ── PROFILE STRIP ── */
+    .profile-strip { background: var(--surface2); border: 1px solid var(--border-soft); border-left: 3px solid var(--yellow); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 14px; }
+    .profile-strip-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--yellow); text-transform: uppercase; white-space: nowrap; margin-top: 2px; }
+    .profile-strip-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    .page-footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid var(--border-soft); }
+    .disclaimer { padding: 14px 18px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-soft); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.5px; color: var(--muted); line-height: 1.8; margin-bottom: 20px; }
+    .disclaimer strong { color: var(--white); }
+    .footer-meta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+    .footer-left { font-size: 13px; color: var(--muted); }
+    .footer-left a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-left a:hover { color: var(--accent); }
+    .copyright { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; color: var(--muted); text-align: center; padding-bottom: 16px; }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      body { background: #fff; color: #000; font-size: 13px; }
+      .back-nav, .session-bar, .mode-tabs, .btn-row, .btn-primary, .btn-secondary, .btn-sm, .btn-ghost, .btn-danger, .output-actions, .how-it-works, .page-footer, .toast, .modal-overlay { display: none !important; }
+      .page-wrap { max-width: 100%; padding: 16px; }
+      .card, .card-accent, .competency-card, .output-box { border: 1px solid #ccc; background: #fafafa; break-inside: avoid; }
+      .detail-body, .competency-question, .section-sub { color: #444; }
+      .detail-label, .card-label, .section-eyebrow, .eyebrow { color: #1a5299; }
+      .competency-detail { display: block !important; }
+      h1 { font-size: 36px; color: #000; }
+      .section-title { font-size: 28px; color: #000; }
     }
 
-    .save-indicator.visible { display: flex; }
-
     /* ── MOBILE BREAKPOINTS ── */
-    /* Tablet / large mobile */
     @media (max-width: 768px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); }
-      .sidebar-toggle { display: block; }
-      .main-content { margin-left: 0; }
-      .content-panel { padding: 32px 24px 60px; }
+      .back-nav { padding: 16px 20px 0; }
+      .page-wrap { padding: 28px 20px 60px; }
       .competency-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       .role-type-grid { grid-template-columns: repeat(2, 1fr); }
-      .mode-tabs { padding: 0 16px; overflow-x: auto; }
-      .mode-tab { padding: 14px 18px; font-size: 14px; }
-      .section-title { font-size: clamp(36px, 8vw, 52px); }
-      .empty-title { font-size: 40px; }
+      .mode-tab { padding: 12px 16px; font-size: 14px; }
+      h1 { font-size: clamp(44px, 10vw, 64px); }
+      .section-title { font-size: clamp(32px, 8vw, 48px); }
     }
 
-    /* Mobile */
     @media (max-width: 600px) {
-      .content-panel { padding: 24px 16px 60px; }
+      .back-nav { padding: 14px 16px 0; }
+      .page-wrap { padding: 24px 16px 60px; }
       .card { padding: 20px 16px; }
       .btn-primary, .btn-secondary { width: 100%; justify-content: center; min-height: 48px; }
       .btn-row { flex-direction: column; align-items: stretch; }
       .role-type-grid { grid-template-columns: 1fr 1fr; }
-      .modal { padding: 24px 20px; }
+      .modal { padding: 24px 16px; }
+      .session-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .session-bar-actions { width: 100%; flex-wrap: wrap; }
+      .output-actions { flex-direction: column; }
       .footer-meta { flex-direction: column; align-items: flex-start; }
-      .mode-tab { padding: 12px 14px; font-size: 13px; }
-      .section-title { font-size: clamp(32px, 10vw, 44px); }
-      .empty-title { font-size: 36px; }
-      .empty-sub { font-size: 15px; }
+      h1 { font-size: clamp(40px, 12vw, 56px); }
     }
-    /* ── HOW IT WORKS BOX ── */
-    .how-it-works {
-      width: 100%;
-      max-width: 520px;
-      margin-top: 32px;
-      border: 1px solid var(--border-soft);
-      background: var(--surface);
-      text-align: left;
-    }
-
-    .how-it-works-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.15s;
-    }
-
-    .how-it-works-header:hover { background: var(--surface2); }
-
-    .how-it-works-label {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-
-    .how-it-works-chevron {
-      font-size: 12px;
-      color: var(--muted);
-      transition: transform 0.2s;
-      flex-shrink: 0;
-    }
-
-    .how-it-works.open .how-it-works-chevron { transform: rotate(180deg); }
-
-    .how-it-works-body {
-      display: none;
-      padding: 0 20px 20px;
-      border-top: 1px solid var(--border-soft);
-    }
-
-    .how-it-works.open .how-it-works-body { display: block; }
-
-    .how-it-works-intro {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.75;
-      padding-top: 16px;
-      margin-bottom: 20px;
-    }
-
-    .how-it-works-mode {
-      display: flex;
-      gap: 14px;
-      margin-bottom: 16px;
-      align-items: flex-start;
-    }
-
-    .how-it-works-mode:last-of-type { margin-bottom: 20px; }
-
-    .how-mode-num {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border: 1px solid var(--accent-border);
-      padding: 3px 8px;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .how-mode-content {}
-
-    .how-mode-title {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--white);
-      margin-bottom: 4px;
-    }
-
-    .how-mode-desc {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .how-it-works-note {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      line-height: 1.8;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-soft);
-    }
-
-    .how-it-works-note strong { color: var(--white); font-weight: 500; }
-
   </style>
 </head>
 <body>
-
-  <!-- Back Nav -->
-  <nav class="back-nav">
-    <a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a>
-  </nav>
-
-  <!-- Mobile Sidebar Toggle -->
-  <button class="sidebar-toggle" id="sidebarToggle">☰ Sessions</button>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
@@ -1037,348 +497,364 @@
     </div>
   </div>
 
-  <!-- New Session Modal -->
-  <div class="modal-overlay" id="newSessionModal">
+  <!-- New / Rename Session Modal -->
+  <div class="modal-overlay" id="sessionModal">
     <div class="modal">
-      <div class="modal-title">New Session</div>
+      <div class="modal-title" id="sessionModalTitle">New Session</div>
       <div class="modal-body">Give this session a name so you can find it later. A good name includes the company and role.</div>
       <div class="form-group" style="margin-bottom: 20px;">
         <label for="sessionNameInput">Session Name</label>
         <input type="text" id="sessionNameInput" placeholder="e.g. Company ABC — Operations Manager" />
       </div>
       <div class="modal-actions">
-        <button class="btn-ghost" id="newSessionCancel">Cancel</button>
-        <button class="btn-primary" id="newSessionCreate">Create Session</button>
+        <button class="btn-ghost" id="sessionModalCancel">Cancel</button>
+        <button class="btn-primary" id="sessionModalConfirm">Save</button>
       </div>
     </div>
   </div>
 
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-brand">Interview <span>Prep</span></div>
-        <div class="sidebar-tagline">Operations, Augmented</div>
-      </div>
-      <div class="sidebar-section">Sessions</div>
-      <div class="session-list" id="sessionList">
-        <div style="padding: 20px 12px; font-size: 13px; color: var(--muted); font-style: italic;">
-          No sessions yet. Create one to get started.
-        </div>
-      </div>
-      <div class="sidebar-actions">
-        <button class="btn-new-session" id="newSessionBtn">+ New Session</button>
-        <button class="btn-export" id="exportBtn">↓ Export Library</button>
+  <!-- Library Modal -->
+  <div class="modal-overlay" id="libraryModal">
+    <div class="modal">
+      <div class="modal-title">Session Library</div>
+      <div class="modal-body" style="margin-bottom: 16px;">Your saved sessions. Click one to load it.</div>
+      <div id="libraryList" style="margin-bottom: 20px;"></div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--border-soft);">
+        <button class="btn-sm" id="exportLibraryBtn">↓ Export Library</button>
         <input type="file" id="importFile" accept=".json" style="display:none;" />
-        <button class="btn-export" id="importBtn">↑ Import Library</button>
+        <button class="btn-sm" id="importLibraryBtn">↑ Import Library</button>
+        <button class="btn-ghost" id="libraryModalClose" style="margin-left: auto;">Close</button>
       </div>
-    </aside>
+    </div>
+  </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
+  <!-- Back Nav -->
+  <nav class="back-nav">
+    <a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a>
+    <span class="back-nav-right">Career Tools</span>
+  </nav>
 
-      <!-- Mode Tabs -->
-      <div class="mode-tabs" id="modeTabs" style="display:none;">
-        <button class="mode-tab active" data-mode="pre">Pre-Interview</button>
-        <button class="mode-tab" data-mode="post">Post-Interview</button>
-        <button class="mode-tab" data-mode="story">Story Translation</button>
-        <button class="mode-tab" data-mode="notes">Session Notes</button>
+  <div class="page-wrap">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="eyebrow">Interview Prep</div>
+      <h1>Prep <span>Smarter</span></h1>
+      <p class="hero-sub">Decode the job description. Reverse-engineer past interviews. Translate your experience into the language hiring managers are listening for. Build your Tell Me About Yourself.</p>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-it-works" id="howItWorks">
+      <div class="how-it-works-header" id="howItWorksToggle">
+        <span class="how-it-works-label">How this tool works</span>
+        <span class="how-it-works-chevron">&#9660;</span>
+      </div>
+      <div class="how-it-works-body">
+        <p class="how-it-works-intro">Five connected modes. Create a session for each role. Your work saves automatically to your browser.</p>
+        <div class="how-mode">
+          <div class="how-mode-num">01</div>
+          <div><div class="how-mode-title">Pre-Interview</div><div class="how-mode-desc">Paste the JD. Get the competency map — what the hiring manager is actually scoring underneath each question — and the methodology behind a strong answer.</div></div>
+        </div>
+        <div class="how-mode">
+          <div class="how-mode-num">02</div>
+          <div><div class="how-mode-title">Post-Interview</div><div class="how-mode-desc">Enter questions that were actually asked. Get a reverse-engineered read on what each one was testing and where your answer could have been stronger.</div></div>
+        </div>
+        <div class="how-mode">
+          <div class="how-mode-num">03</div>
+          <div><div class="how-mode-title">Story Translation</div><div class="how-mode-desc">Describe a real work experience. Get it mapped to the competencies of the role and translated into the language and framing that lands with hiring managers — using the SOAR framework.</div></div>
+        </div>
+        <div class="how-mode">
+          <div class="how-mode-num">04</div>
+          <div><div class="how-mode-title">Tell Me About Yourself</div><div class="how-mode-desc">Build a structured, role-specific TMAY answer grounded in your actual background. Past, present, and future — connected to the role and closed with a question.</div></div>
+        </div>
+        <div class="how-mode" style="margin-bottom: 16px;">
+          <div class="how-mode-num">05</div>
+          <div><div class="how-mode-title">Session Notes</div><div class="how-mode-desc">Company research, interviewer names, follow-up questions, anything that belongs to this role and this interview.</div></div>
+        </div>
+        <div class="how-note"><strong>Think tank, not a script.</strong> Hiring managers go off-JD. Use the competency map to internalize the thinking so you can respond live — not recite a prepared answer.</div>
+      </div>
+    </div>
+
+    <!-- Session Bar -->
+    <div class="session-bar">
+      <span class="session-bar-label">Session</span>
+      <span class="session-name-display empty" id="sessionNameDisplay">No session — create one to start</span>
+      <div class="session-bar-actions">
+        <button class="btn-sm accent" id="newSessionBtn">+ New</button>
+        <button class="btn-sm" id="renameSessionBtn">Rename</button>
+        <button class="btn-sm" id="libraryBtn">☰ Library</button>
+        <button class="btn-sm" id="savePdfBtn">↓ Save PDF</button>
+        <button class="btn-sm" id="archiveSessionBtn">Archive</button>
+      </div>
+    </div>
+
+    <!-- Mode Tabs (hidden until session active) -->
+    <div class="mode-tabs" id="modeTabs" style="display:none;">
+      <button class="mode-tab active" data-mode="pre">Pre-Interview</button>
+      <button class="mode-tab" data-mode="post">Post-Interview</button>
+      <button class="mode-tab" data-mode="story">Story Translation</button>
+      <button class="mode-tab" data-mode="tmay">Tell Me About Yourself</button>
+      <button class="mode-tab" data-mode="notes">Session Notes</button>
+    </div>
+
+    <!-- ════ PRE-INTERVIEW MODE ════ -->
+    <div id="mode-pre" style="display:none;">
+      <div class="section-eyebrow">Mode 01</div>
+      <div class="section-title">Pre-<span>Interview</span></div>
+      <div class="section-sub">Paste the job description. Get the competency map, likely questions, and what the interviewer is actually scoring — not what the JD says, but what it means.</div>
+
+      <div id="preForm">
+        <div class="card">
+          <div class="card-label">Role Setup</div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="companyName">Company</label>
+              <input type="text" id="companyName" placeholder="e.g. Company ABC" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="roleTitle">Role Title</label>
+              <input type="text" id="roleTitle" placeholder="e.g. Operations Manager" />
+            </div>
+          </div>
+          <div style="margin-top: 16px; margin-bottom: 8px;">
+            <label>Role Type <span style="color: var(--muted); font-size: 10px;">(select closest match)</span></label>
+            <div class="role-type-grid" id="roleTypeGrid">
+              <button class="role-type-btn" data-type="operations">Operations</button>
+              <button class="role-type-btn" data-type="project_management">Project Mgmt</button>
+              <button class="role-type-btn" data-type="sales_revops">Sales / RevOps</button>
+              <button class="role-type-btn" data-type="enablement">Enablement</button>
+              <button class="role-type-btn" data-type="it_technical">IT / Technical</button>
+              <button class="role-type-btn" data-type="customer_success">Customer Success</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Job Description</div>
+          <textarea id="jdInput" placeholder="Paste the full job description here. The more complete it is, the more specific the analysis." style="min-height: 200px;"></textarea>
+          <div class="hint">Include the full JD — qualifications, requirements, everything. Every line is a signal.</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="analyzeJDBtn">Analyze This JD</button>
+          <div class="status-line" id="preStatus" style="display:none;">
+            <div class="dot-pulse"><span></span><span></span><span></span></div>
+            <span>Decoding the role...</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Content Panels -->
-      <div class="content-panel" id="contentPanel">
-
-        <!-- Empty State -->
-        <div class="empty-state" id="emptyState">
-          <div class="empty-icon">🎯</div>
-          <div class="empty-title">Ready to Prep</div>
-          <div class="empty-sub">Create a session for each role you're interviewing for. Your work saves automatically and stays private to your browser.</div>
-          <button class="btn-primary" id="emptyNewSessionBtn">+ Create Your First Session</button>
-          <div style="margin-top: 16px; font-family: var(--font-mono); font-size: 14px; color: var(--muted); letter-spacing: 0.5px; line-height: 1.8; text-align: center; max-width: 420px;">
-            Data lives in your browser. Clear cache = clear data.<br>Use Export regularly to back up your library.
-          </div>
-
-          <!-- How it works collapsible -->
-          <div class="how-it-works" id="howItWorks">
-            <div class="how-it-works-header" id="howItWorksToggle">
-              <span class="how-it-works-label">How this tool works</span>
-              <span class="how-it-works-chevron">&#9660;</span>
-            </div>
-            <div class="how-it-works-body">
-              <p class="how-it-works-intro">
-                This tool helps you prep for interviews through three connected modes that build on each other.
-                Each role you apply for gets its own session — your work saves automatically.
-              </p>
-
-              <div class="how-it-works-mode">
-                <div class="how-mode-num">01</div>
-                <div class="how-mode-content">
-                  <div class="how-mode-title">Pre-Interview</div>
-                  <div class="how-mode-desc">Paste the job description. Get the competency map — not just what the JD says, but what the hiring manager is actually evaluating underneath each question — and the methodology behind a strong answer for each one.</div>
-                </div>
-              </div>
-
-              <div class="how-it-works-mode">
-                <div class="how-mode-num">02</div>
-                <div class="how-mode-content">
-                  <div class="how-mode-title">Post-Interview</div>
-                  <div class="how-mode-desc">Enter questions that were actually asked in a past interview. Get a reverse-engineered read on what each question was really testing, what a strong answer looks like, and what most candidates miss.</div>
-                </div>
-              </div>
-
-              <div class="how-it-works-mode">
-                <div class="how-mode-num">03</div>
-                <div class="how-mode-content">
-                  <div class="how-mode-title">Story Translation</div>
-                  <div class="how-mode-desc">Describe a real experience from your work history. The tool maps it to the competencies of the target role and translates it into the language and framing that lands with hiring managers — using the SOAR framework.</div>
-                </div>
-              </div>
-
-              <div class="how-it-works-note">
-                <strong>Think tank, not a script.</strong> Hiring managers often take conversations off-JD.
-                Use the competency map to internalize the thinking — so you can respond live,
-                not recite a prepared answer.
-              </div>
-            </div>
-          </div>
-
+      <div id="preResults" style="display:none; margin-top: 32px;">
+        <div class="card-accent" style="margin-bottom: 24px;">
+          <div class="detail-label">What This Role Is Actually Solving For</div>
+          <div id="businessProblemText" style="font-size: 15px; color: var(--white); line-height: 1.8;"></div>
         </div>
 
-        <!-- PRE-INTERVIEW MODE -->
-        <div id="mode-pre" style="display:none;">
-          <div class="section-eyebrow">Mode 01</div>
-          <div class="section-title">Pre-<span>Interview</span></div>
-          <div class="section-sub">Paste the job description. Get the competency map, likely questions, methodology behind strong answers, and what the interviewer is actually scoring.</div>
-
-          <div id="preForm">
-            <div class="card">
-              <div class="card-label">Role Setup</div>
-
-              <div class="form-row">
-                <div class="form-group" style="margin-bottom:0;">
-                  <label for="companyName">Company</label>
-                  <input type="text" id="companyName" placeholder="e.g. Company ABC" />
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                  <label for="roleTitle">Role Title</label>
-                  <input type="text" id="roleTitle" placeholder="e.g. Commercial Process Specialist" />
-                </div>
-              </div>
-
-              <div style="margin-top: 16px; margin-bottom: 8px;">
-                <label>Role Type <span style="color: var(--muted); font-size: 10px;">(select the closest match)</span></label>
-                <div class="role-type-grid" id="roleTypeGrid">
-                  <button class="role-type-btn" data-type="operations">Operations</button>
-                  <button class="role-type-btn" data-type="project_management">Project Mgmt</button>
-                  <button class="role-type-btn" data-type="sales_revops">Sales / RevOps</button>
-                  <button class="role-type-btn" data-type="enablement">Enablement</button>
-                  <button class="role-type-btn" data-type="it_technical">IT / Technical</button>
-                  <button class="role-type-btn" data-type="customer_success">Customer Success</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Job Description</div>
-              <textarea id="jdInput" placeholder="Paste the full job description here. The more complete it is, the more specific the analysis." style="min-height: 200px;"></textarea>
-              <div class="hint">Tip: include the full JD including qualifications and additional requirements — every line is a signal.</div>
-            </div>
-
-            <div class="btn-row">
-              <button class="btn-primary" id="analyzeJDBtn">Analyze This JD</button>
-              <div class="status-line" id="preStatus" style="display:none;">
-                <div class="dot-pulse"><span></span><span></span><span></span></div>
-                <span>Decoding the role...</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pre-Interview Results -->
-          <div id="preResults" style="display:none; margin-top: 32px;">
-
-            <div class="card-accent" id="businessProblemCard" style="margin-bottom: 24px;">
-              <div class="detail-label">What This Role Is Actually Solving For</div>
-              <div id="businessProblemText" style="font-size: 14px; color: var(--white); line-height: 1.8;"></div>
-            </div>
-
-            <div style="margin-bottom: 16px;">
-              <div class="section-eyebrow" style="margin-bottom: 6px;">Competency Map</div>
-              <div style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Click any competency to see the methodology and scoring layers.</div>
-              <div class="competency-grid" id="competencyGrid"></div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="card-accent" id="disclaimerCard">
-              <div class="detail-label">Think Tank Disclaimer</div>
-              <div style="font-size: 13px; color: var(--muted); line-height: 1.75;">
-                This analysis is based on the job description as written. Hiring managers often discuss things that aren't in the JD — use this as preparation scaffolding, not a script. The best use is to internalize the competency map so you can think on your feet when the conversation goes somewhere unexpected.
-              </div>
-            </div>
-
-            <div class="btn-row" style="margin-top: 24px;">
-              <button class="btn-secondary" id="reanalyzeBtn">Re-analyze</button>
-              <button class="btn-ghost" id="goToStoryModeBtn">Build Your Stories →</button>
-            </div>
-          </div>
+        <div style="margin-bottom: 16px;">
+          <div class="section-eyebrow" style="margin-bottom: 6px;">Competency Map</div>
+          <div class="hint" style="margin-bottom: 16px;">Click any competency to expand the methodology and scoring layers.</div>
+          <div class="competency-grid" id="competencyGrid"></div>
         </div>
 
-        <!-- POST-INTERVIEW MODE -->
-        <div id="mode-post" style="display:none;">
-          <div class="section-eyebrow">Mode 02</div>
-          <div class="section-title">Post-<span>Interview</span></div>
-          <div class="section-sub">Enter questions that were actually asked. Get a reverse-engineered read on what each one was scoring and where your answer could have been stronger.</div>
-
-          <div class="card">
-            <div class="card-label">Questions From the Interview</div>
-            <div id="postQuestionsList"></div>
-            <button class="btn-secondary" id="addQuestionBtn" style="margin-top: 8px;">+ Add Question</button>
-          </div>
-
-          <div class="btn-row" style="margin-bottom: 24px;">
-            <button class="btn-primary" id="analyzeQuestionsBtn">Analyze These Questions</button>
-            <div class="status-line" id="postStatus" style="display:none;">
-              <div class="dot-pulse"><span></span><span></span><span></span></div>
-              <span>Reverse-engineering the interview...</span>
-            </div>
-          </div>
-
-          <div id="postResults"></div>
+        <div class="card-accent">
+          <div class="detail-label">Think Tank Disclaimer</div>
+          <div style="font-size: 14px; color: var(--muted); line-height: 1.75;">This analysis is based on the JD as written. Hiring managers often discuss things that aren't in the JD — use this as scaffolding, not a script. Internalize the competency map so you can think on your feet.</div>
         </div>
 
-        <!-- STORY TRANSLATION MODE -->
-        <div id="mode-story" style="display:none;">
-          <div class="section-eyebrow">Mode 03</div>
-          <div class="section-title">Story <span>Translation</span></div>
-          <div class="section-sub">Describe a real experience from your background. The tool maps it to the competencies this role requires and shows you how to articulate it in the language the interviewer is listening for.</div>
+        <div class="btn-row" style="margin-top: 20px;">
+          <button class="btn-secondary" id="reanalyzeBtn">Re-analyze</button>
+          <button class="btn-ghost" id="goToStoryModeBtn">Build Your Stories →</button>
+        </div>
+      </div>
+    </div>
 
-          <div id="storyProfileNote" class="profile-strip" style="display:none;">
-            <div class="profile-strip-label">From Pre-Interview</div>
-            <div class="profile-strip-text" id="storyProfileNoteText"></div>
-          </div>
+    <!-- ════ POST-INTERVIEW MODE ════ -->
+    <div id="mode-post" style="display:none;">
+      <div class="section-eyebrow">Mode 02</div>
+      <div class="section-title">Post-<span>Interview</span></div>
+      <div class="section-sub">Enter questions that were actually asked. Get a reverse-engineered read on what each one was scoring and where your answer could have been stronger.</div>
 
-          <div class="card">
-            <div class="card-label">Your Experience</div>
-            <div class="form-group">
-              <label for="storyTitle">Story Title</label>
-              <input type="text" id="storyTitle" placeholder="e.g. Promo Correction Process Build" />
-            </div>
-            <div class="form-group">
-              <label for="storyInput">Describe What Happened</label>
-              <textarea id="storyInput" placeholder="What was the situation? What did you do? What was the result? Be specific — include systems used, teams involved, and measurable outcomes if you have them. Don't worry about framing it as a perfect answer yet. Just describe it the way you'd tell a colleague." style="min-height: 160px;"></textarea>
-            </div>
-            <div class="btn-row">
-              <button class="btn-primary" id="translateStoryBtn">Translate This Story</button>
-              <div class="status-line" id="storyStatus" style="display:none;">
-                <div class="dot-pulse"><span></span><span></span><span></span></div>
-                <span>Mapping to competencies...</span>
-              </div>
-            </div>
-          </div>
+      <div class="card">
+        <div class="card-label">Questions From the Interview</div>
+        <div id="postQuestionsList"></div>
+        <button class="btn-secondary" id="addQuestionBtn" style="margin-top: 8px;">+ Add Question</button>
+      </div>
 
-          <div id="storyResult" style="display:none; margin-top: 8px;"></div>
+      <div class="btn-row" style="margin-bottom: 24px;">
+        <button class="btn-primary" id="analyzeQuestionsBtn">Analyze These Questions</button>
+        <div class="status-line" id="postStatus" style="display:none;">
+          <div class="dot-pulse"><span></span><span></span><span></span></div>
+          <span>Reverse-engineering the interview...</span>
+        </div>
+      </div>
 
-          <div class="divider"></div>
+      <div id="postResults"></div>
+    </div>
 
-          <div>
-            <div class="section-eyebrow" style="margin-bottom: 8px;">Story Library</div>
-            <div style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Stories you've translated in this session. Reusable across any role.</div>
-            <div id="storyLibrary"></div>
+    <!-- ════ STORY TRANSLATION MODE ════ -->
+    <div id="mode-story" style="display:none;">
+      <div class="section-eyebrow">Mode 03</div>
+      <div class="section-title">Story <span>Translation</span></div>
+      <div class="section-sub">Describe a real experience. Get it mapped to the competencies of this role and translated into the language the interviewer is listening for.</div>
+
+      <div id="storyProfileNote" class="profile-strip" style="display:none;">
+        <div class="profile-strip-label">From Pre-Interview</div>
+        <div class="profile-strip-text" id="storyProfileNoteText"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Your Experience</div>
+        <div class="form-group">
+          <label for="storyTitle">Story Title</label>
+          <input type="text" id="storyTitle" placeholder="e.g. Budget Tracking Gap Resolution" />
+        </div>
+        <div class="form-group">
+          <label for="storyInput">Describe What Happened</label>
+          <textarea id="storyInput" placeholder="What was the situation? What did you do? What was the result? Be specific — systems used, teams involved, measurable outcomes. Don't worry about framing it yet. Just describe it the way you'd tell a colleague." style="min-height: 160px;"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" id="translateStoryBtn">Translate This Story</button>
+          <div class="status-line" id="storyStatus" style="display:none;">
+            <div class="dot-pulse"><span></span><span></span><span></span></div>
+            <span>Mapping to competencies...</span>
           </div>
         </div>
+      </div>
 
-        <!-- SESSION NOTES MODE -->
-        <div id="mode-notes" style="display:none;">
-          <div class="section-eyebrow">Session Notes</div>
-          <div class="section-title">Notes & <span>Context</span></div>
-          <div class="section-sub">Capture anything about this role, company, or interview that doesn't fit elsewhere. These notes stay with this session.</div>
+      <div id="storyResult" style="display:none; margin-top: 8px;"></div>
 
-          <div class="card">
-            <div class="card-label">Session Notes</div>
-            <textarea id="sessionNotesInput" placeholder="Company research, interviewer names, things to remember, follow-up questions, anything..." style="min-height: 300px;"></textarea>
-            <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
-              <div class="save-indicator visible" id="notesSaveIndicator">
-                ✓ Auto-saved
-              </div>
-            </div>
-          </div>
+      <div class="divider"></div>
+      <div class="section-eyebrow" style="margin-bottom: 8px;">Story Library</div>
+      <div class="hint" style="margin-bottom: 16px;">Stories translated in this session. Reusable across any role.</div>
+      <div id="storyLibrary"></div>
+    </div>
 
-          <div class="card" style="margin-top: 0;">
-            <div class="card-label">Session Actions</div>
-            <div class="btn-row">
-              <button class="btn-secondary" id="archiveSessionBtn">Archive Session</button>
-              <button class="btn-danger" id="deleteSessionBtn">Delete Session</button>
-            </div>
-            <div class="hint" style="margin-top: 12px;">Archiving keeps the session in your library but marks it as complete. Deleting is permanent.</div>
-          </div>
+    <!-- ════ TELL ME ABOUT YOURSELF MODE ════ -->
+    <div id="mode-tmay" style="display:none;">
+      <div class="section-eyebrow">Mode 04</div>
+      <div class="section-title">Tell Me About <span>Yourself</span></div>
+      <div class="section-sub">Build a structured, role-specific TMAY answer. Past, present, and future — connected to what this role is actually solving for. Closes with a question that hands control back to the interviewer.</div>
+
+      <div class="card">
+        <div class="card-label">Your Background</div>
+        <div class="form-group">
+          <label for="tmayBackground">What You've Done</label>
+          <textarea id="tmayBackground" placeholder="Describe your background in your own words. Include roles, types of work, key things you built or fixed, teams you worked with, and any specific outcomes you're proud of. Don't worry about structure — just give the raw material." style="min-height: 160px;"></textarea>
         </div>
-
-        <!-- Footer lives inside content-panel so it respects sidebar offset -->
-        <div class="page-footer" id="siteFooter">
-          <div class="disclaimer">
-            <strong>AI Notice:</strong> Output is generated automatically and may contain inaccuracies.
-            Review before use. Results depend on information available at time of request.
-            Output is a starting point — verify any specific facts before acting on them.
-            Luis Figueroa is not responsible for results generated by third-party AI.
-          </div>
-          <div class="footer-meta">
-            <div class="footer-left">
-              Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a>
-              &nbsp;·&nbsp;
-              <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>
-              Augmenting Human Potential, One Workflow at a Time
-            </div>
-            <div class="footer-left">HTML / Claude API</div>
-          </div>
-          <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+        <div class="form-group">
+          <label for="tmayCurrentRole">Current Situation</label>
+          <input type="text" id="tmayCurrentRole" placeholder="e.g. Recently transitioned after a layoff, currently interviewing for operations roles" />
         </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="tmayWhy">Why This Role / Company</label>
+          <textarea id="tmayWhy" placeholder="What draws you to this specific role or company? What makes this the right next move for you?" style="min-height: 100px;"></textarea>
+        </div>
+      </div>
 
-      </div><!-- end content-panel -->
-    </div><!-- end main-content -->
-  </div><!-- end app -->
+      <div class="btn-row" style="margin-bottom: 24px;">
+        <button class="btn-primary" id="buildTMAYBtn">Build My TMAY</button>
+        <div class="status-line" id="tmayStatus" style="display:none;">
+          <div class="dot-pulse"><span></span><span></span><span></span></div>
+          <span>Building your answer...</span>
+        </div>
+      </div>
+
+      <div id="tmayResult" style="display:none;">
+        <div class="section-eyebrow" style="margin-bottom: 12px;">Your TMAY Answer</div>
+        <div class="output-box" id="tmayOutput"></div>
+        <div class="output-actions">
+          <button class="btn-sm" id="copyTMAYBtn">⎘ Copy to Clipboard</button>
+          <button class="btn-sm" id="saveTMAYPdfBtn">↓ Save as PDF</button>
+        </div>
+        <div class="card-accent" style="margin-top: 8px;">
+          <div class="detail-label">Coaching Notes</div>
+          <div class="detail-body" id="tmayCoaching"></div>
+        </div>
+        <div class="btn-row" style="margin-top: 16px;">
+          <button class="btn-ghost" id="rebuildTMAYBtn">Rebuild →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ SESSION NOTES MODE ════ -->
+    <div id="mode-notes" style="display:none;">
+      <div class="section-eyebrow">Mode 05</div>
+      <div class="section-title">Session <span>Notes</span></div>
+      <div class="section-sub">Company research, interviewer names, follow-up questions, anything that belongs to this role and this interview.</div>
+
+      <div class="card">
+        <div class="card-label">Notes</div>
+        <textarea id="sessionNotesInput" placeholder="Company research, interviewer names, things to remember, follow-up questions, closing script, anything..." style="min-height: 320px;"></textarea>
+        <div style="margin-top: 10px; font-family: var(--font-mono); font-size: 10px; color: var(--green); letter-spacing: 1px;" id="notesSaveIndicator"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Session Actions</div>
+        <div class="btn-row">
+          <button class="btn-sm" id="copyNotesBtn">⎘ Copy Notes</button>
+          <button class="btn-sm" id="saveNotesPdfBtn">↓ Save Notes as PDF</button>
+          <button class="btn-danger" id="deleteSessionBtn">Delete Session</button>
+        </div>
+        <div class="hint" style="margin-top: 12px;">Deleting removes all data for this session permanently.</div>
+      </div>
+    </div>
+
+    <!-- No Session State -->
+    <div id="noSessionState">
+      <div style="text-align: center; padding: 60px 20px;">
+        <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;">🎯</div>
+        <div style="font-family: var(--font-display); font-size: 40px; letter-spacing: 2px; margin-bottom: 12px;">Ready to Prep</div>
+        <div style="font-size: 16px; color: var(--muted); max-width: 380px; margin: 0 auto 28px; line-height: 1.75;">Create a session for each role you're interviewing for. Your work saves automatically and stays private to your browser.</div>
+        <button class="btn-primary" id="noStateNewBtn">+ Create Your First Session</button>
+        <div style="margin-top: 16px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); letter-spacing: 0.5px; line-height: 1.8;">
+          Data lives in your browser. Clear cache = clear data.<br>Use Library → Export to back up your sessions.
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <div class="disclaimer">
+        <strong>AI Notice:</strong> This tool uses Anthropic Claude and always requests the most current, relevant information available at the time of each request. Outputs are generated automatically and may contain inaccuracies. Review before use. Results are a starting point — verify any specific facts, claims, or suggestions before applying them in a real interview context. Output quality depends on what you provide as input. Luis Figueroa is not responsible for results generated by third-party AI.
+      </div>
+      <div class="footer-meta">
+        <div class="footer-left">
+          Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a>
+          &nbsp;·&nbsp;
+          <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>
+          Augmenting Human Potential, One Workflow at a Time
+        </div>
+        <div class="footer-left">HTML / Claude API</div>
+      </div>
+      <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+    </div>
+
+  </div><!-- end page-wrap -->
 
   <script>
-  // ════════════════════════════════════════════════
-  // CONSTANTS
-  // ════════════════════════════════════════════════
-  const WORKER_URL   = 'https://career-tools-proxy.figueroaluisd.workers.dev/';
-  const STORAGE_KEY  = 'interview-prep-v1';
-  const PROFILE_KEY  = 'interview-prep-profile-v1';
+  const WORKER_URL  = 'https://career-tools-proxy.figueroaluisd.workers.dev/';
+  const STORAGE_KEY = 'interview-prep-v2';
 
   const ROLE_TYPE_LABELS = {
-    operations:       'Operations',
-    project_management: 'Project Management',
-    sales_revops:     'Sales / Revenue Operations',
-    enablement:       'Enablement & Training',
-    it_technical:     'IT / Technical',
-    customer_success: 'Customer Success & Support'
+    operations: 'Operations', project_management: 'Project Management',
+    sales_revops: 'Sales / Revenue Operations', enablement: 'Enablement & Training',
+    it_technical: 'IT / Technical', customer_success: 'Customer Success & Support'
   };
 
-  // ════════════════════════════════════════════════
-  // STATE
-  // ════════════════════════════════════════════════
-  let library = [];          // all sessions
+  // ── STATE ──
+  let library = [];
   let activeSessionId = null;
   let selectedRoleType = '';
-  let postQuestions = [];    // current post-interview question inputs
+  let postQuestions = [];
   let currentMode = 'pre';
   let pendingConfirm = null;
   let notesDebounce = null;
+  let sessionModalMode = 'new'; // 'new' | 'rename'
 
-  // ════════════════════════════════════════════════
-  // STORAGE
-  // ════════════════════════════════════════════════
-  function saveLibrary() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(library)); } catch(e) {}
-  }
-
-  function loadLibrary() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; }
-  }
-
+  // ── STORAGE ──
+  function saveLibrary() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(library)); } catch(e) {} }
+  function loadLibrary() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
   function getSession(id) { return library.find(s => s.id === id); }
-
   function updateSession(id, updates) {
     const idx = library.findIndex(s => s.id === id);
     if (idx === -1) return;
@@ -1386,352 +862,285 @@
     saveLibrary();
   }
 
-  // ════════════════════════════════════════════════
-  // API
-  // ════════════════════════════════════════════════
-  async function callClaude(systemPrompt, userMessage, maxTokens = 2000) {
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: maxTokens,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMessage }]
-      })
+  // ── API ──
+  async function callClaude(system, user, maxTokens = 2000) {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }] })
     });
-
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err?.error?.message || `HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.content[0].text.trim();
+    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
+    return (await res.json()).content[0].text.trim();
   }
-
-  async function callClaudeJSON(systemPrompt, userMessage, maxTokens = 2000) {
-    const raw = await callClaude(systemPrompt, userMessage, maxTokens);
+  async function callClaudeJSON(system, user, maxTokens = 2000) {
+    const raw = await callClaude(system, user, maxTokens);
     const match = raw.match(/\{[\s\S]*\}/) || raw.match(/\[[\s\S]*\]/);
     try { return JSON.parse(match ? match[0] : raw); }
     catch(e) { throw new Error('Could not parse response. Please try again.'); }
   }
 
-  // ════════════════════════════════════════════════
-  // TOAST
-  // ════════════════════════════════════════════════
+  // ── TOAST ──
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('visible');
+    t.textContent = msg; t.classList.add('visible');
     setTimeout(() => t.classList.remove('visible'), 2400);
   }
 
-  // ════════════════════════════════════════════════
-  // MODAL
-  // ════════════════════════════════════════════════
+  // ── CONFIRM MODAL ──
   function showConfirm(title, body, onConfirm) {
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('modalBody').textContent = body;
     document.getElementById('confirmModal').classList.add('visible');
     pendingConfirm = onConfirm;
   }
-
   document.getElementById('modalCancel').addEventListener('click', () => {
-    document.getElementById('confirmModal').classList.remove('visible');
-    pendingConfirm = null;
+    document.getElementById('confirmModal').classList.remove('visible'); pendingConfirm = null;
   });
-
   document.getElementById('modalConfirm').addEventListener('click', () => {
     document.getElementById('confirmModal').classList.remove('visible');
     if (pendingConfirm) { pendingConfirm(); pendingConfirm = null; }
   });
 
-  // ════════════════════════════════════════════════
-  // SIDEBAR
-  // ════════════════════════════════════════════════
-  document.getElementById('sidebarToggle').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('open');
+  // ── HOW IT WORKS ──
+  document.getElementById('howItWorksToggle').addEventListener('click', () => {
+    document.getElementById('howItWorks').classList.toggle('open');
   });
 
-  function renderSidebar() {
-    const list = document.getElementById('sessionList');
-    if (library.length === 0) {
-      list.innerHTML = '<div style="padding: 20px 12px; font-size: 13px; color: var(--muted); font-style: italic;">No sessions yet. Create one to get started.</div>';
+  // ── SESSION MODAL ──
+  function openSessionModal(mode, currentName = '') {
+    sessionModalMode = mode;
+    document.getElementById('sessionModalTitle').textContent = mode === 'new' ? 'New Session' : 'Rename Session';
+    document.getElementById('sessionNameInput').value = mode === 'rename' ? currentName : '';
+    document.getElementById('sessionModal').classList.add('visible');
+    setTimeout(() => document.getElementById('sessionNameInput').focus(), 100);
+  }
+  document.getElementById('sessionModalCancel').addEventListener('click', () => {
+    document.getElementById('sessionModal').classList.remove('visible');
+  });
+  document.getElementById('sessionModalConfirm').addEventListener('click', () => {
+    const name = document.getElementById('sessionNameInput').value.trim();
+    if (!name) { document.getElementById('sessionNameInput').focus(); return; }
+    document.getElementById('sessionModal').classList.remove('visible');
+    if (sessionModalMode === 'new') {
+      const id = createSession(name);
+      switchSession(id);
+    } else {
+      if (activeSessionId) {
+        updateSession(activeSessionId, { name });
+        document.getElementById('sessionNameDisplay').textContent = name;
+        document.getElementById('sessionNameDisplay').classList.remove('empty');
+      }
+    }
+    showToast(sessionModalMode === 'new' ? 'Session created' : 'Session renamed');
+  });
+  document.getElementById('sessionNameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('sessionModalConfirm').click();
+  });
+
+  // ── LIBRARY MODAL ──
+  function openLibraryModal() {
+    renderLibraryList();
+    document.getElementById('libraryModal').classList.add('visible');
+  }
+  document.getElementById('libraryModalClose').addEventListener('click', () => {
+    document.getElementById('libraryModal').classList.remove('visible');
+  });
+  function renderLibraryList() {
+    const container = document.getElementById('libraryList');
+    const sorted = library.slice().sort((a, b) => b.updatedAt - a.updatedAt);
+    if (sorted.length === 0) {
+      container.innerHTML = '<div style="font-size: 14px; color: var(--muted); font-style: italic; padding: 12px 0;">No sessions yet.</div>';
       return;
     }
-    list.innerHTML = library
-      .sort((a, b) => b.updatedAt - a.updatedAt)
-      .map(s => `
-        <div class="session-item ${s.id === activeSessionId ? 'active' : ''}" data-id="${s.id}">
-          <div class="session-item-name">
-            ${escapeHtml(s.name)}
-            <span class="session-item-status ${s.status === 'archived' ? 'status-archived' : 'status-active'}">${s.status}</span>
-          </div>
-          <div class="session-item-meta">${s.roleTitle ? escapeHtml(s.roleTitle) : 'No role set'}</div>
+    container.innerHTML = sorted.map(s => `
+      <div class="library-item" data-id="${s.id}">
+        <div>
+          <div class="library-item-name">${escapeHtml(s.name)}</div>
+          <div class="library-item-meta">${s.roleTitle ? escapeHtml(s.roleTitle) : 'No role set'} · ${new Date(s.updatedAt).toLocaleDateString()}</div>
         </div>
-      `).join('');
-
-    list.querySelectorAll('.session-item').forEach(item => {
+        <span class="library-item-status ${s.status === 'archived' ? 'status-archived' : 'status-active'}">${s.status}</span>
+      </div>
+    `).join('');
+    container.querySelectorAll('.library-item').forEach(item => {
       item.addEventListener('click', () => {
-        const id = item.dataset.id;
-        if (id === activeSessionId) return;
-        // Check for unsaved work — auto-save handles it but check notes
-        switchSession(id);
-        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('libraryModal').classList.remove('visible');
+        switchSession(item.dataset.id);
       });
     });
   }
 
-  // ════════════════════════════════════════════════
-  // SESSION MANAGEMENT
-  // ════════════════════════════════════════════════
+  // ── SESSION MANAGEMENT ──
   function createSession(name) {
     const id = 'session_' + Date.now();
-    const session = {
-      id, name,
-      status: 'active',
-      company: '',
-      roleTitle: '',
-      roleType: '',
-      jd: '',
-      businessProblem: '',
-      competencies: [],
-      postQuestions: [],
-      postAnalysis: [],
-      stories: [],
-      notes: '',
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    library.unshift(session);
+    library.unshift({ id, name, status: 'active', company: '', roleTitle: '', roleType: '', jd: '', businessProblem: '', roleContextNote: '', competencies: [], postQuestions: [], postAnalysis: [], stories: [], tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '', notes: '', createdAt: Date.now(), updatedAt: Date.now() });
     saveLibrary();
     return id;
   }
 
   function switchSession(id) {
     activeSessionId = id;
-    const session = getSession(id);
-    if (!session) return;
+    const s = getSession(id);
+    if (!s) return;
 
-    // Update tab visibility
+    document.getElementById('sessionNameDisplay').textContent = s.name;
+    document.getElementById('sessionNameDisplay').classList.remove('empty');
     document.getElementById('modeTabs').style.display = 'flex';
-    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('noSessionState').style.display = 'none';
 
-    // Load session into pre-interview form
-    document.getElementById('companyName').value = session.company || '';
-    document.getElementById('roleTitle').value = session.roleTitle || '';
-    document.getElementById('jdInput').value = session.jd || '';
-    document.getElementById('sessionNotesInput').value = session.notes || '';
+    // Load fields
+    document.getElementById('companyName').value = s.company || '';
+    document.getElementById('roleTitle').value = s.roleTitle || '';
+    document.getElementById('jdInput').value = s.jd || '';
+    document.getElementById('sessionNotesInput').value = s.notes || '';
+    document.getElementById('tmayBackground').value = s.tmayBackground || '';
+    document.getElementById('tmayCurrentRole').value = s.tmayCurrent || '';
+    document.getElementById('tmayWhy').value = s.tmayWhy || '';
 
-    // Role type
-    selectedRoleType = session.roleType || '';
-    document.querySelectorAll('.role-type-btn').forEach(btn => {
-      btn.classList.toggle('selected', btn.dataset.type === selectedRoleType);
-    });
+    selectedRoleType = s.roleType || '';
+    document.querySelectorAll('.role-type-btn').forEach(b => b.classList.toggle('selected', b.dataset.type === selectedRoleType));
 
-    // Reset to pre mode
     switchMode('pre');
 
-    // Render pre results if they exist
-    if (session.competencies && session.competencies.length > 0) {
-      renderPreResults(session);
+    if (s.competencies && s.competencies.length > 0) {
+      renderPreResults(s);
     } else {
       document.getElementById('preForm').style.display = 'block';
       document.getElementById('preResults').style.display = 'none';
     }
 
-    // Render post questions
-    postQuestions = session.postQuestions ? [...session.postQuestions] : [];
+    postQuestions = s.postQuestions ? [...s.postQuestions] : [];
     renderPostQuestions();
-    if (session.postAnalysis && session.postAnalysis.length > 0) {
-      renderPostAnalysis(session.postAnalysis);
-    }
+    if (s.postAnalysis && s.postAnalysis.length > 0) renderPostAnalysis(s.postAnalysis);
 
-    // Render stories
-    renderStoryLibrary(session.stories || []);
+    renderStoryLibrary(s.stories || []);
 
-    // Update story profile note
-    if (session.company || session.roleTitle) {
+    if (s.company || s.roleTitle) {
       document.getElementById('storyProfileNote').style.display = 'flex';
-      document.getElementById('storyProfileNoteText').textContent =
-        `Competencies loaded from: ${[session.roleTitle, session.company].filter(Boolean).join(' @ ')}`;
+      document.getElementById('storyProfileNoteText').textContent = `Competencies from: ${[s.roleTitle, s.company].filter(Boolean).join(' @ ')}`;
     }
 
-    renderSidebar();
+    if (s.tmay) {
+      document.getElementById('tmayOutput').textContent = s.tmay;
+      if (s.tmayCoaching) document.getElementById('tmayCoaching').textContent = s.tmayCoaching;
+      document.getElementById('tmayResult').style.display = 'block';
+    } else {
+      document.getElementById('tmayResult').style.display = 'none';
+    }
   }
 
   function switchMode(mode) {
     currentMode = mode;
     document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-    ['pre','post','story','notes'].forEach(m => {
+    ['pre','post','story','tmay','notes'].forEach(m => {
       document.getElementById('mode-' + m).style.display = m === mode ? 'block' : 'none';
     });
   }
 
-  // ════════════════════════════════════════════════
-  // NEW SESSION FLOW
-  // ════════════════════════════════════════════════
-  function openNewSessionModal() {
-    document.getElementById('sessionNameInput').value = '';
-    document.getElementById('newSessionModal').classList.add('visible');
-    setTimeout(() => document.getElementById('sessionNameInput').focus(), 100);
-  }
-
-  document.getElementById('newSessionBtn').addEventListener('click', openNewSessionModal);
-  document.getElementById('emptyNewSessionBtn').addEventListener('click', openNewSessionModal);
-
-  document.getElementById('newSessionCancel').addEventListener('click', () => {
-    document.getElementById('newSessionModal').classList.remove('visible');
+  // ── SESSION BAR ACTIONS ──
+  document.getElementById('newSessionBtn').addEventListener('click', () => openSessionModal('new'));
+  document.getElementById('noStateNewBtn').addEventListener('click', () => openSessionModal('new'));
+  document.getElementById('renameSessionBtn').addEventListener('click', () => {
+    if (!activeSessionId) { showToast('No active session'); return; }
+    openSessionModal('rename', getSession(activeSessionId)?.name || '');
+  });
+  document.getElementById('libraryBtn').addEventListener('click', openLibraryModal);
+  document.getElementById('savePdfBtn').addEventListener('click', () => {
+    if (!activeSessionId) { showToast('No active session'); return; }
+    window.print();
+  });
+  document.getElementById('archiveSessionBtn').addEventListener('click', () => {
+    if (!activeSessionId) { showToast('No active session'); return; }
+    showConfirm('Archive Session', 'Mark this session as complete? Your data stays intact and it moves to archived status in the library.', () => {
+      updateSession(activeSessionId, { status: 'archived' });
+      showToast('Session archived');
+    });
   });
 
-  document.getElementById('newSessionCreate').addEventListener('click', () => {
-    const name = document.getElementById('sessionNameInput').value.trim();
-    if (!name) { document.getElementById('sessionNameInput').focus(); return; }
-    document.getElementById('newSessionModal').classList.remove('visible');
-    const id = createSession(name);
-    switchSession(id);
-    renderSidebar();
-    showToast('Session created');
-  });
-
-  document.getElementById('sessionNameInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('newSessionCreate').click();
-  });
-
-  // ════════════════════════════════════════════════
-  // MODE TABS
-  // ════════════════════════════════════════════════
+  // ── MODE TABS ──
   document.querySelectorAll('.mode-tab').forEach(tab => {
     tab.addEventListener('click', () => { if (activeSessionId) switchMode(tab.dataset.mode); });
   });
 
-  // ════════════════════════════════════════════════
-  // ROLE TYPE SELECTION
-  // ════════════════════════════════════════════════
+  // ── ROLE TYPE ──
   document.querySelectorAll('.role-type-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       selectedRoleType = btn.dataset.type;
       document.querySelectorAll('.role-type-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
-      if (activeSessionId) {
-        updateSession(activeSessionId, { roleType: selectedRoleType });
-      }
+      if (activeSessionId) updateSession(activeSessionId, { roleType: selectedRoleType });
     });
   });
 
-  // ════════════════════════════════════════════════
-  // AUTO-SAVE FORM FIELDS
-  // ════════════════════════════════════════════════
+  // ── AUTO-SAVE ──
   ['companyName','roleTitle','jdInput'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
       if (!activeSessionId) return;
-      updateSession(activeSessionId, {
-        company: document.getElementById('companyName').value,
-        roleTitle: document.getElementById('roleTitle').value,
-        jd: document.getElementById('jdInput').value
-      });
-      renderSidebar();
+      updateSession(activeSessionId, { company: document.getElementById('companyName').value, roleTitle: document.getElementById('roleTitle').value, jd: document.getElementById('jdInput').value });
     });
   });
-
+  ['tmayBackground','tmayCurrentRole','tmayWhy'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      if (!activeSessionId) return;
+      updateSession(activeSessionId, { tmayBackground: document.getElementById('tmayBackground').value, tmayCurrent: document.getElementById('tmayCurrentRole').value, tmayWhy: document.getElementById('tmayWhy').value });
+    });
+  });
   document.getElementById('sessionNotesInput').addEventListener('input', () => {
     if (!activeSessionId) return;
     clearTimeout(notesDebounce);
+    document.getElementById('notesSaveIndicator').textContent = '';
     notesDebounce = setTimeout(() => {
       updateSession(activeSessionId, { notes: document.getElementById('sessionNotesInput').value });
+      document.getElementById('notesSaveIndicator').textContent = '✓ Auto-saved';
+      setTimeout(() => { document.getElementById('notesSaveIndicator').textContent = ''; }, 2000);
     }, 800);
   });
 
-  // ════════════════════════════════════════════════
-  // PRE-INTERVIEW ANALYSIS
-  // ════════════════════════════════════════════════
+  // ── PRE-INTERVIEW ──
   document.getElementById('analyzeJDBtn').addEventListener('click', async () => {
     if (!activeSessionId) return;
-
     const jd = document.getElementById('jdInput').value.trim();
+    if (jd.length < 100) { showToast('Paste the full job description first'); return; }
     const company = document.getElementById('companyName').value.trim();
     const roleTitle = document.getElementById('roleTitle').value.trim();
     const roleType = selectedRoleType;
-
-    if (jd.length < 100) { showToast('Paste the full job description first'); return; }
-
     const btn = document.getElementById('analyzeJDBtn');
     const status = document.getElementById('preStatus');
-    btn.disabled = true;
-    status.style.display = 'flex';
-
+    btn.disabled = true; status.style.display = 'flex';
     try {
-      const systemPrompt = `You are an expert interview preparation coach specializing in competency-based interview analysis. Your job is to decode job descriptions from the perspective of what the hiring organization is actually trying to solve — not just what the JD says on the surface.
+      const system = `You are an expert interview preparation coach. Decode this job description from the perspective of what the hiring organization is actually trying to solve. Use the most current and relevant thinking available on competency-based interviewing.
 
-You return structured JSON only. No markdown, no preamble, no backticks.
+Return structured JSON only. No markdown, no preamble, no backticks.
 
-Your analysis must include:
-1. A business problem summary — what organizational pain point this role is actually solving for
-2. A competency map — the 5-6 underlying competencies being tested (not just skills listed, but the behavioral competencies a hiring manager would build their interview questions around)
-3. For each competency: the surface question that would be asked, the methodology behind a strong answer, and the 3 scoring layers the interviewer tracks simultaneously
-4. A role-context note about the specific company/industry context that should inform how answers are framed
-
-Role type context provided: ${ROLE_TYPE_LABELS[roleType] || 'General Operations'}
-
-Return this exact JSON structure:
 {
-  "businessProblem": "2-3 sentences describing what pain point or gap this role is solving for",
-  "roleContextNote": "1-2 sentences about company/industry context relevant to how to frame answers",
+  "businessProblem": "2-3 sentences: what organizational pain point this role is solving for",
+  "roleContextNote": "1-2 sentences: company/industry context relevant to framing answers",
   "competencies": [
     {
       "name": "Competency name (5 words max)",
       "surfaceQuestion": "The likely interview question",
-      "methodology": "The expert framework or methodology behind a strong answer (2-3 sentences)",
-      "scoringLayers": ["Layer 1: what they score", "Layer 2: what they score", "Layer 3: what they score"],
+      "methodology": "Expert framework behind a strong answer (2-3 sentences)",
+      "scoringLayers": ["Layer 1", "Layer 2", "Layer 3"],
       "weakAnswer": "What a weak answer looks like",
       "strongAnswer": "What a strong answer looks like"
     }
   ]
 }`;
-
-      const userMessage = `Company: ${company || 'Not specified'}
-Role: ${roleTitle || 'Not specified'}
-Role Type: ${ROLE_TYPE_LABELS[roleType] || 'Not specified'}
-
-Job Description:
-${jd}`;
-
-      const result = await callClaudeJSON(systemPrompt, userMessage, 2500);
-
-      updateSession(activeSessionId, {
-        company,
-        roleTitle,
-        roleType,
-        jd,
-        businessProblem: result.businessProblem,
-        roleContextNote: result.roleContextNote,
-        competencies: result.competencies
-      });
-
+      const user = `Company: ${company || 'Not specified'}\nRole: ${roleTitle || 'Not specified'}\nRole Type: ${ROLE_TYPE_LABELS[roleType] || 'Not specified'}\n\nJob Description:\n${jd}`;
+      const result = await callClaudeJSON(system, user, 2500);
+      updateSession(activeSessionId, { company, roleTitle, roleType, jd, businessProblem: result.businessProblem, roleContextNote: result.roleContextNote, competencies: result.competencies });
       renderPreResults(getSession(activeSessionId));
-      renderSidebar();
       showToast('Analysis complete');
-
-    } catch(err) {
-      showToast('Error: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.style.display = 'none';
-    }
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
   });
 
   function renderPreResults(session) {
     document.getElementById('preForm').style.display = 'none';
     document.getElementById('preResults').style.display = 'block';
-
-    document.getElementById('businessProblemText').innerHTML =
-      `<div>${escapeHtml(session.businessProblem || '')}</div>` +
-      (session.roleContextNote ? `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--accent-border); color: var(--muted); font-size: 13px;">${escapeHtml(session.roleContextNote)}</div>` : '');
-
+    const bpText = document.getElementById('businessProblemText');
+    bpText.innerHTML = `<div>${escapeHtml(session.businessProblem || '')}</div>` +
+      (session.roleContextNote ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--accent-border);color:var(--muted);font-size:13px;">${escapeHtml(session.roleContextNote)}</div>` : '');
     const grid = document.getElementById('competencyGrid');
     grid.innerHTML = '';
-
     (session.competencies || []).forEach((comp, i) => {
       const card = document.createElement('div');
       card.className = 'competency-card';
@@ -1741,30 +1150,16 @@ ${jd}`;
             <div class="competency-name">${escapeHtml(comp.name)}</div>
             <div class="competency-question">"${escapeHtml(comp.surfaceQuestion)}"</div>
           </div>
-          <button class="competency-expand-btn" data-idx="${i}">+</button>
+          <button class="competency-expand-btn">+</button>
         </div>
         <div class="competency-detail" id="comp-detail-${i}">
-          <div class="detail-section">
-            <div class="detail-label">Methodology</div>
-            <div class="detail-body">${escapeHtml(comp.methodology)}</div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-label">What They're Scoring</div>
-            <div>${(comp.scoringLayers || []).map(l => `<span class="scoring-pill pill-blue">${escapeHtml(l)}</span>`).join('')}</div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-label" style="color: var(--red);">Weak Answer Looks Like</div>
-            <div class="detail-body">${escapeHtml(comp.weakAnswer || '')}</div>
-          </div>
-          <div class="detail-section" style="margin-bottom:0;">
-            <div class="detail-label" style="color: var(--green);">Strong Answer Looks Like</div>
-            <div class="detail-body">${escapeHtml(comp.strongAnswer || '')}</div>
-          </div>
-        </div>
-      `;
+          <div class="detail-section"><div class="detail-label">Methodology</div><div class="detail-body">${escapeHtml(comp.methodology)}</div></div>
+          <div class="detail-section"><div class="detail-label">What They're Scoring</div><div>${(comp.scoringLayers||[]).map(l=>`<span class="scoring-pill pill-blue">${escapeHtml(l)}</span>`).join('')}</div></div>
+          <div class="detail-section"><div class="detail-label" style="color:var(--red);">Weak Answer</div><div class="detail-body">${escapeHtml(comp.weakAnswer||'')}</div></div>
+          <div class="detail-section" style="margin-bottom:0;"><div class="detail-label" style="color:var(--green);">Strong Answer</div><div class="detail-body">${escapeHtml(comp.strongAnswer||'')}</div></div>
+        </div>`;
       grid.appendChild(card);
-
-      card.querySelector('.competency-expand-btn').addEventListener('click', (e) => {
+      card.querySelector('.competency-expand-btn').addEventListener('click', e => {
         e.stopPropagation();
         const detail = document.getElementById('comp-detail-' + i);
         const isOpen = detail.classList.contains('visible');
@@ -1779,51 +1174,29 @@ ${jd}`;
     document.getElementById('preForm').style.display = 'block';
     document.getElementById('preResults').style.display = 'none';
   });
+  document.getElementById('goToStoryModeBtn').addEventListener('click', () => switchMode('story'));
 
-  document.getElementById('goToStoryModeBtn').addEventListener('click', () => {
-    switchMode('story');
-  });
-
-  // ════════════════════════════════════════════════
-  // POST-INTERVIEW MODE
-  // ════════════════════════════════════════════════
+  // ── POST-INTERVIEW ──
   function renderPostQuestions() {
     const list = document.getElementById('postQuestionsList');
     list.innerHTML = '';
-
     if (postQuestions.length === 0) {
-      list.innerHTML = '<div style="font-size: 13px; color: var(--muted); font-style: italic; margin-bottom: 16px;">No questions added yet. Click Add Question to start.</div>';
+      list.innerHTML = '<div style="font-size:14px;color:var(--muted);font-style:italic;margin-bottom:16px;">No questions added yet.</div>';
       return;
     }
-
     postQuestions.forEach((q, i) => {
       const row = document.createElement('div');
-      row.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start;';
-      row.innerHTML = `
-        <div style="flex: 1;">
-          <input type="text" value="${escapeHtml(q)}" placeholder="Enter a question that was asked..." data-idx="${i}" class="post-q-input" />
-        </div>
-        <button class="btn-ghost" data-idx="${i}" class="remove-q-btn" style="margin-top: 12px;">✕</button>
-      `;
+      row.style.cssText = 'display:flex;gap:10px;margin-bottom:10px;align-items:center;';
+      row.innerHTML = `<input type="text" value="${escapeHtml(q)}" placeholder="Enter a question that was asked..." data-idx="${i}" class="post-q-input" style="flex:1;" /><button class="btn-ghost remove-q-btn" data-idx="${i}" style="padding:6px 8px;">✕</button>`;
       list.appendChild(row);
-
-      row.querySelector('.post-q-input').addEventListener('input', (e) => {
+      row.querySelector('.post-q-input').addEventListener('input', e => {
         postQuestions[i] = e.target.value;
         if (activeSessionId) updateSession(activeSessionId, { postQuestions });
       });
-
-      row.querySelector('[data-idx="' + i + '"].btn-ghost') || row.querySelector('button').addEventListener('click', () => {
-        postQuestions.splice(i, 1);
-        if (activeSessionId) updateSession(activeSessionId, { postQuestions });
-        renderPostQuestions();
-      });
     });
-
-    // Wire remove buttons
-    list.querySelectorAll('button').forEach(btn => {
+    list.querySelectorAll('.remove-q-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.idx);
-        postQuestions.splice(idx, 1);
+        postQuestions.splice(parseInt(btn.dataset.idx), 1);
         if (activeSessionId) updateSession(activeSessionId, { postQuestions });
         renderPostQuestions();
       });
@@ -1833,361 +1206,235 @@ ${jd}`;
   document.getElementById('addQuestionBtn').addEventListener('click', () => {
     postQuestions.push('');
     renderPostQuestions();
-    // Focus last input
-    setTimeout(() => {
-      const inputs = document.querySelectorAll('.post-q-input');
-      if (inputs.length) inputs[inputs.length - 1].focus();
-    }, 50);
+    setTimeout(() => { const inputs = document.querySelectorAll('.post-q-input'); if (inputs.length) inputs[inputs.length-1].focus(); }, 50);
   });
 
   document.getElementById('analyzeQuestionsBtn').addEventListener('click', async () => {
     if (!activeSessionId) return;
     const validQs = postQuestions.filter(q => q.trim().length > 5);
     if (validQs.length === 0) { showToast('Add at least one question first'); return; }
-
     const session = getSession(activeSessionId);
     const btn = document.getElementById('analyzeQuestionsBtn');
     const status = document.getElementById('postStatus');
-    btn.disabled = true;
-    status.style.display = 'flex';
-
+    btn.disabled = true; status.style.display = 'flex';
     try {
-      const systemPrompt = `You are an expert at reverse-engineering interview questions to reveal what the interviewer was actually assessing. For each question provided, decode:
-1. What competency was being tested
-2. What the interviewer was really scoring (3 layers)
-3. What a strong answer would have included
-4. What common answers miss
-5. How to improve next time
+      const system = `You are an expert at reverse-engineering interview questions. For each question, decode what competency was being tested, what the interviewer was really scoring, what a strong answer includes, what most candidates miss, and the framework to use next time. Use the most current thinking on competency-based interviewing.
 
-Return JSON only, no markdown:
-{
-  "analyses": [
-    {
-      "question": "the original question",
-      "competency": "competency being tested",
-      "whatTheyScored": ["scoring layer 1", "scoring layer 2", "scoring layer 3"],
-      "strongAnswerIncludes": "what a strong answer covers",
-      "commonMiss": "what most candidates miss",
-      "nextTimeFramework": "the methodology or framework to use next time"
-    }
-  ]
-}`;
-
-      const roleContext = session ? `Role: ${session.roleTitle || 'Not specified'} at ${session.company || 'Not specified'}. Role type: ${ROLE_TYPE_LABELS[session.roleType] || 'General'}. ` : '';
-      const userMessage = roleContext + 'Questions asked:\n' + validQs.map((q, i) => `${i+1}. ${q}`).join('\n');
-
-      const result = await callClaudeJSON(systemPrompt, userMessage, 2500);
+Return JSON only:
+{"analyses":[{"question":"","competency":"","whatTheyScored":["","",""],"strongAnswerIncludes":"","commonMiss":"","nextTimeFramework":""}]}`;
+      const roleContext = session ? `Role: ${session.roleTitle||'Not specified'} at ${session.company||'Not specified'}. ` : '';
+      const user = roleContext + 'Questions:\n' + validQs.map((q,i) => `${i+1}. ${q}`).join('\n');
+      const result = await callClaudeJSON(system, user, 2500);
       updateSession(activeSessionId, { postAnalysis: result.analyses });
       renderPostAnalysis(result.analyses);
       showToast('Analysis complete');
-
-    } catch(err) {
-      showToast('Error: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.style.display = 'none';
-    }
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
   });
 
   function renderPostAnalysis(analyses) {
     const container = document.getElementById('postResults');
     container.innerHTML = '';
-
     if (!analyses || analyses.length === 0) return;
-
-    const header = document.createElement('div');
-    header.innerHTML = '<div class="section-eyebrow" style="margin-bottom: 16px;">What They Were Actually Scoring</div>';
-    container.appendChild(header);
-
+    const hdr = document.createElement('div');
+    hdr.innerHTML = '<div class="section-eyebrow" style="margin-bottom:16px;">What They Were Actually Scoring</div>';
+    container.appendChild(hdr);
     analyses.forEach(a => {
       const card = document.createElement('div');
-      card.className = 'question-card';
+      card.className = 'card';
+      card.style.marginBottom = '16px';
       card.innerHTML = `
-        <div class="question-text">"${escapeHtml(a.question)}"</div>
-        <div style="margin-bottom: 10px;">
-          <span class="scoring-pill pill-blue">${escapeHtml(a.competency)}</span>
-        </div>
-        <div class="question-analysis visible">
-          <div class="detail-section">
-            <div class="detail-label">Scoring Layers</div>
-            <div>${(a.whatTheyScored || []).map(l => `<span class="scoring-pill pill-yellow">${escapeHtml(l)}</span>`).join('')}</div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-label" style="color: var(--green);">Strong Answer Includes</div>
-            <div class="detail-body">${escapeHtml(a.strongAnswerIncludes || '')}</div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-label" style="color: var(--red);">What Most Candidates Miss</div>
-            <div class="detail-body">${escapeHtml(a.commonMiss || '')}</div>
-          </div>
-          <div class="detail-section" style="margin-bottom:0;">
-            <div class="detail-label">Next Time — Use This Framework</div>
-            <div class="detail-body">${escapeHtml(a.nextTimeFramework || '')}</div>
-          </div>
-        </div>
-      `;
+        <div style="font-size:16px;color:var(--white);line-height:1.6;margin-bottom:12px;">"${escapeHtml(a.question)}"</div>
+        <div style="margin-bottom:12px;"><span class="scoring-pill pill-blue">${escapeHtml(a.competency)}</span></div>
+        <div class="detail-section"><div class="detail-label">Scoring Layers</div><div>${(a.whatTheyScored||[]).map(l=>`<span class="scoring-pill pill-yellow">${escapeHtml(l)}</span>`).join('')}</div></div>
+        <div class="detail-section"><div class="detail-label" style="color:var(--green);">Strong Answer Includes</div><div class="detail-body">${escapeHtml(a.strongAnswerIncludes||'')}</div></div>
+        <div class="detail-section"><div class="detail-label" style="color:var(--red);">What Most Candidates Miss</div><div class="detail-body">${escapeHtml(a.commonMiss||'')}</div></div>
+        <div class="detail-section" style="margin-bottom:0;"><div class="detail-label">Next Time — Use This Framework</div><div class="detail-body">${escapeHtml(a.nextTimeFramework||'')}</div></div>`;
       container.appendChild(card);
     });
   }
 
-  // ════════════════════════════════════════════════
-  // STORY TRANSLATION
-  // ════════════════════════════════════════════════
+  // ── STORY TRANSLATION ──
   document.getElementById('translateStoryBtn').addEventListener('click', async () => {
     if (!activeSessionId) return;
     const storyText = document.getElementById('storyInput').value.trim();
     const storyTitle = document.getElementById('storyTitle').value.trim();
-
     if (storyText.length < 80) { showToast('Describe the experience in more detail'); return; }
-
     const session = getSession(activeSessionId);
     const btn = document.getElementById('translateStoryBtn');
     const status = document.getElementById('storyStatus');
-    btn.disabled = true;
-    status.style.display = 'flex';
-
+    btn.disabled = true; status.style.display = 'flex';
     try {
-      const competencyContext = session && session.competencies && session.competencies.length > 0
-        ? 'Competencies from the target role: ' + session.competencies.map(c => c.name).join(', ') + '. '
-        : '';
+      const compContext = session?.competencies?.length ? 'Competencies from the target role: ' + session.competencies.map(c=>c.name).join(', ') + '. ' : '';
+      const system = `You are an expert at translating professional experience into competency-based interview language. Use the SOAR method (Situation, Obstacles, Actions, Results). Apply the most current thinking on what makes interview stories land.
 
-      const systemPrompt = `You are an expert at helping professionals translate their real work experience into the language of competency-based interviews. Given a description of a professional experience, you:
-1. Identify which competencies it demonstrates
-2. Show how to frame it using the SOAR method (Situation, Obstacles, Actions, Results)
-3. Suggest the specific language that maps to what interviewers are listening for
-4. Identify any gaps that weaken the story and how to address them
-
-Return JSON only, no markdown:
-{
-  "competenciesProved": ["competency 1", "competency 2", "competency 3"],
-  "soarFramework": {
-    "situation": "How to frame the situation (1-2 sentences)",
-    "obstacles": "The specific challenges to name (emphasize this — it's where most people underinvest)",
-    "actions": "The specific actions in language interviewers listen for",
-    "results": "How to quantify or qualify the outcome"
-  },
-  "keyLanguage": "The specific phrases and framing that will land in an interview context",
-  "gaps": "What's currently missing from this story that would strengthen it",
-  "bestUsedFor": "Which types of interview questions this story answers best"
-}`;
-
-      const userMessage = competencyContext + 'Story title: ' + (storyTitle || 'Untitled') + '\n\n' + storyText;
-
-      const result = await callClaudeJSON(systemPrompt, userMessage, 2000);
-
-      // Save story to session
-      const story = {
-        id: 'story_' + Date.now(),
-        title: storyTitle || 'Untitled Story',
-        rawText: storyText,
-        competencies: result.competenciesProved || [],
-        soar: result.soarFramework || {},
-        keyLanguage: result.keyLanguage || '',
-        gaps: result.gaps || '',
-        bestUsedFor: result.bestUsedFor || '',
-        createdAt: Date.now()
-      };
-
-      const stories = [...(session.stories || []), story];
+Return JSON only:
+{"competenciesProved":[],"soarFramework":{"situation":"","obstacles":"","actions":"","results":""},"keyLanguage":"","gaps":"","bestUsedFor":""}`;
+      const user = compContext + 'Story: ' + (storyTitle||'Untitled') + '\n\n' + storyText;
+      const result = await callClaudeJSON(system, user, 2000);
+      const story = { id: 'story_' + Date.now(), title: storyTitle||'Untitled Story', rawText: storyText, competencies: result.competenciesProved||[], soar: result.soarFramework||{}, keyLanguage: result.keyLanguage||'', gaps: result.gaps||'', bestUsedFor: result.bestUsedFor||'', createdAt: Date.now() };
+      const stories = [...(session.stories||[]), story];
       updateSession(activeSessionId, { stories });
-
       renderStoryResult(result);
       renderStoryLibrary(stories);
-      showToast('Story translated and saved');
-
-      // Clear input for next story
       document.getElementById('storyTitle').value = '';
       document.getElementById('storyInput').value = '';
-
-    } catch(err) {
-      showToast('Error: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.style.display = 'none';
-    }
+      showToast('Story translated and saved');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
   });
 
   function renderStoryResult(result) {
-    const container = document.getElementById('storyResult');
-    container.style.display = 'block';
-    container.innerHTML = `
-      <div class="card-accent" style="margin-bottom: 20px;">
-        <div class="detail-label" style="margin-bottom: 10px;">Competencies This Story Proves</div>
-        <div>${(result.competenciesProved || []).map(c => `<span class="scoring-pill pill-blue">${escapeHtml(c)}</span>`).join('')}</div>
-      </div>
-      <div class="card" style="margin-bottom: 20px;">
+    const c = document.getElementById('storyResult');
+    c.style.display = 'block';
+    c.innerHTML = `
+      <div class="card-accent" style="margin-bottom:16px;"><div class="detail-label" style="margin-bottom:8px;">Competencies This Story Proves</div><div>${(result.competenciesProved||[]).map(x=>`<span class="scoring-pill pill-blue">${escapeHtml(x)}</span>`).join('')}</div></div>
+      <div class="card" style="margin-bottom:16px;">
         <div class="card-label">SOAR Framework</div>
-        <div class="detail-section">
-          <div class="detail-label">Situation</div>
-          <div class="detail-body">${escapeHtml(result.soarFramework?.situation || '')}</div>
-        </div>
-        <div class="detail-section">
-          <div class="detail-label">Obstacles</div>
-          <div class="detail-body">${escapeHtml(result.soarFramework?.obstacles || '')}</div>
-        </div>
-        <div class="detail-section">
-          <div class="detail-label">Actions</div>
-          <div class="detail-body">${escapeHtml(result.soarFramework?.actions || '')}</div>
-        </div>
-        <div class="detail-section" style="margin-bottom:0;">
-          <div class="detail-label">Results</div>
-          <div class="detail-body">${escapeHtml(result.soarFramework?.results || '')}</div>
-        </div>
+        <div class="detail-section"><div class="detail-label">Situation</div><div class="detail-body">${escapeHtml(result.soarFramework?.situation||'')}</div></div>
+        <div class="detail-section"><div class="detail-label">Obstacles</div><div class="detail-body">${escapeHtml(result.soarFramework?.obstacles||'')}</div></div>
+        <div class="detail-section"><div class="detail-label">Actions</div><div class="detail-body">${escapeHtml(result.soarFramework?.actions||'')}</div></div>
+        <div class="detail-section" style="margin-bottom:0;"><div class="detail-label">Results</div><div class="detail-body">${escapeHtml(result.soarFramework?.results||'')}</div></div>
       </div>
-      <div class="card" style="margin-bottom: 20px;">
-        <div class="card-label">Key Language to Use</div>
-        <div style="font-size: 14px; color: var(--white); line-height: 1.8;">${escapeHtml(result.keyLanguage || '')}</div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-        <div class="card" style="border-left: 3px solid var(--red); margin-bottom: 0;">
-          <div class="detail-label" style="color: var(--red);">Story Gaps to Address</div>
-          <div class="detail-body">${escapeHtml(result.gaps || '')}</div>
-        </div>
-        <div class="card" style="border-left: 3px solid var(--green); margin-bottom: 0;">
-          <div class="detail-label" style="color: var(--green);">Best Used For</div>
-          <div class="detail-body">${escapeHtml(result.bestUsedFor || '')}</div>
-        </div>
-      </div>
-    `;
+      <div class="card" style="margin-bottom:16px;"><div class="card-label">Key Language to Use</div><div style="font-size:15px;color:var(--white);line-height:1.8;">${escapeHtml(result.keyLanguage||'')}</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div class="card" style="border-left:3px solid var(--red);margin-bottom:0;"><div class="detail-label" style="color:var(--red);">Story Gaps</div><div class="detail-body">${escapeHtml(result.gaps||'')}</div></div>
+        <div class="card" style="border-left:3px solid var(--green);margin-bottom:0;"><div class="detail-label" style="color:var(--green);">Best Used For</div><div class="detail-body">${escapeHtml(result.bestUsedFor||'')}</div></div>
+      </div>`;
   }
 
   function renderStoryLibrary(stories) {
-    const container = document.getElementById('storyLibrary');
-    if (!stories || stories.length === 0) {
-      container.innerHTML = '<div style="font-size: 13px; color: var(--muted); font-style: italic;">No stories yet. Translate your first experience above.</div>';
-      return;
-    }
-
-    container.innerHTML = stories.slice().reverse().map(s => `
+    const c = document.getElementById('storyLibrary');
+    if (!stories || stories.length === 0) { c.innerHTML = '<div style="font-size:14px;color:var(--muted);font-style:italic;">No stories yet.</div>'; return; }
+    c.innerHTML = stories.slice().reverse().map(s => `
       <div class="story-card">
-        <div class="story-card-header">
-          <div class="story-card-title">${escapeHtml(s.title)}</div>
-        </div>
-        <div style="font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px;">${escapeHtml(s.bestUsedFor || '')}</div>
-        <div class="story-tags">
-          ${(s.competencies || []).map(c => `<span class="story-tag">${escapeHtml(c)}</span>`).join('')}
-        </div>
-      </div>
-    `).join('');
+        <div class="story-card-title">${escapeHtml(s.title)}</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">${escapeHtml(s.bestUsedFor||'')}</div>
+        <div class="story-tags">${(s.competencies||[]).map(c=>`<span class="story-tag">${escapeHtml(c)}</span>`).join('')}</div>
+      </div>`).join('');
   }
 
-  // ════════════════════════════════════════════════
-  // SESSION NOTES — ARCHIVE / DELETE
-  // ════════════════════════════════════════════════
-  document.getElementById('archiveSessionBtn').addEventListener('click', () => {
+  // ── TELL ME ABOUT YOURSELF ──
+  document.getElementById('buildTMAYBtn').addEventListener('click', async () => {
     if (!activeSessionId) return;
-    showConfirm(
-      'Archive Session',
-      'This marks the session as complete and moves it to the bottom of your list. Your data stays intact.',
-      () => {
-        updateSession(activeSessionId, { status: 'archived' });
-        renderSidebar();
-        showToast('Session archived');
-      }
-    );
+    const background = document.getElementById('tmayBackground').value.trim();
+    if (background.length < 60) { showToast('Describe your background in more detail first'); return; }
+    const session = getSession(activeSessionId);
+    const current = document.getElementById('tmayCurrentRole').value.trim();
+    const why = document.getElementById('tmayWhy').value.trim();
+    const btn = document.getElementById('buildTMAYBtn');
+    const status = document.getElementById('tmayStatus');
+    btn.disabled = true; status.style.display = 'flex';
+    try {
+      const roleContext = session ? `Target role: ${session.roleTitle||'Not specified'} at ${session.company||'Not specified'}. Role type: ${ROLE_TYPE_LABELS[session.roleType]||'General'}. Business problem this role solves: ${session.businessProblem||'Not analyzed yet'}.` : '';
+      const system = `You are an expert interview coach. Build a compelling, specific "Tell Me About Yourself" answer for this candidate. Use the past-present-future structure: past (most relevant background), present (current situation and what brought them here), future (why this role is the right next move). End with a question that hands control back to the interviewer — e.g. "Before I go deeper on any of that, is there a particular area you'd like me to focus on today?"
+
+The answer should sound like a real person speaking, not a resume readout. It should be specific and reference actual work done. Target 90-120 seconds when spoken aloud (approximately 200-280 words).
+
+Also provide coaching notes: what's working in this answer, what's weak, and one thing to watch out for.
+
+Return JSON only:
+{"tmay":"The full TMAY answer as a single flowing paragraph or 2-3 short paragraphs","coaching":"2-3 sentences of coaching notes"}`;
+      const user = `${roleContext}\n\nBackground: ${background}\nCurrent situation: ${current||'Not specified'}\nWhy this role: ${why||'Not specified'}`;
+      const result = await callClaudeJSON(system, user, 1500);
+      updateSession(activeSessionId, { tmay: result.tmay, tmayCoaching: result.coaching });
+      document.getElementById('tmayOutput').textContent = result.tmay;
+      document.getElementById('tmayCoaching').textContent = result.coaching;
+      document.getElementById('tmayResult').style.display = 'block';
+      showToast('TMAY built');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
   });
 
+  document.getElementById('rebuildTMAYBtn').addEventListener('click', () => {
+    document.getElementById('tmayResult').style.display = 'none';
+  });
+
+  // ── COPY / PDF BUTTONS ──
+  function copyText(text, label) {
+    navigator.clipboard.writeText(text).then(() => showToast(label + ' copied')).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      showToast(label + ' copied');
+    });
+  }
+
+  document.getElementById('copyTMAYBtn').addEventListener('click', () => {
+    copyText(document.getElementById('tmayOutput').textContent, 'TMAY');
+  });
+  document.getElementById('saveTMAYPdfBtn').addEventListener('click', () => window.print());
+  document.getElementById('copyNotesBtn').addEventListener('click', () => {
+    copyText(document.getElementById('sessionNotesInput').value, 'Notes');
+  });
+  document.getElementById('saveNotesPdfBtn').addEventListener('click', () => window.print());
+
+  // ── DELETE SESSION ──
   document.getElementById('deleteSessionBtn').addEventListener('click', () => {
     if (!activeSessionId) return;
     const session = getSession(activeSessionId);
-    showConfirm(
-      'Delete Session',
-      `Delete "${session?.name}"? This cannot be undone. All analysis, stories, and notes in this session will be permanently removed.`,
-      () => {
-        library = library.filter(s => s.id !== activeSessionId);
-        saveLibrary();
-        activeSessionId = null;
-        document.getElementById('modeTabs').style.display = 'none';
-        document.getElementById('emptyState').style.display = 'flex';
-        ['pre','post','story','notes'].forEach(m => {
-          document.getElementById('mode-' + m).style.display = 'none';
-        });
-        renderSidebar();
-        showToast('Session deleted');
-      }
-    );
+    showConfirm('Delete Session', `Delete "${session?.name}"? This cannot be undone.`, () => {
+      library = library.filter(s => s.id !== activeSessionId);
+      saveLibrary();
+      activeSessionId = null;
+      document.getElementById('sessionNameDisplay').textContent = 'No session — create one to start';
+      document.getElementById('sessionNameDisplay').classList.add('empty');
+      document.getElementById('modeTabs').style.display = 'none';
+      document.getElementById('noSessionState').style.display = 'block';
+      ['pre','post','story','tmay','notes'].forEach(m => document.getElementById('mode-' + m).style.display = 'none');
+      showToast('Session deleted');
+    });
   });
 
-  // ════════════════════════════════════════════════
-  // EXPORT / IMPORT
-  // ════════════════════════════════════════════════
-  document.getElementById('exportBtn').addEventListener('click', () => {
+  // ── EXPORT / IMPORT ──
+  document.getElementById('exportLibraryBtn').addEventListener('click', () => {
     const data = { exportedAt: new Date().toISOString(), sessions: library };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const a = document.createElement('a'); a.href = url;
     a.download = 'interview-prep-library-' + new Date().toISOString().slice(0,10) + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    a.click(); URL.revokeObjectURL(url);
     showToast('Library exported');
   });
-
-  document.getElementById('importBtn').addEventListener('click', () => {
-    document.getElementById('importFile').click();
-  });
-
-  document.getElementById('importFile').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  document.getElementById('importLibraryBtn').addEventListener('click', () => document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', e => {
+    const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = ev => {
       try {
         const data = JSON.parse(ev.target.result);
         const imported = data.sessions || (Array.isArray(data) ? data : []);
         if (imported.length === 0) { showToast('No sessions found in file'); return; }
-        showConfirm(
-          'Import Library',
-          `Import ${imported.length} session(s)? Existing sessions will be kept. Duplicate IDs will be skipped.`,
-          () => {
-            const existingIds = new Set(library.map(s => s.id));
-            const newSessions = imported.filter(s => !existingIds.has(s.id));
-            library = [...newSessions, ...library];
-            saveLibrary();
-            renderSidebar();
-            showToast(`Imported ${newSessions.length} session(s)`);
-          }
-        );
-      } catch(err) {
-        showToast('Could not read file');
-      }
+        showConfirm('Import Library', `Import ${imported.length} session(s)? Existing sessions are kept. Duplicate IDs are skipped.`, () => {
+          const existing = new Set(library.map(s => s.id));
+          const newOnes = imported.filter(s => !existing.has(s.id));
+          library = [...newOnes, ...library]; saveLibrary();
+          renderLibraryList();
+          showToast(`Imported ${newOnes.length} session(s)`);
+        });
+      } catch(err) { showToast('Could not read file'); }
       e.target.value = '';
     };
     reader.readAsText(file);
   });
 
-  // ════════════════════════════════════════════════
-  // UTILITY
-  // ════════════════════════════════════════════════
+  // ── UTILITY ──
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ════════════════════════════════════════════════
-  // INIT
-  // ════════════════════════════════════════════════
+  // ── INIT ──
   function init() {
     library = loadLibrary();
-    renderSidebar();
-
-    // If sessions exist, auto-load the most recent one
     if (library.length > 0) {
-      const mostRecent = library.slice().sort((a, b) => b.updatedAt - a.updatedAt)[0];
-      switchSession(mostRecent.id);
+      const recent = library.slice().sort((a,b) => b.updatedAt - a.updatedAt)[0];
+      switchSession(recent.id);
+    } else {
+      document.getElementById('noSessionState').style.display = 'block';
     }
   }
 
-  // ════════════════════════════════════════════════
-  // HOW IT WORKS TOGGLE
-  // ════════════════════════════════════════════════
-  document.getElementById('howItWorksToggle').addEventListener('click', () => {
-    document.getElementById('howItWorks').classList.toggle('open');
-  });
-
   init();
   </script>
-
-
 </body>
 </html>
