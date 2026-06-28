@@ -321,6 +321,12 @@ const SFX = {
       setTimeout(() => playTone(freqs[i],'sine',0.35,0.18), t*1000);
     });
     setTimeout(() => playNoise(0.6, 0.08, 'bandpass', 800, 4000), 480);
+  },
+  gameover: () => {
+    playTone(220,'sawtooth',0.18,0.28,110);
+    setTimeout(() => playTone(165,'sawtooth',0.18,0.24,82), 200);
+    setTimeout(() => playTone(110,'square',0.5,0.3,55), 420);
+    setTimeout(() => playNoise(0.7, 0.1, 'lowpass', 400, 60), 440);
   }
 };
 
@@ -952,6 +958,7 @@ function loop(ts) {
 function showGameOver() {
   paused=false; pauseBtn.style.display='none';
   setBackNavVisible(true);
+  SFX.gameover();
   const playerName=document.getElementById('player-name').value||'PILOT';
   try{localStorage.setItem('dodge_pilot_name',playerName);}catch(e){}
   const entries=addToLB(playerName,score);
