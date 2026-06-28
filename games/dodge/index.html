@@ -305,6 +305,12 @@ const SFX = {
   die:     () => { playTone(300,'sawtooth',0.6,0.4,20); playTone(150,'square',0.4,0.2,40); },
   powerup: () => { playTone(440,'sine',0.08,0.2); playTone(660,'sine',0.12,0.2); playTone(880,'sine',0.18,0.2); },
   shield:  () => playTone(600,'sine',0.15,0.25,900),
+  earnedShield: () => {
+    playTone(440,'sine',0.12,0.3,880);
+    setTimeout(()=>playTone(660,'sine',0.12,0.25,1320),130);
+    setTimeout(()=>playTone(880,'sine',0.25,0.3,1760),260);
+    setTimeout(()=>playNoise(0.4,0.1,'bandpass',1200,4000),300);
+  },
   levelup: () => {
     playTone(55,'sine',0.5,0.18,80);
     playNoise(0.6, 0.12, 'bandpass', 300, 4000);
@@ -422,6 +428,7 @@ pauseBtn.addEventListener('click', togglePause);
 let shieldActive = false, shieldTimer = 0;
 let slowActive   = false, slowTimer   = 0;
 let powerups = [], obstacles = [];
+let earnedShieldOrb = null; // { x, y, vy, r, life, pulse }
 let baseSpeed = 1.6, spawnRate = 52;
 let bossActive = false, boss = null, bossHP = 0, bossMaxHP = 0, bossWaveLevel = 0;
 let particles = [];
@@ -467,7 +474,11 @@ function updateHUD() {
   ['pip1','pip2','pip3'].forEach((id,i) => document.getElementById(id).classList.toggle('dead', i>=lives));
 }
 function updatePowerupUI() {
-  document.getElementById('pu-shield').classList.toggle('active', shieldActive);
+  const shieldEl = document.getElementById('pu-shield');
+  shieldEl.classList.toggle('active', shieldActive);
+  shieldEl.style.filter = (shieldActive && shieldTimer > 600)
+    ? 'drop-shadow(0 0 8px #ffcc00)'
+    : '';
   document.getElementById('pu-slow').classList.toggle('active', slowActive);
 }
 function showLevelFlash(text, color) {
@@ -522,7 +533,7 @@ document.getElementById('win-btn').addEventListener('click', startGame);
 // ─── Game flow ────────────────────────────────────────────────────────────────
 function startGame() {
   score=0; lives=3; frame=0; lastLevel=1;
-  obstacles=[]; particles=[]; powerups=[];
+  obstacles=[]; particles=[]; powerups=[]; earnedShieldOrb=null;
   shieldActive=false; shieldTimer=0; slowActive=false; slowTimer=0;
   bossActive=false; boss=null; bossWaveLevel=0;
   P.x=W/2; P.y=H-80; mx=W/2; my=H-80; mouseMoved=false;
@@ -740,6 +751,11 @@ function spawnParticles(x, y, color, n=12) {
       life:1, decay:0.04+Math.random()*0.04, r:2+Math.random()*3, color });
   }
 }
+function spawnEarnedShield() {
+  earnedShieldOrb = { x: W/2, y: -40, vy: 0.9, r: 28, life: 700, pulse: 0 };
+  SFX.earnedShield();
+  showLevelFlash('SHIELD EARNED - FLY INTO IT', '#ffcc00');
+}
 function getBossWaveNum(l) { return Math.floor((l-6)/4)+1; }
 function spawnBoss(level) {
   bossActive=true;
@@ -878,7 +894,11 @@ function loop(ts) {
     if(lvl>lastLevel){
       lastLevel=lvl;
       if(isBossLevel(lvl)&&!bossActive) spawnBoss(lvl);
-      else { SFX.levelup(); showLevelFlash(`LEVEL ${lvl} / ${MAX_LEVEL}`,'#ffcc00'); }
+      else {
+        SFX.levelup();
+        showLevelFlash(`LEVEL ${lvl} / ${MAX_LEVEL}`,'#ffcc00');
+        if(lvl===15 && !earnedShieldOrb) setTimeout(spawnEarnedShield, 1200);
+      }
     }
     if(bossActive&&boss) updateBoss();
   }
@@ -920,6 +940,91 @@ function loop(ts) {
     return pu.life>0&&pu.y<H+20;
   });
 
+  // ─── Earned Shield Orb (Level 15 reward) ──────────────────────────────────
+  if (earnedShieldOrb) {
+    const eso = earnedShieldOrb;
+    if (!paused && state==='playing') {
+      eso.y += eso.vy;
+      eso.life--;
+      eso.pulse += 0.08;
+    }
+    if (eso.y < H + eso.r + 10 && eso.life > 0) {
+      const fadeAlpha = Math.min(1, eso.life / 80);
+      const outerPulse = 0.6 + 0.4 * Math.sin(eso.pulse);
+      const innerPulse = 0.4 + 0.4 * Math.sin(eso.pulse + 1.2);
+
+      // Outer gold halo
+      ctx.save();
+      ctx.globalAlpha = fadeAlpha * outerPulse;
+      ctx.shadowColor = '#ffcc00';
+      ctx.shadowBlur = 40;
+      ctx.strokeStyle = '#ffcc00';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(eso.x, eso.y, eso.r + 10, 0, Math.PI*2); ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Rotating dashes ring
+      ctx.translate(eso.x, eso.y);
+      ctx.rotate(eso.pulse * 0.5);
+      ctx.strokeStyle = `rgba(255,204,0,${fadeAlpha * 0.6})`;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 8]);
+      ctx.beginPath(); ctx.arc(0, 0, eso.r + 18, 0, Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // Filled gold core with cyan inner glow
+      ctx.save();
+      ctx.globalAlpha = fadeAlpha;
+      const grad = ctx.createRadialGradient(eso.x, eso.y, 0, eso.x, eso.y, eso.r);
+      grad.addColorStop(0, `rgba(0,255,231,${innerPulse})`);
+      grad.addColorStop(0.5, `rgba(255,204,0,0.85)`);
+      grad.addColorStop(1, `rgba(200,140,0,0.6)`);
+      ctx.shadowColor = '#ffcc00';
+      ctx.shadowBlur = 30 * outerPulse;
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(eso.x, eso.y, eso.r, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Shield icon drawn as canvas shapes (no emoji canvas issues)
+      ctx.fillStyle = `rgba(255,255,255,${fadeAlpha * 0.95})`;
+      ctx.beginPath();
+      ctx.moveTo(eso.x, eso.y - 12);
+      ctx.lineTo(eso.x + 10, eso.y - 6);
+      ctx.lineTo(eso.x + 10, eso.y + 4);
+      ctx.quadraticCurveTo(eso.x + 10, eso.y + 14, eso.x, eso.y + 16);
+      ctx.quadraticCurveTo(eso.x - 10, eso.y + 14, eso.x - 10, eso.y + 4);
+      ctx.lineTo(eso.x - 10, eso.y - 6);
+      ctx.closePath(); ctx.fill();
+
+      // "LVL 15" label above orb
+      ctx.font = "bold 9px 'Orbitron', sans-serif";
+      ctx.fillStyle = `rgba(255,204,0,${fadeAlpha})`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.shadowColor = '#ffcc00'; ctx.shadowBlur = 10;
+      ctx.fillText('LEVEL 15 SHIELD', eso.x, eso.y - eso.r - 14);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+
+      // Pickup check
+      if (state==='playing' && !paused) {
+        const dx = eso.x - P.x, dy = eso.y - P.y;
+        if (Math.sqrt(dx*dx+dy*dy) < eso.r + 16) {
+          shieldActive = true;
+          shieldTimer = 900;
+          updatePowerupUI();
+          spawnParticles(eso.x, eso.y, '#ffcc00', 24);
+          spawnParticles(eso.x, eso.y, '#00ffe7', 16);
+          showLevelFlash('SHIELD ACTIVATED!', '#ffcc00');
+          SFX.earnedShield();
+          earnedShieldOrb = null;
+        }
+      }
+    } else {
+      earnedShieldOrb = null;
+    }
+  }
+
   particles=particles.filter(p=>{
     if(!paused){p.x+=p.vx;p.y+=p.vy;p.vy+=0.12;p.life-=p.decay;}
     ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
@@ -930,8 +1035,10 @@ function loop(ts) {
   if(state!=='dead'&&state!=='won'||frame%6<4){
     const px=P.x,py=P.y;
     if(shieldActive){
-      ctx.strokeStyle=`rgba(68,136,255,${0.5+Math.sin(frame*0.15)*0.3})`;ctx.lineWidth=2;
-      ctx.shadowColor='#4488ff';ctx.shadowBlur=20;
+      const shieldCol = shieldTimer > 600 ? '#ffcc00' : '#4488ff';
+      const shieldRgb = shieldTimer > 600 ? '255,204,0' : '68,136,255';
+      ctx.strokeStyle=`rgba(${shieldRgb},${0.5+Math.sin(frame*0.15)*0.3})`;ctx.lineWidth=2;
+      ctx.shadowColor=shieldCol;ctx.shadowBlur=20;
       ctx.beginPath();ctx.arc(px,py,34,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
     }
     ctx.shadowColor='#00ffe7';ctx.shadowBlur=20;ctx.fillStyle='#00ffe7';
