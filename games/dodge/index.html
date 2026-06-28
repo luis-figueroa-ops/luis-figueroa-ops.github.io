@@ -395,7 +395,7 @@ function renderLB(entries, newScore) {
 const W = GW, H = GH;
 let state    = 'idle';
 let score    = 0, lives = 3, frame = 0, animId = null, lastLevel = 1;
-const P      = { x:W/2, y:H-80, w:28, h:16, speed:5 };
+const P      = { x:W/2, y:H-80, w:42, h:24, speed:5 };
 
 let mx = W/2, my = H-80, mouseMoved = false;
 let touchActive = false, touchInProgress = false;
@@ -793,7 +793,7 @@ function handlePlayerHit() {
   lives--; SFX.hit(); spawnParticles(P.x,P.y,'#ff2d55',16); updateHUD();
   if(lives<=0){state='dead';SFX.die();stopEngineHum();spawnParticles(P.x,P.y,'#ff2d55',35);setTimeout(showGameOver,800);}
 }
-function checkPickup(pu){const dx=pu.x-P.x,dy=pu.y-P.y;return Math.sqrt(dx*dx+dy*dy)<pu.r+16;}
+function checkPickup(pu){const dx=pu.x-P.x,dy=pu.y-P.y;return Math.sqrt(dx*dx+dy*dy)<pu.r+20;}
 
 // ─── Main loop ────────────────────────────────────────────────────────────────
 let _lastLoopTs = 0;
@@ -926,7 +926,7 @@ function loop(ts) {
     if(shieldActive){
       ctx.strokeStyle=`rgba(68,136,255,${0.5+Math.sin(frame*0.15)*0.3})`;ctx.lineWidth=2;
       ctx.shadowColor='#4488ff';ctx.shadowBlur=20;
-      ctx.beginPath();ctx.arc(px,py,26,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
+      ctx.beginPath();ctx.arc(px,py,34,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
     }
     ctx.shadowColor='#00ffe7';ctx.shadowBlur=20;ctx.fillStyle='#00ffe7';
     ctx.beginPath();
@@ -935,9 +935,9 @@ function loop(ts) {
     ctx.lineTo(px+P.w/4,py+P.h/4); ctx.lineTo(px+P.w/2,py+P.h/2);
     ctx.closePath();ctx.fill();
     ctx.fillStyle='#fff';ctx.shadowBlur=8;
-    ctx.beginPath();ctx.ellipse(px,py-2,4,6,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    ctx.beginPath();ctx.ellipse(px,py-3,6,9,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
     ctx.strokeStyle=`rgba(0,255,231,${0.3+Math.sin(frame*0.3)*0.2})`;ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(px-5,py+P.h/2);ctx.lineTo(px,py+P.h/2+6+Math.sin(frame*0.5)*4);ctx.lineTo(px+5,py+P.h/2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(px-8,py+P.h/2);ctx.lineTo(px,py+P.h/2+9+Math.sin(frame*0.5)*6);ctx.lineTo(px+8,py+P.h/2);ctx.stroke();
   }
 
   if(state==='playing'&&!isMobile){
