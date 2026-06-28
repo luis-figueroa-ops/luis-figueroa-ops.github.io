@@ -111,7 +111,7 @@
       padding: 16px 20px 8px;
       font-family: var(--font-mono);
       font-size: 10px;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       color: var(--muted);
       text-transform: uppercase;
     }
@@ -229,11 +229,11 @@
     }
 
     .mode-tab {
-      padding: 16px 24px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      padding: 14px 20px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      text-transform: none;
       color: var(--muted);
       cursor: pointer;
       border: none;
@@ -931,7 +931,7 @@
       <div class="modal-body">Give this session a name so you can find it later. A good name includes the company and role.</div>
       <div class="form-group" style="margin-bottom: 20px;">
         <label for="sessionNameInput">Session Name</label>
-        <input type="text" id="sessionNameInput" placeholder="e.g. Metronet — Commercial Process Specialist" />
+        <input type="text" id="sessionNameInput" placeholder="e.g. Company ABC — Operations Manager" />
       </div>
       <div class="modal-actions">
         <button class="btn-ghost" id="newSessionCancel">Cancel</button>
@@ -1000,7 +1000,7 @@
               <div class="form-row">
                 <div class="form-group" style="margin-bottom:0;">
                   <label for="companyName">Company</label>
-                  <input type="text" id="companyName" placeholder="e.g. Metronet" />
+                  <input type="text" id="companyName" placeholder="e.g. Company ABC" />
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
                   <label for="roleTitle">Role Title</label>
@@ -2004,7 +2004,7 @@ Return JSON only, no markdown:
   </script>
 
   <!-- Footer inside content panel — rendered after content -->
-  <div style="display:none;" id="footerPlaceholder">
+  <div id="footerPlaceholder">
     <div class="page-footer">
       <div class="disclaimer">
         <strong>AI Notice:</strong> Output is generated automatically and may contain inaccuracies.
