@@ -603,12 +603,16 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       addChatBubble('user', message);
 
       const bubble = document.createElement('div');
-      bubble.className = 'chat-bubble assistant';
+      bubble.className = 'chat-bubble thinking';
       const label = document.createElement('div');
       label.className = 'bubble-label';
       label.textContent = 'Analysis';
+      const thinking = document.createElement('div');
+      thinking.textContent = 'Going deeper…';
       const content = document.createElement('div');
+      content.style.display = 'none';
       bubble.appendChild(label);
+      bubble.appendChild(thinking);
       bubble.appendChild(content);
       chatMessages.appendChild(bubble);
       bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -617,12 +621,19 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         content, null,
         (rawText) => {
           conversationHistory.push({ role: 'assistant', content: rawText });
+          thinking.style.display = 'none';
+          content.style.display = '';
+          bubble.className = 'chat-bubble assistant';
           btn.classList.add('viewed');
           if (!btn.textContent.startsWith('\u2713 ')) btn.textContent = '\u2713 ' + btn.textContent;
+          bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
           unlockUI();
         },
         (err) => {
+          thinking.style.display = 'none';
+          content.style.display = '';
           content.innerHTML = `Something went wrong: ${err.message}. Try again.`;
+          bubble.className = 'chat-bubble assistant';
           conversationHistory.pop();
           unlockUI();
         }
@@ -639,12 +650,16 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       addChatBubble('user', userMessage);
 
       const bubble = document.createElement('div');
-      bubble.className = 'chat-bubble assistant';
+      bubble.className = 'chat-bubble thinking';
       const label = document.createElement('div');
       label.className = 'bubble-label';
       label.textContent = 'Analysis';
+      const thinking = document.createElement('div');
+      thinking.textContent = 'Reading between the lines…';
       const content = document.createElement('div');
+      content.style.display = 'none';
       bubble.appendChild(label);
+      bubble.appendChild(thinking);
       bubble.appendChild(content);
       chatMessages.appendChild(bubble);
       bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -653,11 +668,18 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
         content, null,
         (rawText) => {
           conversationHistory.push({ role: 'assistant', content: rawText });
+          thinking.style.display = 'none';
+          content.style.display = '';
+          bubble.className = 'chat-bubble assistant';
+          bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
           unlockUI();
           followUpInput.focus();
         },
         (err) => {
+          thinking.style.display = 'none';
+          content.style.display = '';
           content.innerHTML = `Something went wrong: ${err.message}. Try again.`;
+          bubble.className = 'chat-bubble assistant';
           conversationHistory.pop();
           unlockUI();
         }
