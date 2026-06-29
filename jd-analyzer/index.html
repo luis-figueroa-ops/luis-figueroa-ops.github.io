@@ -399,11 +399,6 @@
               const parsed = JSON.parse(jsonStr);
               if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
                 rawText += parsed.delta.text;
-                if (onChunk) onChunk(parsed.delta.text);
-                if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
-                targetElement.innerHTML = renderMarkdown(rawText);
-                targetElement.appendChild(cursor);
-                targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
               }
             } catch (_) {}
           }
@@ -494,14 +489,15 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       conversationHistory.push({ role: 'user', content: `Please analyze this job description:\n\n${jd}` });
 
       outputContent.innerHTML = '';
-      output.classList.add('visible');
-      loading.classList.remove('visible');
+      output.classList.remove('visible');
 
       await streamClaude(
         outputContent,
         null,
         (rawText) => {
           conversationHistory.push({ role: 'assistant', content: rawText });
+          loading.classList.remove('visible');
+          output.classList.add('visible');
           chatSection.classList.add('visible');
           analyzeBtn.disabled = false;
           requestAnimationFrame(() => {
