@@ -355,64 +355,139 @@
     printBtnTop.addEventListener('click', () => window.print());
     printBtnBottom.addEventListener('click', () => window.print());
 
+    // --- Typing engine ---
+    // Pauses (ms) after punctuation to mimic natural speech rhythm
+    function pauseForChar(ch) {
+      if (ch === '.' || ch === '!' || ch === '?') return 110 + Math.random() * 40;
+      if (ch === ',') return 60 + Math.random() * 30;
+      if (ch === '\n') return 80 + Math.random() * 40;
+      if (ch === ':') return 50 + Math.random() * 20;
+      return 0;
+    }
+
+    // Re-renders typed portion + blinking cursor into targetElement
+    function renderTyped(targetElement, typed, cursorEl) {
+      // Append a zero-width placeholder so cursor sits at end of rendered HTML
+      targetElement.innerHTML = renderMarkdown(typed) + '<span class="typing-anchor"></span>';
+      const anchor = targetElement.querySelector('.typing-anchor');
+      if (anchor && cursorEl) {
+        anchor.replaceWith(cursorEl);
+      } else if (cursorEl && !cursorEl.parentNode) {
+        targetElement.appendChild(cursorEl);
+      }
+    }
+
     async function streamClaude(targetElement, onChunk, onDone, onError) {
       const cursor = document.createElement('span');
       cursor.className = 'streaming-cursor';
       targetElement.appendChild(cursor);
 
-      try {
-        const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            max_tokens: 2000,
-            system: SYSTEM_PROMPT,
-            messages: conversationHistory
-          })
-        });
+      // Queue of raw characters waiting to be typed out
+      let charQueue = '';
+      let streamDone = false;
+      let typedSoFar = '';
+      let fetchError = null;
 
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData.error?.message || `HTTP ${response.status}`);
-        }
+      // Fetch + SSE parsing runs concurrently with typing loop
+      const fetchPromise = (async () => {
+        try {
+          const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              max_tokens: 2000,
+              system: SYSTEM_PROMPT,
+              messages: conversationHistory
+            })
+          });
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let rawText = '';
-        let buffer = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop();
-          for (const line of lines) {
-            if (!line.startsWith('data: ')) continue;
-            const jsonStr = line.slice(6).trim();
-            if (jsonStr === '[DONE]') continue;
-            try {
-              const parsed = JSON.parse(jsonStr);
-              if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
-                rawText += parsed.delta.text;
-                if (onChunk) onChunk(parsed.delta.text);
-                if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
-                targetElement.innerHTML = renderMarkdown(rawText);
-                targetElement.appendChild(cursor);
-                targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-              }
-            } catch (_) {}
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error?.message || `HTTP ${response.status}`);
           }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              const jsonStr = line.slice(6).trim();
+              if (jsonStr === '[DONE]') continue;
+              try {
+                const parsed = JSON.parse(jsonStr);
+                if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                  charQueue += parsed.delta.text;
+                  if (onChunk) onChunk(parsed.delta.text);
+                }
+              } catch (_) {}
+            }
+          }
+        } catch (err) {
+          fetchError = err;
+        } finally {
+          streamDone = true;
+        }
+      })();
+
+      // Typing loop — drains charQueue one character at a time
+      const BASE_DELAY = 33; // ~30 chars/sec
+      await new Promise((resolve) => {
+        let lastScroll = 0;
+
+        function typeNextChar() {
+          if (fetchError) {
+            if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+            if (onError) onError(fetchError);
+            resolve();
+            return;
+          }
+
+          if (charQueue.length === 0) {
+            if (streamDone) {
+              // All done — final clean render, remove cursor after brief pause
+              targetElement.innerHTML = renderMarkdown(typedSoFar);
+              setTimeout(() => {
+                if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+                if (onDone) onDone(typedSoFar);
+                resolve();
+              }, 300);
+              return;
+            }
+            // Waiting for more data — poll quickly
+            setTimeout(typeNextChar, 16);
+            return;
+          }
+
+          // Consume one character
+          const ch = charQueue[0];
+          charQueue = charQueue.slice(1);
+          typedSoFar += ch;
+
+          renderTyped(targetElement, typedSoFar, cursor);
+
+          // Throttle scroll so it doesn't jump on every character
+          const now = Date.now();
+          if (now - lastScroll > 120) {
+            lastScroll = now;
+            cursor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+
+          const extra = pauseForChar(ch);
+          const jitter = (Math.random() - 0.5) * 10; // ±5ms natural variation
+          setTimeout(typeNextChar, BASE_DELAY + extra + jitter);
         }
 
-        if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
-        targetElement.innerHTML = renderMarkdown(rawText);
-        if (onDone) onDone(rawText);
+        typeNextChar();
+      });
 
-      } catch (err) {
-        if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
-        if (onError) onError(err);
-      }
+      await fetchPromise; // ensure fetch is fully settled
     }
 
     const SYSTEM_PROMPT = `You are an experienced operations professional who reads job descriptions with a sharp, structured eye. Your job is to give candidates an honest, specific read on what a role actually is - cutting through vague language to identify what's really being asked for, who will actually succeed here, and what questions to ask.
