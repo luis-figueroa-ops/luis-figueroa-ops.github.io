@@ -609,7 +609,7 @@
     <div class="hero">
       <div class="eyebrow">Interview Prep</div>
       <h1>Prep <span>Smarter</span></h1>
-      <p class="hero-sub">Decode the job description. Reverse-engineer past interviews. Translate your experience into the language hiring managers are listening for. Build your Tell Me About Yourself.</p>
+      <p class="hero-sub">You got the interview. Now win it. Decode the role, build your stories, craft your opening answer, and turn every interview you've ever had into prep intelligence for the next one.</p>
     </div>
 
     <!-- How It Works -->
@@ -619,26 +619,26 @@
         <span class="how-it-works-chevron">&#9660;</span>
       </div>
       <div class="how-it-works-body">
-        <p class="how-it-works-intro">Five connected modes. Create a session for each role. Your work saves automatically to your browser.</p>
+        <p class="how-it-works-intro">Four connected steps to win the interview — plus a fifth you can use any time to sharpen answers from past experience. Create a session for each role. Your work saves automatically.</p>
         <div class="how-mode">
           <div class="how-mode-num">01</div>
-          <div><div class="how-mode-title">Pre-Interview</div><div class="how-mode-desc">Paste the JD. Get the competency map — what the hiring manager is actually scoring underneath each question — and the methodology behind a strong answer.</div></div>
+          <div><div class="how-mode-title">Decode the Role</div><div class="how-mode-desc">Paste the JD. Get the competency map — what the hiring manager is actually scoring underneath each question — and the methodology behind a strong answer. If you have the company website, the tool researches their recent impact too.</div></div>
         </div>
         <div class="how-mode">
           <div class="how-mode-num">02</div>
-          <div><div class="how-mode-title">Post-Interview</div><div class="how-mode-desc">Enter questions that were actually asked. Get a reverse-engineered read on what each one was testing and where your answer could have been stronger.</div></div>
+          <div><div class="how-mode-title">Build Your Stories</div><div class="how-mode-desc">Describe a real work experience. Get it mapped to the competencies of this role and translated into the language that lands — using the SOAR framework with before/after impact framing.</div></div>
         </div>
         <div class="how-mode">
           <div class="how-mode-num">03</div>
-          <div><div class="how-mode-title">Story Translation</div><div class="how-mode-desc">Describe a real work experience. Get it mapped to the competencies of the role and translated into the language and framing that lands with hiring managers — using the SOAR framework.</div></div>
+          <div><div class="how-mode-title">Your Opening Answer</div><div class="how-mode-desc">Build a role-specific Tell Me About Yourself — past, present, future, connected to what this role is actually solving for. Closes with a question that hands control back to the interviewer.</div></div>
         </div>
         <div class="how-mode">
           <div class="how-mode-num">04</div>
-          <div><div class="how-mode-title">Tell Me About Yourself</div><div class="how-mode-desc">Build a structured, role-specific TMAY answer grounded in your actual background. Past, present, and future — connected to the role and closed with a question.</div></div>
+          <div><div class="how-mode-title">Your Notes</div><div class="how-mode-desc">Company research, interviewer names, closing script, follow-up questions — everything that belongs to this specific interview in one place.</div></div>
         </div>
         <div class="how-mode" style="margin-bottom: 16px;">
           <div class="how-mode-num">05</div>
-          <div><div class="how-mode-title">Session Notes</div><div class="how-mode-desc">Company research, interviewer names, follow-up questions, anything that belongs to this role and this interview.</div></div>
+          <div><div class="how-mode-title">Questions & Debrief</div><div class="how-mode-desc">Use this two ways. Before an interview: pull questions from past interviews for similar roles and get smarter answers ready — because the same questions come up again. After an interview: paste the JD and the questions that were asked to get a role-specific read on what was being scored and where you missed.</div></div>
         </div>
         <div class="how-note"><strong>Think tank, not a script.</strong> Hiring managers go off-JD. Use the competency map to internalize the thinking so you can respond live — not recite a prepared answer.</div>
       </div>
@@ -664,18 +664,18 @@
 
     <!-- Mode Tabs (hidden until session active) -->
     <div class="mode-tabs" id="modeTabs" style="display:none;">
-      <button class="mode-tab active" data-mode="pre">Pre-Interview</button>
-      <button class="mode-tab" data-mode="post">Post-Interview</button>
-      <button class="mode-tab" data-mode="story">Story Translation</button>
-      <button class="mode-tab" data-mode="tmay">Tell Me About Yourself</button>
-      <button class="mode-tab" data-mode="notes">Session Notes</button>
+      <button class="mode-tab active" data-mode="pre">Decode the Role</button>
+      <button class="mode-tab" data-mode="story">Build Your Stories</button>
+      <button class="mode-tab" data-mode="tmay">Your Opening Answer</button>
+      <button class="mode-tab" data-mode="notes">Your Notes</button>
+      <button class="mode-tab" data-mode="post">Questions &amp; Debrief</button>
     </div>
 
     <!-- ════ PRE-INTERVIEW MODE ════ -->
     <div id="mode-pre" style="display:none;">
-      <div class="section-eyebrow">Mode 01</div>
-      <div class="section-title">Pre-<span>Interview</span></div>
-      <div class="section-sub">Paste the job description. Get the competency map, likely questions, and what the interviewer is actually scoring — not what the JD says, but what it means.</div>
+      <div class="section-eyebrow">Step 01</div>
+      <div class="section-title">Decode <span>the Role</span></div>
+      <div class="section-sub">Paste the job description. Get the competency map and what the interviewer is actually scoring — not what the JD says, but what it means. Add the company website to pull in real intelligence on who they are.</div>
 
       <div id="preForm">
         <div class="card">
@@ -743,19 +743,31 @@
 
         <div class="btn-row" style="margin-top: 20px;">
           <button class="btn-secondary" id="reanalyzeBtn">Re-analyze</button>
-          <button class="btn-ghost" id="goToStoryModeBtn">Build Your Stories →</button>
+        </div>
+
+        <!-- Flow nudge -->
+        <div class="card-accent" style="margin-top: 24px; border-left-color: var(--green);">
+          <div class="detail-label" style="color: var(--green);">Next Step</div>
+          <div style="font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 12px;">You have your competency map. Now build the stories that prove you can do this work — mapped to the specific competencies this role is testing for.</div>
+          <button class="btn-sm" onclick="switchMode('story')" style="border-color: var(--green); color: var(--green);">Build Your Stories →</button>
         </div>
       </div>
     </div>
 
-    <!-- ════ POST-INTERVIEW MODE ════ -->
+    <!-- ════ QUESTIONS & DEBRIEF MODE ════ -->
     <div id="mode-post" style="display:none;">
-      <div class="section-eyebrow">Mode 02</div>
-      <div class="section-title">Post-<span>Interview</span></div>
-      <div class="section-sub">Enter questions that were actually asked. Get a reverse-engineered read on what each one was scoring and where your answer could have been stronger.</div>
+      <div class="section-eyebrow">Optional</div>
+      <div class="section-title">Questions <span>&amp; Debrief</span></div>
+      <div class="section-sub">Two ways to use this. <strong style="color: var(--white);">Before an interview:</strong> enter questions from past interviews for similar roles — the same questions come up again, and now you can walk in with stronger answers. <strong style="color: var(--white);">After an interview:</strong> paste the JD and the questions that were asked to get a role-specific read on what was being scored and where your answer could have been stronger. Either way, the JD is what makes the analysis specific — not generic.</div>
 
       <div class="card">
-        <div class="card-label">Questions From the Interview</div>
+        <div class="card-label">Job Description for This Analysis</div>
+        <textarea id="debriefJdInput" placeholder="Paste the JD for the role you're analyzing — this is what makes the feedback role-specific, not generic." style="min-height: 160px;"></textarea>
+        <div class="hint" id="debriefJdHint">The analysis is grounded in this JD. If you're prepping for the current role, your JD from Decode the Role has been pre-filled above. Replace it if you're analyzing a different role.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Interview Questions</div>
         <div id="postQuestionsList"></div>
         <button class="btn-secondary" id="addQuestionBtn" style="margin-top: 8px;">+ Add Question</button>
       </div>
@@ -764,18 +776,23 @@
         <button class="btn-primary" id="analyzeQuestionsBtn">Analyze These Questions</button>
         <div class="status-line" id="postStatus" style="display:none;">
           <div class="dot-pulse"><span></span><span></span><span></span></div>
-          <span>Reverse-engineering the interview...</span>
+          <span>Decoding what they were scoring...</span>
         </div>
       </div>
 
       <div id="postResults"></div>
+
+      <div id="postOutputActions" style="display:none;" class="output-actions">
+        <button class="btn-sm" id="copyDebriefBtn">⎘ Copy Analysis</button>
+        <button class="btn-sm" id="saveDebriefPdfBtn">↓ Save as PDF</button>
+      </div>
     </div>
 
     <!-- ════ STORY TRANSLATION MODE ════ -->
     <div id="mode-story" style="display:none;">
-      <div class="section-eyebrow">Mode 03</div>
-      <div class="section-title">Story <span>Translation</span></div>
-      <div class="section-sub">Describe a real experience. Get it mapped to the competencies of this role and translated into the language the interviewer is listening for.</div>
+      <div class="section-eyebrow">Step 02</div>
+      <div class="section-title">Build Your <span>Stories</span></div>
+      <div class="section-sub">Describe a real work experience. Get it mapped to the competencies of this role and translated into the language the interviewer is listening for — with before/after impact framing built in.</div>
 
       <div id="storyProfileNote" class="profile-strip" style="display:none;">
         <div class="profile-strip-label">From Pre-Interview</div>
@@ -807,13 +824,20 @@
       <div class="section-eyebrow" style="margin-bottom: 8px;">Story Library</div>
       <div class="hint" style="margin-bottom: 16px;">Stories translated in this session. Reusable across any role.</div>
       <div id="storyLibrary"></div>
+
+      <!-- Flow nudge -->
+      <div class="card-accent" style="margin-top: 24px; border-left-color: var(--green);">
+        <div class="detail-label" style="color: var(--green);">Next Step</div>
+        <div style="font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 12px;">Stories locked in. Now build your opening answer — the first thing out of your mouth when they say "tell me about yourself." It should connect your background directly to what this role is solving for.</div>
+        <button class="btn-sm" onclick="switchMode('tmay')" style="border-color: var(--green); color: var(--green);">Build Your Opening Answer →</button>
+      </div>
     </div>
 
     <!-- ════ TELL ME ABOUT YOURSELF MODE ════ -->
     <div id="mode-tmay" style="display:none;">
-      <div class="section-eyebrow">Mode 04</div>
-      <div class="section-title">Tell Me About <span>Yourself</span></div>
-      <div class="section-sub">Build a structured, role-specific TMAY answer. Past, present, and future — connected to what this role is actually solving for. Closes with a question that hands control back to the interviewer.</div>
+      <div class="section-eyebrow">Step 03</div>
+      <div class="section-title">Your Opening <span>Answer</span></div>
+      <div class="section-sub">Build your Tell Me About Yourself — past, present, future, connected to what this role is actually solving for. Closes with a question that hands control back to the interviewer.</div>
 
       <div class="card">
         <div class="card-label">Your Background</div>
@@ -853,14 +877,21 @@
         <div class="btn-row" style="margin-top: 16px;">
           <button class="btn-ghost" id="rebuildTMAYBtn">Rebuild →</button>
         </div>
+
+        <!-- Flow nudge -->
+        <div class="card-accent" style="margin-top: 24px; border-left-color: var(--green);">
+          <div class="detail-label" style="color: var(--green);">Next Step</div>
+          <div style="font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 12px;">Opening answer ready. Now capture your company research, interviewer names, questions to ask them, and your closing script — everything you need to walk in fully prepared.</div>
+          <button class="btn-sm" onclick="switchMode('notes')" style="border-color: var(--green); color: var(--green);">Go to Your Notes →</button>
+        </div>
       </div>
     </div>
 
     <!-- ════ SESSION NOTES MODE ════ -->
     <div id="mode-notes" style="display:none;">
-      <div class="section-eyebrow">Mode 05</div>
-      <div class="section-title">Session <span>Notes</span></div>
-      <div class="section-sub">Company research, interviewer names, follow-up questions, anything that belongs to this role and this interview.</div>
+      <div class="section-eyebrow">Step 04</div>
+      <div class="section-title">Your <span>Notes</span></div>
+      <div class="section-sub">Company research, interviewer names, questions to ask, closing script — anything that belongs to this specific interview. Saves automatically.</div>
 
       <div class="card">
         <div class="card-label">Notes</div>
@@ -876,10 +907,17 @@
         <div class="hint" style="margin-top: 12px;">Deleting removes all data for this session permanently. Use Library → Export to back up before deleting.</div>
       </div>
 
-      <!-- Notes output actions — appear after the textarea -->
+      <!-- Notes output actions -->
       <div class="output-actions" style="margin-top: -8px; margin-bottom: 24px;">
         <button class="btn-sm" id="copyNotesBtn">⎘ Copy Notes</button>
         <button class="btn-sm" id="saveNotesPdfBtn">↓ Save as PDF</button>
+      </div>
+
+      <!-- Flow nudge -->
+      <div class="card-accent" style="border-left-color: var(--muted);">
+        <div class="detail-label">Optional — Questions & Debrief</div>
+        <div style="font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 12px;">Have questions from a past interview for a similar role? Add them to get smarter answers ready before you walk in — because the same questions come up again. Or use it after this interview to get a role-specific read on what was being scored.</div>
+        <button class="btn-sm" onclick="switchMode('post')">Questions &amp; Debrief →</button>
       </div>
     </div>
 
@@ -1048,7 +1086,7 @@
   // ── SESSION MANAGEMENT ──
   function createSession(name) {
     const id = 'session_' + Date.now();
-    library.unshift({ id, name, status: 'active', company: '', roleTitle: '', companyWebsite: '', companyIntel: null, roleType: '', jd: '', businessProblem: '', roleContextNote: '', competencies: [], postQuestions: [], postAnalysis: [], stories: [], tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '', notes: '', createdAt: Date.now(), updatedAt: Date.now() });
+    library.unshift({ id, name, status: 'active', company: '', roleTitle: '', companyWebsite: '', companyIntel: null, roleType: '', jd: '', businessProblem: '', roleContextNote: '', competencies: [], postQuestions: [], postAnalysis: [], debriefJd: '', debriefAnalysis: [], stories: [], tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '', notes: '', createdAt: Date.now(), updatedAt: Date.now() });
     saveLibrary();
     return id;
   }
@@ -1085,7 +1123,17 @@
 
     postQuestions = s.postQuestions ? [...s.postQuestions] : [];
     renderPostQuestions();
-    if (s.postAnalysis && s.postAnalysis.length > 0) renderPostAnalysis(s.postAnalysis);
+
+    // Load debrief JD — use session's own debriefJd if set, else default to pre-interview JD
+    const debriefJd = s.debriefJd || s.jd || '';
+    document.getElementById('debriefJdInput').value = debriefJd;
+    updateDebriefJdHint(s);
+
+    const analysesToRender = s.debriefAnalysis?.length ? s.debriefAnalysis : (s.postAnalysis?.length ? s.postAnalysis : []);
+    if (analysesToRender.length > 0) {
+      renderPostAnalysis(analysesToRender);
+      document.getElementById('postOutputActions').style.display = 'flex';
+    }
 
     renderStoryLibrary(s.stories || []);
 
@@ -1106,7 +1154,7 @@
   function switchMode(mode) {
     currentMode = mode;
     document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-    ['pre','post','story','tmay','notes'].forEach(m => {
+    ['pre','story','tmay','notes','post'].forEach(m => {
       document.getElementById('mode-' + m).style.display = m === mode ? 'block' : 'none';
     });
   }
@@ -1160,6 +1208,11 @@
         companyWebsite: document.getElementById('companyWebsite').value
       });
     });
+  });
+
+  document.getElementById('debriefJdInput').addEventListener('input', () => {
+    if (!activeSessionId) return;
+    updateSession(activeSessionId, { debriefJd: document.getElementById('debriefJdInput').value });
   });
   ['tmayBackground','tmayCurrentRole','tmayWhy'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
@@ -1320,7 +1373,13 @@ Return structured JSON only. No markdown, no preamble, no backticks.
     card.style.display = 'block';
   }
 
-  document.getElementById('goToStoryModeBtn').addEventListener('click', () => switchMode('story'));
+  document.getElementById('goToStoryModeBtn') && document.getElementById('goToStoryModeBtn').addEventListener('click', () => switchMode('story'));
+
+  document.getElementById('copyDebriefBtn').addEventListener('click', () => {
+    const container = document.getElementById('postResults');
+    copyText(container.innerText, 'Analysis');
+  });
+  document.getElementById('saveDebriefPdfBtn').addEventListener('click', () => window.print());
 
   document.getElementById('reanalyzeBtn').addEventListener('click', () => {
     document.getElementById('preForm').style.display = 'block';
@@ -1328,7 +1387,51 @@ Return structured JSON only. No markdown, no preamble, no backticks.
     document.getElementById('companyIntelCard').style.display = 'none';
   });
 
-  // ── POST-INTERVIEW ──
+  // ── QUESTIONS & DEBRIEF ──
+  function updateDebriefJdHint(session) {
+    const hint = document.getElementById('debriefJdHint');
+    if (!hint) return;
+    if (session?.jd && !session?.debriefJd) {
+      hint.textContent = 'Pre-filled from Decode the Role. Replace if analyzing a different role.';
+    } else if (session?.debriefJd) {
+      hint.textContent = 'Using saved JD for this analysis. Replace to analyze a different role.';
+    } else {
+      hint.textContent = 'Paste the JD for the role you\'re analyzing — this is what makes the feedback role-specific, not generic.';
+    }
+  }
+
+  document.getElementById('analyzeQuestionsBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const validQs = postQuestions.filter(q => q.trim().length > 5);
+    if (validQs.length === 0) { showToast('Add at least one question first'); return; }
+    const debriefJd = document.getElementById('debriefJdInput').value.trim();
+    if (debriefJd.length < 80) { showToast('Paste the job description first — the analysis needs it to be role-specific'); return; }
+    const session = getSession(activeSessionId);
+    const btn = document.getElementById('analyzeQuestionsBtn');
+    const status = document.getElementById('postStatus');
+    btn.disabled = true; status.style.display = 'flex';
+    try {
+      const system = `You are an expert at reverse-engineering interview questions to reveal what the interviewer was actually evaluating. You have the job description for this role — use it to make every answer role-specific, not generic. Ground your analysis in the actual competencies and business problems this role is solving for.
+
+For each question:
+1. Identify the competency being tested — name it in the context of this specific role
+2. Decode the scoring layers — what 3 things the interviewer was evaluating simultaneously
+3. Describe what a strong answer includes — specific to this role's context
+4. Name what most candidates miss — the gap between an adequate answer and a strong one
+5. Provide a framework for next time — a concrete approach they can use
+
+Return JSON only. No markdown, no preamble:
+{"analyses":[{"question":"","competency":"","whatTheyScored":["","",""],"strongAnswerIncludes":"","commonMiss":"","nextTimeFramework":""}]}`;
+      const user = `Role: ${session?.roleTitle||'Not specified'} at ${session?.company||'Not specified'}\n\nJob Description:\n${debriefJd}\n\nInterview Questions:\n${validQs.map((q,i) => `${i+1}. ${q}`).join('\n')}`;
+      const result = await callClaudeJSON(system, user, 2500);
+      updateSession(activeSessionId, { debriefJd, debriefAnalysis: result.analyses, postQuestions });
+      renderPostAnalysis(result.analyses);
+      document.getElementById('postOutputActions').style.display = 'flex';
+      showToast('Analysis complete');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
+  });
+
   function renderPostQuestions() {
     const list = document.getElementById('postQuestionsList');
     list.innerHTML = '';
@@ -1359,29 +1462,6 @@ Return structured JSON only. No markdown, no preamble, no backticks.
     postQuestions.push('');
     renderPostQuestions();
     setTimeout(() => { const inputs = document.querySelectorAll('.post-q-input'); if (inputs.length) inputs[inputs.length-1].focus(); }, 50);
-  });
-
-  document.getElementById('analyzeQuestionsBtn').addEventListener('click', async () => {
-    if (!activeSessionId) return;
-    const validQs = postQuestions.filter(q => q.trim().length > 5);
-    if (validQs.length === 0) { showToast('Add at least one question first'); return; }
-    const session = getSession(activeSessionId);
-    const btn = document.getElementById('analyzeQuestionsBtn');
-    const status = document.getElementById('postStatus');
-    btn.disabled = true; status.style.display = 'flex';
-    try {
-      const system = `You are an expert at reverse-engineering interview questions. For each question, decode what competency was being tested, what the interviewer was really scoring, what a strong answer includes, what most candidates miss, and the framework to use next time. Use the most current thinking on competency-based interviewing.
-
-Return JSON only:
-{"analyses":[{"question":"","competency":"","whatTheyScored":["","",""],"strongAnswerIncludes":"","commonMiss":"","nextTimeFramework":""}]}`;
-      const roleContext = session ? `Role: ${session.roleTitle||'Not specified'} at ${session.company||'Not specified'}. ` : '';
-      const user = roleContext + 'Questions:\n' + validQs.map((q,i) => `${i+1}. ${q}`).join('\n');
-      const result = await callClaudeJSON(system, user, 2500);
-      updateSession(activeSessionId, { postAnalysis: result.analyses });
-      renderPostAnalysis(result.analyses);
-      showToast('Analysis complete');
-    } catch(err) { showToast('Error: ' + err.message); }
-    finally { btn.disabled = false; status.style.display = 'none'; }
   });
 
   function renderPostAnalysis(analyses) {
@@ -1540,7 +1620,7 @@ Return JSON only:
       document.getElementById('sessionBar').style.display = 'none';
       document.getElementById('modeTabs').style.display = 'none';
       document.getElementById('noSessionState').style.display = 'block';
-      ['pre','post','story','tmay','notes'].forEach(m => document.getElementById('mode-' + m).style.display = 'none');
+      ['pre','story','tmay','notes','post'].forEach(m => document.getElementById('mode-' + m).style.display = 'none');
       showToast('Session deleted');
     });
   });
