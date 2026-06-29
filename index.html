@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Luis Figueroa — Operations, Augmented</title>
-<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -64,191 +63,49 @@ header {
   animation: fadeUp 0.7s ease both;
 }
 
-.header-left {
-  display: flex;
-  align-items: flex-start;
-  gap: 32px;
-}
+.header-left { display: flex; align-items: flex-start; gap: 32px; }
 
-.header-logo {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: none;
-  flex-shrink: 0;
-  margin-top: 4px;
-}
+.header-logo { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: none; flex-shrink: 0; margin-top: 4px; }
 
-.eyebrow {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 16px;
-  letter-spacing: 4px;
-  color: var(--gold);
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
+.eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 16px; letter-spacing: 4px; color: var(--gold); margin-bottom: 10px; text-transform: uppercase; }
 
-h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(52px, 6vw, 80px);
-  letter-spacing: 3px;
-  line-height: 0.95;
-  color: var(--white);
-}
-
+h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px, 6vw, 80px); letter-spacing: 3px; line-height: 0.95; color: var(--white); }
 h1 span { color: var(--gold); }
 
-.tagline {
-  margin-top: 14px;
-  font-size: 19px;
-  font-weight: 400;
-  color: var(--white);
-  letter-spacing: 1px;
-  max-width: 600px;
-  line-height: 1.6;
-  opacity: 0.8;
-  white-space: nowrap;
-}
+.tagline { margin-top: 14px; font-size: 19px; font-weight: 400; color: var(--white); letter-spacing: 1px; max-width: 600px; line-height: 1.6; opacity: 0.8; white-space: nowrap; }
 
-.header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 16px;
-  padding-bottom: 6px;
-}
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; padding-bottom: 6px; }
 
-.header-links {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
+.header-links { display: flex; gap: 20px; align-items: center; }
 
-.header-links a {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 15px;
-  letter-spacing: 2px;
-  color: var(--white);
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.2s;
-  border-bottom: 1px solid transparent;
-  padding-bottom: 2px;
-}
-
+.header-links a { font-family: 'Share Tech Mono', monospace; font-size: 15px; letter-spacing: 2px; color: var(--white); text-decoration: none; text-transform: uppercase; transition: color 0.2s; border-bottom: 1px solid transparent; padding-bottom: 2px; }
 .header-links a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 .header-links .divider { width: 1px; height: 14px; background: var(--border); }
 
-.header-qr {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
+.header-qr { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.header-qr img { width: 140px; height: 140px; border-radius: 6px; border: 1px solid rgba(184,150,62,0.3); image-rendering: crisp-edges; }
+.header-qr span { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
 
-.header-qr img {
-  width: 140px;
-  height: 140px;
-  border-radius: 6px;
-  border: 1px solid rgba(184,150,62,0.3);
-  image-rendering: crisp-edges;
-}
+.intro { position: relative; z-index: 10; padding: 40px 64px; border-bottom: 1px solid var(--border); animation: fadeUp 0.7s 0.1s ease both; }
 
-.header-qr span {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  color: var(--muted);
-  text-transform: uppercase;
-}
-
-.intro {
-  position: relative; z-index: 10;
-  padding: 40px 64px;
-  border-bottom: 1px solid var(--border);
-  animation: fadeUp 0.7s 0.1s ease both;
-}
-
-.intro-top {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
+.intro-top { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
 .intro-bar { width: 3px; height: 48px; background: linear-gradient(to bottom, var(--gold), transparent); flex-shrink: 0; }
-
-.intro-text {
-  font-size: 20px;
-  font-weight: 400;
-  color: var(--white);
-  line-height: 1.7;
-  max-width: 62%;
-  opacity: 0.85;
-}
-
+.intro-text { font-size: 20px; font-weight: 400; color: var(--white); line-height: 1.7; max-width: 62%; opacity: 0.85; }
 .intro-text strong { color: var(--white); font-weight: 500; }
 
-.why-built {
-  border-top: 1px solid var(--border);
-  padding-top: 28px;
-}
-
-.why-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 26px;
-  letter-spacing: 3px;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-
-.why-text {
-  font-size: 17px;
-  font-weight: 400;
-  color: var(--white);
-  line-height: 1.8;
-  max-width: 62%;
-  opacity: 0.78;
-}
-
-.why-text a {
-  color: var(--gold-light);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(184,150,62,0.4);
-  transition: border-color 0.2s, color 0.2s;
-}
-
+.why-built { border-top: 1px solid var(--border); padding-top: 28px; }
+.why-label { font-family: 'Share Tech Mono', monospace; font-size: 26px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
+.why-text { font-size: 17px; font-weight: 400; color: var(--white); line-height: 1.8; max-width: 62%; opacity: 0.78; }
+.why-text a { color: var(--gold-light); text-decoration: none; border-bottom: 1px solid rgba(184,150,62,0.4); transition: border-color 0.2s, color 0.2s; }
 .why-text a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
-.section {
-  position: relative; z-index: 10;
-  padding: 56px 64px;
-}
+.section { position: relative; z-index: 10; padding: 56px 64px; }
 
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 36px;
-}
-
-.section-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 15px;
-  letter-spacing: 4px;
-  color: var(--gold);
-  text-transform: uppercase;
-}
-
+.section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 36px; }
+.section-label { font-family: 'Share Tech Mono', monospace; font-size: 15px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; }
 .section-line { flex: 1; height: 1px; background: var(--border); }
 
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 28px;
-}
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; }
 
 .card {
   position: relative;
@@ -265,76 +122,21 @@ h1 span { color: var(--gold); }
   animation: fadeUp 0.6s ease both;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 3px; height: 100%;
-  background: var(--gold);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.25s ease;
-}
-
-.card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(184,150,62,0.06) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.25s;
-}
+.card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--gold); transform: scaleY(0); transform-origin: bottom; transition: transform 0.25s ease; }
+.card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(184,150,62,0.06) 0%, transparent 60%); opacity: 0; transition: opacity 0.25s; }
 
 .card:hover { border-color: rgba(184,150,62,0.5); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
 .card:hover::before { transform: scaleY(1); }
 .card:hover::after { opacity: 1; }
 
 .card-tag { font-family: 'Share Tech Mono', monospace; font-size: 14px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; }
-
-.card-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 36px;
-  letter-spacing: 2px;
-  line-height: 1;
-  color: var(--white);
-  transition: color 0.2s;
-}
-
+.card-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; line-height: 1; color: var(--white); transition: color 0.2s; }
 .card:hover .card-title { color: var(--gold-light); }
-
-.card-desc {
-  font-size: 17px;
-  font-weight: 400;
-  color: var(--white);
-  line-height: 1.7;
-  flex: 1;
-  opacity: 0.8;
-}
-
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(184,150,62,0.1);
-}
-
-.card-cta {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 15px;
-  letter-spacing: 2px;
-  color: var(--gold);
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-
+.card-desc { font-size: 17px; font-weight: 400; color: var(--white); line-height: 1.7; flex: 1; opacity: 0.8; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 16px; border-top: 1px solid rgba(184,150,62,0.1); }
+.card-cta { font-family: 'Share Tech Mono', monospace; font-size: 15px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .card-cta::after { content: '→'; transition: transform 0.2s; }
 .card:hover .card-cta::after { transform: translateX(4px); }
-
 .card-type { font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
 
 .card:nth-child(1) { animation-delay: 0.15s; }
@@ -347,159 +149,42 @@ h1 span { color: var(--gold); }
 
 .api-section { border-bottom: 1px solid var(--border); padding-bottom: 48px; }
 
-.api-explainer {
-  display: flex;
-  gap: 28px;
-  align-items: flex-start;
-  background: rgba(184,150,62,0.05);
-  border: 1px solid rgba(184,150,62,0.3);
-  padding: 36px 36px 36px 32px;
-  position: relative;
-  overflow: hidden;
-  animation: fadeUp 0.6s 0.1s ease both;
-}
-
-.api-explainer::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 3px; height: 100%;
-  background: linear-gradient(to bottom, var(--gold), rgba(184,150,62,0.2));
-}
-
+.api-explainer { display: flex; gap: 28px; align-items: flex-start; background: rgba(184,150,62,0.05); border: 1px solid rgba(184,150,62,0.3); padding: 36px 36px 36px 32px; position: relative; overflow: hidden; animation: fadeUp 0.6s 0.1s ease both; }
+.api-explainer::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(to bottom, var(--gold), rgba(184,150,62,0.2)); }
 .api-icon { flex-shrink: 0; margin-top: 2px; opacity: 0.85; }
-
 .api-content { display: flex; flex-direction: column; gap: 16px; flex: 1; }
-
-.api-headline {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(22px, 2.2vw, 30px);
-  letter-spacing: 2px;
-  color: var(--gold-light);
-  line-height: 1.1;
-}
-
+.api-headline { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px, 2.2vw, 30px); letter-spacing: 2px; color: var(--gold-light); line-height: 1.1; }
 .api-body { font-size: 17px; color: var(--white); opacity: 0.8; line-height: 1.7; max-width: 640px; }
-
-.api-why {
-  font-size: 16px;
-  color: var(--white);
-  opacity: 0.7;
-  line-height: 1.7;
-  max-width: 640px;
-  font-style: italic;
-  border-left: 2px solid rgba(184,150,62,0.3);
-  padding-left: 14px;
-  margin-top: -4px;
-}
-
-.api-steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
-  margin-top: 4px;
-}
-
+.api-why { font-size: 16px; color: var(--white); opacity: 0.7; line-height: 1.7; max-width: 640px; font-style: italic; border-left: 2px solid rgba(184,150,62,0.3); padding-left: 14px; margin-top: -4px; }
+.api-steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 4px; }
 .api-step { display: flex; gap: 14px; align-items: flex-start; }
-
 .step-num { font-family: 'Share Tech Mono', monospace; font-size: 15px; letter-spacing: 2px; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
-
 .step-text { font-size: 16px; color: var(--white); opacity: 0.85; line-height: 1.6; }
 .step-text strong { color: var(--white); font-weight: 500; opacity: 1; }
 .step-text a { color: var(--gold-light); text-decoration: none; border-bottom: 1px solid rgba(184,150,62,0.4); transition: border-color 0.2s, color 0.2s; }
 .step-text a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 .step-text code { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--gold); background: rgba(184,150,62,0.1); padding: 1px 6px; border-radius: 2px; letter-spacing: 1px; }
 
-.ai-notice-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 4px;
-}
+.ai-notice-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.ai-notice-list li { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; color: var(--white); opacity: 0.8; line-height: 1.6; }
+.ai-notice-list li::before { content: '—'; color: var(--gold); font-family: 'Share Tech Mono', monospace; flex-shrink: 0; margin-top: 1px; }
+.ai-notice-closing { font-size: 16px; color: var(--white); opacity: 0.7; line-height: 1.7; font-style: italic; border-left: 2px solid rgba(184,150,62,0.3); padding-left: 14px; margin-top: 4px; }
 
-.ai-notice-list li {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  font-size: 16px;
-  color: var(--white);
-  opacity: 0.8;
-  line-height: 1.6;
-}
-
-.ai-notice-list li::before {
-  content: '—';
-  color: var(--gold);
-  font-family: 'Share Tech Mono', monospace;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.ai-notice-closing {
-  font-size: 16px;
-  color: var(--white);
-  opacity: 0.7;
-  line-height: 1.7;
-  font-style: italic;
-  border-left: 2px solid rgba(184,150,62,0.3);
-  padding-left: 14px;
-  margin-top: 4px;
-}
-
-.cards-divider {
-  grid-column: 1 / -1;
-  height: 5px;
-  background: linear-gradient(to right, var(--gold), var(--gold-light), var(--gold));
-  border-radius: 2px;
-  margin: 4px 0;
-}
+.cards-divider { grid-column: 1 / -1; height: 5px; background: linear-gradient(to right, var(--gold), var(--gold-light), var(--gold)); border-radius: 2px; margin: 4px 0; }
 
 @media (max-width: 700px) {
   .api-explainer { flex-direction: column; gap: 20px; padding: 28px 22px 28px 26px; }
   .api-steps { grid-template-columns: 1fr; }
 }
 
-footer {
-  position: relative; z-index: 10;
-  padding: 32px 64px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
+footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .footer-brand { font-family: 'Share Tech Mono', monospace; font-size: 15px; letter-spacing: 3px; color: var(--white); opacity: 0.7; text-transform: uppercase; }
-
 .footer-links { display: flex; gap: 20px; }
-
-.footer-links a {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 15px;
-  letter-spacing: 2px;
-  color: var(--white);
-  text-decoration: none;
-  opacity: 0.7;
-  transition: opacity 0.2s, color 0.2s;
-  text-transform: uppercase;
-}
-
+.footer-links a { font-family: 'Share Tech Mono', monospace; font-size: 15px; letter-spacing: 2px; color: var(--white); text-decoration: none; opacity: 0.7; transition: opacity 0.2s, color 0.2s; text-transform: uppercase; }
 .footer-links a:hover { opacity: 1; color: var(--gold); }
+.gold-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); margin-right: 8px; vertical-align: middle; }
 
-.gold-dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 8px var(--gold);
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 700px) {
   header { flex-direction: column; align-items: flex-start; gap: 24px; padding: 36px 28px 32px; }
@@ -525,11 +210,7 @@ footer {
 
 <header>
   <div class="header-left">
-    <img
-      class="header-logo"
-      src="https://luis-figueroa-ops.github.io/images/Untitled%20design.png"
-      alt="Luis Figueroa - Technology & Operations logo"
-    />
+    <img class="header-logo" src="https://luis-figueroa-ops.github.io/images/Untitled%20design.png" alt="Luis Figueroa - Technology & Operations logo" />
     <div>
       <div class="eyebrow">Luis Figueroa</div>
       <h1>Operations, <span>Augmented</span></h1>
@@ -545,10 +226,7 @@ footer {
       <a href="https://github.com/luis-figueroa-ops" target="_blank">GitHub</a>
     </nav>
     <div class="header-qr">
-      <img
-        src="https://luis-figueroa-ops.github.io/images/luis_portfolio_qr_v4.png"
-        alt="QR code - scan to visit luis-figueroa-ops.github.io"
-      />
+      <img src="https://luis-figueroa-ops.github.io/images/luis_portfolio_qr_v4.png" alt="QR code - scan to visit luis-figueroa-ops.github.io" />
       <span>Scan to visit</span>
     </div>
   </div>
@@ -563,7 +241,6 @@ footer {
       experiments that document what's possible when operations thinking meets modern AI.
     </p>
   </div>
-
   <div class="why-built">
     <div class="why-label">Why I Built This</div>
     <p class="why-text">
@@ -580,11 +257,14 @@ footer {
 
   <div class="cards">
 
+    <!-- ── CAREER TOOLS ── -->
+
+    <!-- 1. JD Analyzer -->
     <a class="card" href="https://luis-figueroa-ops.github.io/jd-analyzer/">
       <div class="card-tag">Career Tools</div>
       <div class="card-title">JD Analyzer</div>
       <div class="card-desc">
-        Reads between the lines of a job description — role type, culture fit, red flags, and whether it's worth your time to apply. Then goes deeper: the business problems each requirement is really solving, the thinking hiring managers are actually evaluating, and how to bridge your own story to the role.
+        Is this job worth applying to? Paste any job description and get an honest ops read — what the role actually is, who it's really for, green flags, red flags, and the questions to ask before you commit. Then go deeper on the competency themes to understand what they're really evaluating.
       </div>
       <div class="card-footer">
         <span class="card-cta">Launch Tool</span>
@@ -592,6 +272,20 @@ footer {
       </div>
     </a>
 
+    <!-- 2. Interview Prep -->
+    <a class="card" href="https://luis-figueroa-ops.github.io/interview-prep/">
+      <div class="card-tag">Career Tools</div>
+      <div class="card-title">Interview Prep</div>
+      <div class="card-desc">
+        You're applying — now win it. Decode the competency map behind the JD, build stories that prove you can do the work, craft your Tell Me About Yourself, and turn every interview you've been in into prep intelligence for the next one.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Launch Tool</span>
+        <span class="card-type">HTML / Claude API</span>
+      </div>
+    </a>
+
+    <!-- 3. AI Role Revealer -->
     <a class="card" href="https://luis-figueroa-ops.github.io/ai-role-revealer/">
       <div class="card-tag">Career Tools</div>
       <div class="card-title">AI Role Revealer</div>
@@ -605,32 +299,9 @@ footer {
       </div>
     </a>
 
-    <a class="card" href="https://luis-figueroa-ops.github.io/prompt-coach/">
-      <div class="card-tag">Career Tools</div>
-      <div class="card-title">Prompt Coach</div>
-      <div class="card-desc">
-        Type a rough prompt and get a score, a diagnosis, and a coached version — grounded in real prompt engineering research.
-        Before/after diff, refinement buttons, and one-click export to Claude, ChatGPT, Gemini, or Copilot.
-      </div>
-      <div class="card-footer">
-        <span class="card-cta">Launch Tool</span>
-        <span class="card-type">HTML / Optional AI</span>
-      </div>
-    </a>
-
-    <a class="card" href="https://luis-figueroa-ops.github.io/interview-prep/">
-      <div class="card-tag">Career Tools</div>
-      <div class="card-title">Interview Prep</div>
-      <div class="card-desc">
-        Paste a job description and get the competency map, likely questions, and what the interviewer is actually scoring. Enter questions from a past interview and get a reverse-engineered read on what went wrong. Describe your experience and get it translated into the language that lands with hiring managers.
-      </div>
-      <div class="card-footer">
-        <span class="card-cta">Launch Tool</span>
-        <span class="card-type">HTML / Claude API</span>
-      </div>
-    </a>
-
     <div class="cards-divider"></div>
+
+    <!-- ── SIDE BUILDS ── -->
 
     <a class="card" href="./games/dodge/index.html">
       <div class="card-tag">Side Builds</div>
@@ -672,6 +343,8 @@ footer {
 
     <div class="cards-divider"></div>
 
+    <!-- ── LEARNING TOOLS ── -->
+
     <a class="card" href="./learning-tools/course-blueprint/">
       <div class="card-tag">Learning Tools</div>
       <div class="card-title">15-Minute Course Blueprint</div>
@@ -680,6 +353,19 @@ footer {
       </div>
       <div class="card-footer">
         <span class="card-cta">Build Blueprint</span>
+        <span class="card-type">HTML / Optional AI</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://luis-figueroa-ops.github.io/prompt-coach/">
+      <div class="card-tag">Learning Tools</div>
+      <div class="card-title">Prompt Coach</div>
+      <div class="card-desc">
+        Type a rough prompt and get a score, a diagnosis, and a coached version — grounded in real prompt engineering research.
+        Before/after diff, refinement buttons, and one-click export to Claude, ChatGPT, Gemini, or Copilot.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Launch Tool</span>
         <span class="card-type">HTML / Optional AI</span>
       </div>
     </a>
