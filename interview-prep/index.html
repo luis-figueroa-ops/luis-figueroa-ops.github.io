@@ -51,6 +51,8 @@
 
     /* ── BACK NAV ── */
     .back-nav {
+      max-width: 860px;
+      margin: 0 auto;
       padding: 20px 48px 0;
       display: flex;
       align-items: center;
@@ -224,6 +226,7 @@
       letter-spacing: 2px;
       color: var(--white);
       margin-bottom: 10px;
+      word-break: break-word;
     }
     .section-title span { color: var(--accent); }
     .section-sub {
@@ -525,7 +528,6 @@
       .page-wrap { padding: 28px 20px 60px; }
       .competency-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
-
       .mode-tab { padding: 12px 16px; font-size: 14px; }
       h1 { font-size: clamp(44px, 10vw, 64px); }
       .section-title { font-size: clamp(32px, 8vw, 48px); }
@@ -537,7 +539,6 @@
       .card { padding: 20px 16px; }
       .btn-primary, .btn-secondary { width: 100%; justify-content: center; min-height: 48px; }
       .btn-row { flex-direction: column; align-items: stretch; }
-
       .modal { padding: 24px 16px; }
       .session-bar { flex-wrap: wrap; gap: 10px; }
       .session-bar-actions { width: 100%; }
@@ -723,6 +724,8 @@
             </div>
           </div>
         </div>
+
+        <div class="card-accent" style="margin-bottom: 24px;">
           <div class="detail-label">What This Role Is Actually Solving For</div>
           <div id="businessProblemText" style="font-size: 15px; color: var(--white); line-height: 1.8;"></div>
         </div>
