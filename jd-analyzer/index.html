@@ -13,503 +13,115 @@
   </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background-color: #1B2A4A;
-      color: #ffffff;
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 1.05rem;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
-    }
-
+    body { background-color: #1B2A4A; color: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 1.05rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
     .container { max-width: 720px; width: 100%; }
-
-    .back-nav {
-      width: 100%;
-      max-width: 720px;
-      margin-bottom: 16px;
-    }
-    .back-nav a {
-      color: #8892b0;
-      text-decoration: none;
-      font-size: 0.9rem;
-      letter-spacing: 0.03em;
-      transition: color 0.2s;
-    }
+    .back-nav { width: 100%; max-width: 720px; margin-bottom: 16px; }
+    .back-nav a { color: #8892b0; text-decoration: none; font-size: 0.9rem; letter-spacing: 0.03em; transition: color 0.2s; }
     .back-nav a:hover { color: #B8963E; }
-
     .header { text-align: center; margin-bottom: 36px; }
     .header h1 { font-size: 2.3rem; color: #B8963E; margin-bottom: 10px; line-height: 1.2; }
     .header .tagline { font-size: 1.15rem; color: #ccd6f6; font-style: italic; margin-bottom: 6px; }
     .header .sub { font-size: 1rem; color: #8892b0; }
-
-    .card {
-      background-color: #243554;
-      border-radius: 10px;
-      padding: 28px;
-      margin-bottom: 12px;
-    }
-
-    label {
-      display: block;
-      font-size: 1rem;
-      color: #B8963E;
-      margin-bottom: 8px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    input[type="password"], textarea, input[type="text"] {
-      width: 100%;
-      background-color: #1B2A4A;
-      border: 1px solid #3a4f72;
-      border-radius: 6px;
-      color: #ffffff;
-      font-size: 1.1rem;
-      padding: 12px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input[type="password"]:focus,
-    textarea:focus,
-    input[type="text"]:focus { border-color: #B8963E; }
+    .card { background-color: #243554; border-radius: 10px; padding: 28px; margin-bottom: 12px; }
+    label { display: block; font-size: 1rem; color: #B8963E; margin-bottom: 8px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+    input[type="password"], textarea, input[type="text"] { width: 100%; background-color: #1B2A4A; border: 1px solid #3a4f72; border-radius: 6px; color: #ffffff; font-size: 1.1rem; padding: 12px; outline: none; transition: border-color 0.2s; }
+    input[type="password"]:focus, textarea:focus, input[type="text"]:focus { border-color: #B8963E; }
     textarea { height: 220px; resize: vertical; line-height: 1.6; }
-
     .hint { font-size: 0.9rem; color: #8892b0; margin-top: 8px; }
     .hint a { color: #B8963E; text-decoration: none; }
     .hint a:hover { text-decoration: underline; }
-
-    .clear-row {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 20px;
-    }
-
-    #clearBtn {
-      background: none;
-      border: none;
-      color: #8892b0;
-      font-size: 0.88rem;
-      cursor: pointer;
-      letter-spacing: 0.04em;
-      padding: 4px 0;
-      transition: color 0.2s;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
+    .clear-row { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+    #clearBtn { background: none; border: none; color: #8892b0; font-size: 0.88rem; cursor: pointer; letter-spacing: 0.04em; padding: 4px 0; transition: color 0.2s; text-decoration: underline; text-underline-offset: 3px; }
     #clearBtn:hover { color: #B8963E; }
     #clearBtn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    #analyzeBtn {
-      width: 100%;
-      padding: 14px;
-      background-color: #B8963E;
-      color: #1B2A4A;
-      font-size: 1rem;
-      font-weight: 700;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      letter-spacing: 0.03em;
-    }
-
+    #analyzeBtn { width: 100%; padding: 14px; background-color: #B8963E; color: #1B2A4A; font-size: 1rem; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; letter-spacing: 0.03em; }
     #analyzeBtn:hover:not(:disabled) { background-color: #d4a94a; }
     #analyzeBtn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .output {
-      background-color: #243554;
-      border-radius: 10px;
-      padding: 28px;
-      margin-top: 20px;
-      display: none;
-      line-height: 1.8;
-      font-size: 1.1rem;
-    }
-
+    .output { background-color: #243554; border-radius: 10px; padding: 28px; margin-top: 20px; display: none; line-height: 1.8; font-size: 1.1rem; }
     .output.visible { display: block; }
-
-    .output h2 {
-      color: #B8963E;
-      font-size: 1.3rem;
-      margin: 24px 0 10px 0;
-      padding-bottom: 6px;
-      border-bottom: 1px solid #3a4f72;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
+    .output h2 { color: #B8963E; font-size: 1.3rem; margin: 24px 0 10px 0; padding-bottom: 6px; border-bottom: 1px solid #3a4f72; text-transform: uppercase; letter-spacing: 0.05em; }
     .output h2:first-child { margin-top: 0; }
     .output h3 { color: #ccd6f6; font-size: 1.1rem; margin: 16px 0 6px 0; }
     .output p { color: #ccd6f6; margin-bottom: 12px; line-height: 1.8; }
     .output ul { margin: 8px 0 16px 20px; color: #ccd6f6; }
     .output ul li { margin-bottom: 8px; line-height: 1.7; }
     .output strong { color: #ffffff; font-weight: 600; }
-
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-      flex-wrap: wrap;
-    }
-
-    .action-btn {
-      flex: 1;
-      min-width: 140px;
-      padding: 10px 18px;
-      background-color: transparent;
-      color: #B8963E;
-      border: 1px solid #B8963E;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.04em;
-      transition: all 0.2s;
-    }
-
+    .action-buttons { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+    .action-btn { flex: 1; min-width: 140px; padding: 10px 18px; background-color: transparent; color: #B8963E; border: 1px solid #B8963E; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; letter-spacing: 0.04em; transition: all 0.2s; }
     .action-btn:hover { background-color: #B8963E; color: #1B2A4A; }
     .action-btn.copied { background-color: #2a4a2a; border-color: #4caf50; color: #4caf50; }
     .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .theme-container {
-      display: none;
-      margin-top: 20px;
-      padding: 20px;
-      background-color: #1e3060;
-      border: 1px solid #3a4f72;
-      border-radius: 10px;
-    }
-
+    .theme-container { display: none; margin-top: 20px; padding: 20px; background-color: #1e3060; border: 1px solid #3a4f72; border-radius: 10px; }
     .theme-container.visible { display: block; }
-
-    .theme-container-label {
-      font-size: 0.9rem;
-      color: #B8963E;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-
-    .theme-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .theme-btn {
-      padding: 8px 16px;
-      background-color: transparent;
-      color: #ccd6f6;
-      border: 1px solid #3a4f72;
-      border-radius: 20px;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
+    .theme-container-label { font-size: 0.9rem; color: #B8963E; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+    .theme-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+    .theme-btn { padding: 8px 16px; background-color: transparent; color: #ccd6f6; border: 1px solid #3a4f72; border-radius: 20px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
     .theme-btn:hover:not(:disabled) { background-color: #243554; border-color: #B8963E; color: #B8963E; }
     .theme-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .theme-btn.viewed {
-      background-color: #1a2e1a;
-      border-color: #4a7a4a;
-      color: #7ab87a;
-      opacity: 0.85;
-    }
+    .theme-btn.viewed { background-color: #1a2e1a; border-color: #4a7a4a; color: #7ab87a; opacity: 0.85; }
     .theme-btn.viewed:disabled { opacity: 0.4; }
-
-    .chat-section {
-      margin-top: 20px;
-      display: none;
-    }
-
+    .chat-section { margin-top: 20px; display: none; }
     .chat-section.visible { display: block; }
-
-    .chat-divider {
-      text-align: center;
-      color: #B8963E;
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .chat-divider::before,
-    .chat-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #3a4f72;
-    }
-
-    .chat-messages {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .chat-bubble {
-      padding: 16px 20px;
-      border-radius: 10px;
-      line-height: 1.7;
-      font-size: 1.1rem;
-    }
-
-    .chat-bubble.user {
-      background-color: #1B2A4A;
-      border: 1px solid #3a4f72;
-      color: #ccd6f6;
-      margin-left: 40px;
-    }
-
-    .chat-bubble.assistant {
-      background-color: #243554;
-      border: 1px solid #2e4268;
-      color: #ccd6f6;
-    }
-
-    .chat-bubble.thinking {
-      background-color: #1f2f4a;
-      border: 1px solid #2e4268;
-      color: #8892b0;
-      font-style: italic;
-    }
-
-    .chat-bubble .bubble-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-      color: #B8963E;
-    }
-
+    .chat-divider { text-align: center; color: #B8963E; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .chat-divider::before, .chat-divider::after { content: ''; flex: 1; height: 1px; background: #3a4f72; }
+    .chat-messages { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
+    .chat-bubble { padding: 16px 20px; border-radius: 10px; line-height: 1.7; font-size: 1.1rem; }
+    .chat-bubble.user { background-color: #1B2A4A; border: 1px solid #3a4f72; color: #ccd6f6; margin-left: 40px; }
+    .chat-bubble.assistant { background-color: #243554; border: 1px solid #2e4268; color: #ccd6f6; }
+    .chat-bubble.thinking { background-color: #1f2f4a; border: 1px solid #2e4268; color: #8892b0; font-style: italic; }
+    .chat-bubble .bubble-label { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; color: #B8963E; }
     .chat-bubble.user .bubble-label { color: #8892b0; }
     .chat-bubble.thinking .bubble-label { color: #8892b0; }
-
     .chat-bubble p { color: #ccd6f6; margin-bottom: 8px; line-height: 1.7; }
     .chat-bubble ul { margin: 6px 0 10px 18px; color: #ccd6f6; }
     .chat-bubble ul li { margin-bottom: 6px; line-height: 1.6; }
     .chat-bubble strong { color: #ffffff; font-weight: 600; }
     .chat-bubble h2 { color: #B8963E; font-size: 1.15rem; margin: 16px 0 8px 0; }
     .chat-bubble h3 { color: #B8963E; font-size: 1.2rem; font-weight: 700; margin: 20px 0 8px 0; }
-
-    /* Streaming cursor blink */
-    .streaming-cursor {
-      display: inline-block;
-      width: 2px;
-      height: 1em;
-      background-color: #B8963E;
-      margin-left: 2px;
-      vertical-align: text-bottom;
-      animation: blink 0.7s step-end infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    .chat-input-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-      margin-top: 20px;
-    }
-
-    .chat-input-row input {
-      flex: 1;
-      border: 2px solid #B8963E !important;
-      background-color: #1e3060 !important;
-    }
-
-    .chat-input-row input:focus {
-      border-color: #d4a94a !important;
-      box-shadow: 0 0 0 3px rgba(184, 150, 62, 0.15);
-    }
-
-    .send-btn {
-      padding: 12px 20px;
-      background-color: #B8963E;
-      color: #1B2A4A;
-      font-size: 1rem;
-      font-weight: 700;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      white-space: nowrap;
-    }
-
+    .streaming-cursor { display: inline-block; width: 2px; height: 1em; background-color: #B8963E; margin-left: 2px; vertical-align: text-bottom; animation: blink 0.7s step-end infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .chat-input-row { display: flex; gap: 10px; margin-bottom: 16px; margin-top: 20px; }
+    .chat-input-row input { flex: 1; border: 2px solid #B8963E !important; background-color: #1e3060 !important; }
+    .chat-input-row input:focus { border-color: #d4a94a !important; box-shadow: 0 0 0 3px rgba(184, 150, 62, 0.15); }
+    .send-btn { padding: 12px 20px; background-color: #B8963E; color: #1B2A4A; font-size: 1rem; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; white-space: nowrap; }
     .send-btn:hover:not(:disabled) { background-color: #d4a94a; }
     .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .bottom-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-
-    .start-over-row {
-      display: flex;
-      justify-content: center;
-      margin-top: 28px;
-    }
-
-    #startOverBtn {
-      background: none;
-      border: 1px solid #3a4f72;
-      color: #8892b0;
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      padding: 10px 28px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    #startOverBtn:hover {
-      border-color: #B8963E;
-      color: #B8963E;
-    }
-
-    .error {
-      background-color: #3d1f1f;
-      border: 1px solid #a94442;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 20px;
-      font-size: 1rem;
-      color: #f5c6cb;
-      display: none;
-    }
-
+    .bottom-actions { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+    .start-over-row { display: flex; justify-content: center; margin-top: 28px; }
+    #startOverBtn { background: none; border: 1px solid #3a4f72; color: #8892b0; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.06em; padding: 10px 28px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+    #startOverBtn:hover { border-color: #B8963E; color: #B8963E; }
+    .error { background-color: #3d1f1f; border: 1px solid #a94442; border-radius: 10px; padding: 20px; margin-top: 20px; font-size: 1rem; color: #f5c6cb; display: none; }
     .error.visible { display: block; }
-
-    .loading {
-      text-align: center;
-      color: #B8963E;
-      font-style: italic;
-      padding: 20px;
-      display: none;
-    }
-
+    .loading { text-align: center; color: #B8963E; font-style: italic; padding: 20px; display: none; }
     .loading.visible { display: block; }
-
-    .ai-disclaimer {
-      margin-top: 28px;
-      padding: 14px 18px;
-      background-color: #1a2540;
-      border: 1px solid #2e3f5c;
-      border-radius: 8px;
-      font-size: 0.78rem;
-      color: #6b7a99;
-      line-height: 1.7;
-      text-align: left;
-    }
-
-    .ai-disclaimer strong {
-      color: #8892b0;
-      font-weight: 600;
-    }
-
-    .footer {
-      margin-top: 28px;
-      text-align: center;
-      font-size: 0.78rem;
-      color: #8892b0;
-      line-height: 1.8;
-    }
-
+    .ai-disclaimer { margin-top: 28px; padding: 14px 18px; background-color: #1a2540; border: 1px solid #2e3f5c; border-radius: 8px; font-size: 0.78rem; color: #6b7a99; line-height: 1.7; text-align: left; }
+    .ai-disclaimer strong { color: #8892b0; font-weight: 600; }
+    .footer { margin-top: 28px; text-align: center; font-size: 0.78rem; color: #8892b0; line-height: 1.8; }
     .footer a { color: #B8963E; text-decoration: none; }
     .footer a:hover { text-decoration: underline; }
-    .footer .credit-line {
-      display: block;
-      margin-top: 4px;
-      font-style: italic;
-      color: #6b7a99;
-    }
-
+    .footer .credit-line { display: block; margin-top: 4px; font-style: italic; color: #6b7a99; }
     @media print {
       body { background-color: #ffffff; color: #000000; padding: 0; }
-
-      .header, .card, .clear-row, #analyzeBtn, .loading,
-      .error, .action-buttons, .chat-input-row,
-      .bottom-actions, .chat-divider, .footer,
-      .theme-container, .back-nav, .start-over-row,
-      .ai-disclaimer { display: none !important; }
-
-      .output {
-        display: block !important;
-        background-color: #ffffff;
-        padding: 0;
-        margin: 0;
-        border-radius: 0;
-      }
-
-      .output h2 {
-        color: #1B2A4A !important;
-        border-bottom: 2px solid #B8963E;
-        font-size: 1rem;
-        margin: 20px 0 8px 0;
-      }
-
+      .header, .card, .clear-row, #analyzeBtn, .loading, .error, .action-buttons, .chat-input-row, .bottom-actions, .chat-divider, .footer, .theme-container, .back-nav, .start-over-row, .ai-disclaimer { display: none !important; }
+      .output { display: block !important; background-color: #ffffff; padding: 0; margin: 0; border-radius: 0; }
+      .output h2 { color: #1B2A4A !important; border-bottom: 2px solid #B8963E; font-size: 1rem; margin: 20px 0 8px 0; }
       .output h3 { color: #1B2A4A !important; font-size: 0.95rem; }
       .output p, .output ul, .output li { color: #000000; }
       .output strong { color: #000000; }
-
-      .chat-section {
-        display: block !important;
-        margin-top: 30px;
-      }
-
-      .chat-bubble {
-        background-color: #ffffff !important;
-        border: 1px solid #cccccc !important;
-        margin-bottom: 12px;
-        page-break-inside: avoid;
-      }
-
-      .chat-bubble.user {
-        margin-left: 40px;
-        background-color: #f5f5f5 !important;
-      }
-
+      .chat-section { display: block !important; margin-top: 30px; }
+      .chat-bubble { background-color: #ffffff !important; border: 1px solid #cccccc !important; margin-bottom: 12px; page-break-inside: avoid; }
+      .chat-bubble.user { margin-left: 40px; background-color: #f5f5f5 !important; }
       .chat-bubble.thinking { display: none !important; }
-
-      .chat-bubble p,
-      .chat-bubble ul,
-      .chat-bubble li { color: #000000 !important; }
-
+      .chat-bubble p, .chat-bubble ul, .chat-bubble li { color: #000000 !important; }
       .chat-bubble strong { color: #000000 !important; }
       .chat-bubble h2, .chat-bubble h3 { color: #1B2A4A !important; }
       .chat-bubble .bubble-label { color: #1B2A4A !important; }
       .chat-bubble.user .bubble-label { color: #555555 !important; }
-
       .streaming-cursor { display: none !important; }
-
       .print-header { display: block !important; text-align: center; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 3px solid #B8963E; }
       .print-header h1 { font-size: 1.3rem; color: #1B2A4A; margin-bottom: 4px; }
       .print-header p { font-size: 0.75rem; color: #555; font-style: italic; }
     }
-
     @media (max-width: 768px) {
       body { padding: 20px 12px; }
       .container { width: 100%; }
@@ -539,7 +151,6 @@
   </div>
 
   <div class="container">
-
     <div class="print-header" style="display:none;">
       <h1>Is This Job Worth Applying To?</h1>
       <p>A structured ops analysis - luis-figueroa-ops.github.io/jd-analyzer</p>
@@ -548,7 +159,7 @@
     <div class="header">
       <h1>Is This Job Worth Applying To?</h1>
       <p class="tagline">&#8220;I read process documents the way other people read between the lines.&#8221;</p>
-      <p class="sub">Paste any job description. Get a structured ops read on what the role actually is, who it&#8217;s really for, and what to ask in the interview. Then go deeper &#8212; the business problems behind each requirement, the thinking they&#8217;re actually evaluating, and how to bridge your story to the role.</p>
+      <p class="sub">Paste any job description. Get a structured ops read on what the role actually is, who it&#8217;s really for, and what to ask in the interview. Then go deeper &#8212; the business problems behind each requirement and the thinking they&#8217;re actually evaluating.</p>
     </div>
 
     <div class="card">
@@ -571,7 +182,6 @@
         <button class="action-btn" id="copyBtnTop">Copy Full Conversation</button>
         <button class="action-btn" id="printBtnTop">Print / Save as PDF</button>
         <button class="action-btn" id="goDeepBtn">Go Deeper</button>
-        <button class="action-btn" id="tmaybBtn">Tell Me About Yourself Bridge</button>
       </div>
       <div class="theme-container" id="themeContainer">
         <div class="theme-container-label">Competency themes &#8212; click any to go deeper</div>
@@ -606,7 +216,6 @@
       <span class="credit-line">A tool built by an ops professional who reads between the lines of every process document.</span>
       <span class="credit-line" style="margin-top:8px;font-style:normal;font-size:0.72rem;">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</span>
     </div>
-
   </div>
 
   <script>
@@ -622,7 +231,6 @@
     const copyBtnBottom = document.getElementById('copyBtnBottom');
     const printBtnBottom = document.getElementById('printBtnBottom');
     const goDeepBtn = document.getElementById('goDeepBtn');
-    const tmaybBtn = document.getElementById('tmaybBtn');
     const themeContainer = document.getElementById('themeContainer');
     const themeButtons = document.getElementById('themeButtons');
     const chatSection = document.getElementById('chatSection');
@@ -639,7 +247,6 @@
       requestInFlight = true;
       sendBtn.disabled = true;
       if (!goDeepUsed) goDeepBtn.disabled = true;
-      tmaybBtn.disabled = true;
       document.querySelectorAll('.theme-btn').forEach(b => { b.disabled = true; });
     }
 
@@ -647,7 +254,6 @@
       requestInFlight = false;
       sendBtn.disabled = false;
       if (!goDeepUsed) goDeepBtn.disabled = false;
-      tmaybBtn.disabled = false;
       document.querySelectorAll('.theme-btn').forEach(b => { b.disabled = false; });
     }
 
@@ -674,7 +280,6 @@
       requestInFlight = false;
       goDeepBtn.disabled = false;
       goDeepBtn.textContent = 'Go Deeper';
-      tmaybBtn.disabled = false;
       output.classList.remove('visible');
       chatSection.classList.remove('visible');
       errorBox.classList.remove('visible');
@@ -750,10 +355,6 @@
     printBtnTop.addEventListener('click', () => window.print());
     printBtnBottom.addEventListener('click', () => window.print());
 
-    // -------------------------------------------------------
-    // STREAMING: reads SSE chunks and feeds text incrementally
-    // into a target DOM element, then renders markdown at the end.
-    // -------------------------------------------------------
     async function streamClaude(targetElement, onChunk, onDone, onError) {
       const cursor = document.createElement('span');
       cursor.className = 'streaming-cursor';
@@ -783,11 +384,9 @@
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-
           buffer += decoder.decode(value, { stream: true });
           const lines = buffer.split('\n');
-          buffer = lines.pop(); // keep incomplete line in buffer
-
+          buffer = lines.pop();
           for (const line of lines) {
             if (!line.startsWith('data: ')) continue;
             const jsonStr = line.slice(6).trim();
@@ -797,23 +396,15 @@
               if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
                 rawText += parsed.delta.text;
                 if (onChunk) onChunk(parsed.delta.text);
-
-                // Update display: render markdown incrementally while streaming
-                // Remove cursor, render markdown, re-append cursor
                 if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
                 targetElement.innerHTML = renderMarkdown(rawText);
                 targetElement.appendChild(cursor);
-
-                // Auto-scroll as content grows
                 targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
               }
-            } catch (_) {
-              // incomplete JSON chunk, skip
-            }
+            } catch (_) {}
           }
         }
 
-        // Done streaming — remove cursor, render final markdown
         if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
         targetElement.innerHTML = renderMarkdown(rawText);
         if (onDone) onDone(rawText);
@@ -854,7 +445,7 @@ Note for the user after all four questions: These are thinking models, not scrip
 
 ---
 
-ADDITIONAL INSTRUCTIONS (used when handling Go Deeper theme-list requests, theme drill-down requests, or Tell Me About Yourself Bridge requests):
+ADDITIONAL INSTRUCTIONS (used when handling Go Deeper theme-list requests and theme drill-down requests):
 
 COMPETENCY THEME EXTRACTION — when asked to extract themes from a JD as a JSON array:
 Identify 3-6 business process areas or competency themes grounded in specific JD language. Use this anchor list as your starting point: Project/Program Management, Stakeholder & Cross-Functional Coordination, Revenue/Sales Operations, Process Improvement, Data & Reporting, Vendor/Partner Management, Technical/Systems Operations, Issue Resolution & Troubleshooting, Change Management. Expand beyond this list only when the JD content clearly doesn't fit any anchor — use the same plain-language style. Keep labels short (3-6 words), specific, and plain-language.
@@ -871,18 +462,8 @@ THEME DRILL-DOWN STRUCTURE — when drilling deeper on a specific competency the
 3. What separates a strong demonstration from a weak one — use the multi-dimensional scoring rule above
 4. An illustrative example of the thinking in action — frame it explicitly as generic/illustrative: "here's the shape — make it yours." Never fabricate or assume the user's personal work history.
 
-TELL ME ABOUT YOURSELF BRIDGE FRAMEWORK (adapted from Farah Sharghi, ex-Google recruiter):
-Every line of a job description is a symptom of a business problem the company is trying to solve. The candidate's job is to read the JD like a business owner, then structure a response in these parts:
-
-- Log Line: 1-2 sentences. Sentence one states who the candidate is professionally; sentence two is the "hook" — what their core strength is and why it matters to this business's specific needs. Provide this as an illustrative generic pattern.
-- Past: 2-3 sentences connecting real accomplishments to the JD's hidden business problems. Since this tool does not have the user's actual resume, COACH this section instead of writing it for them — name the specific kind of business problem the JD reveals, describe the kind/shape of metric or scenario the user should be mining from their own background to address it, with a generic illustrative example of what that could sound like. Be explicit that the user needs to swap in their own real number/story.
-- Future: One sentence on why this specific role is the logical next step. Illustrative pattern.
-- Closing pivot: End the response by asking the interviewer what they'd like to learn more about, then stopping talking. Provide this as a ready-to-use line since it's role-agnostic.
-
-STANDING REMINDER: Never fabricate or assume the user's personal work history. All examples are illustrative patterns the user must adapt to their own real experience.
-
-GO DEEPER AND TELL ME ABOUT YOURSELF — RESEARCH GROUNDING:
-When responding to Go Deeper theme drill-downs or the Tell Me About Yourself Bridge, ground your response in current, relevant thinking about that competency or interview approach. Reference what practitioners, researchers, and hiring professionals actually emphasize today about that skill area — not just general knowledge. If the competency involves a fast-moving area (AI in operations, change management in hybrid environments, modern sales ops tools, current interview coaching methodology), reflect what the current landscape looks like, not just foundational principles. Make the response feel informed by what is actually happening in that domain right now, not just what has always been true.
+GO DEEPER — RESEARCH GROUNDING:
+When responding to Go Deeper theme drill-downs, ground your response in current, relevant thinking about that competency. Reference what practitioners, researchers, and hiring professionals actually emphasize today about that skill area — not just general knowledge. If the competency involves a fast-moving area (AI in operations, change management in hybrid environments, modern sales ops tools), reflect what the current landscape looks like, not just foundational principles. Make the response feel informed by what is actually happening in that domain right now, not just what has always been true.
 
 ---
 
@@ -890,12 +471,8 @@ For ALL OTHER FOLLOW-UP messages, respond conversationally and directly. Build o
 
 Be direct, specific, and practical. Never generic. Write like someone who has actually worked in operations and can read between the lines of a process document.`;
 
-    // -------------------------------------------------------
-    // INITIAL ANALYSIS — streams into the main output panel
-    // -------------------------------------------------------
     analyzeBtn.addEventListener('click', async () => {
       const jd = jdInput.value.trim();
-
       conversationHistory = [];
       chatMessages.innerHTML = '';
       themeButtons.innerHTML = '';
@@ -904,28 +481,22 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       requestInFlight = false;
       goDeepBtn.disabled = false;
       goDeepBtn.textContent = 'Go Deeper';
-      tmaybBtn.disabled = false;
       output.classList.remove('visible');
       chatSection.classList.remove('visible');
       errorBox.classList.remove('visible');
       loading.classList.add('visible');
       analyzeBtn.disabled = true;
 
-      conversationHistory.push({
-        role: 'user',
-        content: `Please analyze this job description:\n\n${jd}`
-      });
+      conversationHistory.push({ role: 'user', content: `Please analyze this job description:\n\n${jd}` });
 
-      // Show output panel immediately so streaming has a place to go
       outputContent.innerHTML = '';
       output.classList.add('visible');
       loading.classList.remove('visible');
 
       await streamClaude(
         outputContent,
-        null, // onChunk — not needed separately
+        null,
         (rawText) => {
-          // onDone
           conversationHistory.push({ role: 'assistant', content: rawText });
           chatSection.classList.add('visible');
           analyzeBtn.disabled = false;
@@ -936,7 +507,6 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
           });
         },
         (err) => {
-          // onError
           output.classList.remove('visible');
           errorBox.textContent = `Something went wrong: ${err.message}. Please try again.`;
           errorBox.classList.add('visible');
@@ -952,33 +522,21 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       );
     });
 
-    // -------------------------------------------------------
-    // GO DEEPER — theme extraction (non-streaming, JSON response)
-    // then theme drill-downs stream into chat bubbles
-    // -------------------------------------------------------
     goDeepBtn.addEventListener('click', async () => {
       if (goDeepUsed || requestInFlight) return;
-
       lockUI();
       goDeepBtn.textContent = 'Extracting themes...';
 
       const themeRequest = 'Based on this job description, extract 3-6 business process areas or competency themes. Respond ONLY with a JSON array of short plain-language string labels, nothing else. Example format: ["Influencing Without Authority", "Managing Competing Priorities", "Diagnosing Before Prescribing"]. No explanation, no markdown fences, just the raw JSON array.';
-
       conversationHistory.push({ role: 'user', content: themeRequest });
 
-      // Theme extraction doesn't need streaming — it's JSON
       try {
         const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            max_tokens: 2000,
-            system: SYSTEM_PROMPT,
-            messages: conversationHistory
-          })
+          body: JSON.stringify({ max_tokens: 2000, system: SYSTEM_PROMPT, messages: conversationHistory })
         });
 
-        // Worker now streams, so we need to collect the full text for JSON parsing
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let rawText = '';
@@ -996,9 +554,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
             if (jsonStr === '[DONE]') continue;
             try {
               const parsed = JSON.parse(jsonStr);
-              if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
-                rawText += parsed.delta.text;
-              }
+              if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') rawText += parsed.delta.text;
             } catch (_) {}
           }
         }
@@ -1011,9 +567,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
           themes = JSON.parse(cleaned);
           if (!Array.isArray(themes)) throw new Error('not an array');
         } catch (_) {
-          themes = rawText.split('\n')
-            .map(l => l.replace(/^[\s\-\*\d\.\["]+|[\]",\s]+$/g, '').trim())
-            .filter(l => l.length > 2 && l.length < 80);
+          themes = rawText.split('\n').map(l => l.replace(/^[\s\-\*\d\.\["]+|[\]",\s]+$/g, '').trim()).filter(l => l.length > 2 && l.length < 80);
         }
 
         themeButtons.innerHTML = '';
@@ -1041,19 +595,13 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       }
     });
 
-    // -------------------------------------------------------
-    // THEME DRILL-DOWN — streams into a chat bubble
-    // -------------------------------------------------------
     async function handleThemeClick(btn, theme) {
       if (requestInFlight) return;
-
       lockUI();
-
       const message = `Go deeper on: ${theme}`;
       conversationHistory.push({ role: 'user', content: message });
       addChatBubble('user', message);
 
-      // Create streaming bubble
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble assistant';
       const label = document.createElement('div');
@@ -1066,14 +614,11 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
       await streamClaude(
-        content,
-        null,
+        content, null,
         (rawText) => {
           conversationHistory.push({ role: 'assistant', content: rawText });
           btn.classList.add('viewed');
-          if (!btn.textContent.startsWith('\u2713 ')) {
-            btn.textContent = '\u2713 ' + btn.textContent;
-          }
+          if (!btn.textContent.startsWith('\u2713 ')) btn.textContent = '\u2713 ' + btn.textContent;
           unlockUI();
         },
         (err) => {
@@ -1084,56 +629,12 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       );
     }
 
-    // -------------------------------------------------------
-    // TELL ME ABOUT YOURSELF — streams into a chat bubble
-    // -------------------------------------------------------
-    tmaybBtn.addEventListener('click', async () => {
-      if (requestInFlight) return;
-
-      lockUI();
-
-      const message = 'Apply the Tell Me About Yourself Bridge framework to this specific job description. Walk me through each part of the framework — Log Line, Past, Future, and Closing Pivot — tailored to what this JD reveals about the company\'s business problems and needs.';
-
-      conversationHistory.push({ role: 'user', content: message });
-      addChatBubble('user', 'Tell Me About Yourself Bridge');
-
-      const bubble = document.createElement('div');
-      bubble.className = 'chat-bubble assistant';
-      const label = document.createElement('div');
-      label.className = 'bubble-label';
-      label.textContent = 'Analysis';
-      const content = document.createElement('div');
-      bubble.appendChild(label);
-      bubble.appendChild(content);
-      chatMessages.appendChild(bubble);
-      bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-      await streamClaude(
-        content,
-        null,
-        (rawText) => {
-          conversationHistory.push({ role: 'assistant', content: rawText });
-          unlockUI();
-        },
-        (err) => {
-          content.innerHTML = `Something went wrong: ${err.message}. Try again.`;
-          conversationHistory.pop();
-          unlockUI();
-        }
-      );
-    });
-
-    // -------------------------------------------------------
-    // FOLLOW-UP CHAT — streams into a chat bubble
-    // -------------------------------------------------------
     async function sendFollowUp() {
       if (requestInFlight) return;
       const userMessage = followUpInput.value.trim();
       if (!userMessage) return;
-
       lockUI();
       followUpInput.value = '';
-
       conversationHistory.push({ role: 'user', content: userMessage });
       addChatBubble('user', userMessage);
 
@@ -1149,8 +650,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
       bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
       await streamClaude(
-        content,
-        null,
+        content, null,
         (rawText) => {
           conversationHistory.push({ role: 'assistant', content: rawText });
           unlockUI();
@@ -1165,9 +665,7 @@ Be direct, specific, and practical. Never generic. Write like someone who has ac
     }
 
     sendBtn.addEventListener('click', sendFollowUp);
-    followUpInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') sendFollowUp();
-    });
+    followUpInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendFollowUp(); });
   </script>
 </body>
 </html>
