@@ -122,11 +122,10 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 14px 20px;
+      padding: 12px 20px;
       background: var(--surface);
       border: 1px solid var(--border-soft);
       margin-bottom: 32px;
-      flex-wrap: wrap;
     }
     .session-bar-label {
       font-family: var(--font-mono);
@@ -146,8 +145,42 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .session-name-display.empty { color: var(--muted); font-style: italic; }
-    .session-bar-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+    .session-bar-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+
+    /* ── MANAGE DROPDOWN ── */
+    .manage-menu-wrap { position: relative; }
+    .manage-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--accent-border);
+      min-width: 180px;
+      z-index: 400;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .manage-menu.open { display: block; }
+    .manage-menu-item {
+      display: block;
+      width: 100%;
+      padding: 11px 18px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .manage-menu-item:last-child { border-bottom: none; }
+    .manage-menu-item:hover { background: var(--surface2); color: var(--accent); }
+    .manage-menu-item.danger { color: var(--red); }
+    .manage-menu-item.danger:hover { background: rgba(248,81,73,0.08); color: var(--red); }
 
     /* ── MODE TABS ── */
     .mode-tabs {
@@ -472,11 +505,12 @@
       .btn-row { flex-direction: column; align-items: stretch; }
       .role-type-grid { grid-template-columns: 1fr 1fr; }
       .modal { padding: 24px 16px; }
-      .session-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .session-bar-actions { width: 100%; flex-wrap: wrap; }
+      .session-bar { flex-wrap: wrap; gap: 10px; }
+      .session-bar-actions { width: 100%; }
       .output-actions { flex-direction: column; }
       .footer-meta { flex-direction: column; align-items: flex-start; }
       h1 { font-size: clamp(40px, 12vw, 56px); }
+      .manage-menu { right: auto; left: 0; }
     }
   </style>
 </head>
@@ -575,16 +609,21 @@
       </div>
     </div>
 
-    <!-- Session Bar -->
-    <div class="session-bar">
+    <!-- Session Bar — hidden until a session exists -->
+    <div class="session-bar" id="sessionBar" style="display:none;">
       <span class="session-bar-label">Session</span>
-      <span class="session-name-display empty" id="sessionNameDisplay">No session — create one to start</span>
+      <span class="session-name-display" id="sessionNameDisplay"></span>
       <div class="session-bar-actions">
-        <button class="btn-sm accent" id="newSessionBtn">+ New</button>
-        <button class="btn-sm" id="renameSessionBtn">Rename</button>
-        <button class="btn-sm" id="libraryBtn">☰ Library</button>
-        <button class="btn-sm" id="savePdfBtn">↓ Save PDF</button>
-        <button class="btn-sm" id="archiveSessionBtn">Archive</button>
+        <button class="btn-sm accent" id="newSessionBtn">+ New Session</button>
+        <div class="manage-menu-wrap">
+          <button class="btn-sm" id="manageMenuBtn">☰ Manage</button>
+          <div class="manage-menu" id="manageMenu">
+            <button class="manage-menu-item" id="renameSessionBtn">Rename Session</button>
+            <button class="manage-menu-item" id="libraryBtn">Session Library</button>
+            <button class="manage-menu-item" id="archiveSessionBtn">Archive Session</button>
+            <button class="manage-menu-item danger" id="deleteSessionBtn">Delete Session</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -791,23 +830,27 @@
       <div class="card">
         <div class="card-label">Session Actions</div>
         <div class="btn-row">
-          <button class="btn-sm" id="copyNotesBtn">⎘ Copy Notes</button>
-          <button class="btn-sm" id="saveNotesPdfBtn">↓ Save Notes as PDF</button>
           <button class="btn-danger" id="deleteSessionBtn">Delete Session</button>
         </div>
-        <div class="hint" style="margin-top: 12px;">Deleting removes all data for this session permanently.</div>
+        <div class="hint" style="margin-top: 12px;">Deleting removes all data for this session permanently. Use Library → Export to back up before deleting.</div>
+      </div>
+
+      <!-- Notes output actions — appear after the textarea -->
+      <div class="output-actions" style="margin-top: -8px; margin-bottom: 24px;">
+        <button class="btn-sm" id="copyNotesBtn">⎘ Copy Notes</button>
+        <button class="btn-sm" id="saveNotesPdfBtn">↓ Save as PDF</button>
       </div>
     </div>
 
-    <!-- No Session State -->
-    <div id="noSessionState">
-      <div style="text-align: center; padding: 60px 20px;">
-        <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;">🎯</div>
-        <div style="font-family: var(--font-display); font-size: 40px; letter-spacing: 2px; margin-bottom: 12px;">Ready to Prep</div>
-        <div style="font-size: 16px; color: var(--muted); max-width: 380px; margin: 0 auto 28px; line-height: 1.75;">Create a session for each role you're interviewing for. Your work saves automatically and stays private to your browser.</div>
-        <button class="btn-primary" id="noStateNewBtn">+ Create Your First Session</button>
-        <div style="margin-top: 16px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); letter-spacing: 0.5px; line-height: 1.8;">
-          Data lives in your browser. Clear cache = clear data.<br>Use Library → Export to back up your sessions.
+    <!-- No Session State — the only entry point before a session exists -->
+    <div id="noSessionState" style="display:none;">
+      <div style="text-align: center; padding: 72px 20px 48px;">
+        <div style="font-size: 52px; margin-bottom: 24px; opacity: 0.25;">🎯</div>
+        <div style="font-family: var(--font-display); font-size: 44px; letter-spacing: 2px; margin-bottom: 14px; color: var(--white);">Ready to Prep</div>
+        <div style="font-size: 16px; color: var(--muted); max-width: 360px; margin: 0 auto 32px; line-height: 1.75;">Create a session for each role you're interviewing for. Name it after the company and role. Your work saves automatically.</div>
+        <button class="btn-primary" id="noStateNewBtn" style="font-size: 14px; padding: 16px 40px;">+ Start New Session</button>
+        <div style="margin-top: 20px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.5px; line-height: 1.9;">
+          Already have sessions? <button class="btn-ghost" id="noStateLibraryBtn" style="font-size: 11px; display: inline; padding: 0; text-decoration: underline; text-underline-offset: 3px;">Open Library</button>
         </div>
       </div>
     </div>
@@ -982,7 +1025,7 @@
     if (!s) return;
 
     document.getElementById('sessionNameDisplay').textContent = s.name;
-    document.getElementById('sessionNameDisplay').classList.remove('empty');
+    document.getElementById('sessionBar').style.display = 'flex';
     document.getElementById('modeTabs').style.display = 'flex';
     document.getElementById('noSessionState').style.display = 'none';
 
@@ -1038,17 +1081,30 @@
   // ── SESSION BAR ACTIONS ──
   document.getElementById('newSessionBtn').addEventListener('click', () => openSessionModal('new'));
   document.getElementById('noStateNewBtn').addEventListener('click', () => openSessionModal('new'));
+  document.getElementById('noStateLibraryBtn').addEventListener('click', openLibraryModal);
+
+  // Manage menu toggle
+  document.getElementById('manageMenuBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('manageMenu').classList.toggle('open');
+  });
+  // Close manage menu on outside click
+  document.addEventListener('click', () => {
+    document.getElementById('manageMenu').classList.remove('open');
+  });
+
   document.getElementById('renameSessionBtn').addEventListener('click', () => {
-    if (!activeSessionId) { showToast('No active session'); return; }
+    document.getElementById('manageMenu').classList.remove('open');
+    if (!activeSessionId) return;
     openSessionModal('rename', getSession(activeSessionId)?.name || '');
   });
-  document.getElementById('libraryBtn').addEventListener('click', openLibraryModal);
-  document.getElementById('savePdfBtn').addEventListener('click', () => {
-    if (!activeSessionId) { showToast('No active session'); return; }
-    window.print();
+  document.getElementById('libraryBtn').addEventListener('click', () => {
+    document.getElementById('manageMenu').classList.remove('open');
+    openLibraryModal();
   });
   document.getElementById('archiveSessionBtn').addEventListener('click', () => {
-    if (!activeSessionId) { showToast('No active session'); return; }
+    document.getElementById('manageMenu').classList.remove('open');
+    if (!activeSessionId) return;
     showConfirm('Archive Session', 'Mark this session as complete? Your data stays intact and it moves to archived status in the library.', () => {
       updateSession(activeSessionId, { status: 'archived' });
       showToast('Session archived');
@@ -1268,8 +1324,15 @@ Return JSON only:
       const compContext = session?.competencies?.length ? 'Competencies from the target role: ' + session.competencies.map(c=>c.name).join(', ') + '. ' : '';
       const system = `You are an expert at translating professional experience into competency-based interview language. Use the SOAR method (Situation, Obstacles, Actions, Results). Apply the most current thinking on what makes interview stories land.
 
+Critical guidance on impact and results — apply this rigorously:
+1. BEFORE/AFTER framing is required in the Results section. Always describe what existed or was happening before the candidate's actions, and what changed after. This is the most concrete way to demonstrate impact even without hard numbers.
+2. If hard metrics exist (percentages, dollar amounts, volume), use them. If they don't, use honest relative terms: "reduced by roughly half," "eliminated most of the manual work," "went from weekly escalations to none." Never leave results vague.
+3. Distinguish individual contribution from team outcome. Name specifically what the candidate personally built, drove, or owned — not just what the team achieved. Interviewers are trained to probe "we" language.
+4. Connect the result to a business outcome — time saved, errors reduced, process adopted, behavior changed, escalations stopped. Even process improvement work has a downstream business effect; name it.
+5. Flag in gaps if the story lacks a clear before/after or if the individual contribution is unclear.
+
 Return JSON only:
-{"competenciesProved":[],"soarFramework":{"situation":"","obstacles":"","actions":"","results":""},"keyLanguage":"","gaps":"","bestUsedFor":""}`;
+{"competenciesProved":[],"soarFramework":{"situation":"Set context: what was broken, missing, or at risk before this person acted","obstacles":"The specific challenges — competing priorities, missing systems, cross-org resistance, time pressure. This is where most candidates underinvest.","actions":"What this person specifically did — use active verbs, name tools and teams, make individual ownership clear","results":"Before/after: what changed as a result. Use numbers if available; use honest relative terms if not. Connect to business impact."},"keyLanguage":"Specific phrases and framing that map to what interviewers listen for in this competency area","gaps":"What is currently missing that would strengthen this story — missing before/after, unclear individual ownership, unquantified result, or weak connection to business impact","bestUsedFor":"Which interview questions this story answers best"}`;
       const user = compContext + 'Story: ' + (storyTitle||'Untitled') + '\n\n' + storyText;
       const result = await callClaudeJSON(system, user, 2000);
       const story = { id: 'story_' + Date.now(), title: storyTitle||'Untitled Story', rawText: storyText, competencies: result.competenciesProved||[], soar: result.soarFramework||{}, keyLanguage: result.keyLanguage||'', gaps: result.gaps||'', bestUsedFor: result.bestUsedFor||'', createdAt: Date.now() };
@@ -1370,14 +1433,14 @@ Return JSON only:
 
   // ── DELETE SESSION ──
   document.getElementById('deleteSessionBtn').addEventListener('click', () => {
+    document.getElementById('manageMenu').classList.remove('open');
     if (!activeSessionId) return;
     const session = getSession(activeSessionId);
-    showConfirm('Delete Session', `Delete "${session?.name}"? This cannot be undone.`, () => {
+    showConfirm('Delete Session', `Delete "${session?.name}"? This cannot be undone. All analysis, stories, and notes will be permanently removed.`, () => {
       library = library.filter(s => s.id !== activeSessionId);
       saveLibrary();
       activeSessionId = null;
-      document.getElementById('sessionNameDisplay').textContent = 'No session — create one to start';
-      document.getElementById('sessionNameDisplay').classList.add('empty');
+      document.getElementById('sessionBar').style.display = 'none';
       document.getElementById('modeTabs').style.display = 'none';
       document.getElementById('noSessionState').style.display = 'block';
       ['pre','post','story','tmay','notes'].forEach(m => document.getElementById('mode-' + m).style.display = 'none');
@@ -1431,6 +1494,8 @@ Return JSON only:
       switchSession(recent.id);
     } else {
       document.getElementById('noSessionState').style.display = 'block';
+      document.getElementById('sessionBar').style.display = 'none';
+      document.getElementById('modeTabs').style.display = 'none';
     }
   }
 
