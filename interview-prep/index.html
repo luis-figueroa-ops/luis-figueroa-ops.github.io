@@ -444,7 +444,41 @@
     .how-note { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.5px; color: var(--muted); line-height: 1.8; padding-top: 14px; border-top: 1px solid var(--border-soft); }
     .how-note strong { color: var(--white); }
 
-    /* ── TOAST ── */
+    /* ── COMPANY INTEL CARD ── */
+    .card-intel {
+      background: rgba(240,193,75,0.06);
+      border: 1px solid rgba(240,193,75,0.25);
+      border-left: 3px solid var(--yellow);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .card-intel .detail-label { color: var(--yellow); }
+    .intel-section { margin-bottom: 14px; }
+    .intel-section:last-of-type { margin-bottom: 0; }
+    .intel-section-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .intel-section-body {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .intel-disclaimer {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(240,193,75,0.2);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .intel-disclaimer strong { color: var(--yellow); }
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--accent-border); color: var(--accent); font-family: var(--font-mono); font-size: 12px; letter-spacing: 2px; padding: 12px 24px; z-index: 600; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
     .toast.visible { opacity: 1; }
 
@@ -452,10 +486,10 @@
     .divider { height: 1px; background: var(--border-soft); margin: 28px 0; }
 
     /* ── ROLE TYPE GRID ── */
-    .role-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-    .role-type-btn { padding: 11px 8px; background: var(--surface2); border: 1px solid var(--border-soft); color: var(--muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; text-align: center; cursor: pointer; transition: all 0.15s; }
-    .role-type-btn:hover { border-color: var(--accent-border); color: var(--white); }
-    .role-type-btn.selected { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+
+
+
+
 
     /* ── PROFILE STRIP ── */
     .profile-strip { background: var(--surface2); border: 1px solid var(--border-soft); border-left: 3px solid var(--yellow); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 14px; }
@@ -491,7 +525,7 @@
       .page-wrap { padding: 28px 20px 60px; }
       .competency-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
-      .role-type-grid { grid-template-columns: repeat(2, 1fr); }
+
       .mode-tab { padding: 12px 16px; font-size: 14px; }
       h1 { font-size: clamp(44px, 10vw, 64px); }
       .section-title { font-size: clamp(32px, 8vw, 48px); }
@@ -503,7 +537,7 @@
       .card { padding: 20px 16px; }
       .btn-primary, .btn-secondary { width: 100%; justify-content: center; min-height: 48px; }
       .btn-row { flex-direction: column; align-items: stretch; }
-      .role-type-grid { grid-template-columns: 1fr 1fr; }
+
       .modal { padding: 24px 16px; }
       .session-bar { flex-wrap: wrap; gap: 10px; }
       .session-bar-actions { width: 100%; }
@@ -648,23 +682,17 @@
           <div class="form-row">
             <div class="form-group" style="margin-bottom:0;">
               <label for="companyName">Company</label>
-              <input type="text" id="companyName" placeholder="e.g. Company ABC" />
+              <input type="text" id="companyName" placeholder="e.g. Metronet, Company ABC" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label for="roleTitle">Role Title</label>
               <input type="text" id="roleTitle" placeholder="e.g. Operations Manager" />
             </div>
           </div>
-          <div style="margin-top: 16px; margin-bottom: 8px;">
-            <label>Role Type <span style="color: var(--muted); font-size: 10px;">(select closest match)</span></label>
-            <div class="role-type-grid" id="roleTypeGrid">
-              <button class="role-type-btn" data-type="operations">Operations</button>
-              <button class="role-type-btn" data-type="project_management">Project Mgmt</button>
-              <button class="role-type-btn" data-type="sales_revops">Sales / RevOps</button>
-              <button class="role-type-btn" data-type="enablement">Enablement</button>
-              <button class="role-type-btn" data-type="it_technical">IT / Technical</button>
-              <button class="role-type-btn" data-type="customer_success">Customer Success</button>
-            </div>
+          <div class="form-group" style="margin-top: 16px; margin-bottom: 0;">
+            <label for="companyWebsite">Company Website <span style="color: var(--muted); font-size: 10px; letter-spacing: 1px;">(optional)</span></label>
+            <input type="text" id="companyWebsite" placeholder="e.g. https://metronet.com — leave blank if JD is from a recruiting agency" />
+            <div class="hint">When provided, the tool researches this company's recent business impact and community initiatives — useful for "Why this company?" and to contextualize the role.</div>
           </div>
         </div>
 
@@ -684,7 +712,17 @@
       </div>
 
       <div id="preResults" style="display:none; margin-top: 32px;">
-        <div class="card-accent" style="margin-bottom: 24px;">
+
+        <!-- Company Intelligence — shown only when website was provided -->
+        <div id="companyIntelCard" style="display:none; margin-bottom: 24px;">
+          <div class="section-eyebrow" style="margin-bottom: 10px; color: var(--yellow);">Company Intelligence</div>
+          <div class="card-intel">
+            <div id="companyIntelContent"></div>
+            <div class="intel-disclaimer">
+              <strong>Verify before use.</strong> This research is generated by AI using publicly available information and may contain inaccuracies, outdated data, or omissions. Do not use this as your sole source of company knowledge. Cross-reference with the company's own website, recent news, press releases, and LinkedIn before your interview. AI-generated company research is a starting point, not a substitute for your own due diligence.
+            </div>
+          </div>
+        </div>
           <div class="detail-label">What This Role Is Actually Solving For</div>
           <div id="businessProblemText" style="font-size: 15px; color: var(--white); line-height: 1.8;"></div>
         </div>
@@ -878,16 +916,9 @@
   const WORKER_URL  = 'https://career-tools-proxy.figueroaluisd.workers.dev/';
   const STORAGE_KEY = 'interview-prep-v2';
 
-  const ROLE_TYPE_LABELS = {
-    operations: 'Operations', project_management: 'Project Management',
-    sales_revops: 'Sales / Revenue Operations', enablement: 'Enablement & Training',
-    it_technical: 'IT / Technical', customer_success: 'Customer Success & Support'
-  };
-
   // ── STATE ──
   let library = [];
   let activeSessionId = null;
-  let selectedRoleType = '';
   let postQuestions = [];
   let currentMode = 'pre';
   let pendingConfirm = null;
@@ -1014,7 +1045,7 @@
   // ── SESSION MANAGEMENT ──
   function createSession(name) {
     const id = 'session_' + Date.now();
-    library.unshift({ id, name, status: 'active', company: '', roleTitle: '', roleType: '', jd: '', businessProblem: '', roleContextNote: '', competencies: [], postQuestions: [], postAnalysis: [], stories: [], tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '', notes: '', createdAt: Date.now(), updatedAt: Date.now() });
+    library.unshift({ id, name, status: 'active', company: '', roleTitle: '', companyWebsite: '', companyIntel: null, roleType: '', jd: '', businessProblem: '', roleContextNote: '', competencies: [], postQuestions: [], postAnalysis: [], stories: [], tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '', notes: '', createdAt: Date.now(), updatedAt: Date.now() });
     saveLibrary();
     return id;
   }
@@ -1032,19 +1063,18 @@
     // Load fields
     document.getElementById('companyName').value = s.company || '';
     document.getElementById('roleTitle').value = s.roleTitle || '';
+    document.getElementById('companyWebsite').value = s.companyWebsite || '';
     document.getElementById('jdInput').value = s.jd || '';
     document.getElementById('sessionNotesInput').value = s.notes || '';
     document.getElementById('tmayBackground').value = s.tmayBackground || '';
     document.getElementById('tmayCurrentRole').value = s.tmayCurrent || '';
     document.getElementById('tmayWhy').value = s.tmayWhy || '';
 
-    selectedRoleType = s.roleType || '';
-    document.querySelectorAll('.role-type-btn').forEach(b => b.classList.toggle('selected', b.dataset.type === selectedRoleType));
-
     switchMode('pre');
 
     if (s.competencies && s.competencies.length > 0) {
       renderPreResults(s);
+      if (s.companyIntel) renderCompanyIntel(s.companyIntel);
     } else {
       document.getElementById('preForm').style.display = 'block';
       document.getElementById('preResults').style.display = 'none';
@@ -1116,21 +1146,16 @@
     tab.addEventListener('click', () => { if (activeSessionId) switchMode(tab.dataset.mode); });
   });
 
-  // ── ROLE TYPE ──
-  document.querySelectorAll('.role-type-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectedRoleType = btn.dataset.type;
-      document.querySelectorAll('.role-type-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      if (activeSessionId) updateSession(activeSessionId, { roleType: selectedRoleType });
-    });
-  });
-
   // ── AUTO-SAVE ──
-  ['companyName','roleTitle','jdInput'].forEach(id => {
+  ['companyName','roleTitle','jdInput','companyWebsite'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
       if (!activeSessionId) return;
-      updateSession(activeSessionId, { company: document.getElementById('companyName').value, roleTitle: document.getElementById('roleTitle').value, jd: document.getElementById('jdInput').value });
+      updateSession(activeSessionId, {
+        company: document.getElementById('companyName').value,
+        roleTitle: document.getElementById('roleTitle').value,
+        jd: document.getElementById('jdInput').value,
+        companyWebsite: document.getElementById('companyWebsite').value
+      });
     });
   });
   ['tmayBackground','tmayCurrentRole','tmayWhy'].forEach(id => {
@@ -1157,18 +1182,60 @@
     if (jd.length < 100) { showToast('Paste the full job description first'); return; }
     const company = document.getElementById('companyName').value.trim();
     const roleTitle = document.getElementById('roleTitle').value.trim();
-    const roleType = selectedRoleType;
+    const companyWebsite = document.getElementById('companyWebsite').value.trim();
     const btn = document.getElementById('analyzeJDBtn');
-    const status = document.getElementById('preStatus');
-    btn.disabled = true; status.style.display = 'flex';
+    const statusEl = document.getElementById('preStatus');
+    btn.disabled = true;
+
+    // ── STEP 1: Company Intelligence (only if website provided) ──
+    let companyIntel = null;
+    let companyIntelText = '';
+
+    if (companyWebsite && company) {
+      statusEl.querySelector('span').textContent = 'Researching the company...';
+      statusEl.style.display = 'flex';
+      try {
+        const intelSystem = `You are a company research analyst. Research the company provided and return a structured intelligence brief covering:
+1. Business impact — recent milestones, growth, products/services launched, awards, recognitions, partnerships, and market position in the last 2-3 years
+2. Community and humanitarian impact — charitable initiatives, diversity programs, environmental commitments, community investments, foundation work, or social responsibility efforts
+3. Culture and values signals — what the company publicly says about how it operates and what it prioritizes
+4. Why this company angle — 2-3 specific, genuine reasons a candidate might find this company compelling beyond just the paycheck
+
+Be specific and factual. Only include information that is verifiable and publicly known. If information in a category is not available, say so briefly rather than speculating.
+
+Return JSON only. No markdown, no preamble:
+{
+  "businessImpact": "Specific recent achievements, milestones, recognitions, or growth signals",
+  "communityImpact": "Charitable, humanitarian, environmental, or social responsibility initiatives",
+  "cultureSignals": "What the company publicly emphasizes about its culture and values",
+  "whyThisCompany": "2-3 specific compelling angles a candidate could authentically use",
+  "researchNote": "Any important caveats — e.g. limited public info available, company is private, etc."
+}`;
+        const intelUser = `Company: ${company}\nWebsite: ${companyWebsite}\nRole being applied for: ${roleTitle || 'Not specified'}\n\nResearch this company using the most current publicly available information.`;
+        companyIntel = await callClaudeJSON(intelSystem, intelUser, 1500);
+        companyIntelText = JSON.stringify(companyIntel);
+        updateSession(activeSessionId, { companyWebsite, companyIntel });
+        renderCompanyIntel(companyIntel);
+      } catch(err) {
+        showToast('Company research unavailable — continuing with JD analysis');
+      }
+    }
+
+    // ── STEP 2: JD Analysis ──
+    statusEl.querySelector('span').textContent = 'Decoding the role...';
+    statusEl.style.display = 'flex';
     try {
-      const system = `You are an expert interview preparation coach. Decode this job description from the perspective of what the hiring organization is actually trying to solve. Use the most current and relevant thinking available on competency-based interviewing.
+      const companyContext = companyIntel
+        ? `\n\nCompany Intelligence (use this to add company-specific context to the analysis):\n- Business Impact: ${companyIntel.businessImpact}\n- Community Impact: ${companyIntel.communityImpact}\n- Culture Signals: ${companyIntel.cultureSignals}`
+        : '';
+
+      const system = `You are an expert interview preparation coach. Decode this job description from the perspective of what the hiring organization is actually trying to solve. Use the most current and relevant thinking available on competency-based interviewing. Derive the role type and functional competency domain directly from the job description — do not rely on category labels.${companyContext}
 
 Return structured JSON only. No markdown, no preamble, no backticks.
 
 {
   "businessProblem": "2-3 sentences: what organizational pain point this role is solving for",
-  "roleContextNote": "1-2 sentences: company/industry context relevant to framing answers",
+  "roleContextNote": "1-2 sentences: company/industry context relevant to framing answers — weave in company intelligence if provided",
   "competencies": [
     {
       "name": "Competency name (5 words max)",
@@ -1180,13 +1247,13 @@ Return structured JSON only. No markdown, no preamble, no backticks.
     }
   ]
 }`;
-      const user = `Company: ${company || 'Not specified'}\nRole: ${roleTitle || 'Not specified'}\nRole Type: ${ROLE_TYPE_LABELS[roleType] || 'Not specified'}\n\nJob Description:\n${jd}`;
+      const user = `Company: ${company || 'Not specified'}\nRole: ${roleTitle || 'Not specified'}\n\nJob Description:\n${jd}`;
       const result = await callClaudeJSON(system, user, 2500);
-      updateSession(activeSessionId, { company, roleTitle, roleType, jd, businessProblem: result.businessProblem, roleContextNote: result.roleContextNote, competencies: result.competencies });
+      updateSession(activeSessionId, { company, roleTitle, companyWebsite, jd, businessProblem: result.businessProblem, roleContextNote: result.roleContextNote, competencies: result.competencies });
       renderPreResults(getSession(activeSessionId));
       showToast('Analysis complete');
     } catch(err) { showToast('Error: ' + err.message); }
-    finally { btn.disabled = false; status.style.display = 'none'; }
+    finally { btn.disabled = false; statusEl.style.display = 'none'; }
   });
 
   function renderPreResults(session) {
@@ -1226,11 +1293,39 @@ Return structured JSON only. No markdown, no preamble, no backticks.
     });
   }
 
-  document.getElementById('reanalyzeBtn').addEventListener('click', () => {
+  function renderCompanyIntel(intel) {
+    if (!intel) return;
+    const card = document.getElementById('companyIntelCard');
+    const content = document.getElementById('companyIntelContent');
+    const sections = [
+      { key: 'businessImpact', title: 'Business Impact' },
+      { key: 'communityImpact', title: 'Community & Humanitarian Impact' },
+      { key: 'cultureSignals', title: 'Culture & Values Signals' },
+      { key: 'whyThisCompany', title: 'Why This Company — Interview Angles' }
+    ];
+    content.innerHTML = sections.map(s => {
+      const val = intel[s.key];
+      if (!val || val.toLowerCase().includes('not available') || val.toLowerCase().includes('no information')) return '';
+      return `<div class="intel-section">
+        <div class="intel-section-title">${s.title}</div>
+        <div class="intel-section-body">${escapeHtml(val)}</div>
+      </div>`;
+    }).filter(Boolean).join('');
+    if (intel.researchNote) {
+      content.innerHTML += `<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(240,193,75,0.15);">${escapeHtml(intel.researchNote)}</div>`;
+    }
+    card.style.display = 'block';
+  }
     document.getElementById('preForm').style.display = 'block';
     document.getElementById('preResults').style.display = 'none';
   });
   document.getElementById('goToStoryModeBtn').addEventListener('click', () => switchMode('story'));
+
+  document.getElementById('reanalyzeBtn').addEventListener('click', () => {
+    document.getElementById('preForm').style.display = 'block';
+    document.getElementById('preResults').style.display = 'none';
+    document.getElementById('companyIntelCard').style.display = 'none';
+  });
 
   // ── POST-INTERVIEW ──
   function renderPostQuestions() {
@@ -1389,16 +1484,17 @@ Return JSON only:
     const status = document.getElementById('tmayStatus');
     btn.disabled = true; status.style.display = 'flex';
     try {
-      const roleContext = session ? `Target role: ${session.roleTitle||'Not specified'} at ${session.company||'Not specified'}. Role type: ${ROLE_TYPE_LABELS[session.roleType]||'General'}. Business problem this role solves: ${session.businessProblem||'Not analyzed yet'}.` : '';
+      const roleContext = session ? `Target role: ${session.roleTitle||'Not specified'} at ${session.company||'Not specified'}. Business problem this role solves: ${session.businessProblem||'Not analyzed yet'}.` : '';
+      const intelContext = session?.companyIntel ? `\n\nCompany Intelligence for context:\n- Business Impact: ${session.companyIntel.businessImpact||''}\n- Community Impact: ${session.companyIntel.communityImpact||''}\n- Why This Company angles: ${session.companyIntel.whyThisCompany||''}` : '';
       const system = `You are an expert interview coach. Build a compelling, specific "Tell Me About Yourself" answer for this candidate. Use the past-present-future structure: past (most relevant background), present (current situation and what brought them here), future (why this role is the right next move). End with a question that hands control back to the interviewer — e.g. "Before I go deeper on any of that, is there a particular area you'd like me to focus on today?"
 
-The answer should sound like a real person speaking, not a resume readout. It should be specific and reference actual work done. Target 90-120 seconds when spoken aloud (approximately 200-280 words).
+The answer should sound like a real person speaking, not a resume readout. It should be specific and reference actual work done. If company intelligence is provided, weave in 1-2 specific, authentic reasons this company appeals — grounded in what they've actually done, not generic praise. Target 90-120 seconds when spoken aloud (approximately 200-280 words).
 
 Also provide coaching notes: what's working in this answer, what's weak, and one thing to watch out for.
 
 Return JSON only:
 {"tmay":"The full TMAY answer as a single flowing paragraph or 2-3 short paragraphs","coaching":"2-3 sentences of coaching notes"}`;
-      const user = `${roleContext}\n\nBackground: ${background}\nCurrent situation: ${current||'Not specified'}\nWhy this role: ${why||'Not specified'}`;
+      const user = `${roleContext}${intelContext}\n\nBackground: ${background}\nCurrent situation: ${current||'Not specified'}\nWhy this role: ${why||'Not specified'}`;
       const result = await callClaudeJSON(system, user, 1500);
       updateSession(activeSessionId, { tmay: result.tmay, tmayCoaching: result.coaching });
       document.getElementById('tmayOutput').textContent = result.tmay;
