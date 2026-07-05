@@ -1758,6 +1758,7 @@ async function buildAssembledPrompt() {
     const content = `Original prompt: ${original}\n\nCoaching fields filled in:\n${fieldSummary}`;
 
     // ── CHANGE 1: web search added so Polish with AI always uses current information ──
+    let polishErrorMsg = '';
     try {
       const res = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', {
         method: 'POST',
@@ -1770,7 +1771,7 @@ async function buildAssembledPrompt() {
           messages: [{ role: 'user', content }]
         })
       });
-      if (!res.ok) { const errData = await res.json().catch(() => ({})); throw new Error(errData.error?.message || errData.error || 'API error'); }
+      if (!res.ok) { const errData = await res.json().catch(() => ({})); throw new Error(errData.error?.message || errData.error || ('HTTP ' + res.status)); }
       const assembled = (await collectStreamedText(res)).trim();
 
       if (assembled) {
@@ -1785,11 +1786,15 @@ async function buildAssembledPrompt() {
         btn.textContent = originalText;
         return;
       }
-    } catch(e) {}
+      polishErrorMsg = 'empty response from AI';
+    } catch(e) {
+      polishErrorMsg = (e && e.message) ? e.message : String(e);
+      console.error('Polish with AI failed:', e);
+    }
 
     btn.disabled = false;
     btn.textContent = originalText;
-    showToast('AI unavailable — using local assembly');
+    showToast('AI unavailable (' + polishErrorMsg + ') — using local assembly', 6000);
   }
 
   // Local assembly fallback
@@ -1962,11 +1967,11 @@ function startOver() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function showToast(msg) {
+function showToast(msg, duration) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+  setTimeout(() => t.classList.remove('show'), duration || 2200);
 }
 
 // ═══════════════════════════════════════
