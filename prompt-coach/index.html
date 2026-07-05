@@ -1714,7 +1714,13 @@ async function collectStreamedText(response) {
       if (jsonStr === '[DONE]') continue;
       let parsed;
       try { parsed = JSON.parse(jsonStr); } catch (_) { continue; }
-      if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+      if (parsed.type === 'content_block_start' && parsed.content_block && parsed.content_block.type === 'text') {
+        // A new text block is starting. With web_search enabled, a response can
+        // contain earlier text (e.g. commentary before searching) followed by a
+        // separate final text block after the search completes. Discard anything
+        // accumulated so far so only the most recent (final) text block survives.
+        rawText = '';
+      } else if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
         rawText += parsed.delta.text;
       } else if (parsed.type === 'error') {
         throw new Error(parsed.error?.message || 'Stream error');
@@ -2088,8 +2094,14 @@ function saveToLibrary() {
   const scoreEl = document.getElementById('scoreNum');
   const score = scoreEl ? parseInt(scoreEl.textContent) : 0;
   if (!original) { showToast('Analyze a prompt first'); return; }
+
+  const fieldValues = {};
+  document.querySelectorAll('.coach-field-input').forEach(el => {
+    if (el.value.trim()) fieldValues[el.dataset.ruleId] = el.value;
+  });
+
   const lib = getLibrary();
-  lib.unshift({ id: Date.now(), originalPrompt: original, coachedPrompt: coached, score, savedAt: Date.now() });
+  lib.unshift({ id: Date.now(), originalPrompt: original, coachedPrompt: coached, fieldValues, score, savedAt: Date.now() });
   saveLibrary(lib);
   showToast("Saved! Find it under \u2018My Library\u2019 at the top of the page.");
 
@@ -2118,7 +2130,25 @@ function loadFromLibrary(id) {
   document.getElementById('promptInput').value = entry.originalPrompt;
   document.getElementById('charCount').textContent = entry.originalPrompt.length + ' chars';
   analyzePrompt();
-  showToast('Prompt loaded — re-analyzed');
+
+  if (entry.fieldValues) {
+    Object.keys(entry.fieldValues).forEach(ruleId => {
+      const field = document.querySelector('[data-rule-id="' + ruleId + '"]');
+      if (field) {
+        field.value = entry.fieldValues[ruleId];
+        updateFieldBadge(ruleId);
+      }
+    });
+  }
+
+  if (entry.coachedPrompt) {
+    baseCoached = entry.coachedPrompt;
+    resetRefineState();
+    document.getElementById('coachedText').textContent = entry.coachedPrompt;
+    document.getElementById('assembledSection').style.display = 'block';
+  }
+
+  showToast(entry.coachedPrompt ? 'Prompt loaded — full session restored' : 'Prompt loaded — re-analyzed');
 }
 
 function deleteFromLibrary(id) {
