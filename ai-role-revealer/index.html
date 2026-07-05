@@ -416,6 +416,7 @@
 For example: I manage a team of 8 sales reps across three states. Every week I'm doing pipeline reviews, coaching deals that are stuck, running a forecast call with my VP, and trying to figure out why one territory is underperforming..."></textarea>
       <div style="display:flex; gap:12px; align-items:center; margin-top:20px; flex-wrap:wrap;">
         <button class="btn-primary" id="analyze-btn" onclick="runStep1()">Reveal What's Possible</button>
+        <button class="btn-action" id="clear-role-btn" onclick="clearRoleInput()">Clear</button>
         <div class="status-line" id="status-1" style="display:none;"><div class="dot-pulse"><span></span><span></span><span></span></div><span id="status-1-text">Analyzing your role...</span></div>
       </div>
     </div>
@@ -538,6 +539,33 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
       setTimeout(tick, speed);
     }
     tick();
+  }
+
+  async function collectStreamedText(response) {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let rawText = '';
+    let buffer = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === '[DONE]') continue;
+        let parsed;
+        try { parsed = JSON.parse(jsonStr); } catch (_) { continue; }
+        if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+          rawText += parsed.delta.text;
+        } else if (parsed.type === 'error') {
+          throw new Error(parsed.error?.message || 'Stream error');
+        }
+      }
+    }
+    return rawText;
   }
 
   function saveSession() {
@@ -682,6 +710,14 @@ For example: I manage a team of 8 sales reps across three states. Every week I'm
     document.getElementById('brief-btn').style.display = 'none';
   }
 
+  function clearRoleInput() {
+    const ta = document.getElementById('role-input');
+    if (!ta.value.trim()) return;
+    if (!confirm('Clear this text?')) return;
+    ta.value = '';
+    ta.focus();
+  }
+
   async function runStep1() {
     const roleText = document.getElementById('role-input').value.trim();
     if (roleText.length < 40) { alert('Tell me a bit more about your role.'); return; }
@@ -711,9 +747,8 @@ Respond ONLY in this JSON format (no markdown, no backticks):
 
     try {
       const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userContent }] }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || data.error || 'API error');
-      const rawText = data.content[0].text.trim();
+      if (!response.ok) { const errData = await response.json().catch(() => ({})); throw new Error(errData.error?.message || errData.error || 'API error'); }
+      const rawText = (await collectStreamedText(response)).trim();
       let parsed;
       try { parsed = JSON.parse(rawText); } catch { const match = rawText.match(/\{[\s\S]*\}/); if (match) parsed = JSON.parse(match[0]); else throw new Error('Could not parse response.'); }
       insights = managerMode ? parsed.gaps : parsed.insights;
@@ -922,9 +957,8 @@ Respond ONLY in this JSON format (no markdown, no backticks):
 
     try {
       const response = await fetch('https://career-tools-proxy.figueroaluisd.workers.dev/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || data.error || 'API error');
-      const promptText = data.content[0].text.trim();
+      if (!response.ok) { const errData = await response.json().catch(() => ({})); throw new Error(errData.error?.message || errData.error || 'API error'); }
+      const promptText = (await collectStreamedText(response)).trim();
       if (!promptStore[currentInsightIndex]) promptStore[currentInsightIndex] = {};
       promptStore[currentInsightIndex].promptText = promptText;
       promptStore[currentInsightIndex].pieces = pieces;
