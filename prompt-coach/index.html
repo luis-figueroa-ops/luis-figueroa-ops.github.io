@@ -1697,6 +1697,15 @@ function updateFieldBadge(ruleId) {
   setBadgeStatus(ruleId, rule.check(value));
 }
 
+function stripPreamble(text) {
+  // Some model responses ignore the "no preamble" instruction and prepend a
+  // sentence like "Here is the rewritten prompt..." followed by a separator
+  // before the actual content. Strip that leading preamble if present.
+  const match = text.match(/^[\s\S]{0,220}?\n\s*-{3,}\s*\n+/);
+  if (match) return text.slice(match[0].length).trim();
+  return text.trim();
+}
+
 async function collectStreamedText(response) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
@@ -1778,7 +1787,7 @@ async function buildAssembledPrompt() {
         })
       });
       if (!res.ok) { const errData = await res.json().catch(() => ({})); throw new Error(errData.error?.message || errData.error || ('HTTP ' + res.status)); }
-      const assembled = (await collectStreamedText(res)).trim();
+      const assembled = stripPreamble(await collectStreamedText(res));
 
       if (assembled) {
         baseCoached = assembled;
