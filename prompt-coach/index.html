@@ -895,6 +895,18 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   gap: 8px;
 }
 .btn-save-library:hover { background: rgba(201,168,76,0.25); }
+.btn-save-library.saved {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: rgba(76,175,125,0.4);
+}
+
+@keyframes libraryBadgePulse {
+  0% { box-shadow: 0 0 0 0 rgba(201,168,76,0.55); }
+  70% { box-shadow: 0 0 0 9px rgba(201,168,76,0); }
+  100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+}
+.library-count-badge.pulse { animation: libraryBadgePulse 0.9s ease-out 2; }
 
 /* ── AI NOTICE ── */
 .ai-notice {
@@ -1685,6 +1697,33 @@ function updateFieldBadge(ruleId) {
   setBadgeStatus(ruleId, rule.check(value));
 }
 
+async function collectStreamedText(response) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let rawText = '';
+  let buffer = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const jsonStr = line.slice(6).trim();
+      if (jsonStr === '[DONE]') continue;
+      let parsed;
+      try { parsed = JSON.parse(jsonStr); } catch (_) { continue; }
+      if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+        rawText += parsed.delta.text;
+      } else if (parsed.type === 'error') {
+        throw new Error(parsed.error?.message || 'Stream error');
+      }
+    }
+  }
+  return rawText;
+}
+
 async function buildAssembledPrompt() {
   const original = document.getElementById('promptInput').value.trim();
   const additions = [];
@@ -1731,12 +1770,8 @@ async function buildAssembledPrompt() {
           messages: [{ role: 'user', content }]
         })
       });
-      const data = await res.json();
-      const assembled = (data.content || [])
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('')
-        .trim();
+      if (!res.ok) { const errData = await res.json().catch(() => ({})); throw new Error(errData.error?.message || errData.error || 'API error'); }
+      const assembled = (await collectStreamedText(res)).trim();
 
       if (assembled) {
         baseCoached = assembled;
@@ -2051,7 +2086,24 @@ function saveToLibrary() {
   const lib = getLibrary();
   lib.unshift({ id: Date.now(), originalPrompt: original, coachedPrompt: coached, score, savedAt: Date.now() });
   saveLibrary(lib);
-  showToast('Saved to library');
+  showToast("Saved! Find it under \u2018My Library\u2019 at the top of the page.");
+
+  const btn = document.querySelector('.btn-save-library');
+  if (btn) {
+    const originalHtml = btn.innerHTML;
+    btn.classList.add('saved');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Saved to Library';
+    setTimeout(() => {
+      btn.classList.remove('saved');
+      btn.innerHTML = originalHtml;
+    }, 2400);
+  }
+
+  const badge = document.getElementById('libraryCountBadge');
+  if (badge) {
+    badge.classList.add('pulse');
+    setTimeout(() => badge.classList.remove('pulse'), 1900);
+  }
 }
 
 function loadFromLibrary(id) {
