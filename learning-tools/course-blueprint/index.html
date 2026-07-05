@@ -664,6 +664,36 @@ select option { background: var(--surface2); }
   var basePrompt = '';
   var enhancedPrompt = '';
 
+  function collectStreamedText(response) {
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder();
+    var rawText = '';
+    var buffer = '';
+    function pump() {
+      return reader.read().then(function(result) {
+        if (result.done) return rawText;
+        buffer += decoder.decode(result.value, { stream: true });
+        var lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          if (line.indexOf('data: ') !== 0) continue;
+          var jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') continue;
+          var parsed;
+          try { parsed = JSON.parse(jsonStr); } catch (e) { continue; }
+          if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
+            rawText += parsed.delta.text;
+          } else if (parsed.type === 'error') {
+            throw new Error((parsed.error && parsed.error.message) || 'Stream error');
+          }
+        }
+        return pump();
+      });
+    }
+    return pump();
+  }
+
   function assemblePrompt(topic, goal, level, context) {
     return 'You are my personal learning coach. I want to learn the following:\n\n'
       + 'TOPIC: ' + topic + '\n'
@@ -783,14 +813,10 @@ select option { background: var(--surface2); }
       if (!resp.ok) {
         return resp.text().then(function(t) { throw new Error(t || 'Server responded with ' + resp.status); });
       }
-      return resp.json();
+      return collectStreamedText(resp);
     })
-    .then(function(data) {
-      var text = (data.content || [])
-        .filter(function(b) { return b.type === 'text'; })
-        .map(function(b) { return b.text; })
-        .join('')
-        .trim();
+    .then(function(text) {
+      text = (text || '').trim();
 
       if (!text) throw new Error('No response received - try again.');
 
