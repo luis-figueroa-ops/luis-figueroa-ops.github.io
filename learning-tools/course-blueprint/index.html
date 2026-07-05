@@ -241,6 +241,27 @@ select option { background: var(--surface2); }
 .build-btn:hover { background: var(--green-light); transform: translateY(-1px); }
 .build-btn:active { transform: translateY(0); }
 
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+.form-actions .build-btn { flex: 1; }
+
+.clear-fields-btn {
+  padding: 15px 28px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.clear-fields-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+
 .output-section {
   display: none;
   flex-direction: column;
@@ -503,6 +524,8 @@ select option { background: var(--surface2); }
   select { font-size: 16px; }
   .action-row { flex-direction: column; }
   .btn { width: 100%; text-align: center; min-height: 44px; }
+  .form-actions { flex-direction: column; }
+  .clear-fields-btn { width: 100%; text-align: center; min-height: 44px; }
   .polish-row { flex-direction: column; }
   .overview-phases { grid-template-columns: 1fr; }
   h1 { font-size: clamp(36px, 7vw, 56px); }
@@ -607,10 +630,13 @@ select option { background: var(--surface2); }
       </div>
 
     </div>
-    <button class="build-btn" onclick="handleBuild()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      Build My Course Prompt
-    </button>
+    <div class="form-actions">
+      <button class="build-btn" onclick="handleBuild()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Build My Course Prompt
+      </button>
+      <button class="clear-fields-btn" onclick="handleClearFields()" type="button">Clear</button>
+    </div>
   </div>
 
   <div class="output-section" id="outputSection">
@@ -733,6 +759,21 @@ select option { background: var(--surface2); }
     document.getElementById('promptBox').textContent = basePrompt;
     document.getElementById('outputSection').classList.add('visible');
     document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function handleClearFields() {
+    var topic   = document.getElementById('topic');
+    var goal    = document.getElementById('goal');
+    var context = document.getElementById('context');
+
+    if (!topic.value && !goal.value && !context.value) return;
+    if (!confirm('Clear all fields?')) return;
+
+    topic.value   = '';
+    goal.value    = '';
+    context.value = '';
+    document.getElementById('level').selectedIndex = 0;
+    topic.focus();
   }
 
   function handleStartOver() {
