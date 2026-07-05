@@ -690,6 +690,15 @@ select option { background: var(--surface2); }
   var basePrompt = '';
   var enhancedPrompt = '';
 
+  function stripPreamble(text) {
+    // Some model responses ignore the "no preamble" instruction and prepend a
+    // sentence like "Here is the rewritten prompt..." followed by a separator
+    // before the actual content. Strip that leading preamble if present.
+    var match = text.match(/^[\s\S]{0,220}?\n\s*-{3,}\s*\n+/);
+    if (match) return text.slice(match[0].length).trim();
+    return text.trim();
+  }
+
   function collectStreamedText(response) {
     var reader = response.body.getReader();
     var decoder = new TextDecoder();
@@ -863,7 +872,7 @@ select option { background: var(--surface2); }
       return collectStreamedText(resp);
     })
     .then(function(text) {
-      text = (text || '').trim();
+      text = stripPreamble(text || '');
 
       if (!text) throw new Error('No response received - try again.');
 
