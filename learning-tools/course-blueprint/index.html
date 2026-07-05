@@ -708,7 +708,13 @@ select option { background: var(--surface2); }
           if (jsonStr === '[DONE]') continue;
           var parsed;
           try { parsed = JSON.parse(jsonStr); } catch (e) { continue; }
-          if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
+          if (parsed.type === 'content_block_start' && parsed.content_block && parsed.content_block.type === 'text') {
+            // With web_search enabled, a response can contain earlier text (e.g.
+            // commentary before searching) followed by a separate final text block
+            // after the search completes. Discard anything accumulated so far so
+            // only the most recent (final) text block survives.
+            rawText = '';
+          } else if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
             rawText += parsed.delta.text;
           } else if (parsed.type === 'error') {
             throw new Error((parsed.error && parsed.error.message) || 'Stream error');
