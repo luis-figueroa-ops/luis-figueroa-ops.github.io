@@ -1825,12 +1825,19 @@ function stripPreamble(text) {
     text = text.slice(leadingMatch[0].length).trim();
   }
 
-  // Pass 2: some model responses instead do the opposite — they write the
-  // actual coached prompt correctly, then continue past it with a separator
-  // and a full answer to the prompt, ignoring the "start directly with the
-  // prompt, no meta-commentary" instruction. If a divider still remains and
-  // what follows it is long enough to look like a real answer (not just more
-  // prompt text), cut everything from that divider onward.
+  // Pass 2: some model responses write the coached prompt correctly, then
+  // keep going and answer it — almost always starting with a bolded numbered
+  // heading like "**1. ...**". That's a structured answer, not part of the
+  // prompt, so cut everything from that heading onward. This catches the
+  // failure whether or not the model also added a "---" divider first.
+  const answerHeadingMatch = text.match(/\n+\s*\*\*\s*1[.):]/);
+  if (answerHeadingMatch) {
+    text = text.slice(0, answerHeadingMatch.index).trim();
+  }
+
+  // Pass 3: fallback for responses that use a "---" divider instead of (or
+  // in addition to) a numbered heading. If a divider remains and what
+  // follows it is long enough to look like a real answer, cut from there.
   const trailingMatch = text.match(/\n\s*-{3,}\s*\n+([\s\S]*)$/);
   if (trailingMatch && trailingMatch[1].length > 400) {
     text = text.slice(0, trailingMatch.index).trim();
