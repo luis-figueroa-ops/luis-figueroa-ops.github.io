@@ -49,7 +49,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 48px;
+  padding: 14px 48px;
   border-bottom: 1px solid var(--gold-border);
   background: rgba(14,14,14,0.95);
   backdrop-filter: blur(8px);
@@ -75,7 +75,7 @@ body {
 
 /* ── HERO ── */
 .hero {
-  padding: 56px 48px 40px;
+  padding: 48px 48px 20px;
   max-width: 900px;
 }
 .hero-eyebrow {
@@ -88,7 +88,7 @@ body {
 }
 .hero h1 {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(52px, 6.5vw, 80px);
+  font-size: clamp(44px, 5.5vw, 68px);
   letter-spacing: 3px;
   line-height: 0.95;
   color: var(--white);
@@ -161,7 +161,7 @@ body {
 .input-panel {
   background: var(--bg2);
   border: 1px solid var(--gold-border);
-  padding: 36px;
+  padding: 22px;
   margin-bottom: 32px;
   position: relative;
 }
@@ -293,7 +293,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   align-items: center;
   justify-content: center;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 42px;
+  font-size: 36px;
   letter-spacing: 2px;
   line-height: 1;
 }
@@ -325,7 +325,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 .findings-panel {
   background: var(--bg2);
   border: 1px solid var(--gold-border);
-  padding: 36px;
+  padding: 22px;
   margin-bottom: 28px;
 }
 .panel-title {
@@ -414,7 +414,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 .refinement-panel {
   background: var(--bg2);
   border: 1px solid var(--gold-border);
-  padding: 28px 36px;
+  padding: 16px 24px;
   margin-bottom: 28px;
 }
 .refinement-title {
@@ -517,7 +517,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 .export-panel {
   background: var(--bg2);
   border: 1px solid var(--gold-border);
-  padding: 28px 36px;
+  padding: 16px 24px;
   margin-bottom: 28px;
 }
 .export-title {
@@ -665,7 +665,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 
 /* ── DESKTOP-ONLY TEXT SIZE REDUCTION (mobile breakpoint below is untouched) ── */
 @media (min-width: 801px) {
-  .topbar-brand { font-size: 30px; }
+  .topbar-brand { font-size: 26px; }
   .hero-eyebrow { font-size: 16px; }
   .scoring-explainer-dismiss { font-size: 21px; }
   .scoring-explainer p { font-size: 14px; }
@@ -673,8 +673,8 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   .btn-ghost { font-size: 15px; }
   .char-count { font-size: 15px; }
   .score-ring .score-label { font-size: 15px; }
-  .score-title { font-size: 35px; }
-  .panel-title { font-size: 27px; }
+  .score-title { font-size: 30px; }
+  .panel-title { font-size: 24px; }
   .finding-badge { font-size: 14px; }
   .finding-rule { font-size: 16px; }
   .refinement-title { font-size: 15px; }
@@ -701,12 +701,28 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   .btn-library-toggle { font-size: 15px; }
   .library-count-badge { font-size: 14px; }
   .library-empty { font-size: 16px; }
-  .library-score-badge { font-size: 25px; }
+  .library-score-badge { font-size: 22px; }
   .library-date { font-size: 15px; }
   .btn-lib-action { font-size: 15px; }
   .btn-save-library { font-size: 14px; }
   #allGoodMsg { font-size: 17px; }
   .prompt-focus-note { font-size: 16px; }
+
+  /* ── DESKTOP-ONLY SPACING TIGHTENING (mobile breakpoint below is untouched) ── */
+  body { padding-bottom: 40px; }
+  .scoring-explainer { padding: 14px 20px; margin-top: 22px; }
+  .input-panel { margin-bottom: 20px; }
+  .score-panel { padding: 22px; gap: 28px; margin-bottom: 18px; }
+  .findings-panel { margin-bottom: 18px; }
+  .finding { padding: 10px 0; }
+  .coached-box { padding: 16px; margin-bottom: 16px; }
+  .refinement-panel { margin-bottom: 18px; }
+  .coach-field { padding: 14px 18px; margin-bottom: 16px; }
+  .original-prompt-display { padding: 14px 16px; margin-bottom: 18px; }
+  .export-panel { margin-bottom: 18px; }
+  .library-panel { padding: 16px 24px; margin-bottom: 18px; }
+  .ai-notice { margin: 0 auto 18px; }
+  .site-footer { margin: 0 auto 36px; }
 }
 
 @media (max-width: 800px) {
@@ -961,7 +977,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 .ai-notice {
   max-width: 1200px;
   margin: 0 auto 28px;
-  padding: 14px 48px;
+  padding: 10px 48px;
   background: var(--bg2);
   border: 1px solid var(--gold-border);
   font-size: 13px;
@@ -982,7 +998,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 .site-footer {
   max-width: 1200px;
   margin: 0 auto 60px;
-  padding: 28px 48px;
+  padding: 16px 48px;
   border-top: 1px solid var(--gold-border);
   text-align: center;
 }
