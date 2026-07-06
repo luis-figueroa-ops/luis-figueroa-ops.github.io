@@ -972,6 +972,25 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   color: var(--muted);
   opacity: 0.6;
 }
+@media print {
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f5;
+    --bg3: #eeeeee;
+    --gold: #8a6d1f;
+    --gold-dim: rgba(138,109,31,0.08);
+    --gold-border: rgba(138,109,31,0.35);
+    --white: #1a1a1a;
+    --muted: #555555;
+    --green: #2f7d54;
+    --yellow: #7a5c00;
+    --red: #c0392b;
+    --green-bg: rgba(47,125,84,0.08);
+    --yellow-bg: rgba(122,92,0,0.08);
+    --red-bg: rgba(192,57,43,0.08);
+  }
+  .badge-neutral { color: #555 !important; }
+}
 </style>
 </head>
 <body>
@@ -1503,13 +1522,13 @@ function renderFindings(findings) {
 const COACH_FIELDS = {
   role_assignment: {
     label: 'Who Should The AI Be',
-    type: 'input',
+    type: 'textarea',
     placeholder: 'e.g. "Act as a senior sales operations consultant" or "You are an expert technical writer"',
     why: 'This is separate from what you want done. Giving the AI a specific persona changes the depth and vocabulary of the response before it even reads your task.'
   },
   action_verb: {
     label: 'Opening Instruction',
-    type: 'input',
+    type: 'textarea',
     placeholder: 'e.g. "Write 3 paragraphs about creating content for beginners" or "Explain how to..."',
     why: 'Tell the AI exactly what to do. Lead with an imperative verb — "Write", "Analyze", "List", "Explain". This is the core task directive and sets the direction for everything that follows.'
   },
@@ -1521,25 +1540,25 @@ const COACH_FIELDS = {
   },
   audience: {
     label: 'Who This Is For',
-    type: 'input',
+    type: 'textarea',
     placeholder: 'e.g. "For me — I\'m a complete beginner to marketing" or "For my small business team of 3 people"',
     why: 'Tell the AI who will be reading the output. A beginner needs simpler language than an expert. Your boss needs a different tone than your team. Even "for me, I\'m just starting out" is enough to change how the AI responds.'
   },
   format: {
     label: 'How You Want It Laid Out',
-    type: 'input',
+    type: 'textarea',
     placeholder: 'e.g. "Use bullet points with a bold heading for each one" or "Write it in 3 short paragraphs" or "Number each step"',
     why: 'Tell the AI what the output should look like on the page. Without this, it will write one long wall of text. Do you want a list? Short paragraphs? Steps numbered 1-2-3? Say it here.'
   },
   length: {
     label: 'How Long the Answer Should Be',
-    type: 'input',
+    type: 'textarea',
     placeholder: 'e.g. "No more than one page" or "Keep it under 200 words" or "Give me 5 bullet points maximum"',
     why: 'AI will write as much as it possibly can unless you stop it. Set a limit so you get something you can actually read and use. Think about what would feel right — a quick summary or a detailed guide?'
   },
   tone: {
     label: 'How It Should Sound',
-    type: 'input',
+    type: 'textarea',
     placeholder: 'e.g. "Friendly and encouraging, like a coach talking to a beginner" or "Simple and clear, like you\'re explaining to a 15 year old"',
     why: 'Should the AI sound like a professor, a friendly coworker, or a coach talking to a teenager? If you don\'t say, it defaults to a flat textbook-style voice that can feel cold and hard to read.'
   },
@@ -1958,6 +1977,19 @@ function copyCoached() {
 function savePDF() {
   window.print();
 }
+
+window.addEventListener('beforeprint', () => {
+  document.querySelectorAll('.coach-field-input, #promptInput').forEach(el => {
+    el.dataset.printOrigHeight = el.style.height || '';
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  });
+});
+window.addEventListener('afterprint', () => {
+  document.querySelectorAll('.coach-field-input, #promptInput').forEach(el => {
+    el.style.height = el.dataset.printOrigHeight || '';
+  });
+});
 
 const AI_URLS = {
   claude:     'https://claude.ai/new',
