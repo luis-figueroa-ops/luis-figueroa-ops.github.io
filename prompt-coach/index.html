@@ -1803,12 +1803,28 @@ function updateFieldBadge(ruleId) {
 }
 
 function stripPreamble(text) {
-  // Some model responses ignore the "no preamble" instruction and prepend a
-  // sentence like "Here is the rewritten prompt..." followed by a separator
-  // before the actual content. Strip that leading preamble if present.
-  const match = text.match(/^[\s\S]{0,220}?\n\s*-{3,}\s*\n+/);
-  if (match) return text.slice(match[0].length).trim();
-  return text.trim();
+  text = text.trim();
+
+  // Pass 1: some model responses ignore the "no preamble" instruction and
+  // prepend a short sentence like "Here is the rewritten prompt..." followed
+  // by a separator before the actual content. Strip that leading preamble if present.
+  const leadingMatch = text.match(/^[\s\S]{0,220}?\n\s*-{3,}\s*\n+/);
+  if (leadingMatch) {
+    text = text.slice(leadingMatch[0].length).trim();
+  }
+
+  // Pass 2: some model responses instead do the opposite — they write the
+  // actual coached prompt correctly, then continue past it with a separator
+  // and a full answer to the prompt, ignoring the "start directly with the
+  // prompt, no meta-commentary" instruction. If a divider still remains and
+  // what follows it is long enough to look like a real answer (not just more
+  // prompt text), cut everything from that divider onward.
+  const trailingMatch = text.match(/\n\s*-{3,}\s*\n+([\s\S]*)$/);
+  if (trailingMatch && trailingMatch[1].length > 400) {
+    text = text.slice(0, trailingMatch.index).trim();
+  }
+
+  return text;
 }
 
 async function collectStreamedText(response) {
