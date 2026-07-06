@@ -1066,13 +1066,37 @@
   }
 
   // ── API ──
+  async function collectStreamedText(response) {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let text = '';
+    let buffer = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === '[DONE]') continue;
+        let parsed;
+        try { parsed = JSON.parse(jsonStr); } catch (_) { continue; }
+        if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
+          text += parsed.delta.text;
+        }
+      }
+    }
+    return text;
+  }
   async function callClaude(system, user, maxTokens = 2000) {
     const res = await fetch(WORKER_URL, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }] })
     });
     if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
-    return (await res.json()).content[0].text.trim();
+    return (await collectStreamedText(res)).trim();
   }
   async function callClaudeJSON(system, user, maxTokens = 2000) {
     const raw = await callClaude(system, user, maxTokens);
