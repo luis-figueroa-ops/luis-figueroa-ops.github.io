@@ -1826,13 +1826,23 @@ function stripPreamble(text) {
   }
 
   // Pass 2: some model responses write the coached prompt correctly, then
-  // keep going and answer it — almost always starting with a bolded numbered
-  // heading like "**1. ...**". That's a structured answer, not part of the
-  // prompt, so cut everything from that heading onward. This catches the
-  // failure whether or not the model also added a "---" divider first.
-  const answerHeadingMatch = text.match(/\n+\s*\*\*\s*1[.):]/);
-  if (answerHeadingMatch) {
-    text = text.slice(0, answerHeadingMatch.index).trim();
+  // keep going and answer it. This shows up in different shapes — a bolded
+  // numbered heading ("**1. ..."), a plain numbered list ("1. ..."), or a
+  // bullet list ("- ..." / "* ..."). Any of these at the start of a line means
+  // the model has moved from writing a prompt into writing a structured
+  // answer, so cut everything from that point onward — regardless of whether
+  // a "---" divider was also used. Also trim back a short orphaned section
+  // heading (e.g. "Travel Tips") that sometimes sits just before the list.
+  const answerSignature = /\n+\s*(?:\*{2}\s*\d+[.):]|\d+[.):]\s|[-*•]\s)/;
+  const answerMatch = text.match(answerSignature);
+  if (answerMatch) {
+    let cutAt = answerMatch.index;
+    const before = text.slice(0, cutAt);
+    const headingMatch = before.match(/\n{1,2}([ \t]*[^\n.!?]{1,40})\s*$/);
+    if (headingMatch && headingMatch[1].trim().split(/\s+/).filter(Boolean).length <= 5) {
+      cutAt = headingMatch.index;
+    }
+    text = text.slice(0, cutAt).trim();
   }
 
   // Pass 3: fallback for responses that use a "---" divider instead of (or
@@ -1934,7 +1944,7 @@ async function buildAssembledPrompt() {
           model: 'claude-sonnet-4-6',
           max_tokens: 1500,
           tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-          system: `You are a prompt engineering expert. First search the web for the most current best practices, frameworks, and techniques relevant to the topic in the user's prompt. Then use what you find to weave the coaching field answers into one natural, well-written prompt — not a bulleted list of the fields. The prompt should reflect current, accurate context for the topic. Write in second person, as if the user wrote it. 100-200 words. No meta-commentary, no markdown formatting, start directly with the prompt itself.`,
+          system: `You are a prompt engineering expert. First search the web for the most current best practices, frameworks, and techniques relevant to the topic in the user's prompt. Then use what you find to weave the coaching field answers into one natural, well-written prompt — not a bulleted list of the fields. The prompt should reflect current, accurate context for the topic. Write in second person, as if the user wrote it. 100-200 words. No meta-commentary, no markdown formatting, start directly with the prompt itself. Your entire response is that one paragraph and nothing else — do not answer the prompt yourself, and do not add headings, lists, examples, or a second paragraph after it. The moment the prompt paragraph ends, stop.`,
           messages: [{ role: 'user', content }]
         })
       });
