@@ -1174,9 +1174,9 @@ const RULES = [
     name: 'Action Verb',
     weight: 12,
     check(p) {
-      const startsWithVerb = /^(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|give me|show me)/i;
-      const delegation = /\b(help me\s+(?:to\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|design|plan)|i need you to|assist me\s+(?:with|in)|can you\s+(?:please\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|describe|identify|fix|improve)|please\s+(?:write|create|draft|summarize|analyze|explain|generate|list))\b/i;
-      const verbAnywhere = /\b(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan)\b/i;
+      const startsWithVerb = /^(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|teach|guide|instruct|give me|show me|teach me|guide me|walk me through|tell me)/i;
+      const delegation = /\b(help me\s+(?:to\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|design|plan|teach|guide|instruct)|i need you to|assist me\s+(?:with|in)|can you\s+(?:please\s+)?(?:write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|describe|identify|fix|improve|teach|guide|instruct)|please\s+(?:write|create|draft|summarize|analyze|explain|generate|list|teach|guide|instruct)|walk me through)\b/i;
+      const verbAnywhere = /\b(write|create|draft|summarize|analyze|explain|list|generate|build|compare|review|translate|rewrite|suggest|evaluate|outline|describe|extract|identify|fix|improve|convert|classify|rate|rank|design|plan|teach|guide|instruct)\b/i;
       if (startsWithVerb.test(p.trim()) || delegation.test(p)) return 'good';
       if (verbAnywhere.test(p)) return 'weak';
       return 'missing';
@@ -1191,7 +1191,7 @@ const RULES = [
     name: 'Role Assignment',
     weight: 8,
     check(p) {
-      const hasRole = /\b(act as|you are a|you are an|as a senior|as an expert|as a professional|as a\s+\w+\s+expert)\b/i;
+      const hasRole = /\b(act as|acting as|you are a|you are an|you\'re a|you\'re an|in the role of|as a senior|as an expert|as a professional|as a\s+\w+\s+expert)\b/i;
       return hasRole.test(p) ? 'good' : 'weak';
     },
     goodMsg: 'Role is assigned — the model has a persona to ground its expertise level and voice.',
@@ -1227,7 +1227,7 @@ const RULES = [
     name: 'Audience',
     weight: 8,
     check(p) {
-      const hasAudience = /\b(for a|for an|for my|for me|for myself|i\'m the|i am the|to help me|so i can|i\'m a|i am a|audience|reader|beginner|expert|manager|team|client|customer|executive|engineer|developer|non-?technical|stakeholder)\b/i;
+      const hasAudience = /\b(for a|for an|for my|for me|for myself|for someone|for people|written for|i\'m the|i am the|to help me|so i can|i\'m a|i am a|new to (?:the|this)|newcomers?|audience|reader|beginner|expert|manager|team|client|customer|executive|engineer|developer|non-?technical|stakeholder)\b/i;
       return hasAudience.test(p) ? 'good' : 'weak';
     },
     goodMsg: 'Audience is specified — the model can calibrate vocabulary and depth.',
@@ -1240,7 +1240,7 @@ const RULES = [
     name: 'Output Format',
     weight: 10,
     check(p) {
-      const hasFormat = /\b(bullet|bulleted|numbered|list|table|paragraph|json|markdown|summary|outline|step.by.step|in \d+ (words|sentences|paragraphs|points)|as a|format|structure)\b/i;
+      const hasFormat = /\b(bullet|bulleted|numbered|list|table|paragraph|json|markdown|summary|outline|step.by.step|q\s?&\s?a|faq|dialogue|script|cheat sheet|in \d+ (words|sentences|paragraphs|points)|as a (?:list|table|bullet(?:ed)?|numbered list|q\s?&\s?a|faq|dialogue|script)|format|structure)\b/i;
       return hasFormat.test(p) ? 'good' : 'weak';
     },
     goodMsg: 'Output format is defined — no guessing on structure.',
@@ -1270,8 +1270,12 @@ const RULES = [
     name: 'Negative Instructions',
     weight: 8,
     check(p) {
-      const hasNeg = /\b(don\'t|do not|never|avoid|without|no (lists|bullets|headers|markdown|jargon|fluff|filler|intro|summary|preamble))\b/i;
-      return hasNeg.test(p) ? 'weak' : 'good';
+      const hasStrongNeg = /\b(don\'t|do not|never|avoid|no (lists|bullets|headers|markdown|jargon|fluff|filler|intro|summary|preamble))\b/i;
+      const isLengthPhrase = /\bwithout\s+(?:being|going|it being)?\s*(?:over|exceeding|more than|longer than)\b/i;
+      const hasBareWithout = /\bwithout\b/i;
+      if (hasStrongNeg.test(p)) return 'weak';
+      if (hasBareWithout.test(p) && !isLengthPhrase.test(p)) return 'weak';
+      return 'good';
     },
     goodMsg: 'No negative instructions detected — prompt is framed positively.',
     weakMsg: 'Contains "don\'t" or "avoid" phrasing. Negative instructions are less reliable — models sometimes invert them under load.',
@@ -1328,7 +1332,7 @@ const RULES = [
     name: 'Tone',
     weight: 10,
     check(p) {
-      const hasTone = /\b(professional|casual|formal|informal|friendly|direct|concise|technical|plain|conversational|persuasive|neutral|serious|humorous|empathetic|confident|authoritative)\b/i;
+      const hasTone = /\b(professional|casual|formal|informal|friendly|direct|concise|technical|plain|conversational|persuasive|neutral|serious|humorous|empathetic|confident|authoritative|warm|encouraging|upbeat|playful|approachable|supportive|blunt|straightforward|witty|engaging|relaxed|matter-of-fact|no-nonsense)\b/i;
       return hasTone.test(p) ? 'good' : 'weak';
     },
     goodMsg: 'Tone is specified — the model can match your voice.',
