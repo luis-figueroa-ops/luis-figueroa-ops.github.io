@@ -1854,25 +1854,14 @@ async function buildAssembledPrompt() {
   }
 
   // Local assembly fallback
-  let openingLine = '';
-  if (roleInstruction && openingInstruction) {
-    openingLine = roleInstruction.replace(/\.\s*$/, '') + '. ' + openingInstruction.replace(/\.\s*$/, '');
-  } else if (roleInstruction) {
-    openingLine = roleInstruction.replace(/\.\s*$/, '');
-  } else if (openingInstruction) {
-    openingLine = openingInstruction.replace(/\.\s*$/, '');
-  }
-
-  let assembled;
-  if (openingLine) {
-    assembled = openingLine;
-    if (additions.length > 0) assembled += '\n\n' + additions.join('\n');
+  let assembled = '';
+  if (roleInstruction) assembled += roleInstruction.replace(/\.\s*$/, '') + '. ';
+  if (openingInstruction) {
+    assembled += openingInstruction.replace(/\.\s*$/, '') + '.\n\n' + original.replace(/\.\s*$/, '') + '.';
   } else {
-    assembled = original;
-    if (additions.length > 0) {
-      assembled = original.replace(/\.\s*$/, '') + '.\n\n' + additions.join('\n');
-    }
+    assembled += original.replace(/\.\s*$/, '') + '.';
   }
+  if (additions.length > 0) assembled += '\n\n' + additions.join('\n');
 
   baseCoached = assembled;
   resetRefineState();
