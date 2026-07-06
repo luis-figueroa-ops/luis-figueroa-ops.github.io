@@ -88,7 +88,7 @@ body {
 }
 .hero h1 {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(72px, 9vw, 108px);
+  font-size: clamp(60px, 7.5vw, 92px);
   letter-spacing: 3px;
   line-height: 0.95;
   color: var(--white);
@@ -96,7 +96,7 @@ body {
 }
 .hero h1 span { color: var(--gold); }
 .hero-sub {
-  font-size: 30px;
+  font-size: 25px;
   color: var(--white);
   opacity: 0.92;
   line-height: 1.7;
@@ -175,7 +175,7 @@ body {
 
 .label {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 21px;
+  font-size: 18px;
   letter-spacing: 3px;
   color: var(--gold);
   text-transform: uppercase;
@@ -189,7 +189,7 @@ textarea#promptInput {
   border: 1px solid rgba(201,168,76,0.2);
   color: var(--white);
   font-family: 'DM Sans', sans-serif;
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1.7;
   padding: 18px 20px;
   resize: vertical;
@@ -228,7 +228,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 
 .btn-primary {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 21px;
+  font-size: 18px;
   letter-spacing: 3px;
   text-transform: uppercase;
   background: var(--gold);
@@ -293,7 +293,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   align-items: center;
   justify-content: center;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 57px;
+  font-size: 48px;
   letter-spacing: 2px;
   line-height: 1;
 }
@@ -314,7 +314,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   margin-bottom: 8px;
 }
 .score-summary {
-  font-size: 24px;
+  font-size: 20px;
   color: var(--white);
   opacity: 0.9;
   line-height: 1.7;
@@ -382,13 +382,13 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   margin-bottom: 4px;
 }
 .finding-desc {
-  font-size: 23px;
+  font-size: 19px;
   color: var(--white);
   line-height: 1.6;
   margin-bottom: 6px;
 }
 .finding-research {
-  font-size: 23px;
+  font-size: 19px;
   color: var(--muted);
   font-style: italic;
   line-height: 1.5;
@@ -403,7 +403,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   position: relative;
 }
 .coached-prompt-text {
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1.8;
   color: var(--white);
   white-space: pre-wrap;
@@ -486,7 +486,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 .coach-field input[type="text"]::placeholder,
 .coach-field textarea::placeholder { color: rgba(240,237,230,0.3); }
 .coach-field-why {
-  font-size: 23px;
+  font-size: 19px;
   color: var(--muted);
   margin-top: 8px;
   line-height: 1.6;
@@ -659,6 +659,55 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
   display: block;
 }
 .btn-use-example:hover { border-color: var(--gold); color: var(--gold); }
+
+#allGoodMsg { font-size: 23px; }
+.prompt-focus-note { font-size: 21px; }
+
+/* ── DESKTOP-ONLY TEXT SIZE REDUCTION (mobile breakpoint below is untouched) ── */
+@media (min-width: 801px) {
+  .topbar-brand { font-size: 34px; }
+  .hero-eyebrow { font-size: 18px; }
+  .scoring-explainer-dismiss { font-size: 24px; }
+  .scoring-explainer p { font-size: 15px; }
+  .live-tip { font-size: 18px; }
+  .btn-ghost { font-size: 16px; }
+  .char-count { font-size: 17px; }
+  .score-ring .score-label { font-size: 16px; }
+  .score-title { font-size: 40px; }
+  .panel-title { font-size: 30px; }
+  .finding-badge { font-size: 15px; }
+  .finding-rule { font-size: 18px; }
+  .refinement-title { font-size: 17px; }
+  .btn-refine { font-size: 15px; }
+  .refine-tick { font-size: 16px; }
+  .coach-field-label { font-size: 18px; }
+  .coach-field input[type="text"],
+  .coach-field textarea { font-size: 19px; }
+  .original-prompt-display { font-size: 19px; }
+  .export-title { font-size: 17px; }
+  .btn-export { font-size: 15px; }
+  .ai-row-label { font-size: 17px; }
+  .btn-ai { font-size: 17px; }
+  .session-footer { font-size: 19px; }
+  .toast { font-size: 16px; }
+  .example-chip { font-size: 15px; }
+  .example-preview { font-size: 18px; }
+  .btn-use-example { font-size: 15px; }
+  .score-trend { font-size: 17px; }
+  .score-trend .trend-val { font-size: 18px; }
+  .polish-note { font-size: 17px; }
+  .ai-toggle-label { font-size: 17px; }
+  .reset-link { font-size: 16px; }
+  .btn-library-toggle { font-size: 17px; }
+  .library-count-badge { font-size: 15px; }
+  .library-empty { font-size: 18px; }
+  .library-score-badge { font-size: 28px; }
+  .library-date { font-size: 17px; }
+  .btn-lib-action { font-size: 16px; }
+  .btn-save-library { font-size: 15px; }
+  #allGoodMsg { font-size: 19px; }
+  .prompt-focus-note { font-size: 18px; }
+}
 
 @media (max-width: 800px) {
   .topbar, .hero, .main { padding-left: 20px; padding-right: 20px; }
@@ -848,7 +897,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 }
 .library-meta { flex: 1; min-width: 0; }
 .library-snippet {
-  font-size: 23px;
+  font-size: 19px;
   color: var(--white);
   opacity: 0.95;
   white-space: nowrap;
@@ -1085,7 +1134,7 @@ textarea#promptInput::placeholder { color: var(--muted); opacity: 0.7; }
 
       <div id="coachFieldsContainer"></div>
 
-      <div id="allGoodMsg" style="display:none;padding:16px 20px;background:var(--green-bg);border:1px solid rgba(76,175,125,0.3);color:var(--green);font-size:23px;line-height:1.6;margin-bottom:24px;">
+      <div id="allGoodMsg" style="display:none;padding:16px 20px;background:var(--green-bg);border:1px solid rgba(76,175,125,0.3);color:var(--green);line-height:1.6;margin-bottom:24px;">
         Your prompt is already well-structured. Use the export buttons below to copy and test it.
       </div>
 
@@ -1631,7 +1680,7 @@ function renderRewriteFields(raw, findings) {
       return `
       <div class="coach-field" data-field-id="prompt_focus">
         <div class="coach-field-label">Prompt Focus <span class="finding-badge field-badge badge-weak">weak</span></div>
-        <div style="padding:14px 16px;background:var(--yellow-bg);border:1px solid rgba(224,184,76,0.3);color:var(--yellow);font-size:21px;line-height:1.6;margin-bottom:6px;">
+        <div class="prompt-focus-note" style="padding:14px 16px;background:var(--yellow-bg);border:1px solid rgba(224,184,76,0.3);color:var(--yellow);line-height:1.6;margin-bottom:6px;">
           Your prompt runs long. Re-read it and cut anything that isn&rsquo;t doing direct work &mdash; extra context, hedging, repeated points.
         </div>
         <div class="coach-field-why">${f.rule.research}</div>
