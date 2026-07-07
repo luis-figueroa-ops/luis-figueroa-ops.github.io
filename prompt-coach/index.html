@@ -2001,14 +2001,12 @@ async function buildAssembledPrompt() {
   }
 
   // Local assembly fallback
-  let assembled = '';
-  if (roleInstruction) assembled += roleInstruction.replace(/\.\s*$/, '') + '. ';
-  if (openingInstruction) {
-    assembled += openingInstruction.replace(/\.\s*$/, '') + '.\n\n' + original.replace(/\.\s*$/, '') + '.';
-  } else {
-    assembled += original.replace(/\.\s*$/, '') + '.';
-  }
-  if (additions.length > 0) assembled += '\n\n' + additions.join('\n');
+  const assembledParts = [];
+  if (roleInstruction) assembledParts.push('Who Should The AI Be: ' + roleInstruction.replace(/\.\s*$/, '') + '.');
+  if (openingInstruction) assembledParts.push('Opening Instruction: ' + openingInstruction.replace(/\.\s*$/, '') + '.');
+  assembledParts.push('Your Original Prompt: ' + original.replace(/\.\s*$/, '') + '.');
+  if (additions.length > 0) assembledParts.push(additions.join('\n'));
+  let assembled = assembledParts.join('\n\n');
 
   baseCoached = assembled;
   resetRefineState();
