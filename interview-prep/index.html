@@ -1573,18 +1573,20 @@ Strict rules:
 - Only use information found via search results on the ${companyDomain} domain itself. Do not use outside articles, third-party sources, or prior general knowledge about this company, even if you have it.
 - Run a small, targeted number of searches (a handful at most) — check the most relevant pages, don't exhaustively crawl the site.
 - If a category isn't covered on the site, say so honestly in that field rather than filling it in from outside knowledge or speculation.
+- Each field is a summary, not a research report: 2-4 sentences per field, covering only the most relevant points. Do not list every fact you found — pick the strongest ones.
 
-Return JSON only. No markdown, no preamble:
+Critical output format rule: after you finish searching, your entire reply must be ONLY the JSON object below — nothing before it, nothing after it. Do not narrate what you searched for, do not summarize your findings in prose first, do not cite sources, do not use markdown or code fences. The moment you're ready to answer, output the raw JSON object and stop.
+
 {
-  "businessImpact": "Specific recent achievements, milestones, recognitions, or growth signals — from the company's own site",
-  "communityImpact": "Charitable, humanitarian, environmental, or social responsibility initiatives — from the company's own site",
-  "cultureSignals": "What the company's own site emphasizes about its culture and values",
+  "businessImpact": "2-4 sentences: the strongest recent achievements, milestones, recognitions, or growth signals — from the company's own site",
+  "communityImpact": "2-4 sentences: charitable, humanitarian, environmental, or social responsibility initiatives — from the company's own site",
+  "cultureSignals": "2-4 sentences: what the company's own site emphasizes about its culture and values",
   "whyThisCompany": "2-3 specific compelling angles a candidate could authentically use, grounded in the site's own content",
-  "researchNote": "Any important caveats — e.g. limited info found on-site, category not covered, etc."
+  "researchNote": "One short sentence of caveats — e.g. limited info found on-site, category not covered, etc."
 }`;
-          const intelUser = `Company: ${company}\nWebsite: ${companyWebsite}\nDomain to search (and only this domain): ${companyDomain}\nRole being applied for: ${roleTitle || 'Not specified'}\n\nResearch this company using only what's published on its own site.`;
+          const intelUser = `Company: ${company}\nWebsite: ${companyWebsite}\nDomain to search (and only this domain): ${companyDomain}\nRole being applied for: ${roleTitle || 'Not specified'}\n\nResearch this company using only what's published on its own site. Remember: output ONLY the final JSON object, no research summary or citations before it.`;
           const intelTools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4, allowed_domains: [companyDomain] }];
-          companyIntel = await callClaudeJSON(intelSystem, intelUser, 1500, intelTools);
+          companyIntel = await callClaudeJSON(intelSystem, intelUser, 3000, intelTools);
           companyIntelText = JSON.stringify(companyIntel);
           updateSession(activeSessionId, { companyWebsite, companyIntel });
           renderCompanyIntel(companyIntel);
