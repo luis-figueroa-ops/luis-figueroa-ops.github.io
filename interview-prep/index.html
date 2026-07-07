@@ -1170,11 +1170,16 @@
   }
 
   // ── API ──
+  // Same tool-aware SSE parser used by the other career-tools that hit this
+  // Worker (prompt-coach, course-blueprint). Discards any pre-search commentary
+  // ("I'll look into...") so only the real answer after a tool call is kept.
   async function collectStreamedText(response) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let text = '';
     let buffer = '';
+    let sawToolUse = false;
+    let resetDoneAfterToolUse = false;
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -1187,7 +1192,19 @@
         if (jsonStr === '[DONE]') continue;
         let parsed;
         try { parsed = JSON.parse(jsonStr); } catch (_) { continue; }
-        if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
+        if (parsed.type === 'content_block_start' && parsed.content_block) {
+          const blockType = parsed.content_block.type;
+          if (blockType === 'server_tool_use' || blockType === 'web_search_tool_result') {
+            sawToolUse = true;
+          } else if (blockType === 'text') {
+            if (!sawToolUse) {
+              text = '';
+            } else if (!resetDoneAfterToolUse) {
+              text = '';
+              resetDoneAfterToolUse = true;
+            }
+          }
+        } else if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
           text += parsed.delta.text;
         } else if (parsed.type === 'error') {
           throw new Error(parsed.error?.message || 'Stream error');
@@ -1202,7 +1219,7 @@
     try {
       const res = await fetch(WORKER_URL, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }] }),
+        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: maxTokens, tools: [{ type: 'web_search_20250305', name: 'web_search' }], system, messages: [{ role: 'user', content: user }] }),
         signal: controller.signal
       });
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
