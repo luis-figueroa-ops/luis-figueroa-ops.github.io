@@ -1180,6 +1180,7 @@
     let buffer = '';
     let sawToolUse = false;
     let resetDoneAfterToolUse = false;
+    let stopReason = null;
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -1206,12 +1207,14 @@
           }
         } else if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
           text += parsed.delta.text;
+        } else if (parsed.type === 'message_delta' && parsed.delta && parsed.delta.stop_reason) {
+          stopReason = parsed.delta.stop_reason;
         } else if (parsed.type === 'error') {
           throw new Error(parsed.error?.message || 'Stream error');
         }
       }
     }
-    return text;
+    return { text, stopReason };
   }
   // `tools` is opt-in and only ever passed for the one feature that actually
   // needs live web data (company research) — every other call in this tool
@@ -1229,9 +1232,14 @@
         signal: controller.signal
       });
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
-      const text = (await collectStreamedText(res)).trim();
-      if (!text) throw new Error('Empty response from AI. Please try again.');
-      return text;
+      const { text, stopReason } = await collectStreamedText(res);
+      const trimmed = text.trim();
+      if (!trimmed) throw new Error('Empty response from AI. Please try again.');
+      if (stopReason === 'max_tokens') {
+        console.error('Claude response was cut off at the token limit before finishing:', trimmed);
+        throw new Error('The response was cut off before it finished. Try again, or shorten the job description/story if this keeps happening.');
+      }
+      return trimmed;
     } catch (err) {
       if (err.name === 'AbortError') throw new Error('Request timed out. Check your connection and try again.');
       throw err;
@@ -1243,7 +1251,10 @@
     const raw = await callClaude(system, user, maxTokens, tools);
     const match = raw.match(/\{[\s\S]*\}/) || raw.match(/\[[\s\S]*\]/);
     try { return JSON.parse(match ? match[0] : raw); }
-    catch(e) { throw new Error('Could not parse response. Please try again.'); }
+    catch(e) {
+      console.error('Could not parse AI response as JSON. Raw response was:', raw);
+      throw new Error('Could not read the AI\'s response. Please try again.');
+    }
   }
 
   // Pulls the bare registrable-ish host out of a user-typed URL so web search
@@ -1610,7 +1621,7 @@ Return structured JSON only. No markdown, no preamble, no backticks.
   ]
 }`;
       const user = `Company: ${company || 'Not specified'}\nRole: ${roleTitle || 'Not specified'}\n\nJob Description:\n${jd}`;
-      const result = await callClaudeJSON(system, user, 2500);
+      const result = await callClaudeJSON(system, user, 4000);
       updateSession(activeSessionId, { company, roleTitle, companyWebsite, jd, businessProblem: result.businessProblem, roleContextNote: result.roleContextNote, competencies: result.competencies });
       renderPreResults(getSession(activeSessionId));
       showToast('Analysis complete');
@@ -1744,7 +1755,7 @@ Return structured JSON only. No markdown, no preamble, no backticks.
   ]
 }`;
       const user = `Role: ${session.roleTitle || 'Not specified'} at ${session.company || 'Not specified'}\n\nJob Description:\n${session.jd}\n\nAlready-identified explicit competencies (do not repeat these): ${(session.competencies||[]).map(c=>c.name).join(', ')}`;
-      const result = await callClaudeJSON(system, user, 2000);
+      const result = await callClaudeJSON(system, user, 2500);
       updateSession(activeSessionId, { impliedCompetencies: result.impliedCompetencies || [] });
       renderImpliedCompetencies(result.impliedCompetencies || []);
       showToast('Implied competencies found');
@@ -1804,7 +1815,7 @@ For each question:
 Return JSON only. No markdown, no preamble:
 {"analyses":[{"question":"","competency":"","whatTheyScored":["","",""],"strongAnswerIncludes":"","commonMiss":"","nextTimeFramework":""}]}`;
       const user = `Role: ${session?.roleTitle||'Not specified'} at ${session?.company||'Not specified'}\n\nJob Description:\n${debriefJd}\n\nInterview Questions:\n${validQs.map((q,i) => `${i+1}. ${q}`).join('\n')}`;
-      const result = await callClaudeJSON(system, user, 2500);
+      const result = await callClaudeJSON(system, user, 4000);
       updateSession(activeSessionId, { debriefJd, debriefAnalysis: result.analyses, postQuestions });
       renderPostAnalysis(result.analyses);
       document.getElementById('postOutputActions').style.display = 'flex';
@@ -1891,7 +1902,7 @@ Critical guidance on impact and results — apply this rigorously:
 Return JSON only:
 {"competenciesProved":[],"soarFramework":{"situation":"Set context: what was broken, missing, or at risk before this person acted","obstacles":"The specific challenges — competing priorities, missing systems, cross-org resistance, time pressure. This is where most candidates underinvest.","actions":"What this person specifically did — use active verbs, name tools and teams, make individual ownership clear","results":"Before/after: what changed as a result. Use numbers if available; use honest relative terms if not. Connect to business impact."},"keyLanguage":"Specific phrases and framing that map to what interviewers listen for in this competency area","gaps":"What is currently missing that would strengthen this story — missing before/after, unclear individual ownership, unquantified result, or weak connection to business impact","bestUsedFor":"Which interview questions this story answers best"}`;
       const user = compContext + 'Story: ' + (storyTitle||'Untitled') + '\n\n' + storyText;
-      const result = await callClaudeJSON(system, user, 2000);
+      const result = await callClaudeJSON(system, user, 2500);
       const story = { id: 'story_' + Date.now(), title: storyTitle||'Untitled Story', rawText: storyText, competencies: result.competenciesProved||[], soar: result.soarFramework||{}, keyLanguage: result.keyLanguage||'', gaps: result.gaps||'', bestUsedFor: result.bestUsedFor||'', createdAt: Date.now() };
       const stories = [...(session.stories||[]), story];
       updateSession(activeSessionId, { stories });
