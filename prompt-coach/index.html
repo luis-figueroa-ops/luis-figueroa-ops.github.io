@@ -2002,9 +2002,10 @@ async function buildAssembledPrompt() {
 
   // Local assembly fallback
   const assembledParts = [];
-  if (roleInstruction) assembledParts.push('Who Should The AI Be: ' + roleInstruction.replace(/\.\s*$/, '') + '.');
-  if (openingInstruction) assembledParts.push('Opening Instruction: ' + openingInstruction.replace(/\.\s*$/, '') + '.');
-  assembledParts.push('Your Original Prompt: ' + original.replace(/\.\s*$/, '') + '.');
+  const withTerminalPunct = s => /[.!?]\s*$/.test(s) ? s : s + '.';
+  if (roleInstruction) assembledParts.push('Who Should The AI Be: ' + withTerminalPunct(roleInstruction));
+  if (openingInstruction) assembledParts.push('Opening Instruction: ' + withTerminalPunct(openingInstruction));
+  assembledParts.push('Your Original Prompt: ' + withTerminalPunct(original));
   if (additions.length > 0) assembledParts.push(additions.join('\n'));
   let assembled = assembledParts.join('\n\n');
 
