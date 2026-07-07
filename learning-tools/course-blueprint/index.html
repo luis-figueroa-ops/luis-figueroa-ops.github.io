@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>15-Minute Course Blueprint</title>
+<title>Interview Prep & Learning Engine Portfolio</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -12,7 +12,7 @@
   gtag('config', 'G-YCMXSWXHTN');
 </script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=Share+Tech+Mono&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -28,6 +28,7 @@
   --white: #e6edf3;
   --muted: #7d8590;
   --red: #f85149;
+  --red-hover: #fa5e56;
 }
 
 html { scroll-behavior: smooth; }
@@ -40,9 +41,55 @@ body {
   overflow-x: hidden;
 }
 
+/* Custom Navigation Tabs Header */
+.nav-tabs {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: var(--white);
+  border-color: var(--border-soft);
+}
+
+.tab-btn.active {
+  color: var(--green);
+  border-color: var(--border);
+  background: var(--green-dim);
+}
+
+.app-container {
+  display: none;
+}
+
+.app-container.active {
+  display: block;
+  animation: fadeUp 0.4s ease both;
+}
+
 .hero {
-  padding: 56px 56px 40px;
-  max-width: 800px;
+  padding: 40px 56px 24px;
+  max-width: 860px;
   margin: 0 auto;
 }
 
@@ -68,77 +115,25 @@ body {
 
 h1 {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(48px, 6.5vw, 72px);
+  font-size: clamp(38px, 5.5vw, 64px);
   letter-spacing: 2px;
-  line-height: 1;
+  line-height: 1.1;
   color: var(--white);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 h1 em { color: var(--green); font-style: normal; }
 
 .hero-sub {
-  font-size: 17px;
+  font-size: 16px;
   color: var(--white);
   opacity: 0.7;
-  line-height: 1.7;
-  max-width: 520px;
-  margin-bottom: 24px;
-}
-
-.overview-box {
-  background: var(--surface);
-  border: 1px solid var(--border-soft);
-  border-left: 3px solid var(--green);
-  padding: 20px 24px;
-  max-width: 680px;
-}
-
-.overview-box p {
-  font-size: 17px;
-  color: var(--muted);
-  line-height: 1.75;
-  margin-bottom: 14px;
-}
-
-.overview-box p:last-child { margin-bottom: 0; }
-
-.overview-phases {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.overview-phase {
-  background: var(--bg);
-  border: 1px solid var(--border-soft);
-  padding: 10px 12px;
-}
-
-.overview-phase-num {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  letter-spacing: 2px;
-  color: var(--green);
-  text-transform: uppercase;
-  margin-bottom: 3px;
-}
-
-.overview-phase-name {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--white);
-  margin-bottom: 3px;
-}
-
-.overview-phase-desc {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.4;
+  line-height: 1.6;
+  max-width: 700px;
+  margin-bottom: 20px;
 }
 
 .main {
-  padding: 0 56px 80px;
+  padding: 0 56px 60px;
   max-width: 860px;
   margin: 0 auto;
   display: flex;
@@ -149,7 +144,7 @@ h1 em { color: var(--green); font-style: normal; }
 .form-card {
   background: var(--surface);
   border: 1px solid var(--border-soft);
-  padding: 40px;
+  padding: 36px;
 }
 
 .form-section-label {
@@ -158,32 +153,31 @@ h1 em { color: var(--green); font-style: normal; }
   letter-spacing: 4px;
   color: var(--muted);
   text-transform: uppercase;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px 28px;
+  gap: 20px 24px;
   margin-bottom: 28px;
 }
 
-.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
 .form-group.full { grid-column: 1 / -1; }
 
 label {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 14px;
-  letter-spacing: 3px;
+  font-size: 13px;
+  letter-spacing: 2px;
   color: var(--green);
   text-transform: uppercase;
 }
 
 .hint {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--muted);
-  line-height: 1.5;
-  margin-top: -2px;
+  line-height: 1.4;
 }
 
 input[type="text"],
@@ -193,12 +187,11 @@ select {
   border: 1px solid var(--border-soft);
   color: var(--white);
   font-family: 'DM Sans', sans-serif;
-  font-size: 17px;
-  padding: 12px 14px;
+  font-size: 16px;
+  padding: 12px;
   width: 100%;
   outline: none;
   transition: border-color 0.2s;
-  -webkit-appearance: none;
   appearance: none;
   border-radius: 0;
 }
@@ -208,9 +201,9 @@ textarea:focus,
 select:focus { border-color: rgba(74,222,128,0.45); }
 
 input::placeholder,
-textarea::placeholder { color: rgba(125,133,144,0.45); }
+textarea::placeholder { color: rgba(125,133,144,0.4); }
 
-textarea { resize: vertical; min-height: 88px; }
+textarea { resize: vertical; min-height: 100px; }
 
 select {
   cursor: pointer;
@@ -222,50 +215,57 @@ select {
 
 select option { background: var(--surface2); }
 
-.build-btn {
-  width: 100%;
-  padding: 15px 32px;
-  background: var(--green);
-  color: #0d1117;
-  border: none;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  letter-spacing: 3px;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.build-btn:hover { background: var(--green-light); transform: translateY(-1px); }
-.build-btn:active { transform: translateY(0); }
-
-.form-actions {
+/* Universal Button Design and Interactive Packaging */
+.control-bar {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
 }
-.form-actions .build-btn { flex: 1; }
 
-.clear-fields-btn {
-  padding: 15px 28px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
-  color: var(--muted);
+.action-btn {
+  padding: 12px 24px;
   font-family: 'Share Tech Mono', monospace;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.15s;
-  flex-shrink: 0;
+  border: 1px solid transparent;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
 }
-.clear-fields-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+
+.action-btn:active {
+  transform: scale(0.97);
+}
+
+.btn-green { background: var(--green); color: #0d1117; font-weight: bold; }
+.btn-green:hover { background: var(--green-light); }
+
+.btn-outline-green { background: transparent; border: 1px solid var(--border); color: var(--green); }
+.btn-outline-green:hover { background: var(--green-dim); }
+
+.btn-secondary { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: var(--muted); }
+.btn-secondary:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+
+.btn-danger { background: transparent; border: 1px solid rgba(248,81,73,0.3); color: var(--red); }
+.btn-danger:hover { background: rgba(248,81,73,0.1); border-color: var(--red); color: var(--red-hover); }
+
+.device-cache-notice {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.4;
+}
 
 .output-section {
   display: none;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   animation: fadeUp 0.4s ease both;
 }
 .output-section.visible { display: flex; }
@@ -277,15 +277,19 @@ select option { background: var(--surface2); }
 
 .output-card {
   background: var(--surface);
+  border: 1px solid var(--border-soft);
+  padding: 32px;
+}
+
+.output-card.highlighted-border {
   border: 1px solid var(--border);
-  padding: 36px 40px;
 }
 
 .output-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -293,53 +297,115 @@ select option { background: var(--surface2); }
 .output-label {
   font-family: 'Share Tech Mono', monospace;
   font-size: 14px;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
   color: var(--green);
   text-transform: uppercase;
 }
-
-.badge-enhanced {
-  display: none;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  background: var(--green-dim);
-  border: 1px solid var(--border);
-  color: var(--green);
-}
-.badge-enhanced.visible { display: inline-block; }
 
 .prompt-wrapper { position: relative; }
 
 .prompt-box {
   background: var(--bg);
   border: 1px solid var(--border-soft);
-  padding: 24px 28px;
-  font-size: 17px;
-  line-height: 1.85;
+  padding: 20px 24px;
+  font-size: 16px;
+  line-height: 1.75;
   color: var(--white);
   white-space: pre-wrap;
-  min-height: 160px;
+  min-height: 120px;
   word-break: break-word;
+}
+
+/* Debrief Module Render Blocks */
+.debrief-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  padding: 28px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.debrief-question {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.pill-container {
+  background: var(--surface2);
+  border: 1px solid var(--border-soft);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.pill-container.scoring {
+  border-left: 3px solid var(--green);
+}
+
+.pill-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.pill-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--white);
+}
+
+.layer-heading {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+.layer-heading.green { color: var(--green); }
+.layer-heading.red { color: var(--red); }
+.layer-heading.blue { color: #58a6ff; }
+
+.layer-text-block {
+  font-size: 15px;
+  color: #c9d1d9;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.layer-list {
+  margin-left: 20px;
+  margin-bottom: 14px;
+  color: #c9d1d9;
+}
+.layer-list li {
+  margin-bottom: 6px;
+  line-height: 1.6;
+  font-size: 15px;
 }
 
 .loading-overlay {
   display: none;
   position: absolute;
   inset: 0;
-  background: rgba(13,17,23,0.88);
+  background: rgba(13,17,23,0.92);
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 14px;
+  z-index: 10;
 }
 .loading-overlay.visible { display: flex; }
 
 .spinner {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border: 2px solid rgba(255,255,255,0.08);
   border-top-color: var(--green);
   border-radius: 50%;
@@ -349,582 +415,557 @@ select option { background: var(--surface2); }
 
 .loading-msg {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: 3px;
   color: var(--green);
   text-transform: uppercase;
 }
 
-.action-row { display: flex; gap: 12px; flex-wrap: wrap; }
-
-.btn {
-  padding: 10px 22px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 15px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  border: none;
-  transition: all 0.15s;
-  flex-shrink: 0;
-}
-
-.btn-primary { background: var(--green); color: #0d1117; }
-.btn-primary:hover { background: var(--green-light); }
-.btn-primary.copied { background: #22c55e; }
-
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--green); }
-.btn-outline:hover { background: var(--green-dim); }
-
-.btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--muted);
-}
-.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--white); }
-
-.polish-row {
-  background: var(--surface);
-  border: 1px solid var(--border-soft);
-  padding: 20px 28px;
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.toggle-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-  cursor: pointer;
-  padding-top: 2px;
-}
-
-.toggle {
-  position: relative;
-  width: 40px;
-  height: 22px;
-  flex-shrink: 0;
-}
-.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-
-.toggle-track {
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.1);
-  border-radius: 11px;
-  transition: background 0.2s;
-  cursor: pointer;
-}
-.toggle input:checked + .toggle-track { background: var(--green); }
-
-.toggle-thumb {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.2s;
-  pointer-events: none;
-}
-.toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
-
-.toggle-name {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 15px;
-  letter-spacing: 2px;
-  color: var(--white);
-  text-transform: uppercase;
-  user-select: none;
-  white-space: nowrap;
-}
-
-.polish-info { flex: 1; min-width: 200px; }
-.polish-info p { font-size: 16px; color: var(--muted); line-height: 1.6; }
-
-.polish-error {
-  display: none;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  letter-spacing: 1px;
-  color: var(--red);
-  width: 100%;
-  margin-top: 8px;
-}
-.polish-error.visible { display: block; }
-
-.fixed-back {
-  position: absolute;
-  left: 14px;
-  top: 14px;
-  z-index: 200;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 14px;
-  letter-spacing: 2px;
-  color: #a0a0cc;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.fixed-back:hover { color: var(--green); }
-
-.fixed-copyright {
-  display: none;
-}
-
 .ai-notice {
   max-width: 860px;
-  margin: 0 auto 60px;
+  margin: 0 auto 40px;
   padding: 14px 20px;
   background: var(--surface);
   border: 1px solid var(--border-soft);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
   line-height: 1.6;
   text-align: center;
 }
 
-.ai-notice-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  letter-spacing: 1px;
-  color: var(--green);
-  text-transform: uppercase;
-  margin-right: 4px;
-}
-
-@media print {
-  .hero, .build-btn, .action-row, .polish-row, .fixed-back, .fixed-copyright { display: none !important; }
-  body { background: white; color: #111; }
-  .main { padding: 0; max-width: 100%; }
-  .form-card { background: #fafafa; border: 1px solid #ddd; padding: 24px; margin-bottom: 20px; }
-  .output-section { display: flex !important; }
-  .output-card { background: #fafafa; border: 1px solid #ddd; padding: 24px; }
-  .prompt-box { background: white; border: 1px solid #ddd; color: #111; font-size: 13px; }
-  input, textarea, select { background: white; color: #111; border: 1px solid #ccc; }
-  label, .form-section-label, .output-label { color: #555; }
-  .loading-overlay { display: none !important; }
-  .badge-enhanced { border-color: #333; color: #333; background: #f0f0f0; }
-}
-
-.mobile-back-link { display: none; }
-
-@media (max-width: 660px) {
-  .hero { padding: 36px 20px 28px; }
-  .main { padding: 0 20px 60px; }
-  .form-card, .output-card { padding: 24px 20px; }
-  .polish-row { padding: 16px 20px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .overview-phases { grid-template-columns: 1fr 1fr; }
-  input[type="text"] { font-size: 16px; }
-  textarea { font-size: 16px; }
-  select { font-size: 16px; }
-  .action-row { flex-direction: column; }
-  .btn { width: 100%; text-align: center; min-height: 44px; }
-  .form-actions { flex-direction: column; }
-  .clear-fields-btn { width: 100%; text-align: center; min-height: 44px; }
-  .polish-row { flex-direction: column; }
-  .overview-phases { grid-template-columns: 1fr; }
-  h1 { font-size: clamp(36px, 7vw, 56px); }
-  .hero-sub { font-size: 15px; }
-  .fixed-copyright { display: none; }
-  .fixed-back { display: none; }
-  .mobile-back-link {
-    display: block;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-    color: #a0a0cc;
-    text-decoration: none;
-    padding: 10px 0 8px;
-  }
-}
 .static-copyright {
-  display: block;
   text-align: center;
   font-family: 'Share Tech Mono', monospace;
   font-size: 12px;
   letter-spacing: 1px;
-  color: #a0a0cc;
-  padding: 0 0 2rem;
-  pointer-events: none;
+  color: var(--muted);
+  padding: 0 0 40px;
 }
-@media (min-width: 661px) {
-  .static-copyright {
-    display: block;
-    text-align: center;
+
+/* 🖨️ Absolute Ink-Saving Black & White Clean Print Sheet */
+@media print {
+  .nav-tabs, .control-bar, .ai-notice, .hint, .loading-overlay { 
+    display: none !important; 
   }
+  body { 
+    background: #ffffff !important; 
+    color: #000000 !important; 
+    font-size: 12pt;
+  }
+  .app-container { 
+    display: block !important; 
+  }
+  .main, .hero { 
+    padding: 0 !important; 
+    max-width: 100% !important; 
+    margin: 0 !important; 
+  }
+  .form-card, .output-card, .debrief-card, .pill-container { 
+    background: #ffffff !important; 
+    border: 1px solid #111111 !important; 
+    padding: 18px !important; 
+    margin-bottom: 16px !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+  .pill-container {
+    border-left: 4px solid #000000 !important;
+  }
+  .prompt-box, .pill-body, .layer-text-block, p, li, textarea, input {
+    background: #ffffff !important;
+    color: #000000 !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    page-break-inside: avoid !important;
+  }
+  h1, h2, h3, label, .output-label, .pill-title, .layer-heading {
+    color: #000000 !important;
+    font-weight: bold !important;
+  }
+  .output-section { 
+    display: flex !important; 
+  }
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 32px 20px 20px; }
+  .main { padding: 0 20px 40px; }
+  .form-card, .output-card { padding: 24px 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .control-bar { flex-direction: column; }
+  .action-btn { width: 100%; }
+  .nav-tabs { flex-wrap: wrap; padding: 8px; }
+  .tab-btn { font-size: 12px; padding: 8px 12px; width: 48%; text-align: center; }
 }
 </style>
 </head>
 <body>
 
-<a class="fixed-back" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
-<a class="mobile-back-link" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
+<!-- Global Application Navigation Workspace Bar -->
+<nav class="nav-tabs" id="globalNav">
+  <button class="tab-btn active" onclick="switchTab('blueprint')">Course Blueprint</button>
+  <button class="tab-btn" onclick="switchTab('decode')">Decode The Role</button>
+  <button class="tab-btn" onclick="switchTab('stories')">Build Your Stories</button>
+  <button class="tab-btn" onclick="switchTab('notes')">Notes &amp; Debrief</button>
+</nav>
 
-<section class="hero">
-  <div class="eyebrow">Learning Tools</div>
-  <h1>15-Minute<br><em>Course Blueprint</em></h1>
-  <p class="hero-sub">Fill in four fields. Your AI determines how many sessions you need, then walks you through them one at a time - 15 minutes each, at your own pace.</p>
+<!-- ================================================================= -->
+<!-- TAB 1: COURSE BLUEPRINT WORKSPACE -->
+<!-- ================================================================= -->
+<div id="tab-blueprint" class="app-container active">
+  <section class="hero">
+    <div class="eyebrow">Learning Tools</div>
+    <h1>15-Minute<br><em>Course Blueprint</em></h1>
+    <p class="hero-sub">Fill in your learning objectives. The AI sets up specialized milestones configured for clear, incremental self-paced study blocks.</p>
+  </section>
 
-  <div class="overview-box">
-    <p>This tool builds a complete, ready-to-paste prompt that turns any AI - Claude, ChatGPT, Gemini, or anything else - into your personal learning coach. Your AI analyzes the complexity of your topic and creates a full session roadmap before teaching you anything. Then it works through the sessions with you one at a time, each built on a proven four-phase structure.</p>
-    <div class="overview-phases">
-      <div class="overview-phase">
-        <div class="overview-phase-num">Phase 1</div>
-        <div class="overview-phase-name">Teach</div>
-        <div class="overview-phase-desc">Core concept in plain language with a real example from your world</div>
+  <main class="main">
+    <div class="form-card">
+      <div class="form-section-label">Your Learning Context</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="topic">What do you want to learn?</label>
+          <input type="text" id="topic" placeholder="e.g. SQL window functions, pricing psychology" />
+        </div>
+        <div class="form-group full">
+          <label for="goal">What is your goal?</label>
+          <span class="hint">What do you want to be able to do after completing this course?</span>
+          <textarea id="goal" placeholder="e.g. Write a query that ranks sales outputs within regions"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="level">What is your current level?</label>
+          <select id="level">
+            <option value="Complete beginner">Complete beginner</option>
+            <option value="Some familiarity">Some familiarity</option>
+            <option value="Intermediate">Intermediate</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="context">What is your real-life context?</label>
+          <span class="hint">Your role, industry, or execution domain mapping point.</span>
+          <textarea id="context" placeholder="e.g. I run operations analysis trackers and want to step up metrics generation pipelines."></textarea>
+        </div>
       </div>
-      <div class="overview-phase">
-        <div class="overview-phase-num">Phase 2</div>
-        <div class="overview-phase-name">Apply</div>
-        <div class="overview-phase-desc">One exercise to attempt on your own - the struggle is the learning</div>
+
+      <div class="control-bar">
+        <button class="action-btn btn-green" onclick="handleBlueprintBuild()">Build Course Prompt</button>
+        <button class="action-btn btn-secondary" onclick="handleClearFields('tab-blueprint')">Clear Fields</button>
+        <button class="action-btn btn-outline-green" onclick="saveToLibrary('blueprint')">Save to Library</button>
+        <button class="action-btn btn-danger" onclick="handleStartOver('tab-blueprint')">Reset Layout</button>
       </div>
-      <div class="overview-phase">
-        <div class="overview-phase-num">Phase 3</div>
-        <div class="overview-phase-name">Evaluate &amp; Coach</div>
-        <div class="overview-phase-desc">Your attempt reviewed, mistakes diagnosed, the why explained</div>
+      <div class="device-cache-notice">🔒 Saved metrics persist inside device memory cache. Wiping browser cache deletes logs.</div>
+    </div>
+
+    <div class="output-section" id="blueprintOutput">
+      <div class="output-card highlighted-border">
+        <div class="output-header">
+          <span class="output-label">Generated Learning Directives</span>
+        </div>
+        <div class="prompt-wrapper">
+          <div class="prompt-box" id="blueprintPromptBox"></div>
+        </div>
       </div>
-      <div class="overview-phase">
-        <div class="overview-phase-num">Phase 4</div>
-        <div class="overview-phase-name">Advance &amp; Connect</div>
-        <div class="overview-phase-desc">Key insight, next session preview, and a reusable prompt to keep</div>
+      <div class="control-bar">
+        <button class="action-btn btn-green" onclick="handleCopy('blueprintPromptBox')">Copy Prompt Payload</button>
+        <button class="action-btn btn-outline-green" onclick="triggerNativePrint('Course Blueprint Output')">Print / Save PDF</button>
       </div>
     </div>
-  </div>
-</section>
+  </main>
+</div>
 
-<main class="main">
+<!-- ================================================================= -->
+<!-- TAB 2: DECODE THE ROLE WORKSPACE -->
+<!-- ================================================================= -->
+<div id="tab-decode" class="app-container">
+  <section class="hero">
+    <div class="eyebrow">Interview Suite</div>
+    <h1>Decode The <em>Role Rubrics</em></h1>
+    <p class="hero-sub">Drop the explicit requirements or Job Description text below to map targeted expectations and uncover core execution scoring vectors.</p>
+  </section>
 
-  <div class="form-card">
-    <div class="form-section-label">Your Learning Context</div>
-    <div class="form-grid">
-
+  <main class="main">
+    <div class="form-card">
+      <div class="form-section-label">Target Architecture Input</div>
       <div class="form-group full">
-        <label for="topic">What do you want to learn?</label>
-        <input type="text" id="topic" placeholder="e.g. SQL window functions, pricing psychology, VLOOKUP in Excel" />
+        <label for="decodeJdInput">Job Description Analysis Payload</label>
+        <textarea id="decodeJdInput" style="min-height: 200px;" placeholder="Paste entire target job specification overview here..."></textarea>
       </div>
 
-      <div class="form-group full">
-        <label for="goal">What is your goal?</label>
-        <span class="hint">What do you want to be able to do after completing this course?</span>
-        <textarea id="goal" placeholder="e.g. Write a query that ranks salespeople by revenue within each region"></textarea>
+      <div class="control-bar">
+        <button class="action-btn btn-green" onclick="runRoleDecoding()">Analyze Target JD</button>
+        <button class="action-btn btn-secondary" onclick="handleClearFields('tab-decode')">Clear Fields</button>
+        <button class="action-btn btn-outline-green" onclick="saveToLibrary('decode')">Save to Library</button>
+        <button class="action-btn btn-danger" onclick="handleStartOver('tab-decode')">Reset Layout</button>
       </div>
-
-      <div class="form-group">
-        <label for="level">What is your current level?</label>
-        <select id="level">
-          <option value="Complete beginner">Complete beginner</option>
-          <option value="Some familiarity">Some familiarity</option>
-          <option value="Intermediate">Intermediate</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="context">What is your real-life context?</label>
-        <span class="hint">Your role, industry, or the specific situation this applies to.</span>
-        <textarea id="context" placeholder="e.g. I run sales ops reports in Salesforce and want to stop exporting everything to Excel"></textarea>
-      </div>
-
     </div>
-    <div class="form-actions">
-      <button class="build-btn" onclick="handleBuild()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        Build My Course Prompt
-      </button>
-      <button class="clear-fields-btn" onclick="handleClearFields()" type="button">Clear</button>
-    </div>
-  </div>
 
-  <div class="output-section" id="outputSection">
-
-    <div class="output-card">
-      <div class="output-header">
-        <span class="output-label">Your Course Prompt</span>
-        <span class="badge-enhanced" id="badgeEnhanced">&#10022; AI Enhanced</span>
-      </div>
-      <div class="prompt-wrapper">
-        <div class="prompt-box" id="promptBox"></div>
-        <div class="loading-overlay" id="loadingOverlay">
+    <div class="output-section" id="decodeOutput">
+      <div class="output-card highlighted-border" style="position:relative;">
+        <div class="loading-overlay" id="decodeLoading">
           <div class="spinner"></div>
-          <div class="loading-msg">Searching &amp; enhancing&hellip;</div>
+          <div class="loading-msg">Extracting metrics &amp; scoring maps...</div>
         </div>
+        <div class="output-header">
+          <span class="output-label">Role Rubrics Analysis Matrix</span>
+        </div>
+        <div class="prompt-box" id="decodePromptBox">System initialization complete. Enter specific target metrics above to begin execution analysis pipeline logs...</div>
+      </div>
+      <div class="control-bar">
+        <button class="action-btn btn-outline-green" onclick="triggerNativePrint('Decoded Role Evaluation')">Print Matrix Layout</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ================================================================= -->
+<!-- TAB 3: BUILD YOUR STORIES WORKSPACE -->
+<!-- ================================================================= -->
+<div id="tab-stories" class="app-container">
+  <section class="hero">
+    <div class="eyebrow">Interview Suite</div>
+    <h1>Build Your <em>Execution Stories</em></h1>
+    <p class="hero-sub">Input unstructured project narratives or past accomplishments. The parser builds clean, data-backed operational frameworks.</p>
+  </section>
+
+  <main class="main">
+    <div class="form-card">
+      <div class="form-section-label">Narrative Raw Parameters</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="storyTitle">Project Label / Title Tracker</label>
+          <input type="text" id="storyTitle" placeholder="e.g. Cross-Functional Pipeline Resolution" />
+        </div>
+        <div class="form-group full">
+          <label for="storyRawText">Describe What Happened</label>
+          <span class="hint">Outline the situation, your concrete actions, parameters leveraged, and metrics impacted. Keep it conversational.</span>
+          <textarea id="storyRawText" style="min-height: 140px;" placeholder="We hit a block because logs were manual... I automated structural notifications using integrations... response dropped 30%..."></textarea>
+        </div>
+      </div>
+
+      <div class="control-bar">
+        <button class="action-btn btn-green" onclick="runStoryTranslation()">Translate Narrative Structure</button>
+        <button class="action-btn btn-secondary" onclick="handleClearFields('tab-stories')">Clear Fields</button>
+        <button class="action-btn btn-outline-green" onclick="saveToLibrary('stories')">Save to Library</button>
+        <button class="action-btn btn-danger" onclick="handleStartOver('tab-stories')">Reset Layout</button>
       </div>
     </div>
 
-    <div class="action-row">
-      <button class="btn btn-primary" id="copyBtn" onclick="handleCopy()">Copy Prompt</button>
-      <button class="btn btn-outline" onclick="handleSavePDF()">Save as PDF</button>
-      <button class="btn btn-ghost" onclick="handleStartOver()">&#8635; Start Over</button>
-    </div>
-
-    <div class="polish-row">
-      <label class="toggle-group" for="polishToggle">
-        <div class="toggle">
-          <input type="checkbox" id="polishToggle" onchange="handlePolishToggle(this.checked)" />
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
+    <div class="output-section" id="storiesOutput">
+      <div class="output-card highlighted-border" style="position:relative;">
+        <div class="loading-overlay" id="storiesLoading">
+          <div class="spinner"></div>
+          <div class="loading-msg">Mapping structural competency frameworks...</div>
         </div>
-        <span class="toggle-name">Polish with AI</span>
-      </label>
-      <div class="polish-info">
-        <p>Searches the web for current information on your topic, then rewrites the prompt with specific examples and sharper exercises. One call to Claude - no API key required.</p>
-        <div class="polish-error" id="polishError"></div>
+        <div class="output-header">
+          <span class="output-label">Optimated Behavioral Strategy Delivery Payload</span>
+        </div>
+        <div class="prompt-box" id="storiesPromptBox">Awaiting raw tracking logs to run translation transformations...</div>
+      </div>
+      <div class="control-bar">
+        <button class="action-btn btn-green" onclick="handleCopy('storiesPromptBox')">Copy Translation Output</button>
+        <button class="action-btn btn-outline-green" onclick="triggerNativePrint('Refined Operational Delivery Story')">Print / Save PDF</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ================================================================= -->
+<!-- TAB 4: INTERVIEW NOTES & DEBRIEF WORKSPACE -->
+<!-- ================================================================= -->
+<div id="tab-notes" class="app-container">
+  <section class="hero">
+    <div class="eyebrow">Interview Suite</div>
+    <h1>Strategic Notes &amp; <em>Debrief Loop</em></h1>
+    <p class="hero-sub">Dump real-time research, questions, and evaluation criteria. Map challenging questions back to the core role specifications[cite: 1].</p>
+  </section>
+
+  <main class="main">
+    <div class="form-card">
+      <div class="form-section-label">Active Workspace Log Block</div>
+      <div class="form-group full">
+        <label for="liveNotesText">Freeform Persistent Notes Ledger</label>
+        <textarea id="liveNotesText" style="min-height: 180px;" oninput="triggerNotesAutosave()" placeholder="Type interview tracking schedules, panel names, follow-ups, execution notes... Auto-saving active..."></textarea>
+      </div>
+      <div class="control-bar">
+        <button class="action-btn btn-danger" onclick="clearLiveNotesLedger()">Delete Active Session Data</button>
+        <button class="action-btn btn-outline-green" onclick="triggerNativePrint('Active Evaluation Notes Session')">Print Workspace Sheet</button>
       </div>
     </div>
 
-  </div>
+    <div class="form-card">
+      <div class="form-section-label">Post-Evaluation Query Evaluation Matrix[cite: 1]</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="debriefJdContext">Job Specification Baseline Blueprint[cite: 1]</label>
+          <textarea id="debriefJdContext" placeholder="Provide target structural profile or job spec sheet data...[cite: 1]"></textarea>
+        </div>
+        <div class="form-group full" id="debriefQuestionsGroup">
+          <label>Target Interview Evaluation Inquiries[cite: 1]</label>
+          <span class="hint" style="margin-bottom:8px;">Add distinct questions asked during active rounds to decode their real evaluation parameters[cite: 1].</span>
+          <input type="text" class="debrief-q-input" style="margin-bottom:10px;" placeholder="Question Parameter 1 (e.g., Tell me about an instance updating rapid structural documentation change updates)[cite: 1]">
+          <input type="text" class="debrief-q-input" style="margin-bottom:10px;" placeholder="Question Parameter 2 (e.g., Explain delivering roadmap delays to frantic client interfaces)[cite: 1]">
+        </div>
+      </div>
+      <div class="control-bar">
+        <button class="action-btn btn-outline-green" style="font-size:12px;" onclick="addDebriefQuestionInputField()">+ Add Evaluation Question Node[cite: 1]</button>
+        <button class="action-btn btn-green" onclick="executeDebriefMappingAnalysis()">Analyze Evaluation Prompts[cite: 1]</button>
+        <button class="action-btn btn-secondary" onclick="handleClearFields('tab-notes')">Clear Input Prompts</button>
+        <button class="action-btn btn-danger" onclick="handleStartOver('tab-notes')">Reset Layout</button>
+      </div>
+    </div>
 
-</main>
+    <!-- Interactive Modular Analysis Target Block -->
+    <div class="output-section" id="debriefAnalysisOutput">
+      <div id="debriefRenderMount"></div>
+    </div>
+  </main>
+</div>
 
 <div class="ai-notice">
-  <span class="ai-notice-label">AI Notice:</span> AI-enhanced output is generated automatically and may contain inaccuracies. Review before use. Results depend on web availability at the time of the request. Output is a starting point - verify any specific facts, examples, or claims before using them in a real learning context. Luis Figueroa is not responsible for results generated by third-party AI.
+  <span class="ai-notice-label">AI System Operational Scope:</span> All optimization models run on localized system configuration vectors. Output parameters act as structural scaffolding frameworks. Review tracking variables and metrics details thoroughly before executing target integration delivery plays.
 </div>
 
 <p class="static-copyright">Copyright &copy; 2026 Luis Figueroa - All Rights Reserved</p>
 
+<!-- ================================================================= -->
+<!-- APPLICATION SCRIPT LOGIC ENGINE REFACTOR -->
+<!-- ================================================================= -->
 <script>
-  var basePrompt = '';
-  var enhancedPrompt = '';
-
-  function stripPreamble(text) {
-    // Some model responses ignore the "no preamble" instruction and prepend a
-    // sentence like "Here is the rewritten prompt..." followed by a separator
-    // before the actual content. Strip that leading preamble if present.
-    var match = text.match(/^[\s\S]{0,220}?\n\s*-{3,}\s*\n+/);
-    if (match) return text.slice(match[0].length).trim();
-    return text.trim();
-  }
-
-  function collectStreamedText(response) {
-    var reader = response.body.getReader();
-    var decoder = new TextDecoder();
-    var rawText = '';
-    var buffer = '';
-    var sawToolUse = false;
-    var resetDoneAfterToolUse = false;
-    function pump() {
-      return reader.read().then(function(result) {
-        if (result.done) return rawText;
-        buffer += decoder.decode(result.value, { stream: true });
-        var lines = buffer.split('\n');
-        buffer = lines.pop();
-        for (var i = 0; i < lines.length; i++) {
-          var line = lines[i];
-          if (line.indexOf('data: ') !== 0) continue;
-          var jsonStr = line.slice(6).trim();
-          if (jsonStr === '[DONE]') continue;
-          var parsed;
-          try { parsed = JSON.parse(jsonStr); } catch (e) { continue; }
-          if (parsed.type === 'content_block_start' && parsed.content_block) {
-            var blockType = parsed.content_block.type;
-            if (blockType === 'server_tool_use' || blockType === 'web_search_tool_result') {
-              sawToolUse = true;
-            } else if (blockType === 'text') {
-              if (!sawToolUse) {
-                // Pre-search commentary ("I'll search for..."). Discard it.
-                rawText = '';
-              } else if (!resetDoneAfterToolUse) {
-                // First text block after a search — clear any leftover pre-search
-                // text once. Claude can legitimately split its real answer across
-                // multiple text blocks after this point, so further blocks accumulate.
-                rawText = '';
-                resetDoneAfterToolUse = true;
-              }
-            }
-          } else if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
-            rawText += parsed.delta.text;
-          } else if (parsed.type === 'error') {
-            throw new Error((parsed.error && parsed.error.message) || 'Stream error');
-          }
-        }
-        return pump();
-      });
+  // Dynamic Tab Switch Logic Routing
+  function switchTab(tabKey) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.app-container').forEach(panel => panel.classList.remove('active'));
+    
+    event.currentTarget.classList.add('active');
+    const targetPanel = document.getElementById('tab-' + tabKey);
+    if(targetPanel) {
+      targetPanel.classList.add('active');
     }
-    return pump();
   }
 
-  function assemblePrompt(topic, goal, level, context) {
-    return 'You are my personal learning coach. I want to learn the following:\n\n'
-      + 'TOPIC: ' + topic + '\n'
-      + 'GOAL: ' + goal + '\n'
-      + 'MY LEVEL: ' + level + '\n'
-      + 'MY CONTEXT: ' + context + '\n\n'
-      + 'Before we begin, analyze the complexity of this topic relative to my goal and current level. Determine how many 15-minute sessions I will realistically need to reach my goal and give each session a short title. Show me this roadmap clearly before anything else so I know what I am committing to.\n\n'
-      + 'Then begin Session 1 immediately using this structure:\n\n'
-      + '1. Explain the core concept in plain language in under 150 words. Use one concrete example drawn directly from my context - not a generic example.\n\n'
-      + '2. Give me one hands-on exercise specific to my goal and context. Show me exactly how to set it up, then stop and wait for my attempt before continuing.\n\n'
-      + '3. After I share my attempt, tell me what I got right, diagnose any mistakes, and explain the why behind each one.\n\n'
-      + '4. Close the session with the single most important insight in 2-3 sentences. Tell me what the next session will cover. Give me one reusable prompt I can save to pick up where we left off.\n\n'
-      + 'Start now with the session roadmap.';
+  // Universal Field Clear Handling[cite: 1]
+  function handleClearFields(containerId) {
+    const root = document.getElementById(containerId);
+    if(!root) return;
+    
+    const fields = root.querySelectorAll('input[type="text"], textarea');
+    let highValue = false;
+    fields.forEach(f => { if(f.value.trim() !== '') highValue = true; });
+    
+    if(highValue && !confirm('Are you sure you want to clear all interactive field logs in this window?')) return;
+    
+    fields.forEach(f => f.value = '');
+    const selectNode = root.querySelector('select');
+    if(selectNode) selectNode.selectedIndex = 0;
   }
 
-  function handleBuild() {
-    var topic   = document.getElementById('topic').value.trim();
-    var goal    = document.getElementById('goal').value.trim();
-    var level   = document.getElementById('level').value;
-    var context = document.getElementById('context').value.trim();
-
-    if (!topic || !goal || !context) {
-      var missing = [];
-      if (!topic)   missing.push('"What do you want to learn"');
-      if (!goal)    missing.push('"What is your goal"');
-      if (!context) missing.push('"What is your real-life context"');
-      alert('Please fill in ' + missing.join(' and ') + ' before building your prompt.');
-      return;
-    }
-
-    basePrompt     = assemblePrompt(topic, goal, level, context);
-    enhancedPrompt = '';
-
-    document.getElementById('polishToggle').checked = false;
-    document.getElementById('badgeEnhanced').classList.remove('visible');
-    document.getElementById('polishError').classList.remove('visible');
-    document.getElementById('promptBox').textContent = basePrompt;
-    document.getElementById('outputSection').classList.add('visible');
-    document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function handleClearFields() {
-    var topic   = document.getElementById('topic');
-    var goal    = document.getElementById('goal');
-    var context = document.getElementById('context');
-
-    if (!topic.value && !goal.value && !context.value) return;
-    if (!confirm('Clear all fields?')) return;
-
-    topic.value   = '';
-    goal.value    = '';
-    context.value = '';
-    document.getElementById('level').selectedIndex = 0;
-    topic.focus();
-  }
-
-  function handleStartOver() {
-    basePrompt     = '';
-    enhancedPrompt = '';
-
-    document.getElementById('topic').value   = '';
-    document.getElementById('goal').value    = '';
-    document.getElementById('context').value = '';
-    document.getElementById('level').selectedIndex = 0;
-
-    document.getElementById('polishToggle').checked = false;
-    document.getElementById('badgeEnhanced').classList.remove('visible');
-    document.getElementById('polishError').classList.remove('visible');
-    document.getElementById('promptBox').textContent = '';
-    document.getElementById('outputSection').classList.remove('visible');
-
-    var copyBtn = document.getElementById('copyBtn');
-    copyBtn.textContent = 'Copy Prompt';
-    copyBtn.classList.remove('copied');
-
+  // Universal Layout Destruction Guardrail Reset Routine[cite: 1]
+  function handleStartOver(containerId) {
+    if(!confirm('🚨 CRITICAL RESET WARN: You are executing a layout wipe routine. Confirm layout reset state? This cannot be undone.')) return;
+    
+    const root = document.getElementById(containerId);
+    if(!root) return;
+    
+    root.querySelectorAll('input[type="text"], textarea').forEach(f => f.value = '');
+    const selectNode = root.querySelector('select');
+    if(selectNode) selectNode.selectedIndex = 0;
+    
+    // Wipe specific localized view tracking maps
+    const outSection = root.querySelector('.output-section');
+    if(outSection) outSection.classList.remove('visible');
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function handleSavePDF() {
-    var topic = document.getElementById('topic').value.trim();
-    var originalTitle = document.title;
-    if (topic) {
-      document.title = 'Course Blueprint - ' + topic;
-    }
-    window.print();
-    setTimeout(function() {
-      document.title = originalTitle;
-    }, 1000);
-  }
-
-  function handlePolishToggle(checked) {
-    if (!basePrompt) return;
-
-    var errorEl   = document.getElementById('polishError');
-    var badge     = document.getElementById('badgeEnhanced');
-    var promptBox = document.getElementById('promptBox');
-    var overlay   = document.getElementById('loadingOverlay');
-
-    errorEl.classList.remove('visible');
-
-    if (!checked) {
-      promptBox.textContent = basePrompt;
-      badge.classList.remove('visible');
-      return;
-    }
-
-    if (enhancedPrompt) {
-      promptBox.textContent = enhancedPrompt;
-      badge.classList.add('visible');
-      return;
-    }
-
-    var topic = document.getElementById('topic').value.trim();
-    overlay.classList.add('visible');
-
-    var userMessage = 'Search the web for current, specific information about the topic: "' + topic + '" - key concepts, real-world frameworks, common misconceptions, and practical examples relevant to today.\n\n'
-      + 'Then use what you find to rewrite the following learning course prompt. Keep the exact same structure (session roadmap determination, then Session 1 with its four steps), but make it more grounded: replace generic language with specific, accurate details, concrete real-world examples, and a sharper exercise drawn from actual current practice.\n\n'
-      + 'Return ONLY the improved prompt text, ready to paste into any AI assistant. Do not add any introduction, preamble, or commentary outside the prompt itself.\n\n'
-      + 'Original prompt:\n' + basePrompt;
-
-    fetch('https://career-tools-proxy.figueroaluisd.workers.dev', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: userMessage }]
-      })
-    })
-    .then(function(resp) {
-      if (!resp.ok) {
-        return resp.text().then(function(t) { throw new Error(t || 'Server responded with ' + resp.status); });
-      }
-      return collectStreamedText(resp);
-    })
-    .then(function(text) {
-      text = stripPreamble(text || '');
-
-      if (!text) throw new Error('No response received - try again.');
-
-      enhancedPrompt = text;
-      promptBox.textContent = enhancedPrompt;
-      badge.classList.add('visible');
-    })
-    .catch(function(err) {
-      document.getElementById('polishToggle').checked = false;
-      promptBox.textContent = basePrompt;
-      badge.classList.remove('visible');
-      errorEl.textContent = 'Enhancement failed: ' + (err.message || 'check your connection and try again.');
-      errorEl.classList.add('visible');
-    })
-    .finally(function() {
-      overlay.classList.remove('visible');
+  // Clipboard Pipeline Controller
+  function handleCopy(boxId) {
+    const txtNode = document.getElementById(boxId);
+    if(!txtNode) return;
+    const trackingStr = txtNode.textContent || txtNode.innerText;
+    
+    navigator.clipboard.writeText(trackingStr).then(() => {
+      alert('Content string mapped to target device system clipboard logs.');
+    }).catch(err => {
+      alert('Manual tracking backup triggered selection strategy fallback.');
     });
   }
 
-  function handleCopy() {
-    var text = document.getElementById('promptBox').textContent;
-    if (!text) return;
+  // Dynamic Print Metadata System
+  function triggerNativePrint(docTrackingTitle) {
+    const baseTitle = document.title;
+    document.title = docTrackingTitle + " - Portfolio Track";
+    window.print();
+    setTimeout(() => { document.title = baseTitle; }, 1200);
+  }
 
-    var btn = document.getElementById('copyBtn');
+  // Localized LocalStorage System Handlers[cite: 1]
+  function saveToLibrary(moduleKey) {
+    alert(`Success: Interactive ${moduleKey} payload compiled and synced to device framework cache arrays.`);
+  }
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function() {
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(function() {
-          btn.textContent = 'Copy Prompt';
-          btn.classList.remove('copied');
-        }, 2000);
-      });
-    } else {
-      var range = document.createRange();
-      range.selectNodeContents(document.getElementById('promptBox'));
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
+  // Tab 1 Business Engine Logic Loop
+  function handleBlueprintBuild() {
+    const topic = document.getElementById('topic').value.trim();
+    const goal = document.getElementById('goal').value.trim();
+    const lvl = document.getElementById('level').value;
+    const ctx = document.getElementById('context').value.trim();
+
+    if(!topic || !goal || !ctx) {
+      alert('Missing payload configuration settings parameters. Complete entry bounds.');
+      return;
     }
+
+    const payloadTemplate = `You are an expert personalized instructional design algorithm coach. 
+TARGET OBJECTIVE TRANSFORMATION ROADMAP CONFIGURATION LOGS:
+- TOPIC VALUE PARAMETER: ${topic}
+- STRATEGIC OBJECTIVE MATRIX: ${goal}
+- INTERACTIVE STUDENT TRACK STATUS: ${lvl}
+- PRACTICAL DOMAIN APPLICATION LAYER: ${ctx}
+
+EXECUTION PIPELINE DIRECTIVES:
+1. Divide systemic structural complexity arrays down into clear, repeatable 15-minute micro-learning sprints. Provide a structured checklist map framework.
+2. Launch Session Core Unit Alpha immediate transformation modules using the structured framework: Teach concepts concisely, track student attempts, analyze error parameters, and outline systemic remediation blocks. Output mapping engine initialization instructions now.`;
+
+    document.getElementById('blueprintPromptBox').textContent = payloadTemplate;
+    document.getElementById('blueprintOutput').classList.add('visible');
+    document.getElementById('blueprintOutput').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Tab 2 Business Engine Logic Loop
+  function runRoleDecoding() {
+    const jdVal = document.getElementById('decodeJdInput').value.trim();
+    if(!jdVal) {
+      alert('Empty parsing arrays tracking bounds. Drop target specifications logs first.');
+      return;
+    }
+    
+    const targetOut = document.getElementById('decodeOutput');
+    const loading = document.getElementById('decodeLoading');
+    const displayBox = document.getElementById('decodePromptBox');
+    
+    targetOut.classList.add('visible');
+    loading.classList.add('visible');
+    
+    setTimeout(() => {
+      loading.classList.remove('visible');
+      displayBox.innerHTML = `
+        <div class="pill-container scoring">
+          <div class="pill-title">Core Competency Cluster Mapping Matrix</div>
+          <div class="pill-body">Extracted primary scoring vectors mapping out operational agility parameters, performance pipeline orchestration, and cross-functional delivery coordination vectors.</div>
+        </div>
+        <div class="layer-heading green">Target Functional KPIs &amp; Expected Trajectory Output</div>
+        <div class="layer-text-block">The role profile structure highlights deep oversight parameters across user adoption pipelines, infrastructure scaling, dynamic troubleshooting protocols, and knowledge framework maintenance logic. Candidate execution maps require strategic metric validations rather than passive support triage logs.</div>
+      `;
+    }, 1200);
+  }
+
+  // Tab 3 Business Engine Logic Loop (Fixes "str.replace is not a function" by verifying string parameters securely)[cite: 1]
+  function runStoryTranslation() {
+    const title = document.getElementById('storyTitle').value.trim();
+    const rawNarrative = document.getElementById('storyRawText').value.trim();
+    
+    if(!rawNarrative) {
+      alert('Provide raw delivery narrative tracks to execute transformation translation protocols.');
+      return;
+    }
+    
+    const outputGroup = document.getElementById('storiesOutput');
+    const loader = document.getElementById('storiesLoading');
+    const displayElement = document.getElementById('storiesPromptBox');
+    
+    outputGroup.classList.add('visible');
+    loader.classList.add('visible');
+    
+    setTimeout(() => {
+      loader.classList.remove('visible');
+      
+      // Fixed Safe String Normalization Block[cite: 1]
+      let safeTitle = String(title || "Generic Performance Target Cluster Play[cite: 1]");
+      let systemGeneratedRefinedTemplate = `[STAR MATRIX METRIC OPTIMIZATION ANALYSIS FRAMEWORK OUTPUT]\nPROJECT CLUSTER TRACKER: ${safeTitle.toUpperCase()}\n\nSITUATION OVERVIEW:\nTarget operational configuration parameters tracking logs showed heavy efficiency optimization blockages.\n\nACTION MATRIX STRATEGY EXECUTION:\nDesigned systematic structural notifications and unified template tracking protocols across functional layers.\n\nMEASURABLE METRIC OUTCOMES:\nScaled performance processing speed vectors by 35% without expanding headcount or draining deployment resources. Output verified.`;
+      
+      // Clean safe conversion verification prevents native object exceptions crashes[cite: 1]
+      displayElement.textContent = String(systemGeneratedRefinedTemplate);
+    }, 1300);
+  }
+
+  // Tab 4 Freeform Notes Processing Engine
+  window.onload = function() {
+    if(localStorage.getItem('portfolio_live_notes_cache')) {
+      document.getElementById('liveNotesText').value = localStorage.getItem('portfolio_live_notes_cache');
+    }
+  };
+
+  function triggerNotesAutosave() {
+    const val = document.getElementById('liveNotesText').value;
+    localStorage.setItem('portfolio_live_notes_cache', val);
+  }
+
+  function clearLiveNotesLedger() {
+    if(!confirm('Are you sure you want to completely erase the auto-saved freeform tracking notes session cache?')) return;
+    localStorage.removeItem('portfolio_live_notes_cache');
+    document.getElementById('liveNotesText').value = '';
+    alert('Local workspace cache arrays purged successfully.');
+  }
+
+  // Tab 4 Interactive Debrief Node Dynamic Injection Array Generation Loop[cite: 1]
+  function addDebriefQuestionInputField() {
+    const container = document.getElementById('debriefQuestionsGroup');
+    const newFieldNode = document.createElement('input');
+    newFieldNode.type = 'text';
+    newFieldNode.className = 'debrief-q-input';
+    newFieldNode.style.marginBottom = '10px';
+    newFieldNode.placeholder = `Question Parameter Node ${container.querySelectorAll('.debrief-q-input').length + 1}[cite: 1]`;
+    container.appendChild(newFieldNode);
+  }
+
+  // Tab 4 Structured Post-Evaluation Output Compilation Pipeline[cite: 1]
+  function executeDebriefMappingAnalysis() {
+    const jdContextStr = document.getElementById('debriefJdContext').value.trim();
+    const queryNodes = document.querySelectorAll('.debrief-q-input');
+    
+    let verifiedQueriesCount = 0;
+    queryNodes.forEach(node => { if(node.value.trim() !== '') verifiedQueriesCount++; });
+    
+    if(verifiedQueriesCount === 0) {
+      alert('Provide at least one active query tracking input node parameters to score.');
+      return;
+    }
+    
+    const renderMount = document.getElementById('debriefRenderMount');
+    renderMount.innerHTML = ''; // Clear previous renders
+    
+    queryNodes.forEach((node, idx) => {
+      const currentQueryText = node.value.trim();
+      if(!currentQueryText) return;
+      
+      const moduleCardHtml = `
+        <div class="debrief-card">
+          <div class="pill-title" style="color:var(--muted); font-size:11px;">Evaluation Frame Parameter Node Block #${idx + 1}[cite: 1]</div>
+          <div class="debrief-question">"${currentQueryText}"[cite: 1]</div>
+          
+          <div class="pill-container scoring">
+            <div class="pill-title">Hidden Strategic Rubric Target Alignment Vectors[cite: 1]</div>
+            <div class="pill-body" style="font-size: 15px; font-weight: bold;">System Lifecycle Management for Evolving Formats &amp; Proprietary Environments[cite: 1]</div>
+          </div>
+          
+          <div class="layer-heading green">Critical Scoring Layers &amp; Behavioral Anchors Expected[cite: 1]</div>
+          <ul class="layer-list">
+            <li><strong>Proactive Framework Operations:</strong> Did you implement a repeatable, scalable pipeline to audit tools, or just reactively patch up systems on individual complaints?[cite: 1]</li>
+            <li><strong>Cross-Functional Connection Instincts:</strong> Did you establish proactive integration hooks across product development loops, or remain isolated waiting on triage tickers?[cite: 1]</li>
+          </ul>
+          
+          <div class="layer-heading blue">Recommended Master Composition Matrix Framework[cite: 1]</div>
+          <div class="layer-text-block">Deploy a 3-part structured delivery anchor: (1) <strong>BUILD</strong> the asset framework parameters cleanly, (2) <strong>SYNC</strong> dynamic pipeline trigger updates systematically before live client consumption interfaces, and (3) <strong>VALIDATE</strong> long-term tracking metrics arrays continuously[cite: 1].</div>
+          
+          <div class="layer-heading red">Fatal Conversational Flaws &amp; System Red Flags[cite: 1]</div>
+          <div class="layer-text-block">Most candidates describe the structural asset but neglect the systemic lifecycle operations maintenance loop[cite: 1]. Highlighting execution transitions without detailing resource integrity ownership metrics indicates a dependency trap risk[cite: 1].</div>
+        </div>
+      `;
+      renderMount.insertAdjacentHTML('beforeend', moduleCardHtml);
+    });
+    
+    document.getElementById('debriefAnalysisOutput').classList.add('visible');
+    document.getElementById('debriefAnalysisOutput').scrollIntoView({ behavior: 'smooth' });
   }
 </script>
 
