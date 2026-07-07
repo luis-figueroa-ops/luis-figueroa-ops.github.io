@@ -1213,13 +1213,19 @@
     }
     return text;
   }
-  async function callClaude(system, user, maxTokens = 2000) {
+  // `tools` is opt-in and only ever passed for the one feature that actually
+  // needs live web data (company research) — every other call in this tool
+  // works purely from user-supplied text and should never trigger a paid
+  // search, so it gets no tools at all.
+  async function callClaude(system, user, maxTokens = 2000, tools = null) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
     try {
+      const body = { model: 'claude-sonnet-4-6', max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }] };
+      if (tools) body.tools = tools;
       const res = await fetch(WORKER_URL, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: maxTokens, tools: [{ type: 'web_search_20250305', name: 'web_search' }], system, messages: [{ role: 'user', content: user }] }),
+        body: JSON.stringify(body),
         signal: controller.signal
       });
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
@@ -1233,11 +1239,23 @@
       clearTimeout(timeoutId);
     }
   }
-  async function callClaudeJSON(system, user, maxTokens = 2000) {
-    const raw = await callClaude(system, user, maxTokens);
+  async function callClaudeJSON(system, user, maxTokens = 2000, tools = null) {
+    const raw = await callClaude(system, user, maxTokens, tools);
     const match = raw.match(/\{[\s\S]*\}/) || raw.match(/\[[\s\S]*\]/);
     try { return JSON.parse(match ? match[0] : raw); }
     catch(e) { throw new Error('Could not parse response. Please try again.'); }
+  }
+
+  // Pulls the bare registrable-ish host out of a user-typed URL so web search
+  // can be locked to that exact site (e.g. "https://www.acme.com/careers" -> "acme.com").
+  function extractDomain(url) {
+    if (!url) return null;
+    try {
+      const u = new URL(/^https?:\/\//i.test(url) ? url : 'https://' + url);
+      const host = u.hostname.replace(/^www\./i, '');
+      const looksLikeDomain = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i.test(host);
+      return looksLikeDomain ? host : null;
+    } catch (e) { return null; }
   }
 
   // ── TOAST ──
@@ -1527,32 +1545,41 @@
     let companyIntelText = '';
 
     if (companyWebsite && company) {
-      statusEl.querySelector('.status-text').textContent = 'Researching the company...';
-      statusEl.style.display = 'flex';
-      try {
-        const intelSystem = `You are a company research analyst. Research the company provided and return a structured intelligence brief covering:
-1. Business impact — recent milestones, growth, products/services launched, awards, recognitions, partnerships, and market position in the last 2-3 years
-2. Community and humanitarian impact — charitable initiatives, diversity programs, environmental commitments, community investments, foundation work, or social responsibility efforts
-3. Culture and values signals — what the company publicly says about how it operates and what it prioritizes
-4. Why this company angle — 2-3 specific, genuine reasons a candidate might find this company compelling beyond just the paycheck
+      const companyDomain = extractDomain(companyWebsite);
+      if (!companyDomain) {
+        showToast('Could not read a domain from that website — skipping company research');
+      } else {
+        statusEl.querySelector('.status-text').textContent = 'Researching the company...';
+        statusEl.style.display = 'flex';
+        try {
+          const intelSystem = `You are a company research analyst. You have a web search tool restricted to a single domain: ${companyDomain}. Use it to look through that company's own site — pages like About Us, Our Story, Newsroom, Press, Blog, Leadership, Careers, Sustainability/ESG, or Community/Foundation pages — to build a structured intelligence brief covering:
+1. Business impact — recent milestones, growth, products/services launched, awards, recognitions, partnerships, and market position, as described on the company's own site
+2. Community and humanitarian impact — charitable initiatives, diversity programs, environmental commitments, community investments, foundation work, or social responsibility efforts, as described on the company's own site
+3. Culture and values signals — what the company publicly says on its own site about how it operates and what it prioritizes
+4. Why this company angle — 2-3 specific, genuine reasons a candidate might find this company compelling, grounded only in what its own site says
 
-Be specific and factual. Only include information that is verifiable and publicly known. If information in a category is not available, say so briefly rather than speculating.
+Strict rules:
+- Only use information found via search results on the ${companyDomain} domain itself. Do not use outside articles, third-party sources, or prior general knowledge about this company, even if you have it.
+- Run a small, targeted number of searches (a handful at most) — check the most relevant pages, don't exhaustively crawl the site.
+- If a category isn't covered on the site, say so honestly in that field rather than filling it in from outside knowledge or speculation.
 
 Return JSON only. No markdown, no preamble:
 {
-  "businessImpact": "Specific recent achievements, milestones, recognitions, or growth signals",
-  "communityImpact": "Charitable, humanitarian, environmental, or social responsibility initiatives",
-  "cultureSignals": "What the company publicly emphasizes about its culture and values",
-  "whyThisCompany": "2-3 specific compelling angles a candidate could authentically use",
-  "researchNote": "Any important caveats — e.g. limited public info available, company is private, etc."
+  "businessImpact": "Specific recent achievements, milestones, recognitions, or growth signals — from the company's own site",
+  "communityImpact": "Charitable, humanitarian, environmental, or social responsibility initiatives — from the company's own site",
+  "cultureSignals": "What the company's own site emphasizes about its culture and values",
+  "whyThisCompany": "2-3 specific compelling angles a candidate could authentically use, grounded in the site's own content",
+  "researchNote": "Any important caveats — e.g. limited info found on-site, category not covered, etc."
 }`;
-        const intelUser = `Company: ${company}\nWebsite: ${companyWebsite}\nRole being applied for: ${roleTitle || 'Not specified'}\n\nResearch this company using the most current publicly available information.`;
-        companyIntel = await callClaudeJSON(intelSystem, intelUser, 1500);
-        companyIntelText = JSON.stringify(companyIntel);
-        updateSession(activeSessionId, { companyWebsite, companyIntel });
-        renderCompanyIntel(companyIntel);
-      } catch(err) {
-        showToast('Company research unavailable — continuing with JD analysis');
+          const intelUser = `Company: ${company}\nWebsite: ${companyWebsite}\nDomain to search (and only this domain): ${companyDomain}\nRole being applied for: ${roleTitle || 'Not specified'}\n\nResearch this company using only what's published on its own site.`;
+          const intelTools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4, allowed_domains: [companyDomain] }];
+          companyIntel = await callClaudeJSON(intelSystem, intelUser, 1500, intelTools);
+          companyIntelText = JSON.stringify(companyIntel);
+          updateSession(activeSessionId, { companyWebsite, companyIntel });
+          renderCompanyIntel(companyIntel);
+        } catch(err) {
+          showToast('Company research unavailable — continuing with JD analysis');
+        }
       }
     }
 
