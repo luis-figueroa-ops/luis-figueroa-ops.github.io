@@ -233,4 +233,512 @@
       font-size: 16px;
       color: var(--muted);
       max-width: 600px;
-      line-height:
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+    .card-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .card-accent {
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      border-left: 3px solid var(--accent);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+
+    /* ── FORM ELEMENTS ── */
+    label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    input[type="text"], textarea, select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border-soft);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 16px;
+      padding: 13px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    input[type="text"]::placeholder, textarea::placeholder { color: var(--muted); }
+    textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
+    .hint { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .form-group { margin-bottom: 20px; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: var(--bg);
+      font-family: var(--font-mono); font-size: 13px;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 14px 28px; border: none; cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover:not(:disabled) { opacity: 0.88; }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--accent);
+      border: 1px solid var(--accent-border);
+      font-family: var(--font-mono); font-size: 12px;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 11px 22px; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-secondary:hover:not(:disabled) { background: var(--accent-dim); border-color: var(--accent); }
+    .btn-secondary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: none; border: none; color: var(--muted);
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; padding: 6px 0; transition: color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--accent); }
+
+    .btn-sm {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); color: var(--muted);
+      border: 1px solid var(--border-soft);
+      font-family: var(--font-mono); font-size: 10px;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 7px 14px; cursor: pointer; transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-sm:hover { border-color: var(--accent-border); color: var(--accent); }
+    .btn-sm.accent { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .btn-sm.accent:hover { opacity: 0.88; }
+
+    .btn-danger {
+      background: transparent; color: var(--red);
+      border: 1px solid rgba(248,81,73,0.3);
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 8px 16px; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-danger:hover { background: rgba(248,81,73,0.1); }
+
+    .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+    /* ── LOADING ── */
+    .dot-pulse { display: inline-flex; gap: 4px; align-items: center; }
+    .dot-pulse span { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: dpulse 1.2s infinite; }
+    .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
+    .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dpulse { 0%,80%,100% { opacity: 0.2; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+    .status-line { font-family: var(--font-mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+
+    /* ── COMPETENCY GRID ── */
+    .competency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+    .competency-card {
+      background: var(--surface2); border: 1px solid var(--border-soft);
+      border-left: 3px solid var(--accent); padding: 18px 20px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .competency-card:hover { border-color: var(--accent); background: var(--surface3); }
+    .competency-card.expanded { border-color: var(--accent); background: var(--accent-dim); }
+    .competency-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .competency-name { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 4px; }
+    .competency-question { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.5; }
+    .competency-expand-btn { background: none; border: none; color: var(--accent); font-size: 18px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; }
+    .competency-detail { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+    .competency-detail.visible { display: block; }
+
+    /* ── DETAIL SECTIONS ── */
+    .detail-section { margin-bottom: 12px; }
+    .detail-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+    .detail-body { font-size: 14px; color: var(--muted); line-height: 1.75; }
+
+    /* ── PILLS ── */
+    .scoring-pill { display: inline-block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; padding: 4px 12px; border-radius: 20px; margin: 3px 4px 3px 0; font-weight: 500; }
+    .pill-blue   { background: rgba(74,158,255,0.12);  color: var(--accent); border: 1px solid var(--accent-border); }
+    .pill-yellow { background: rgba(240,193,75,0.12);  color: var(--yellow); border: 1px solid rgba(240,193,75,0.3); }
+    .pill-green  { background: rgba(63,185,80,0.12);   color: var(--green);  border: 1px solid rgba(63,185,80,0.3); }
+    .pill-red    { background: rgba(248,81,73,0.12);   color: var(--red);    border: 1px solid rgba(248,81,73,0.3); }
+
+    /* ── STORY CARDS ── */
+    .story-card { background: var(--surface2); border: 1px solid var(--border-soft); padding: 20px; margin-bottom: 14px; }
+    .story-card-title { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 6px; }
+    .story-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .story-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; padding: 3px 10px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+
+    /* ── RESULT OUTPUT BOX ── */
+    .output-box {
+      background: var(--surface2);
+      border: 1px solid var(--border-soft);
+      border-left: 3px solid var(--accent);
+      padding: 24px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--white);
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 12px;
+    }
+
+    /* ── OUTPUT ACTION BAR ── */
+    .output-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.visible { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--accent-border); padding: 32px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-family: var(--font-display); font-size: 32px; letter-spacing: 2px; color: var(--white); margin-bottom: 12px; }
+    .modal-body { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+
+    /* ── LIBRARY MODAL ── */
+    .library-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: var(--surface2);
+      border: 1px solid var(--border-soft); margin-bottom: 8px;
+      cursor: pointer; transition: all 0.15s; gap: 12px;
+    }
+    .library-item:hover { border-color: var(--accent-border); }
+    .library-item-name { font-size: 14px; font-weight: 500; color: var(--white); margin-bottom: 2px; }
+    .library-item-meta { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .library-item-status { font-family: var(--font-mono); font-size: 9px; padding: 2px 8px; border-radius: 20px; flex-shrink: 0; }
+    .status-active { background: rgba(74,158,255,0.15); color: var(--accent); }
+    .status-archived { background: rgba(107,122,153,0.15); color: var(--muted); }
+
+    /* ── HOW IT WORKS ── */
+    .how-it-works { border: 1px solid var(--border-soft); background: var(--surface); margin-bottom: 32px; }
+    .how-it-works-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; user-select: none; }
+    .how-it-works-header:hover { background: var(--surface2); }
+    .how-it-works-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    .how-it-works-chevron { font-size: 11px; color: var(--muted); transition: transform 0.2s; }
+    .how-it-works.open .how-it-works-chevron { transform: rotate(180deg); }
+    .how-it-works-body { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border-soft); }
+    .how-it-works.open .how-it-works-body { display: block; }
+    .how-it-works-intro { font-size: 15px; color: var(--muted); line-height: 1.75; padding-top: 16px; margin-bottom: 20px; }
+    .how-mode { display: flex; gap: 14px; margin-bottom: 14px; align-items: flex-start; }
+    .how-mode-num { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--accent); background: var(--accent-dim); border: 1px solid var(--accent-border); padding: 3px 8px; flex-shrink: 0; margin-top: 2px; }
+    .how-mode-title { font-size: 14px; font-weight: 500; color: var(--white); margin-bottom: 3px; }
+    .how-mode-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .how-note { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.5px; color: var(--muted); line-height: 1.8; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+    .how-note strong { color: var(--white); }
+
+    /* ── COMPANY INTEL CARD ── */
+    .card-intel {
+      background: rgba(240,193,75,0.06);
+      border: 1px solid rgba(240,193,75,0.25);
+      border-left: 3px solid var(--yellow);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .card-intel .detail-label { color: var(--yellow); }
+    .intel-section { margin-bottom: 14px; }
+    .intel-section:last-of-type { margin-bottom: 0; }
+    .intel-section-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .intel-section-body {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .intel-disclaimer {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(240,193,75,0.2);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .intel-disclaimer strong { color: var(--yellow); }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--accent-border); color: var(--accent); font-family: var(--font-mono); font-size: 12px; letter-spacing: 2px; padding: 12px 24px; z-index: 600; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
+    .toast.visible { opacity: 1; }
+
+    /* ── IMPLIED COMPETENCIES ── */
+    .implied-reveal-card {
+      background: rgba(240,193,75,0.08);
+      border: 2px solid var(--yellow);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .implied-reveal-icon { font-size: 28px; margin-bottom: 10px; }
+    .implied-reveal-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      letter-spacing: 1px;
+      color: var(--yellow);
+      margin-bottom: 8px;
+    }
+    .implied-reveal-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 480px;
+      margin: 0 auto 18px;
+    }
+    .btn-reveal {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--yellow); color: var(--bg);
+      font-family: var(--font-mono); font-size: 13px;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 14px 32px; border: none; cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-reveal:hover:not(:disabled) { opacity: 0.88; }
+    .btn-reveal:active { transform: translateY(1px); }
+    .btn-reveal:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .implied-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .implied-card {
+      background: var(--surface2); border: 1px solid rgba(240,193,75,0.25);
+      border-left: 3px solid var(--yellow); padding: 18px 20px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .implied-card:hover { border-color: var(--yellow); background: var(--surface3); }
+    .implied-card.expanded { border-color: var(--yellow); background: rgba(240,193,75,0.08); }
+    .implied-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .implied-name { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 4px; }
+    .implied-trigger font-size: 13px; color: var(--yellow); font-style: italic; line-height: 1.5; }
+    .implied-expand-btn { background: none; border: none; color: var(--yellow); font-size: 18px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; }
+    .implied-detail { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(240,193,75,0.2); }
+    .implied-detail.visible { display: block; }
+    .implied-detail .detail-label { color: var(--yellow); }
+
+    .implied-disclaimer {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      line-height: 1.8;
+      padding-top: 14px;
+      margin-top: 4px;
+      border-top: 1px solid rgba(240,193,75,0.2);
+    }
+    .implied-disclaimer strong { color: var(--yellow); }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--border-soft); margin: 28px 0; }
+
+    /* ── PROFILE STRIP ── */
+    .profile-strip { background: var(--surface2); border: 1px solid var(--border-soft); border-left: 3px solid var(--yellow); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 14px; }
+    .profile-strip-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--yellow); text-transform: uppercase; white-space: nowrap; margin-top: 2px; }
+    .profile-strip-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    .page-footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid var(--border-soft); }
+    .disclaimer { padding: 14px 18px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-soft); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.5px; color: var(--muted); line-height: 1.8; margin-bottom: 20px; }
+    .disclaimer strong { color: var(--white); }
+    .footer-meta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+    .footer-left { font-size: 13px; color: var(--muted); }
+    .footer-left a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-left a:hover { color: var(--accent); }
+    .copyright { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; color: var(--muted); text-align: center; padding-bottom: 16px; }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 13px; }
+      .back-nav, .session-bar, .mode-tabs, .btn-row, .btn-primary, .btn-secondary, .btn-sm, .btn-ghost, .btn-danger, .output-actions, .how-it-works, .page-footer, .toast, .modal-overlay { display: none !important; }
+      .page-wrap { max-width: 100%; padding: 0px; margin: 0px; }
+      
+      /* Pure White/Black high contrast printing rules */
+      .card, .card-accent, .competency-card, .output-box, .implied-card, .implied-reveal-card, .profile-strip, .card-intel { 
+        border: 1px solid #000 !important; 
+        background: #fff !important; 
+        color: #000 !important;
+        padding: 16px !important;
+        margin-bottom: 16px !important;
+        border-left: 4px solid #000 !important;
+        break-inside: avoid; 
+      }
+      
+      .btn-reveal { display: none !important; }
+      .implied-detail, .competency-detail { display: block !important; }
+      
+      /* Override element colors to deep black for legibility */
+      h1, h1 span, .section-title, .section-title span, .competency-name, .implied-name, .story-card-title, .how-mode-title { 
+        color: #000 !important; 
+      }
+      
+      .detail-body, .competency-question, .section-sub, .hero-sub, .intel-section-body, .profile-strip-text { 
+        color: #111 !important; 
+      }
+      
+      .detail-label, .card-label, .section-eyebrow, .eyebrow, .session-bar-label, .profile-strip-label, .intel-section-title { 
+        color: #000 !important; 
+        font-weight: bold !important;
+      }
+      
+      /* Print friendly pill layout replacements */
+      .scoring-pill, .story-tag {
+        background: transparent !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        padding: 2px 6px !important;
+        font-weight: bold !important;
+      }
+    }
+
+    /* ── MOBILE BREAKPOINTS ── */
+    @media (max-width: 768px) {
+      .back-nav { padding: 16px 20px 0; }
+      .page-wrap { padding: 28px 20px 60px; }
+      .competency-grid { grid-template-columns: 1fr; }
+      .implied-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .mode-tab { padding: 12px 16px; font-size: 14px; }
+      h1 { font-size: clamp(44px, 10vw, 64px); }
+      .section-title { font-size: clamp(32px, 8vw, 48px); }
+    }
+
+    @media (max-width: 600px) {
+      .back-nav { padding: 14px 16px 0; }
+      .page-wrap { padding: 24px 16px 60px; }
+      .card { padding: 20px 16px; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; min-height: 48px; }
+      .btn-row { flex-direction: column; align-items: stretch; }
+      .modal { padding: 24px 16px; }
+      .session-bar { flex-wrap: wrap; gap: 10px; }
+      .session-bar-actions { width: 100%; }
+      .output-actions { flex-direction: column; }
+      .footer-meta { flex-direction: column; align-items: flex-start; }
+      h1 { font-size: clamp(40px, 12vw, 56px); }
+      .manage-menu { right: auto; left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+      <div class="modal-title" id="modalTitle">Confirm Action</div>
+      <div class="modal-body" id="modalBody">Are you sure you want to proceed? Unsaved progress might be cleared.</div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="modalCancel">Cancel</button>
+        <button class="btn-danger" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="sessionModal">
+    <div class="modal">
+      <div class="modal-title" id="sessionModalTitle">New Session</div>
+      <div class="modal-body">Give this session a name so you can find it later. A good name includes the company and role.</div>
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="sessionNameInput">Session Name</label>
+        <input type="text" id="sessionNameInput" placeholder="e.g. Company ABC — Operations Manager" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="sessionModalCancel">Cancel</button>
+        <button class="btn-primary" id="sessionModalConfirm">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="libraryModal">
+    <div class="modal">
+      <div class="modal-title">Session Library</div>
+      <div class="modal-body" style="margin-bottom: 16px;">Your saved sessions. Click one to load it.</div>
+      <div id="libraryList" style="margin-bottom: 20px;"></div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--border-soft);">
+        <button class="btn-sm" id="exportLibraryBtn">↓ Export Library</button>
+        <input type="file" id="importFile" accept=".json" style="display:none;" />
+        <button class="btn-sm" id="importLibraryBtn">↑ Import Library</button>
+        <button class="btn-ghost" id="libraryModalClose" style="margin-left: auto;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="back-nav">
+    <a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a>
+    <span class="back-nav-right">Career Tools</span>
+  </nav>
+
+  <div class="page-wrap">
+
+    <div class="hero">
+      <div class="eyebrow">Interview Prep</div>
+      <h1>Prep <span>Smarter</span></h1>
+      <p class="hero-sub">You got the interview. Now win it. Decode the role, build your stories, craft your opening answer, and turn every interview you've ever had into prep intelligence for the next one.</p>
+    </div>
+
+    <div class="how-it-works" id="howItWorks">
+      <div class="how-it-works-header" id="howItWorksToggle">
+        <span class="how-it-works-label">How this tool works</span>
+        <span class="how-it-works-chevron">&#9660;</span>
+      </div>
+      <div class="how-it-works-body">
+        <p class="how-it-works-intro">Four connected steps to win the interview — plus a fifth you can use any time to sharpen answers from past experience. Create a session for each role. Your work saves automatically.</p>
+        <div class="how-mode">
+          <div class="how-mode-num">01</div>
+          <div><div class="how-mode-title">Decode the Role</div><div class="how-mode-desc">Paste the JD. Get the competency map — what the hiring manager is actually scoring underneath each question — and the methodology behind a strong answer. If you have the company website, the tool researches their recent impact too.</div></div>
+        </div>
+        <div class="how-mode">
+          <div class="how-mode-num">02</div>
+          <div><div class="how-mode-title">Build Your Stories</div><div class="how-mode-desc">Describe a real work experience. Get it mapped to the competencies of this role and translated into the language that lands — using the SOAR framework with before/after impact framing.</div></div>
+        </div>
+        <div class="how-mode">
+          <div class="how-mode-num">03</div>
+          <div><div class="how-mode-title">Your Opening Answer</div><div class="how-mode-desc">Build a role-specific Tell Me About Yourself — past, present, future, connected to what this role is actually solving for. Closes with a question that hands control back to the interviewer.</div></div>
+        </div>
+        <div class="how-mode">
+          <div class="how-mode-num">04</div>
+          <div><div class="how-mode-title">Your Notes</div><div class="how-mode-desc">Company research, interviewer names, closing script, follow-up questions — everything that belongs to this specific interview in one place.</div></div>
+        </div>
+        <div class="how-mode" style="margin-bottom: 16px;">
+          <div class="how-mode-num">05</div>
+          <div><div class="how-mode-title">Questions & Debrief</div><div class="how-mode-desc">Use this two ways. Before an interview: pull questions from past interviews for similar roles and get smarter answers ready — because the same questions come up again. After an interview: paste the JD and the questions that were asked to get a role-specific read on what was being scored and where you missed.</div></div>
+        </div>
+        <div class="how-note"><strong>Think tank, not a script.</strong> Hiring managers go off-JD. Use the competency map to internalize the thinking so you can respond live — not recite a prepared answer.</div>
+      </div>
+    </div>
+
+    <div class="session-bar" id="sessionBar" style="display:none;">
+      <span class="session-bar-label">Session</span>
+      <span class="session-name-display" id="sessionNameDisplay"></span>
+      <div class="session-bar-actions">
+        <button class="btn-sm accent" id="newSessionBtn">+ New Session</button>
+        <div class="manage-menu-wrap">
+          <button class="btn-sm" id="manageMenuBtn">☰ Manage</button>
+          <div class="manage-menu" id="manageMenu">
+            <button class="manage-menu-item" id="renameSessionBtn">Rename Session</button>
+            <button class="manage-menu-item" id="libraryBtn">Session Library</button>
+            <button class="manage-menu-item" id="archiveSessionBtn">Archive Session</button>
+            <button class="manage-menu-item danger" id="deleteSessionBtn">Delete Session</button>
+          </div>
+        </div>
+      </div>
+    </div>
