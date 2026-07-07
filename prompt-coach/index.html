@@ -1975,14 +1975,7 @@ async function buildAssembledPrompt() {
         })
       });
       if (!res.ok) { const errData = await res.json().catch(() => ({})); throw new Error(errData.error?.message || errData.error || ('HTTP ' + res.status)); }
-      const rawResponseText = await collectStreamedText(res);
-      console.log('[DEBUG] RAW word count:', rawResponseText.split(/\s+/).filter(Boolean).length);
-      console.log('[DEBUG] RAW text (copy everything between the arrows):');
-      console.log('>>>>>>>>>>');
-      console.log(rawResponseText);
-      console.log('<<<<<<<<<<');
-      const assembled = stripPreamble(rawResponseText);
-      console.log('[DEBUG] AFTER stripPreamble word count:', assembled.split(/\s+/).filter(Boolean).length);
+      const assembled = stripPreamble(await collectStreamedText(res));
 
       if (assembled) {
         baseCoached = assembled;
