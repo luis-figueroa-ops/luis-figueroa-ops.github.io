@@ -360,6 +360,7 @@
 
     .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .section-actions { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-soft); }
+    .autosave-indicator { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.5px; color: var(--green); text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; }
 
     /* ── LOADING ── */
     .dot-pulse { display: inline-flex; gap: 4px; align-items: center; }
@@ -452,11 +453,12 @@
     .status-archived { background: rgba(107,122,153,0.15); color: var(--muted); }
 
     /* ── HOW IT WORKS ── */
-    .how-it-works { border: 1px solid var(--border-soft); background: var(--surface); margin-bottom: 32px; }
-    .how-it-works-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; user-select: none; }
-    .how-it-works-header:hover { background: var(--surface2); }
-    .how-it-works-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
-    .how-it-works-chevron { font-size: 11px; color: var(--muted); transition: transform 0.2s; }
+    .how-it-works { border: 1px solid var(--accent-border); background: var(--accent-dim); margin-bottom: 32px; box-shadow: 0 4px 24px rgba(74,158,255,0.1); }
+    .how-it-works-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; cursor: pointer; user-select: none; }
+    .how-it-works-header:hover { background: rgba(74,158,255,0.1); }
+    .how-it-works-label { font-family: var(--font-mono); font-size: 13px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .how-it-works-pulse-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: dpulse 1.6s infinite; flex-shrink: 0; }
+    .how-it-works-chevron { font-size: 13px; color: var(--accent); transition: transform 0.2s; }
     .how-it-works.open .how-it-works-chevron { transform: rotate(180deg); }
     .how-it-works-body { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border-soft); }
     .how-it-works.open .how-it-works-body { display: block; }
@@ -750,7 +752,7 @@
     <!-- How It Works -->
     <div class="how-it-works" id="howItWorks">
       <div class="how-it-works-header" id="howItWorksToggle">
-        <span class="how-it-works-label">How this tool works</span>
+        <span class="how-it-works-label"><span class="how-it-works-pulse-dot"></span>How this tool works</span>
         <span class="how-it-works-chevron">&#9660;</span>
       </div>
       <div class="how-it-works-body">
@@ -816,7 +818,7 @@
       <div class="section-sub">Paste the job description. Get the competency map and what the interviewer is actually scoring — not what the JD says, but what it means. Add the company website to pull in real intelligence on who they are.</div>
 
       <div class="btn-row section-actions">
-        <button class="btn-secondary" id="saveLibPreBtn">💾 Save to Library</button>
+        <span class="autosave-indicator">✓ Autosaved to this session</span>
         <button class="btn-secondary" id="clearPreBtn">Clear This Section</button>
       </div>
 
@@ -836,7 +838,7 @@
           <div class="form-group" style="margin-top: 16px; margin-bottom: 0;">
             <label for="companyWebsite">Company Website <span style="color: var(--muted); font-size: 10px; letter-spacing: 1px;">(optional)</span></label>
             <input type="text" id="companyWebsite" placeholder="e.g. https://companyabc.com — leave blank if JD is from a recruiting agency" />
-            <div class="hint">When provided, the tool researches this company's recent business impact and community initiatives — useful for "Why this company?" and to contextualize the role.</div>
+            <div class="hint">When provided, the tool searches only this company's own website — pages like About Us, Newsroom, Press, or Careers — for recent business impact and community initiatives, useful for "Why this company?" and to contextualize the role. It never searches the broader internet, so if something isn't published on their site, it won't show up here and you'll need to look elsewhere.</div>
           </div>
         </div>
 
@@ -925,7 +927,7 @@
       <div class="section-sub">Two ways to use this. <strong style="color: var(--white);">Before an interview:</strong> enter questions from past interviews for similar roles — the same questions come up again, and now you can walk in with stronger answers. <strong style="color: var(--white);">After an interview:</strong> paste the JD and the questions that were asked to get a role-specific read on what was being scored and where your answer could have been stronger. Either way, the JD is what makes the analysis specific — not generic.</div>
 
       <div class="btn-row section-actions">
-        <button class="btn-secondary" id="saveLibPostBtn">💾 Save to Library</button>
+        <span class="autosave-indicator">✓ Autosaved to this session</span>
         <button class="btn-secondary" id="clearPostBtn">Clear This Section</button>
       </div>
 
@@ -964,7 +966,7 @@
       <div class="section-sub">Describe a real work experience. Get it mapped to the competencies of this role and translated into the language the interviewer is listening for — with before/after impact framing built in.</div>
 
       <div class="btn-row section-actions">
-        <button class="btn-secondary" id="saveLibStoryBtn">💾 Save to Library</button>
+        <span class="autosave-indicator">✓ Autosaved to this session</span>
         <button class="btn-secondary" id="clearStoryBtn">Clear This Section</button>
       </div>
 
@@ -1014,7 +1016,7 @@
       <div class="section-sub">Build your Tell Me About Yourself — past, present, future, connected to what this role is actually solving for. Closes with a question that hands control back to the interviewer.</div>
 
       <div class="btn-row section-actions">
-        <button class="btn-secondary" id="saveLibTmayBtn">💾 Save to Library</button>
+        <span class="autosave-indicator">✓ Autosaved to this session</span>
         <button class="btn-secondary" id="clearTmayBtn">Clear This Section</button>
       </div>
 
@@ -1073,7 +1075,7 @@
       <div class="section-sub">Company research, interviewer names, questions to ask, closing script — anything that belongs to this specific interview. Saves automatically.</div>
 
       <div class="btn-row section-actions">
-        <button class="btn-secondary" id="saveLibNotesBtn">💾 Save to Library</button>
+        <span class="autosave-indicator">✓ Autosaved to this session</span>
         <button class="btn-secondary" id="clearNotesBtn">Clear This Section</button>
       </div>
 
@@ -1387,7 +1389,7 @@
   // ── SESSION MANAGEMENT ──
   function createSession(name) {
     const id = 'session_' + Date.now();
-    library.unshift({ id, name, status: 'active', company: '', roleTitle: '', companyWebsite: '', companyIntel: null, roleType: '', jd: '', businessProblem: '', roleContextNote: '', competencies: [], impliedCompetencies: [], postQuestions: [], postAnalysis: [], debriefJd: '', debriefAnalysis: [], stories: [], tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '', notes: '', createdAt: Date.now(), updatedAt: Date.now() });
+    library.unshift({ id, name, status: 'active', company: '', roleTitle: '', companyWebsite: '', companyIntel: null, roleType: '', jd: '', businessProblem: '', roleContextNote: '', competencies: [], impliedCompetencies: [], postQuestions: [], postAnalysis: [], debriefJd: '', debriefAnalysis: [], stories: [], storyDraftTitle: '', storyDraftText: '', tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '', notes: '', createdAt: Date.now(), updatedAt: Date.now() });
     saveLibrary();
     return id;
   }
@@ -1412,6 +1414,8 @@
     document.getElementById('tmayBackground').value = s.tmayBackground || '';
     document.getElementById('tmayCurrentRole').value = s.tmayCurrent || '';
     document.getElementById('tmayWhy').value = s.tmayWhy || '';
+    document.getElementById('storyTitle').value = s.storyDraftTitle || '';
+    document.getElementById('storyInput').value = s.storyDraftText || '';
 
     switchMode('pre');
 
@@ -1526,6 +1530,12 @@
     document.getElementById(id).addEventListener('input', () => {
       if (!activeSessionId) return;
       updateSession(activeSessionId, { tmayBackground: document.getElementById('tmayBackground').value, tmayCurrent: document.getElementById('tmayCurrentRole').value, tmayWhy: document.getElementById('tmayWhy').value });
+    });
+  });
+  ['storyTitle','storyInput'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      if (!activeSessionId) return;
+      updateSession(activeSessionId, { storyDraftTitle: document.getElementById('storyTitle').value, storyDraftText: document.getElementById('storyInput').value });
     });
   });
   document.getElementById('sessionNotesInput').addEventListener('input', () => {
@@ -1907,7 +1917,7 @@ Return JSON only:
       const result = await callClaudeJSON(system, user, 2500);
       const story = { id: 'story_' + Date.now(), title: storyTitle||'Untitled Story', rawText: storyText, competencies: result.competenciesProved||[], soar: result.soarFramework||{}, keyLanguage: result.keyLanguage||'', gaps: result.gaps||'', bestUsedFor: result.bestUsedFor||'', createdAt: Date.now() };
       const stories = [...(session.stories||[]), story];
-      updateSession(activeSessionId, { stories });
+      updateSession(activeSessionId, { stories, storyDraftTitle: '', storyDraftText: '' });
       renderStoryResult(result);
       renderStoryLibrary(stories);
       document.getElementById('storyTitle').value = '';
@@ -2032,35 +2042,13 @@ Return JSON only:
         company: '', roleTitle: '', companyWebsite: '', companyIntel: null, jd: '',
         businessProblem: '', roleContextNote: '', competencies: [], impliedCompetencies: [],
         postQuestions: [], postAnalysis: [], debriefJd: '', debriefAnalysis: [],
-        stories: [], tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '',
+        stories: [], storyDraftTitle: '', storyDraftText: '', tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '',
         notes: ''
       });
       postQuestions = [];
       switchSession(activeSessionId);
       showToast('Session reset — starting fresh');
     });
-  });
-
-  // ── SAVE TO LIBRARY (explicit confirmation — autosave already persists on every
-  // keystroke, this just reassures the user their current inputs are stored) ──
-  function saveCurrentToLibrary() {
-    if (!activeSessionId) { showToast('Start or select a session first'); return; }
-    updateSession(activeSessionId, {
-      company: document.getElementById('companyName').value,
-      roleTitle: document.getElementById('roleTitle').value,
-      companyWebsite: document.getElementById('companyWebsite').value,
-      jd: document.getElementById('jdInput').value,
-      debriefJd: document.getElementById('debriefJdInput').value,
-      postQuestions,
-      tmayBackground: document.getElementById('tmayBackground').value,
-      tmayCurrent: document.getElementById('tmayCurrentRole').value,
-      tmayWhy: document.getElementById('tmayWhy').value,
-      notes: document.getElementById('sessionNotesInput').value
-    });
-    showToast('Saved to library');
-  }
-  ['saveLibPreBtn','saveLibStoryBtn','saveLibTmayBtn','saveLibNotesBtn','saveLibPostBtn'].forEach(id => {
-    document.getElementById(id).addEventListener('click', saveCurrentToLibrary);
   });
 
   document.getElementById('notesViewLibraryBtn').addEventListener('click', openLibraryModal);
@@ -2087,6 +2075,7 @@ Return JSON only:
     document.getElementById('storyTitle').value = '';
     document.getElementById('storyInput').value = '';
     document.getElementById('storyResult').style.display = 'none';
+    updateSession(activeSessionId, { storyDraftTitle: '', storyDraftText: '' });
     showToast('Story form cleared');
   });
 
@@ -2175,17 +2164,16 @@ Return JSON only:
   }
 
   // ── INIT ──
+  // Every fresh visit starts at the no-session screen — it never auto-resumes
+  // whatever session was open last time. Saved sessions still exist and are
+  // reachable from Library; this just makes "closed the tab" actually mean
+  // a clean slate instead of silently picking up wherever you left off.
   function init() {
     library = loadLibrary();
-    if (library.length > 0) {
-      const recent = library.slice().sort((a,b) => b.updatedAt - a.updatedAt)[0];
-      switchSession(recent.id);
-    } else {
-      document.getElementById('noSessionState').style.display = 'block';
-      document.getElementById('sessionBar').style.display = 'none';
-      document.getElementById('storageHint').style.display = 'none';
-      document.getElementById('modeTabs').style.display = 'none';
-    }
+    document.getElementById('noSessionState').style.display = 'block';
+    document.getElementById('sessionBar').style.display = 'none';
+    document.getElementById('storageHint').style.display = 'none';
+    document.getElementById('modeTabs').style.display = 'none';
   }
 
   init();
