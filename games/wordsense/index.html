@@ -831,7 +831,7 @@ Return ONLY a valid JSON array, no markdown, no preamble:
   }
 ]`;
 
-  const res = await fetch("https://career-tools-proxy.figueroaluisd.workers.dev", {
+  const res = await fetch("https://career-tools-proxy.figueroaluisd.workers.dev/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -848,14 +848,39 @@ Return ONLY a valid JSON array, no markdown, no preamble:
     throw new Error(err?.error?.message || `API ${res.status}`);
   }
 
-  const data = await res.json();
-  const raw = (data.content||[]).map(b=>b.text||'').join('');
+  const raw = await collectStreamedText(res);
   const start = raw.indexOf('['), end = raw.lastIndexOf(']');
   if (start === -1 || end === -1) throw new Error('No JSON array');
   const parsed = JSON.parse(raw.slice(start, end+1));
 
   const badPatterns = /which means|that is|in other words|meaning |defined as|refers to/i;
   return parsed.filter(q => q.word && q.passage && !badPatterns.test(q.passage));
+}
+
+async function collectStreamedText(response) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let rawText = '';
+  let buffer = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const jsonStr = line.slice(6).trim();
+      if (jsonStr === '[DONE]') continue;
+      try {
+        const parsed = JSON.parse(jsonStr);
+        if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+          rawText += parsed.delta.text;
+        }
+      } catch (_) {}
+    }
+  }
+  return rawText;
 }
 
 function getLevelInstruction() {
