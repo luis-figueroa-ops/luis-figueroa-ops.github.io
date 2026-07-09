@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build. Use. Break. Fix. — Luis Figueroa</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e0e0e;
+  --bg2: #161616;
+  --bg3: #1e1e1e;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-border: rgba(201,168,76,0.25);
+  --white: #F0EDE6;
+  --muted: #aaaaaa;
+}
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+.topbar-back {
+  position: fixed; left: 14px; top: 14px; z-index: 200;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.topbar-back:hover { color: var(--gold); }
+
+.hero {
+  padding: 72px 48px 20px;
+  max-width: 900px;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(38px, 5vw, 58px);
+  letter-spacing: 2px;
+  line-height: 1.02;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  font-size: 18px;
+  color: var(--white);
+  opacity: 0.85;
+  line-height: 1.7;
+  max-width: 620px;
+}
+
+.main {
+  padding: 0 48px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.video-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 14px;
+  margin: 32px 0 40px;
+  position: relative;
+}
+.video-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--gold);
+}
+video {
+  width: 100%;
+  display: block;
+  background: #000;
+}
+
+.story-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px 40px;
+  margin-bottom: 40px;
+}
+.story-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: block;
+}
+.story-panel p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.92;
+  margin-bottom: 18px;
+}
+.story-panel p:last-child { margin-bottom: 0; }
+
+.site-footer {
+  max-width: 1000px;
+  margin: 40px auto 0;
+  padding: 16px 48px;
+  border-top: 1px solid var(--gold-border);
+  text-align: center;
+}
+.site-footer-built {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.site-footer-built a {
+  color: var(--gold);
+  text-decoration: none;
+}
+.site-footer-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.site-footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+@media (max-width: 800px) {
+  .hero, .main, .site-footer { padding-left: 20px; padding-right: 20px; }
+  .hero { padding-top: 56px; }
+  .story-panel { padding: 24px 22px; }
+  .story-panel p { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<a class="topbar-back" href="https://luis-figueroa-ops.github.io">&#8592; Back to Tools</a>
+
+<div class="hero">
+  <div class="hero-eyebrow">Operations, Augmented</div>
+  <h1>Build.  Use.  Break.  <span>Fix.</span></h1>
+  <p class="hero-sub">What changes when one person owns the whole loop, from building the tool to testing it to tracing down what broke.</p>
+</div>
+
+<div class="main">
+
+  <div class="video-panel">
+    <video controls preload="metadata" poster="poster.jpg">
+      <source src="build-use-break-fix.mp4" type="video/mp4">
+      Your browser doesn't support embedded video. <a href="build-use-break-fix.mp4">Download the video</a> instead.
+    </video>
+  </div>
+
+  <div class="story-panel">
+    <span class="story-label">The Story</span>
+    <p>I built Prompt Coach, an AI tool that scores a rough prompt, diagnoses the gaps, and walks the user through building a stronger version by hand. Then I tested it myself, the same way a real user would, and found a bug that most people would only catch by accident.</p>
+    <p>The obvious fix would have been to just cut the output short. That treats the symptom, not the cause, so I traced the actual instruction the tool was sending the AI instead. One ambiguous line was the real problem. Fixed that, then verified it held across four separate test runs on two unrelated topics before calling it done.</p>
+    <p>That loop, build it, use it, diagnose what broke, fix the actual cause, verify more than once, used to be split across three different people at three different desks. Now it happens in one sitting.</p>
+    <p>This video walks through that process. Built as a deck, animated, then scored and finished in Canva.</p>
+  </div>
+
+</div>
+
+<div class="site-footer">
+  <div class="site-footer-built">
+    Built by <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">Luis Figueroa</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
+  </div>
+  <div class="site-footer-tagline">Augmenting Human Potential, One Workflow at a Time</div>
+  <div class="site-footer-copy">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+</div>
+
+</body>
+</html>
