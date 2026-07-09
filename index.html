@@ -162,10 +162,16 @@ h1 span { color: var(--gold); }
   transform: rotate(45deg);
   box-shadow: 0 3px 10px rgba(0,0,0,0.35);
   z-index: 5;
+  animation: construction-pulse 2s ease-in-out infinite;
 }
-.card-construction-row { display: flex; align-items: center; gap: 8px; margin-top: -8px; }
+.card-construction-row { display: flex; align-items: center; gap: 8px; margin-top: -8px; animation: construction-pulse 2s ease-in-out infinite; }
 .card-construction-row svg { flex-shrink: 0; }
 .card-construction-row span { font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 1.5px; color: var(--gold-light); text-transform: uppercase; }
+
+@keyframes construction-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
 .card:nth-child(1) { animation-delay: 0.15s; }
 .card:nth-child(2) { animation-delay: 0.25s; }
