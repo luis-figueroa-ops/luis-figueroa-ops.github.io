@@ -1842,4 +1842,843 @@ Return structured JSON only. No markdown, no preamble, no backticks.
         const isOpen = detail.classList.contains('visible');
         detail.classList.toggle('visible', !isOpen);
         card.classList.toggle('expanded', !isOpen);
-        e.target.te
+        e.target.textContent = isOpen ? '+' : '−';
+      });
+    });
+  }
+
+  // The company-research prompt asks the AI to emit the literal string
+  // NOT_FOUND when a category isn't covered on the site. This also catches
+  // older sessions saved before that convention, or the AI ignoring
+  // instructions and writing a sentence about it instead.
+  function isIntelNotFound(val) {
+    if (!val) return true;
+    const v = String(val).trim().toLowerCase();
+    if (v === 'not_found' || v === 'not found') return true;
+    const fallbackPhrases = ['not available', 'no information', 'not covered', 'not published', 'not listed', 'not mentioned', 'not disclosed', "couldn't find", 'could not find', 'no info', 'not present', 'nothing found'];
+    return fallbackPhrases.some(p => v.includes(p));
+  }
+
+  function renderCompanyIntel(intel, domain) {
+    if (!intel) return;
+    const card = document.getElementById('companyIntelCard');
+    const content = document.getElementById('companyIntelContent');
+    const sections = [
+      { key: 'businessImpact', title: 'Business Impact' },
+      { key: 'communityImpact', title: 'Community & Humanitarian Impact' },
+      { key: 'cultureSignals', title: 'Culture & Values Signals' },
+      { key: 'whyThisCompany', title: 'Why This Company — Interview Angles' }
+    ];
+    const domainLabel = domain ? escapeHtml(domain) : 'their website';
+    content.innerHTML = sections.map(s => {
+      const val = intel[s.key];
+      const notFound = isIntelNotFound(val);
+      const body = notFound
+        ? `Not found on ${domainLabel}. Check LinkedIn, recent news, or their newsroom/press page directly.`
+        : escapeHtml(val);
+      return `<div class="intel-section${notFound ? ' intel-section-empty' : ''}">
+        <div class="intel-section-title">${s.title}</div>
+        <div class="intel-section-body">${body}</div>
+      </div>`;
+    }).join('');
+    if (intel.researchNote && !isIntelNotFound(intel.researchNote)) {
+      content.innerHTML += `<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(240,193,75,0.15);">${escapeHtml(intel.researchNote)}</div>`;
+    }
+    card.style.display = 'block';
+    // Show angle reveal card if competencies already exist
+    if (activeSessionId) {
+      const s = getSession(activeSessionId);
+      if (s && s.competencies && s.competencies.length > 0 && !(s.companyAngles && s.companyAngles.length > 0)) {
+        document.getElementById('angleRevealCard').style.display = 'block';
+      }
+    }
+  }
+
+  // Builds a ready-to-paste research prompt covering only the categories the
+  // site-restricted search came up empty on — no extra AI call needed, it's
+  // pure templating off the NOT_FOUND flags we already compute.
+  function buildExternalResearchPrompt(company, roleTitle, intel) {
+    if (!intel) return null;
+    const gapMap = [
+      { key: 'businessImpact', ask: 'recent business milestones, growth, financial performance, or major initiatives' },
+      { key: 'communityImpact', ask: 'community involvement, charitable initiatives, diversity programs, or social impact' },
+      { key: 'cultureSignals', ask: 'workplace culture and values — especially recent employee or leadership commentary' },
+      { key: 'whyThisCompany', ask: 'specific, genuine reasons someone might be excited to work there right now' }
+    ];
+    const gaps = gapMap.filter(g => isIntelNotFound(intel[g.key]));
+    if (gaps.length === 0) return null;
+    const roleClause = roleTitle ? `the ${roleTitle} role at ${company}` : company;
+    const gapList = gaps.map(g => `- ${g.ask}`).join('\n');
+    return `I'm interviewing for ${roleClause}. Their own website didn't cover everything I need, so please research ${company} and pull together an interview-prep briefing on:\n${gapList}\n\nStart with their LinkedIn page (search "${company} LinkedIn") for recent posts and updates, then check recent news, press coverage, and any public statements. Include enough specifics that I can speak to them naturally in an interview — not vague generalities — and note where each fact came from so I can verify it. This is background for me to think with, not a script to recite.`;
+  }
+
+  function renderExternalResearchPrompt(promptText) {
+    const card = document.getElementById('externalResearchCard');
+    if (!promptText) { card.style.display = 'none'; return; }
+    document.getElementById('externalResearchPromptText').textContent = promptText;
+    card.style.display = 'block';
+  }
+
+  function renderImpliedCompetencies(implied) {
+    document.getElementById('impliedRevealCard').style.display = 'none';
+    document.getElementById('impliedResults').style.display = 'block';
+    const grid = document.getElementById('impliedGrid');
+    grid.innerHTML = '';
+    (implied || []).forEach((comp, i) => {
+      const card = document.createElement('div');
+      card.className = 'implied-card';
+      card.innerHTML = `
+        <div class="implied-card-header">
+          <div>
+            <div class="implied-name">${escapeHtml(comp.name)}</div>
+            <div class="implied-trigger">From: "${escapeHtml(comp.triggerPhrase)}"</div>
+          </div>
+          <button class="implied-expand-btn">+</button>
+        </div>
+        <div class="implied-detail" id="implied-detail-${i}">
+          <div class="detail-section"><div class="detail-label">Likely Question</div><div class="detail-body">${escapeHtml(comp.surfaceQuestion)}</div></div>
+          <div class="detail-section"><div class="detail-label">Methodology</div><div class="detail-body">${escapeHtml(comp.methodology)}</div></div>
+          <div class="detail-section" style="margin-bottom:0;"><div class="detail-label">What They'd Be Scoring</div><div>${(comp.scoringLayers||[]).map(l=>`<span class="scoring-pill pill-yellow">${escapeHtml(l)}</span>`).join('')}</div></div>
+        </div>`;
+      grid.appendChild(card);
+      card.querySelector('.implied-expand-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        const detail = document.getElementById('implied-detail-' + i);
+        const isOpen = detail.classList.contains('visible');
+        detail.classList.toggle('visible', !isOpen);
+        card.classList.toggle('expanded', !isOpen);
+        e.target.textContent = isOpen ? '+' : '−';
+      });
+    });
+  }
+
+  document.getElementById('findImpliedBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const session = getSession(activeSessionId);
+    if (!session || !session.jd) { showToast('Analyze the JD first'); return; }
+    const btn = document.getElementById('findImpliedBtn');
+    const status = document.getElementById('impliedStatus');
+    btn.disabled = true; status.style.display = 'flex';
+    try {
+      const system = `You are an expert interview preparation coach doing a second, deeper pass on a job description. The first pass already identified competencies the JD names directly. Your job now is to find competencies the JD implies but never states outright.
+
+Scan the JD for operational and functional language — reporting, monitoring, evaluating, troubleshooting, working under pressure, cross-functional coordination, process review, documentation — and reverse-engineer what underlying competency that language is really testing for, even though the JD doesn't name it directly.
+
+For example: "Evaluate daily reports to identify potential process gaps" implies risk assessment and proactive issue identification, even though the word "risk" never appears. "Proven ability to work under pressure" implies composure and decisive action once a problem has already materialized.
+
+Identify 2-4 implied competencies. For each one, quote the exact phrase from the JD that triggered the inference — do not paraphrase the trigger, quote it verbatim. Do not repeat competencies already obviously covered by named JD language; focus on what's genuinely unstated.
+
+Return structured JSON only. No markdown, no preamble, no backticks.
+
+{
+  "impliedCompetencies": [
+    {
+      "name": "Competency name (5 words max)",
+      "triggerPhrase": "The exact phrase from the JD that implies this competency",
+      "surfaceQuestion": "The likely interview question testing this",
+      "methodology": "Expert framework behind a strong answer (2-3 sentences)",
+      "scoringLayers": ["Layer 1", "Layer 2", "Layer 3"]
+    }
+  ]
+}`;
+      const user = `Role: ${session.roleTitle || 'Not specified'} at ${session.company || 'Not specified'}\n\nJob Description:\n${session.jd}\n\nAlready-identified explicit competencies (do not repeat these): ${(session.competencies||[]).map(c=>c.name).join(', ')}`;
+      const result = await callClaudeJSON(system, user, 2500);
+      updateSession(activeSessionId, { impliedCompetencies: result.impliedCompetencies || [] });
+      renderImpliedCompetencies(result.impliedCompetencies || []);
+      showToast('Implied competencies found');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
+  });
+
+  // ── COMPANY ANGLE ──
+  function renderCompanyAngles(angles) {
+    document.getElementById('angleRevealCard').style.display = 'none';
+    document.getElementById('angleResults').style.display = 'block';
+    const grid = document.getElementById('angleGrid');
+    grid.innerHTML = '';
+    (angles || []).forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'angle-card';
+      card.innerHTML = `<div class="angle-comp-name">${escapeHtml(a.competencyName)}</div><div class="angle-body">${escapeHtml(a.angle)}</div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  document.getElementById('buildAngleBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const session = getSession(activeSessionId);
+    if (!session || !session.companyIntel || !session.competencies || session.competencies.length === 0) {
+      showToast('Need company intel and competency map first'); return;
+    }
+    const btn = document.getElementById('buildAngleBtn');
+    const status = document.getElementById('angleStatus');
+    btn.disabled = true; status.style.display = 'flex';
+    try {
+      const intelSummary = Object.entries(session.companyIntel)
+        .filter(([k, v]) => v && !isIntelNotFound(v) && k !== 'researchNote')
+        .map(([k, v]) => k + ': ' + v).join('\n');
+      const system = `You are an expert interview coach. You have company intelligence about a specific organization and a competency map for a role there. Your job is to connect them: for each competency, write one specific, grounded paragraph that explains how that competency shows up in THIS company's specific context — not generic interview advice.
+
+Use the company intelligence to make the angle specific. If the company recently expanded into AI, that changes how a 'process improvement' competency reads. If their culture signals emphasize customer trust, that shapes how a 'communication' competency lands. The angle should make the candidate feel like they understand not just what the competency is but why it matters HERE.
+
+Keep each angle 2-4 sentences. Be specific to this company, not generic. Do not repeat what's already in the methodology — add the company-specific lens.
+
+The role type may be operational, technical, creative, or any other domain. Match your language to the role domain, not just operations.
+
+Return JSON only. No markdown, no preamble:
+{"angles":[{"competencyName":"","angle":""}]}`;
+      const user = `Company: ${session.company || 'Not specified'}\nRole: ${session.roleTitle || 'Not specified'}\n\nCompany Intelligence:\n${intelSummary}\n\nCompetencies:\n${session.competencies.map(c => c.name + ': ' + c.surfaceQuestion).join('\n')}`;
+      const result = await callClaudeJSON(system, user, 2500);
+      updateSession(activeSessionId, { companyAngles: result.angles || [] });
+      renderCompanyAngles(result.angles || []);
+      showToast('Company angles connected');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
+  });
+
+  // ── QUESTIONS TO ASK ──
+  function renderQuestionsToAsk(questions) {
+    document.getElementById('questionsRevealCard').style.display = 'none';
+    document.getElementById('questionsResults').style.display = 'block';
+    const list = document.getElementById('questionsList');
+    list.innerHTML = '';
+    (questions || []).forEach(q => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cssText = 'margin-bottom:12px;padding:16px 18px;';
+      card.innerHTML = `
+        <div style="font-size:14px;font-weight:500;color:var(--white);margin-bottom:6px;">${escapeHtml(q.question)}</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;">${escapeHtml(q.why)}</div>`;
+      list.appendChild(card);
+    });
+  }
+
+  document.getElementById('generateQuestionsBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const session = getSession(activeSessionId);
+    if (!session || !session.businessProblem) { showToast('Analyze the JD first'); return; }
+    const btn = document.getElementById('generateQuestionsBtn');
+    const status = document.getElementById('questionsStatus');
+    btn.disabled = true; status.style.display = 'flex';
+    try {
+      const system = `You are an expert interview coach. Generate smart, specific questions for a candidate to ask the interviewer. These questions should:
+1. Signal genuine interest and preparation — not just generic "what does success look like" questions
+2. Be grounded in the specific business problem this role is solving and the competencies it requires
+3. Help the candidate evaluate whether this is the right role and company for them
+4. Work across any role type and industry — whether operational, technical, creative, or other
+
+Generate 5 questions total in two categories:
+- "Role & Team" (3 questions): practical questions about the day-to-day reality, team dynamics, and what success looks like — based on what the JD reveals about the role
+- "You're Evaluating Too" (2 questions): questions that show the candidate is assessing fit, not just chasing an offer — one about what makes people struggle in this role, one about the hiring manager's own experience or mandate
+
+For each question, include one sentence explaining why this question lands and what it reveals.
+
+Return JSON only. No markdown, no preamble:
+{"questions":[{"category":"Role & Team","question":"","why":""},{"category":"You're Evaluating Too","question":"","why":""}]}`;
+      const user = `Company: ${session.company || 'Not specified'}\nRole: ${session.roleTitle || 'Not specified'}\n\nBusiness Problem: ${session.businessProblem}\n\nKey Competencies: ${(session.competencies||[]).map(c=>c.name).join(', ')}`;
+      const result = await callClaudeJSON(system, user, 1500);
+      updateSession(activeSessionId, { questionsToAsk: result.questions || [] });
+      renderQuestionsToAsk(result.questions || []);
+      showToast('Questions generated');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
+  });
+
+  document.getElementById('goToStoryModeBtn') && document.getElementById('goToStoryModeBtn').addEventListener('click', () => switchMode('story'));
+
+  document.getElementById('copyDebriefBtn').addEventListener('click', () => {
+    const container = document.getElementById('postResults');
+    copyText(container.innerText, 'Analysis');
+  });
+  document.getElementById('saveDebriefPdfBtn').addEventListener('click', () => window.print());
+
+  document.getElementById('reanalyzeBtn').addEventListener('click', () => {
+    document.getElementById('preForm').style.display = 'block';
+    document.getElementById('preResults').style.display = 'none';
+    document.getElementById('companyIntelCard').style.display = 'none';
+    document.getElementById('externalResearchCard').style.display = 'none';
+    document.getElementById('impliedRevealCard').style.display = 'block';
+    document.getElementById('impliedResults').style.display = 'none';
+    document.getElementById('angleRevealCard').style.display = 'none';
+    document.getElementById('angleResults').style.display = 'none';
+    document.getElementById('questionsRevealCard').style.display = 'none';
+    document.getElementById('questionsResults').style.display = 'none';
+  });
+
+  // ── QUESTIONS & DEBRIEF ──
+  function updateDebriefJdHint(session) {
+    const hint = document.getElementById('debriefJdHint');
+    if (!hint) return;
+    if (session?.jd && !session?.debriefJd) {
+      hint.textContent = 'Pre-filled from Decode the Role. Replace if analyzing a different role.';
+    } else if (session?.debriefJd) {
+      hint.textContent = 'Using saved JD for this analysis. Replace to analyze a different role.';
+    } else {
+      hint.textContent = 'Paste the JD for the role you\'re analyzing — this is what makes the feedback role-specific, not generic.';
+    }
+  }
+
+  document.getElementById('analyzeQuestionsBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const validQs = postQuestions.filter(q => q.trim().length > 5);
+    if (validQs.length === 0) { showToast('Add at least one question first'); return; }
+    const debriefJd = document.getElementById('debriefJdInput').value.trim();
+    if (debriefJd.length < 80) { showToast('Paste the job description first — the analysis needs it to be role-specific'); return; }
+    const session = getSession(activeSessionId);
+    const btn = document.getElementById('analyzeQuestionsBtn');
+    const status = document.getElementById('postStatus');
+    btn.disabled = true; status.style.display = 'flex';
+    try {
+      const system = `You are an expert at reverse-engineering interview questions to reveal what the interviewer was actually evaluating. You have the job description for this role — use it to make every answer role-specific, not generic. Ground your analysis in the actual competencies and business problems this role is solving for.
+
+For each question:
+1. Identify the competency being tested — name it in the context of this specific role
+2. Decode the scoring layers — what 3 things the interviewer was evaluating simultaneously
+3. Describe what a strong answer includes — specific to this role's context
+4. Name what most candidates miss — the gap between an adequate answer and a strong one
+5. Provide a framework for next time — a concrete approach they can use
+
+Return JSON only. No markdown, no preamble:
+{"analyses":[{"question":"","competency":"","whatTheyScored":["","",""],"strongAnswerIncludes":"","commonMiss":"","nextTimeFramework":""}]}`;
+      const user = `Role: ${session?.roleTitle||'Not specified'} at ${session?.company||'Not specified'}\n\nJob Description:\n${debriefJd}\n\nInterview Questions:\n${validQs.map((q,i) => `${i+1}. ${q}`).join('\n')}`;
+      const result = await callClaudeJSON(system, user, 4000);
+      updateSession(activeSessionId, { debriefJd, debriefAnalysis: result.analyses, postQuestions });
+      renderPostAnalysis(result.analyses);
+      document.getElementById('postOutputActions').style.display = 'flex';
+      showToast('Analysis complete');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
+  });
+
+  function renderPostQuestions() {
+    const list = document.getElementById('postQuestionsList');
+    list.innerHTML = '';
+    if (postQuestions.length === 0) {
+      list.innerHTML = '<div style="font-size:14px;color:var(--muted);font-style:italic;margin-bottom:16px;">No questions added yet.</div>';
+      return;
+    }
+    postQuestions.forEach((q, i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:10px;margin-bottom:10px;align-items:center;';
+      row.innerHTML = `<input type="text" value="${escapeHtml(q)}" placeholder="Enter a question that was asked..." data-idx="${i}" class="post-q-input" style="flex:1;" /><button class="btn-ghost remove-q-btn" data-idx="${i}" style="padding:6px 8px;">✕</button>`;
+      list.appendChild(row);
+      row.querySelector('.post-q-input').addEventListener('input', e => {
+        postQuestions[i] = e.target.value;
+        if (activeSessionId) updateSession(activeSessionId, { postQuestions });
+      });
+    });
+    list.querySelectorAll('.remove-q-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        postQuestions.splice(parseInt(btn.dataset.idx), 1);
+        if (activeSessionId) updateSession(activeSessionId, { postQuestions });
+        renderPostQuestions();
+      });
+    });
+  }
+
+  document.getElementById('addQuestionBtn').addEventListener('click', () => {
+    postQuestions.push('');
+    renderPostQuestions();
+    setTimeout(() => { const inputs = document.querySelectorAll('.post-q-input'); if (inputs.length) inputs[inputs.length-1].focus(); }, 50);
+  });
+
+  function renderPostAnalysis(analyses) {
+    const container = document.getElementById('postResults');
+    container.innerHTML = '';
+    if (!analyses || analyses.length === 0) return;
+    const hdr = document.createElement('div');
+    hdr.innerHTML = '<div class="section-eyebrow" style="margin-bottom:16px;">What They Were Actually Scoring</div>';
+    container.appendChild(hdr);
+    analyses.forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.marginBottom = '16px';
+      card.innerHTML = `
+        <div style="font-size:16px;color:var(--white);line-height:1.6;margin-bottom:12px;">"${escapeHtml(a.question)}"</div>
+        <div style="margin-bottom:12px;"><span class="scoring-pill pill-blue">${escapeHtml(a.competency)}</span></div>
+        <div class="detail-section"><div class="detail-label">Scoring Layers</div><div>${(a.whatTheyScored||[]).map(l=>`<span class="scoring-pill pill-yellow">${escapeHtml(l)}</span>`).join('')}</div></div>
+        <div class="detail-section"><div class="detail-label" style="color:var(--green);">Strong Answer Includes</div>${formatAsList(a.strongAnswerIncludes)}</div>
+        <div class="detail-section"><div class="detail-label" style="color:var(--red);">What Most Candidates Miss</div>${formatAsList(a.commonMiss)}</div>
+        <div class="detail-section" style="margin-bottom:0;"><div class="detail-label">Next Time — Use This Framework</div>${formatAsList(a.nextTimeFramework)}</div>`;
+      container.appendChild(card);
+    });
+  }
+
+  // ── STORY TRANSLATION ──
+  document.getElementById('translateStoryBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const storyText = document.getElementById('storyInput').value.trim();
+    const storyTitle = document.getElementById('storyTitle').value.trim();
+    if (storyText.length < 80) { showToast('Describe the experience in more detail'); return; }
+    const session = getSession(activeSessionId);
+    const btn = document.getElementById('translateStoryBtn');
+    const status = document.getElementById('storyStatus');
+    btn.disabled = true; status.style.display = 'flex';
+    try {
+      const compContext = session?.competencies?.length ? 'Competencies from the target role: ' + session.competencies.map(c=>c.name).join(', ') + '. ' : '';
+      const system = `You are an expert at translating professional experience into competency-based interview language. Use the SOAR method (Situation, Obstacles, Actions, Results). Apply the most current thinking on what makes interview stories land.
+
+Critical guidance on impact and results — apply this rigorously:
+1. BEFORE/AFTER framing is required in the Results section. Always describe what existed or was happening before the candidate's actions, and what changed after. This is the most concrete way to demonstrate impact even without hard numbers.
+2. If hard metrics exist (percentages, dollar amounts, volume), use them. If they don't, use honest relative terms: "reduced by roughly half," "eliminated most of the manual work," "went from weekly escalations to none." Never leave results vague.
+3. Distinguish individual contribution from team outcome. Name specifically what the candidate personally built, drove, or owned — not just what the team achieved. Interviewers are trained to probe "we" language.
+4. Connect the result to a business outcome — time saved, errors reduced, process adopted, behavior changed, escalations stopped. Even process improvement work has a downstream business effect; name it.
+5. Flag in gaps if the story lacks a clear before/after or if the individual contribution is unclear.
+
+Return JSON only:
+{"competenciesProved":[],"soarFramework":{"situation":"Set context: what was broken, missing, or at risk before this person acted","obstacles":"The specific challenges — competing priorities, missing systems, cross-org resistance, time pressure. This is where most candidates underinvest.","actions":"What this person specifically did — use active verbs, name tools and teams, make individual ownership clear","results":"Before/after: what changed as a result. Use numbers if available; use honest relative terms if not. Connect to business impact."},"keyLanguage":"Specific phrases and framing that map to what interviewers listen for in this competency area","gaps":"What is currently missing that would strengthen this story — missing before/after, unclear individual ownership, unquantified result, or weak connection to business impact","bestUsedFor":"Which interview questions this story answers best"}`;
+      const user = compContext + 'Story: ' + (storyTitle||'Untitled') + '\n\n' + storyText;
+      const result = await callClaudeJSON(system, user, 2500);
+      const story = { id: 'story_' + Date.now(), title: storyTitle||'Untitled Story', rawText: storyText, competencies: result.competenciesProved||[], soar: result.soarFramework||{}, keyLanguage: result.keyLanguage||'', gaps: result.gaps||'', bestUsedFor: result.bestUsedFor||'', createdAt: Date.now() };
+      const stories = [...(session.stories||[]), story];
+      updateSession(activeSessionId, { stories, storyDraftTitle: '', storyDraftText: '' });
+      renderStoryResult(result);
+      renderStoryLibrary(stories);
+      document.getElementById('storyTitle').value = '';
+      document.getElementById('storyInput').value = '';
+      showToast('Story translated and saved');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
+  });
+
+  function renderStoryResult(result) {
+    const c = document.getElementById('storyResult');
+    c.style.display = 'block';
+    c.innerHTML = `
+      <div class="card-accent" style="margin-bottom:16px;"><div class="detail-label" style="margin-bottom:8px;">Competencies This Story Proves</div><div>${(result.competenciesProved||[]).map(x=>`<span class="scoring-pill pill-blue">${escapeHtml(x)}</span>`).join('')}</div></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-label">SOAR Framework</div>
+        <div class="detail-section"><div class="detail-label">Situation</div><div class="detail-body">${escapeHtml(result.soarFramework?.situation||'')}</div></div>
+        <div class="detail-section"><div class="detail-label">Obstacles</div><div class="detail-body">${escapeHtml(result.soarFramework?.obstacles||'')}</div></div>
+        <div class="detail-section"><div class="detail-label">Actions</div><div class="detail-body">${escapeHtml(result.soarFramework?.actions||'')}</div></div>
+        <div class="detail-section" style="margin-bottom:0;"><div class="detail-label">Results</div><div class="detail-body">${escapeHtml(result.soarFramework?.results||'')}</div></div>
+      </div>
+      <div class="card" style="margin-bottom:16px;"><div class="card-label">Key Language to Use</div><div style="font-size:15px;color:var(--white);line-height:1.8;">${escapeHtml(result.keyLanguage||'')}</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div class="card" style="border-left:3px solid var(--red);margin-bottom:0;"><div class="detail-label" style="color:var(--red);">Story Gaps</div><div class="detail-body">${escapeHtml(result.gaps||'')}</div></div>
+        <div class="card" style="border-left:3px solid var(--green);margin-bottom:0;"><div class="detail-label" style="color:var(--green);">Best Used For</div><div class="detail-body">${escapeHtml(result.bestUsedFor||'')}</div></div>
+      </div>`;
+  }
+
+  function renderStoryLibrary(stories) {
+    const c = document.getElementById('storyLibrary');
+    if (!stories || stories.length === 0) { c.innerHTML = '<div style="font-size:14px;color:var(--muted);font-style:italic;">No stories yet.</div>'; return; }
+    c.innerHTML = stories.slice().reverse().map(s => `
+      <div class="story-card">
+        <div class="story-card-title">${escapeHtml(s.title)}</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">${escapeHtml(s.bestUsedFor||'')}</div>
+        <div class="story-tags">${(s.competencies||[]).map(c=>`<span class="story-tag">${escapeHtml(c)}</span>`).join('')}</div>
+      </div>`).join('');
+  }
+
+  // ── TELL ME ABOUT YOURSELF ──
+  document.getElementById('buildTMAYBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const background = document.getElementById('tmayBackground').value.trim();
+    if (background.length < 60) { showToast('Describe your background in more detail first'); return; }
+    const session = getSession(activeSessionId);
+    const current = document.getElementById('tmayCurrentRole').value.trim();
+    const why = document.getElementById('tmayWhy').value.trim();
+    const btn = document.getElementById('buildTMAYBtn');
+    const status = document.getElementById('tmayStatus');
+    btn.disabled = true; status.style.display = 'flex';
+    try {
+      const roleContext = session ? `Target role: ${session.roleTitle||'Not specified'} at ${session.company||'Not specified'}. Business problem this role solves: ${session.businessProblem||'Not analyzed yet'}.` : '';
+      const tmayIntelLines = [];
+      if (session?.companyIntel && !isIntelNotFound(session.companyIntel.businessImpact)) tmayIntelLines.push(`Business Impact: ${session.companyIntel.businessImpact}`);
+      if (session?.companyIntel && !isIntelNotFound(session.companyIntel.communityImpact)) tmayIntelLines.push(`Community Impact: ${session.companyIntel.communityImpact}`);
+      if (session?.companyIntel && !isIntelNotFound(session.companyIntel.whyThisCompany)) tmayIntelLines.push(`Why This Company angles: ${session.companyIntel.whyThisCompany}`);
+      const intelContext = tmayIntelLines.length ? `\n\nCompany Intelligence for context:\n- ${tmayIntelLines.join('\n- ')}` : '';
+      const system = `You are an expert interview coach. Build a compelling, specific "Tell Me About Yourself" answer for this candidate. Use the past-present-future structure: past (most relevant background), present (current situation and what brought them here), future (why this role is the right next move). End with a question that hands control back to the interviewer — e.g. "Before I go deeper on any of that, is there a particular area you'd like me to focus on today?"
+
+The answer should sound like a real person speaking, not a resume readout. It should be specific and reference actual work done. If company intelligence is provided, weave in 1-2 specific, authentic reasons this company appeals — grounded in what they've actually done, not generic praise. Target 90-120 seconds when spoken aloud (approximately 200-280 words).
+
+Also provide coaching notes: what's working in this answer, what's weak, and one thing to watch out for.
+
+Return JSON only:
+{"tmay":"The full TMAY answer as a single flowing paragraph or 2-3 short paragraphs","coaching":"2-3 sentences of coaching notes"}`;
+      const user = `${roleContext}${intelContext}\n\nBackground: ${background}\nCurrent situation: ${current||'Not specified'}\nWhy this role: ${why||'Not specified'}`;
+      const result = await callClaudeJSON(system, user, 1500);
+      updateSession(activeSessionId, { tmay: result.tmay, tmayCoaching: result.coaching });
+      document.getElementById('tmayOutput').textContent = result.tmay;
+      document.getElementById('tmayCoaching').textContent = result.coaching;
+      document.getElementById('tmayResult').style.display = 'block';
+      showToast('TMAY built');
+    } catch(err) { showToast('Error: ' + err.message); }
+    finally { btn.disabled = false; status.style.display = 'none'; }
+  });
+
+  document.getElementById('rebuildTMAYBtn').addEventListener('click', () => {
+    document.getElementById('tmayResult').style.display = 'none';
+  });
+
+  // ── COPY / PDF BUTTONS ──
+  function copyText(text, label) {
+    navigator.clipboard.writeText(text).then(() => showToast(label + ' copied')).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      showToast(label + ' copied');
+    });
+  }
+
+  document.getElementById('copyTMAYBtn').addEventListener('click', () => {
+    copyText(document.getElementById('tmayOutput').textContent, 'TMAY');
+  });
+  document.getElementById('copyResearchPromptBtn').addEventListener('click', () => {
+    copyText(document.getElementById('externalResearchPromptText').textContent, 'Research prompt');
+  });
+  document.getElementById('saveTMAYPdfBtn').addEventListener('click', () => window.print());
+  document.getElementById('copyNotesBtn').addEventListener('click', () => {
+    copyText(document.getElementById('sessionNotesInput').value, 'Notes');
+  });
+  document.getElementById('saveNotesPdfBtn').addEventListener('click', () => window.print());
+
+  // ── EXPORT FULL SESSION ──
+  document.getElementById('exportSessionBtn').addEventListener('click', () => {
+    if (!activeSessionId) { showToast('No active session to export'); return; }
+    const session = getSession(activeSessionId);
+    if (!session) return;
+    buildExportView(session);
+    document.body.classList.add('exporting');
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => document.body.classList.remove('exporting'), 500);
+    }, 150);
+  });
+
+  function buildExportView(session) {
+    const view = document.getElementById('exportView');
+    const esc = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    let html = '';
+
+    html += `<div class="export-header">
+      <div class="export-title">${esc(session.roleTitle || 'Interview Prep')}${session.company ? ' — ' + esc(session.company) : ''}</div>
+      <div class="export-subtitle">Interview Prep Guide · Generated ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}</div>
+    </div>`;
+
+    if (session.businessProblem) {
+      html += `<div class="export-section">
+        <div class="export-section-title">What This Role Is Actually Solving For</div>
+        <div class="export-body">${esc(session.businessProblem)}</div>
+        ${session.roleContextNote ? `<div class="export-body" style="margin-top:8px;color:#555;">${esc(session.roleContextNote)}</div>` : ''}
+      </div>`;
+    }
+
+    if (session.companyIntel) {
+      const intel = session.companyIntel;
+      const intelFields = [
+        { key: 'missionOrPurpose', label: 'Mission / Purpose' },
+        { key: 'recentInitiatives', label: 'Recent Initiatives' },
+        { key: 'cultureSignals', label: 'Culture Signals' },
+        { key: 'leadershipPriorities', label: 'Leadership Priorities' },
+        { key: 'productsOrServices', label: 'Products / Services' },
+      ];
+      const hasIntel = intelFields.some(f => intel[f.key] && String(intel[f.key]).toLowerCase() !== 'not_found');
+      if (hasIntel) {
+        html += `<div class="export-section"><div class="export-section-title">Company Intelligence</div>`;
+        intelFields.forEach(f => {
+          if (intel[f.key] && String(intel[f.key]).toLowerCase() !== 'not_found') {
+            html += `<div class="export-block">
+              <div class="export-block-title">${esc(f.label)}</div>
+              <div class="export-body">${esc(intel[f.key])}</div>
+            </div>`;
+          }
+        });
+        html += `</div>`;
+      }
+    }
+
+    if (session.competencies && session.competencies.length > 0) {
+      html += `<div class="export-section"><div class="export-section-title">Competency Map — What They’re Actually Scoring</div>`;
+      session.competencies.forEach((comp, i) => {
+        html += `<div class="export-block">
+          <div class="export-block-title">${i+1}. ${esc(comp.name)}</div>
+          <div class="export-block-question">“${esc(comp.surfaceQuestion)}”</div>
+          <div class="export-label">Methodology</div>
+          <div class="export-body">${esc(comp.methodology)}</div>
+          <div class="export-label">What They’re Scoring</div>
+          <div class="export-pills">${(comp.scoringLayers||[]).map(l=>`<span class="export-pill">${esc(l)}</span>`).join('')}</div>
+          ${comp.weakAnswer ? `<div class="export-label export-label-red">Weak Answer</div><div class="export-body">${esc(comp.weakAnswer)}</div>` : ''}
+          ${comp.strongAnswer ? `<div class="export-label export-label-green">Strong Answer</div><div class="export-body">${esc(comp.strongAnswer)}</div>` : ''}
+          ${comp.keyDistinction ? `<div class="export-key-distinction"><strong>Key Distinction:</strong> ${esc(comp.keyDistinction)}</div>` : ''}
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Company Angles
+    if (session.companyAngles && session.companyAngles.length > 0) {
+      html += `<div class="export-section"><div class="export-section-title">Company Angle — How Competencies Surface Here</div>`;
+      session.companyAngles.forEach(a => {
+        html += `<div class="export-block" style="border-left-color:#2e6b2e;">
+          <div class="export-block-title" style="color:#2e6b2e;">${esc(a.competencyName)}</div>
+          <div class="export-body">${esc(a.angle)}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    if (session.impliedCompetencies && session.impliedCompetencies.length > 0) {
+      html += `<div class="export-section"><div class="export-section-title">Hidden Competencies — Implied But Not Named in JD</div>`;
+      session.impliedCompetencies.forEach((comp) => {
+        html += `<div class="export-implied-block">
+          <div class="export-block-title">${esc(comp.name)}</div>
+          <div class="export-trigger">From JD: “${esc(comp.triggerPhrase)}”</div>
+          <div class="export-block-question">“${esc(comp.surfaceQuestion)}”</div>
+          <div class="export-label">Methodology</div>
+          <div class="export-body">${esc(comp.methodology)}</div>
+          <div class="export-label">What They’d Be Scoring</div>
+          <div class="export-pills">${(comp.scoringLayers||[]).map(l=>`<span class="export-pill export-pill-yellow">${esc(l)}</span>`).join('')}</div>
+        </div>`;
+      });
+      html += `<div class="export-disclaimer">These competencies are inferred from JD language, not stated directly. Treat as a second layer of preparation.</div>`;
+      html += `</div>`;
+    }
+
+    // Questions to Ask
+    if (session.questionsToAsk && session.questionsToAsk.length > 0) {
+      const roleTeam = session.questionsToAsk.filter(q => q.category === "Role & Team");
+      const evalToo = session.questionsToAsk.filter(q => q.category === "You're Evaluating Too");
+      html += `<div class="export-section"><div class="export-section-title">Questions to Ask the Interviewer</div>`;
+      if (roleTeam.length > 0) {
+        html += `<div class="export-label export-label-gold" style="font-size:10pt;margin-bottom:8px;">Role &amp; Team</div>`;
+        roleTeam.forEach(q => {
+          html += `<div class="export-block" style="margin-bottom:8px;">
+            <div class="export-body" style="font-weight:bold;margin-bottom:4px;">${esc(q.question)}</div>
+            <div class="export-body" style="color:#555;font-size:9pt;">${esc(q.why)}</div>
+          </div>`;
+        });
+      }
+      if (evalToo.length > 0) {
+        html += `<div class="export-label export-label-gold" style="font-size:10pt;margin-bottom:8px;margin-top:10px;">You&rsquo;re Evaluating Too</div>`;
+        evalToo.forEach(q => {
+          html += `<div class="export-block" style="margin-bottom:8px;">
+            <div class="export-body" style="font-weight:bold;margin-bottom:4px;">${esc(q.question)}</div>
+            <div class="export-body" style="color:#555;font-size:9pt;">${esc(q.why)}</div>
+          </div>`;
+        });
+      }
+      html += `<div class="export-disclaimer">These are thinking models, not scripts. Use them to shape your own questions in your own voice based on how the conversation unfolds.</div>`;
+      html += `</div>`;
+    }
+
+    if (session.stories && session.stories.length > 0) {
+      html += `<div class="export-section"><div class="export-section-title">Your Stories</div>`;
+      session.stories.forEach((story, i) => {
+        html += `<div class="export-story-block">
+          <div class="export-story-title">${esc(story.title || 'Story ' + (i+1))}</div>
+          ${story.tags && story.tags.length > 0 ? `<div class="export-pills" style="margin-bottom:8px;">${story.tags.map(t=>`<span class="export-pill">${esc(t)}</span>`).join('')}</div>` : ''}
+          ${story.originalText ? `<div class="export-label">Your Experience</div><div class="export-body">${esc(story.originalText)}</div>` : ''}
+          ${story.translatedText ? `<div class="export-label export-label-green">Translated Story</div><div class="export-body" style="margin-top:4px;">${esc(story.translatedText)}</div>` : ''}
+          ${story.beforeAfter ? `<div class="export-key-distinction">${esc(story.beforeAfter)}</div>` : ''}
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    if (session.tmay) {
+      html += `<div class="export-section">
+        <div class="export-section-title">Your Opening Answer — Tell Me About Yourself</div>
+        <div class="export-tmay-box">${esc(session.tmay)}</div>
+        ${session.tmayCoaching ? `<div class="export-label export-label-gold">Coaching Notes</div><div class="export-body">${esc(session.tmayCoaching)}</div>` : ''}
+      </div>`;
+    }
+
+    if (session.notes && session.notes.trim()) {
+      html += `<div class="export-section">
+        <div class="export-section-title">Your Notes</div>
+        <div class="export-notes-box">${esc(session.notes)}</div>
+      </div>`;
+    }
+
+    if (session.debriefAnalysis && session.debriefAnalysis.length > 0) {
+      html += `<div class="export-section"><div class="export-section-title">Questions &amp; Debrief — What Was Actually Being Scored</div>`;
+      session.debriefAnalysis.forEach(a => {
+        html += `<div class="export-block">
+          <div class="export-block-title">${esc(a.competency)}</div>
+          <div class="export-block-question">“${esc(a.question)}”</div>
+          <div class="export-label">What They Scored</div>
+          <div class="export-pills">${(a.whatTheyScored||[]).map(l=>`<span class="export-pill">${esc(l)}</span>`).join('')}</div>
+          ${a.strongAnswerIncludes ? `<div class="export-label export-label-green">Strong Answer Includes</div><div class="export-body">${esc(a.strongAnswerIncludes)}</div>` : ''}
+          ${a.commonMiss ? `<div class="export-label export-label-red">What Most Candidates Miss</div><div class="export-body">${esc(a.commonMiss)}</div>` : ''}
+          ${a.nextTimeFramework ? `<div class="export-label">Next Time — Use This Framework</div><div class="export-body">${esc(a.nextTimeFramework)}</div>` : ''}
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `<div class="export-disclaimer">Generated by Interview Prep Tool · AI-enhanced output — review before use. Results depend on information available at time of request.</div>`;
+    view.innerHTML = html;
+  }
+
+  // ── DELETE SESSION ──
+  function deleteActiveSession() {
+    document.getElementById('manageMenu').classList.remove('open');
+    if (!activeSessionId) return;
+    const session = getSession(activeSessionId);
+    showConfirm('Delete Session', `Delete "${session?.name}"? This cannot be undone. All analysis, stories, and notes will be permanently removed.`, () => {
+      library = library.filter(s => s.id !== activeSessionId);
+      saveLibrary();
+      activeSessionId = null;
+      document.getElementById('sessionBar').style.display = 'none';
+      document.getElementById('storageHint').style.display = 'none';
+      document.getElementById('modeTabs').style.display = 'none';
+      document.getElementById('noSessionState').style.display = 'block';
+      ['pre','story','tmay','notes','post'].forEach(m => document.getElementById('mode-' + m).style.display = 'none');
+      showToast('Session deleted');
+    });
+  }
+  document.getElementById('deleteSessionBtn').addEventListener('click', deleteActiveSession);
+  document.getElementById('notesDeleteSessionBtn').addEventListener('click', deleteActiveSession);
+
+  // ── START OVER (reset all data in the active session, keep the session itself) ──
+  document.getElementById('startOverSessionBtn').addEventListener('click', () => {
+    document.getElementById('manageMenu').classList.remove('open');
+    if (!activeSessionId) return;
+    const session = getSession(activeSessionId);
+    showConfirm('Start Over', `Clear all data in "${session?.name}"? This resets Decode the Role, Build Your Stories, Your Opening Answer, Your Notes, and Questions & Debrief back to blank. The session itself is kept. This cannot be undone.`, () => {
+      updateSession(activeSessionId, {
+        company: '', roleTitle: '', companyWebsite: '', companyIntel: null, externalResearchPrompt: '', jd: '',
+        businessProblem: '', roleContextNote: '', competencies: [], impliedCompetencies: [],
+        postQuestions: [], postAnalysis: [], debriefJd: '', debriefAnalysis: [],
+        stories: [], storyDraftTitle: '', storyDraftText: '', tmay: '', tmayCoaching: '', tmayBackground: '', tmayCurrent: '', tmayWhy: '',
+        notes: ''
+      });
+      postQuestions = [];
+      switchSession(activeSessionId);
+      showToast('Session reset — starting fresh');
+    });
+  });
+
+  document.getElementById('notesViewLibraryBtn').addEventListener('click', openLibraryModal);
+
+  // ── CLEAR THIS SECTION (per-tab reset — no confirmation, low-stakes, only
+  // touches the active section's own fields/results) ──
+  document.getElementById('clearPreBtn').addEventListener('click', () => {
+    if (!activeSessionId) return;
+    document.getElementById('companyName').value = '';
+    document.getElementById('roleTitle').value = '';
+    document.getElementById('companyWebsite').value = '';
+    document.getElementById('jdInput').value = '';
+    document.getElementById('preForm').style.display = 'block';
+    document.getElementById('preResults').style.display = 'none';
+    document.getElementById('companyIntelCard').style.display = 'none';
+    document.getElementById('externalResearchCard').style.display = 'none';
+    document.getElementById('impliedRevealCard').style.display = 'block';
+    document.getElementById('impliedResults').style.display = 'none';
+    updateSession(activeSessionId, { company: '', roleTitle: '', companyWebsite: '', companyIntel: null, externalResearchPrompt: '', jd: '', businessProblem: '', roleContextNote: '', competencies: [], impliedCompetencies: [] });
+    showToast('Decode the Role cleared');
+  });
+
+  document.getElementById('clearStoryBtn').addEventListener('click', () => {
+    if (!activeSessionId) return;
+    document.getElementById('storyTitle').value = '';
+    document.getElementById('storyInput').value = '';
+    document.getElementById('storyResult').style.display = 'none';
+    updateSession(activeSessionId, { storyDraftTitle: '', storyDraftText: '' });
+    showToast('Story form cleared');
+  });
+
+  document.getElementById('clearTmayBtn').addEventListener('click', () => {
+    if (!activeSessionId) return;
+    document.getElementById('tmayBackground').value = '';
+    document.getElementById('tmayCurrentRole').value = '';
+    document.getElementById('tmayWhy').value = '';
+    document.getElementById('tmayResult').style.display = 'none';
+    updateSession(activeSessionId, { tmayBackground: '', tmayCurrent: '', tmayWhy: '', tmay: '', tmayCoaching: '' });
+    showToast('Opening answer cleared');
+  });
+
+  document.getElementById('clearNotesBtn').addEventListener('click', () => {
+    if (!activeSessionId) return;
+    document.getElementById('sessionNotesInput').value = '';
+    updateSession(activeSessionId, { notes: '' });
+    showToast('Notes cleared');
+  });
+
+  document.getElementById('clearPostBtn').addEventListener('click', () => {
+    if (!activeSessionId) return;
+    document.getElementById('debriefJdInput').value = getSession(activeSessionId)?.jd || '';
+    postQuestions = [];
+    renderPostQuestions();
+    document.getElementById('postResults').innerHTML = '';
+    document.getElementById('postOutputActions').style.display = 'none';
+    updateSession(activeSessionId, { debriefJd: '', debriefAnalysis: [], postAnalysis: [], postQuestions: [] });
+    updateDebriefJdHint(getSession(activeSessionId));
+    showToast('Questions & Debrief cleared');
+  });
+
+  // ── EXPORT / IMPORT ──
+  document.getElementById('exportLibraryBtn').addEventListener('click', () => {
+    const data = { exportedAt: new Date().toISOString(), sessions: library };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    a.download = 'interview-prep-library-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click(); URL.revokeObjectURL(url);
+    showToast('Library exported');
+  });
+  document.getElementById('importLibraryBtn').addEventListener('click', () => document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        const imported = data.sessions || (Array.isArray(data) ? data : []);
+        if (imported.length === 0) { showToast('No sessions found in file'); return; }
+        showConfirm('Import Library', `Import ${imported.length} session(s)? Existing sessions are kept. Duplicate IDs are skipped.`, () => {
+          const existing = new Set(library.map(s => s.id));
+          const newOnes = imported.filter(s => !existing.has(s.id));
+          library = [...newOnes, ...library]; saveLibrary();
+          renderLibraryList();
+          showToast(`Imported ${newOnes.length} session(s)`);
+        });
+      } catch(err) { showToast('Could not read file'); }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  // ── UTILITY ──
+  function escapeHtml(val) {
+    if (val === null || val === undefined || val === '') return '';
+    const str = Array.isArray(val) ? val.join(', ') : (typeof val === 'object' ? JSON.stringify(val) : String(val));
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Renders a block of AI-generated prose as a bulleted list when it naturally
+  // breaks into multiple sentences/clauses, so dense paragraphs stay skimmable.
+  // "Label: detail" style clauses get the label bolded.
+  function formatAsList(text) {
+    if (!text) return '<div class="detail-body"></div>';
+    const str = String(text);
+    const parts = str.split(/(?<=[.!?])\s+(?=[A-Z])|;\s+/).map(p => p.trim()).filter(Boolean);
+    if (parts.length < 2) return `<div class="detail-body">${escapeHtml(str)}</div>`;
+    const items = parts.map(p => {
+      const m = p.match(/^([A-Z][A-Za-z0-9 /&'-]{2,40}):\s*(.+)$/);
+      if (m) return `<li><strong>${escapeHtml(m[1])}:</strong> ${escapeHtml(m[2])}</li>`;
+      return `<li>${escapeHtml(p)}</li>`;
+    }).join('');
+    return `<ul class="detail-body formatted-list">${items}</ul>`;
+  }
+
+  // ── INIT ──
+  // Every fresh visit starts at the no-session screen — it never auto-resumes
+  // whatever session was open last time. Saved sessions still exist and are
+  // reachable from Library; this just makes "closed the tab" actually mean
+  // a clean slate instead of silently picking up wherever you left off.
+  function init() {
+    library = loadLibrary();
+    document.getElementById('noSessionState').style.display = 'block';
+    document.getElementById('sessionBar').style.display = 'none';
+    document.getElementById('storageHint').style.display = 'none';
+    document.getElementById('modeTabs').style.display = 'none';
+  }
+
+  init();
+  </script>  <!-- ── EXPORT FULL SESSION VIEW ── -->
+  <div id="exportView"></div>
+
+</body>
+</html>
