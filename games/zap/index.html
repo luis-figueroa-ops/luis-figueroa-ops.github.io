@@ -245,11 +245,11 @@ function uiScale()    { return Math.min(1, W / 500); }
 const DELTA_CAP  = 0.05;
 const MAX_HEALTH = 5;
 
-// CHANGE 1: Quadratic ease-in curve — ramps challenge much earlier
+// CHANGE 1: Linear ramp — difficulty is felt wave-over-wave from the start
 function getWaveConfig(w) {
   const tLin = (w - 1) / (MAX_WAVES - 1);
-  // Quadratic ease-in: slow start but accelerates fast — challenge at wave 6-7 not 12-13
-  const t = tLin * tLin;
+  // Linear: quadratic ease-in kept waves 1-4 nearly indistinguishable
+  const t = tLin;
 
   // Bugs: 10 on wave 1, up to 28 by wave 20
   const bugsNeeded = Math.round(10 + t * 18);
