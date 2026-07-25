@@ -168,6 +168,26 @@ h1 span { color: var(--gold); }
 .card-construction-row svg { flex-shrink: 0; }
 .card-construction-row span { font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 1.5px; color: var(--gold-light); text-transform: uppercase; }
 
+.card-completed-badge {
+  position: absolute;
+  top: 22px;
+  right: -38px;
+  width: 150px;
+  padding: 6px 0;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: var(--navy-deep);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(45deg);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  z-index: 5;
+  animation: construction-pulse 2s ease-in-out infinite;
+}
+
 @keyframes construction-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -443,10 +463,11 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
   <div class="cards">
 
 <a class="card" href="https://luis-figueroa-ops.github.io/credentials/google-ai/">
+  <div class="card-completed-badge">Completed</div>
   <div class="card-tag">Career Courses</div>
   <div class="card-title">Google AI Professional Certificate</div>
   <div class="card-desc">
-    7-course certificate from Google covering AI fluency across brainstorming, research, writing, content creation, data analysis, and app building. Built a portfolio of 20+ AI-assisted artifacts and vibe-coded a custom app. Completed March 2026. Verify at coursera.org/verify/professional-cert/TGT2DBQURPET.
+    7-course certificate from Google covering AI fluency across brainstorming, research, writing, content creation, data analysis, and app building. Built a portfolio of 20+ AI-assisted artifacts and vibe-coded a custom app. Completed March 2026.
   </div>
   <div class="card-footer">
     <span class="card-cta">View Milestones</span>
