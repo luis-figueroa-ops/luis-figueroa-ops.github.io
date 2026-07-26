@@ -353,7 +353,7 @@ pauseBtn.addEventListener('click', togglePause);
 let shieldActive = false, shieldTimer = 0, shieldHits = 0, shieldIsEarned = false, slowActive = false, slowTimer = 0;
 let powerups = [], obstacles = [], earnedShieldOrb = null;
 let bullets = [], lastShotFrame = -999;
-let baseSpeed = 1.6, spawnRate = 52;
+let baseSpeed = 2.2, spawnRate = 34;
 let bossActive = false, boss = null, bossHP = 0, bossMaxHP = 0, bossWaveLevel = 0;
 let particles = [];
 let stars = Array.from({length:60}, () => ({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5+0.3, s:Math.random()*0.4+0.1 }));
@@ -396,7 +396,7 @@ function getObstacleSpeed() {
   const speed = lvl <= 14 ? baseSpeed + (lvl-1)*0.30 : (baseSpeed + 13*0.30) + (lvl-14)*0.15;
   return speed * getSpeedMult();
 }
-function getSpawnRate() { return Math.max(14, spawnRate - (getLevel()-1)*2.0|0); }
+function getSpawnRate() { return Math.max(14, spawnRate - (getLevel()-1)*1.4|0); }
 function isBossLevel(l) { return l >= 6 && (l-6) % 4 === 0; }
 function setBackNavVisible(v) { backNav.classList.toggle('hidden', !v); }
 
@@ -572,7 +572,7 @@ function spawnObstacle() {
   else if(t==='star'){ w=16+Math.random()*10; h=w; }
   else if(t==='comet'){ w=18+Math.random()*10; h=w; }
   else { w=40+Math.random()*50; h=14+Math.random()*6; } // flare
-  const x=Math.random()<0.33?Math.max(10,Math.min(W-w-10,P.x-w/2)):Math.random()*(W-w-20)+10;
+  const x=Math.random()<0.4?Math.max(10,Math.min(W-w-10,P.x-w/2)):Math.random()*(W-w-20)+10;
   obstacles.push({
     x, y:-h-10, w, h, type:t, speed:getObstacleSpeed()*(0.85+Math.random()*0.4),
     vx:0, rot:Math.random()*Math.PI*2, rotSpeed:(Math.random()-0.5)*0.05, phase:Math.random()*Math.PI*2
