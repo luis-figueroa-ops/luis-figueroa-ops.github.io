@@ -269,6 +269,15 @@ function getWaveConfig(w) {
   return { bugsNeeded, spawnInterval, speedMult, betweenWaveDelay, isBossWave };
 }
 
+// Slower early waves spawn bugs in small varied bursts to keep them challenging;
+// once speed ramps up (wave 5+) that alone carries the difficulty, so spawns go back to normal.
+function getSpawnBatchSize(w) {
+  if (w === 2) return 2;
+  if (w === 3) return 3;
+  if (w === 4) return 2;
+  return 1;
+}
+
 function getTapRadius(bug) {
   if (W >= 500) return 42;
   if (!bug) return 54;
@@ -514,7 +523,20 @@ function spawnBug() {
     pool = ['mosquito','mosquito','cockroach','beetle','hornet','hornet','spider','spider','spider'];
   }
 
-  createBug(pool[Math.floor(Math.random() * pool.length)]);
+  const batchSize = Math.min(getSpawnBatchSize(wave), bugsNeeded - bugsSpawned);
+  // Bursts mix in a couple of faster bug types on top of the wave's normal pool for variety
+  const burstPool = batchSize > 1 ? [...pool, 'bee', 'mosquito'] : pool;
+
+  const usedTypes = new Set();
+  for (let i = 0; i < batchSize; i++) {
+    let type, attempts = 0;
+    do {
+      type = burstPool[Math.floor(Math.random() * burstPool.length)];
+      attempts++;
+    } while (usedTypes.has(type) && attempts < 10);
+    usedTypes.add(type);
+    createBug(type);
+  }
 }
 
 function createBug(type) {
