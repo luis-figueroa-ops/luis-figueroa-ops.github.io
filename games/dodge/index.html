@@ -190,7 +190,7 @@
         <div id="lb-rows"></div>
       </div>
       <button id="start-btn">PLAY</button>
-      <div id="tip">MOUSE, ARROW KEYS, or DRAG to move</div>
+      <div id="tip">MOUSE, ARROW KEYS, or DRAG to move &mdash; TAP/CLICK to shoot</div>
       <div id="tip2">&#128737; SHIELD - blocks one hit &nbsp;|&nbsp; &#9201; SLOW-MO - halves speed</div>
     </div>
     <div id="win-overlay">
@@ -271,6 +271,8 @@ const SFX = {
   boss:    () => { playTone(80,'sawtooth',0.8,0.35,60); playTone(60,'square',0.5,0.2,50); },
   bossdie: () => { playTone(500,'sawtooth',0.05,0.3); playTone(400,'sawtooth',0.05,0.3); playTone(300,'sawtooth',0.05,0.3); playTone(200,'sawtooth',0.4,0.3,50); },
   dodge:   () => { if (Math.random()>0.94) playTone(880,'sine',0.04,0.05,1200); },
+  shoot:   () => playTone(1100,'square',0.05,0.1,1700),
+  destroy: () => { playTone(700,'sine',0.08,0.16,320); playNoise(0.1,0.07,'bandpass',600,2200); },
   whoosh:  () => playNoise(0.18,0.08,'bandpass',3000,400),
   thruster:() => playNoise(0.1,0.05,'lowpass',280,120),
   victory: () => { [0,0.12,0.24,0.38].forEach((t,i)=>{ const f=[523,659,784,1047]; setTimeout(()=>playTone(f[i],'sine',0.35,0.18),t*1000); }); setTimeout(()=>playNoise(0.6,0.08,'bandpass',800,4000),480); },
@@ -350,6 +352,7 @@ pauseBtn.addEventListener('click', togglePause);
 
 let shieldActive = false, shieldTimer = 0, slowActive = false, slowTimer = 0;
 let powerups = [], obstacles = [], earnedShieldOrb = null;
+let bullets = [], lastShotFrame = -999;
 let baseSpeed = 1.6, spawnRate = 52;
 let bossActive = false, boss = null, bossHP = 0, bossMaxHP = 0, bossWaveLevel = 0;
 let particles = [];
@@ -384,6 +387,14 @@ function showLevelFlash(text, color) {
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
 
+function fireBullet() {
+  if (state!=='playing' || paused) return;
+  if (frame - lastShotFrame < 10) return;
+  lastShotFrame = frame;
+  bullets.push({ x:P.x, y:P.y-P.h/2-4, r:4, speed:9 });
+  SFX.shoot();
+}
+
 // Input
 canvas.addEventListener('mousemove', e => {
   if (isMobile) return;
@@ -391,6 +402,7 @@ canvas.addEventListener('mousemove', e => {
   if (Math.abs(p.x-mx)>1||Math.abs(p.y-my)>1) { mx=p.x; my=p.y; mouseMoved=true; }
 });
 canvas.addEventListener('mouseleave', () => { mouseMoved = false; });
+canvas.addEventListener('click', () => { if (!isMobile) fireBullet(); });
 document.addEventListener('keydown', e => {
   if (e.key===' ') { e.preventDefault(); togglePause(); return; }
   keys[e.key]=true; if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault();
@@ -402,6 +414,7 @@ if (isMobile) {
     if (state!=='playing') return;
     const pos=screenToGame(e.touches[0].clientX,e.touches[0].clientY);
     touchTargetX=pos.x; touchTargetY=pos.y; touchActive=true; mouseMoved=false;
+    fireBullet();
   }, {passive:false});
   canvas.addEventListener('touchmove', e => {
     e.preventDefault(); if(state!=='playing'||!touchActive) return;
@@ -417,7 +430,7 @@ document.getElementById('win-btn').addEventListener('click', startGame);
 
 function startGame() {
   score=0; lives=3; frame=0; lastLevel=1;
-  obstacles=[]; particles=[]; powerups=[]; earnedShieldOrb=null;
+  obstacles=[]; particles=[]; powerups=[]; earnedShieldOrb=null; bullets=[]; lastShotFrame=-999;
   shieldActive=false; shieldTimer=0; slowActive=false; slowTimer=0;
   bossActive=false; boss=null; bossWaveLevel=0;
   P.x=W/2; P.y=H-80; mx=W/2; my=H-80; mouseMoved=false;
@@ -666,6 +679,21 @@ function updateBoss() {
     if(state==='playing'){const dx=p.x-P.x,dy=p.y-P.y;if(Math.sqrt(dx*dx+dy*dy)<p.r+8){handlePlayerHit();return false;}}
     return p.y<H+20;
   });
+  if(state==='playing'){
+    for(let i=bullets.length-1;i>=0;i--){
+      const b=bullets[i];
+      if(checkAABB(b.x-b.r,b.y-b.r,b.r*2,b.r*2,boss.x,boss.y,boss.w,boss.h)){
+        bullets.splice(i,1); bossHP--; spawnParticles(b.x,b.y,'#ff2d55',10); SFX.hit();
+        if(bossHP<=0){
+          SFX.bossdie(); spawnParticles(boss.x+boss.w/2,boss.y+boss.h/2,'#ff2d55',40);
+          score+=200; updateHUD(); showLevelFlash('BOSS DEFEATED!','#00ffe7');
+          document.getElementById('boss-bar-wrap').classList.remove('visible');
+          document.getElementById('boss-label').classList.remove('visible');
+          bossActive=false; boss=null; return;
+        }
+      }
+    }
+  }
   document.getElementById('boss-bar').style.width=(bossHP/bossMaxHP*100)+'%';
   if(state==='playing'&&P.x+P.w/2>boss.x&&P.x-P.w/2<boss.x+boss.w&&P.y+P.h/2>boss.y&&P.y-P.h/2<boss.y+boss.h) handlePlayerHit();
 }
@@ -753,11 +781,30 @@ function loop(ts) {
     }
     obs.y+=obs.speed*sm;
     obs.rot=(obs.rot||0)+(obs.rotSpeed||0)*sm;
+    if(state==='playing'){
+      for(let i=bullets.length-1;i>=0;i--){
+        const b=bullets[i];
+        if(checkAABB(b.x-b.r,b.y-b.r,b.r*2,b.r*2,obs.x,obs.y,obs.w,obs.h)){
+          bullets.splice(i,1); score+=12; updateHUD();
+          spawnParticles(obs.x+obs.w/2,obs.y+obs.h/2,'#7cffea',14); SFX.destroy();
+          return false;
+        }
+      }
+    }
     drawObstacle(obs);
     const pw=P.w*0.7, ph=P.h*0.7;
     if(state==='playing'&&checkAABB(P.x-pw/2,P.y-ph/2,pw,ph,obs.x,obs.y,obs.w,obs.h)){handlePlayerHit();return false;}
     if(state==='playing'&&obs.y>P.y&&obs.y-obs.speed*sm<=P.y){if(Math.abs((obs.x+obs.w/2)-P.x)<60) SFX.whoosh();}
     return obs.y<H+20;
+  });
+
+  bullets=bullets.filter(b=>{
+    b.y-=b.speed;
+    ctx.save();
+    ctx.shadowColor='#7cffea'; ctx.shadowBlur=10; ctx.fillStyle='rgba(160,255,240,0.95)';
+    ctx.beginPath(); ctx.ellipse(b.x,b.y,b.r*0.6,b.r*1.6,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    return b.y>-20;
   });
   if(bossActive&&boss) drawBoss();
 
