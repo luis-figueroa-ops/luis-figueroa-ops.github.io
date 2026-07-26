@@ -278,7 +278,7 @@ function getTapRadius(bug) {
 }
 
 const BUG_DEFS = {
-  fly:       { emoji: '\u{1FAB0}', hp: 1, speed: 90,  score: 10,  size: 24, sineAmp: 0,  sineFreq: 0   },
+  fly:       { emoji: '\u{1FAB0}', hp: 1, speed: 90,  score: 10,  size: 24, sineAmp: 16, sineFreq: 2.6 },
   bee:       { emoji: '\u{1F41D}', hp: 2, speed: 115, score: 35,  size: 22, sineAmp: 22, sineFreq: 2.8 },
   mosquito:  { emoji: '\u{1F99F}', hp: 1, speed: 130, score: 25,  size: 22, sineAmp: 28, sineFreq: 2.4 },
   beetle:    { emoji: '\u{1FAB2}', hp: 3, speed: 70,  score: 50,  size: 28, sineAmp: 18, sineFreq: 1.2 },
@@ -530,7 +530,7 @@ function createBug(type) {
     speed: def.speed * currentSpeedMult,
     emoji: def.emoji, size: def.size, score: def.score,
     sineAmp: def.sineAmp, sineFreq: def.sineFreq,
-    erraticAmp: wave >= 8 ? (12 + Math.random() * 18) * erraticScale : 0,
+    erraticAmp: (10 + Math.random() * 16) * erraticScale,
     erraticFreq: 3 + Math.random() * 2,
     t: Math.random() * Math.PI * 2, flashTimer: 0,
   });
