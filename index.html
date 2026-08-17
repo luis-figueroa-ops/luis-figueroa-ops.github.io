@@ -185,6 +185,25 @@ h1 span { color: var(--gold); }
   transform: rotate(45deg);
   box-shadow: 0 3px 10px rgba(0,0,0,0.35);
   z-index: 5;
+}
+
+.card-inprogress-badge {
+  position: absolute;
+  top: 22px;
+  right: -38px;
+  width: 150px;
+  padding: 6px 0;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: var(--navy-deep);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(45deg);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  z-index: 5;
   animation: construction-pulse 2s ease-in-out infinite;
 }
 
@@ -225,6 +244,16 @@ h1 span { color: var(--gold); }
 .ai-notice-closing { font-size: 16px; color: var(--white); opacity: 0.7; line-height: 1.7; font-style: italic; border-left: 2px solid rgba(184,150,62,0.3); padding-left: 14px; margin-top: 4px; }
 
 .cards-divider { grid-column: 1 / -1; height: 5px; background: linear-gradient(to right, var(--gold), var(--gold-light), var(--gold)); border-radius: 2px; margin: 4px 0; }
+
+.section-divider {
+  height: 5px;
+  background: linear-gradient(to right, var(--gold), var(--gold-light), var(--gold));
+  border-radius: 2px;
+  margin: 0 64px;
+}
+@media (max-width: 700px) {
+  .section-divider { margin: 0 28px; }
+}
 
 @media (max-width: 700px) {
   .api-explainer { flex-direction: column; gap: 20px; padding: 28px 22px 28px 26px; }
@@ -454,6 +483,8 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
   </div>
 </section>
 
+<div class="section-divider"></div>
+
 <section class="section">
   <div class="section-header">
     <span class="section-label">Professional Development</span>
@@ -484,6 +515,19 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
   </div>
   <div class="card-footer">
     <span class="card-cta">View Program</span>
+    <span class="card-type">Coursera / Google</span>
+  </div>
+</a>
+
+<a class="card" id="google-data-analytics" href="https://luis-figueroa-ops.github.io/credentials/google-data-analytics/">
+  <div class="card-inprogress-badge">In Progress</div>
+  <div class="card-tag">Career Courses</div>
+  <div class="card-title">Google Data Analytics Professional Certificate</div>
+  <div class="card-desc">
+    Currently working through Google's 9-course data analytics certificate — covering spreadsheets, SQL, Python, and Tableau. Course 1 complete; documenting the journey as I go.
+  </div>
+  <div class="card-footer">
+    <span class="card-cta">View Progress</span>
     <span class="card-type">Coursera / Google</span>
   </div>
 </a>
