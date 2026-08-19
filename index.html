@@ -144,6 +144,18 @@ h1 span { color: var(--gold); }
 .card-cta::after { content: '→'; transition: transform 0.2s; }
 .card:hover .card-cta::after { transform: translateX(4px); }
 .card-type { font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.card-credit-badge {
+  display: inline-block;
+  width: fit-content;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--gold-light);
+  border: 1px solid rgba(184,150,62,0.45);
+  padding: 3px 9px;
+  text-transform: uppercase;
+  margin-top: -4px;
+}
 
 .card-construction-badge {
   position: absolute;
@@ -498,6 +510,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 <a class="card" id="google-ai" href="https://luis-figueroa-ops.github.io/credentials/google-ai/">
   <div class="card-completed-badge">Completed</div>
   <div class="card-tag">Career Courses</div>
+  <div class="card-credit-badge">ACE&reg;-Recommended for College Credit</div>
   <div class="card-title">Google AI Professional Certificate</div>
   <div class="card-desc">
     7-course certificate from Google covering AI fluency across brainstorming, research, writing, content creation, data analysis, and app building. Built a portfolio of 20+ AI-assisted artifacts and vibe-coded a custom app. Completed March 2026.
@@ -511,6 +524,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 <a class="card" id="google-pm" href="https://luis-figueroa-ops.github.io/credentials/google-pm/">
   <div class="card-completed-badge">Completed</div>
   <div class="card-tag">Career Courses</div>
+  <div class="card-credit-badge">ACE&reg;-Recommended for College Credit</div>
   <div class="card-title">Google Project Management Professional Certificate</div>
   <div class="card-desc">
     7-course certificate from Google covering Agile, budgeting, risk, and stakeholder communication. Documented the journey on LinkedIn along the way (OKRs, Gantt charts, and more). Completed August 2026.
@@ -524,6 +538,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 <a class="card" id="google-data-analytics" href="https://luis-figueroa-ops.github.io/credentials/google-data-analytics/">
   <div class="card-inprogress-badge">In Progress</div>
   <div class="card-tag">Career Courses</div>
+  <div class="card-credit-badge">ACE&reg;-Recommended for College Credit</div>
   <div class="card-title">Google Data Analytics Professional Certificate</div>
   <div class="card-desc">
     Currently working through Google's 9-course data analytics certificate — covering spreadsheets, SQL, Python, and Tableau. Course 1 complete; documenting the journey as I go.
