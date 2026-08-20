@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Automations — Luis Figueroa</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e0e0e;
+  --bg2: #161616;
+  --bg3: #1e1e1e;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-border: rgba(201,168,76,0.25);
+  --white: #F0EDE6;
+  --muted: #aaaaaa;
+}
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+.topbar-back {
+  position: fixed; left: 14px; top: 14px; z-index: 200;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.topbar-back:hover { color: var(--gold); }
+
+.hero {
+  padding: 72px 48px 20px;
+  max-width: 900px;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(38px, 5vw, 58px);
+  letter-spacing: 2px;
+  line-height: 1.02;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  font-size: 18px;
+  color: var(--white);
+  opacity: 0.85;
+  line-height: 1.7;
+  max-width: 640px;
+}
+
+.main {
+  padding: 0 48px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.intro-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px 40px;
+  margin: 32px 0 40px;
+  position: relative;
+}
+.intro-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--gold);
+}
+.intro-panel p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.92;
+}
+
+.automation-panel {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  padding: 36px 40px;
+  margin-bottom: 32px;
+}
+.automation-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+.automation-panel h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 3.4vw, 38px);
+  letter-spacing: 1.5px;
+  color: var(--white);
+  margin-bottom: 22px;
+}
+.automation-image {
+  width: 100%;
+  border: 1px solid var(--gold-border);
+  background: var(--bg3);
+  margin-bottom: 24px;
+  display: block;
+}
+.automation-panel p {
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+.automation-panel p:last-child { margin-bottom: 0; }
+
+.stack-note {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gold-border);
+}
+.stack-note span { color: var(--gold); }
+
+.site-footer {
+  max-width: 1000px;
+  margin: 40px auto 0;
+  padding: 16px 48px;
+  border-top: 1px solid var(--gold-border);
+  text-align: center;
+}
+.site-footer-built {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.site-footer-built a {
+  color: var(--gold);
+  text-decoration: none;
+}
+.site-footer-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.site-footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+@media (max-width: 800px) {
+  .hero, .main, .site-footer { padding-left: 20px; padding-right: 20px; }
+  .hero { padding-top: 56px; }
+  .intro-panel, .automation-panel { padding: 24px 22px; }
+  .intro-panel p, .automation-panel p { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<a class="topbar-back" href="https://luis-figueroa-ops.github.io/#ai-automations">&#8592; Back to Tools</a>
+
+<div class="hero">
+  <div class="hero-eyebrow">Operations, Augmented</div>
+  <h1>AI <span>Automations</span></h1>
+  <p class="hero-sub">Three personal workflow builds running on Google Apps Script and the Gemini API, free tier only.</p>
+</div>
+
+<div class="main">
+
+  <div class="intro-panel">
+    <p>
+      These are personal AI-automation builds, not client work, not a product, just workflows I got tired of doing by hand and decided to automate. All three run on Google Apps Script plus the Gemini API's free tier, so the total cost to build and run them is $0. It's the same idea behind everything else on this site: point AI at a real, recurring task and let it carry the repetitive part, while I stay in the loop on anything that actually matters.
+    </p>
+  </div>
+
+  <div class="automation-panel">
+    <span class="automation-label">Automation 01</span>
+    <h2>Receipt-to-Spreadsheet Pipeline</h2>
+    <img class="automation-image" src="receipt-pipeline-workflow.jpg" alt="Diagram of the receipt to spreadsheet automation workflow">
+    <p>
+      Whenever a receipt lands in my Gmail, Gemini reads the email and pulls out the vendor, date, amount, and category, then logs it as a new row in a Google Sheet automatically. No forwarding receipts to myself, no typing numbers into a spreadsheet after the fact. It also sends me a weekly spending summary email, so I get a running read on where the money's actually going without ever opening the sheet myself.
+    </p>
+  </div>
+
+  <div class="automation-panel">
+    <span class="automation-label">Automation 02</span>
+    <h2>Scheduled Research Digests</h2>
+    <img class="automation-image" src="research-digest-workflow.png" alt="Diagram of the scheduled research digest automation workflow">
+    <p>
+      Two separate digests run every morning, one for AI and Tech, one for Sales Ops and GTM. Each pulls from a set of RSS feeds, and Gemini goes through what came in overnight, picks out the stories that are genuinely significant, and cuts anything that's a duplicate or a rehash of something I already saw. Then it emails me a clean summary, so I start the day with the signal instead of scrolling through a dozen feeds myself.
+    </p>
+  </div>
+
+  <div class="automation-panel">
+    <span class="automation-label">Automation 03</span>
+    <h2>Inbox Triage Assistant</h2>
+    <img class="automation-image" src="inbox-triage-workflow.png" alt="Diagram of the inbox triage assistant automation workflow">
+    <p>
+      Gemini reads new unread mail in my Gmail and labels each one, Needs Reply, Urgent, Action Item, FYI, or Newsletter. For anything urgent, it drafts a reply, but it never sends anything on its own. I review every draft before it goes out. It's a triage layer, not an autopilot, it just means I'm not the one deciding what's worth my attention first.
+    </p>
+    <div class="stack-note">Stack: <span>Google Apps Script + Gemini API (free tier)</span> &nbsp;&middot;&nbsp; Cost to build: <span>$0</span></div>
+  </div>
+
+</div>
+
+<div class="site-footer">
+  <div class="site-footer-built">
+    Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
+  </div>
+  <div class="site-footer-tagline">Augmenting Human Potential, One Workflow at a Time</div>
+  <div class="site-footer-copy">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+</div>
+
+</body>
+</html>
