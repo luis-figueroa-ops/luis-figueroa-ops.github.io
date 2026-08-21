@@ -137,7 +137,13 @@ h1 span { color: var(--gold); }
 .card:hover::before { transform: scaleY(1); }
 .card:hover::after { opacity: 1; }
 
-.card-tag { font-family: 'Share Tech Mono', monospace; font-size: 14px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; }
+.card-tag { font-family: 'Share Tech Mono', monospace; font-size: 14px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.card-tag-icon { display: inline-block; font-size: 15px; line-height: 1; animation: bot-pulse-rotate 3s ease-in-out infinite; transform-origin: center; }
+
+@keyframes bot-pulse-rotate {
+  0%, 100% { opacity: 0.65; transform: scale(1) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+}
 .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; line-height: 1; color: var(--white); transition: color 0.2s; }
 .card-title span { color: var(--gold); }
 .card:hover .card-title { color: var(--gold-light); }
@@ -486,7 +492,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     <!-- ── AI AUTOMATIONS ── -->
 
     <a class="card" id="ai-automations" href="https://luis-figueroa-ops.github.io/ai-automations/">
-      <div class="card-tag">AI Automations</div>
+      <div class="card-tag"><span class="card-tag-icon" aria-hidden="true">🤖</span>AI Workflows</div>
       <div class="card-title">AI Automations</div>
       <div class="card-desc">
         Three personal workflows I got tired of doing by hand, a receipt-to-spreadsheet pipeline, scheduled research digests, and an inbox triage assistant. All built on Google Apps Script and the Gemini API's free tier, so the cost to run them is $0.
