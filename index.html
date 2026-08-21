@@ -144,6 +144,14 @@ h1 span { color: var(--gold); }
   0%, 100% { opacity: 0.65; transform: scale(1) rotate(0deg); }
   50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
 }
+.card-tag-icon.hammer-icon { animation: hammer-strike 1.3s ease-in-out infinite; }
+
+@keyframes hammer-strike {
+  0%, 100% { transform: rotate(0deg); }
+  12% { transform: rotate(-28deg); }
+  15% { transform: rotate(-28deg); }
+  27% { transform: rotate(0deg); }
+}
 .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; line-height: 1; color: var(--white); transition: color 0.2s; }
 .card-title span { color: var(--gold); }
 .card:hover .card-title { color: var(--gold-light); }
@@ -506,7 +514,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     <!-- ── STORIES ── -->
 
     <a class="card" id="build-use-break-fix" href="https://luis-figueroa-ops.github.io/build-use-break-fix/">
-      <div class="card-tag">Behind The Build</div>
+      <div class="card-tag"><span class="card-tag-icon hammer-icon" aria-hidden="true">🔨</span>Behind The Build</div>
       <div class="card-title">Build. Use. Break. Fix.</div>
       <div class="card-desc">
         What changes when one person owns the whole loop — building a tool, testing it the way a real user would, tracing what broke, and fixing the actual cause instead of the symptom. A short video walkthrough, with the full story behind it.
