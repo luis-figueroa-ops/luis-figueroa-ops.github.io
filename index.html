@@ -209,21 +209,48 @@ h1 span { color: var(--gold); }
 
 .card-completed-badge {
   position: absolute;
-  top: 22px;
-  right: -38px;
-  width: 150px;
-  padding: 6px 0;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold));
-  color: var(--navy-deep);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-align: center;
-  text-transform: uppercase;
-  transform: rotate(45deg);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  top: 16px;
+  right: 16px;
+  width: 74px;
+  height: 74px;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));
+}
+.card-completed-badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  clip-path: polygon(
+    100% 50%, 89.6% 60.6%, 93.3% 75%, 79% 79%, 75% 93.3%, 60.6% 89.6%,
+    50% 100%, 39.4% 89.6%, 25% 93.3%, 21% 79%, 6.7% 75%, 10.4% 60.6%,
+    0% 50%, 10.4% 39.4%, 6.7% 25%, 21% 21%, 25% 6.7%, 39.4% 10.4%,
+    50% 0%, 60.6% 10.4%, 75% 6.7%, 79% 21%, 93.3% 25%, 89.6% 39.4%
+  );
+}
+.card-completed-badge span {
+  position: relative;
+  z-index: 1;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--navy-deep);
+  border: 1.5px solid rgba(17,29,51,0.55);
+  box-shadow: inset 0 0 0 1px rgba(212,174,96,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.15;
+  color: var(--gold-light);
+  text-transform: uppercase;
 }
 
 .card-inprogress-badge {
@@ -549,7 +576,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
   <div class="cards">
 
 <a class="card" id="google-ai" href="https://luis-figueroa-ops.github.io/credentials/google-ai/">
-  <div class="card-completed-badge">Completed</div>
+  <div class="card-completed-badge"><span>Completed</span></div>
   <div class="card-tag">Career Courses</div>
   <div class="card-credit-badge">ACE&reg;-Recommended for College Credit</div>
   <div class="card-title">Google AI Professional Certificate</div>
@@ -563,7 +590,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 </a>
 
 <a class="card" id="google-pm" href="https://luis-figueroa-ops.github.io/credentials/google-pm/">
-  <div class="card-completed-badge">Completed</div>
+  <div class="card-completed-badge"><span>Completed</span></div>
   <div class="card-tag">Career Courses</div>
   <div class="card-credit-badge">ACE&reg;-Recommended for College Credit</div>
   <div class="card-title">Google Project Management Professional Certificate</div>
@@ -605,7 +632,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 </a>
 
 <a class="card" id="reskilling-coursework" href="https://luis-figueroa-ops.github.io/credentials/reskilling-coursework/">
-  <div class="card-completed-badge">Completed</div>
+  <div class="card-completed-badge"><span>Completed</span></div>
   <div class="card-tag">Reskilling Program</div>
   <div class="card-title">Reskilling Coursework</div>
   <div class="card-desc">
