@@ -162,6 +162,14 @@ h1 span { color: var(--gold); }
   15% { transform: rotate(-28deg); }
   27% { transform: rotate(0deg); }
 }
+.card-tag-icon.magnify-icon { animation: magnify-scan 2.2s ease-in-out infinite; }
+
+@keyframes magnify-scan {
+  0%, 100% { transform: translate(-2px, 1px) rotate(-12deg) scale(1); opacity: 0.7; }
+  25% { transform: translate(2px, -1px) rotate(10deg) scale(1.15); opacity: 1; }
+  50% { transform: translate(2px, 2px) rotate(12deg) scale(1); opacity: 0.85; }
+  75% { transform: translate(-2px, -1px) rotate(-10deg) scale(1.15); opacity: 1; }
+}
 .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; line-height: 1; color: var(--white); transition: color 0.2s; }
 .card-title span { color: var(--gold); }
 .card:hover .card-title { color: var(--gold-light); }
@@ -492,7 +500,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 
     <!-- JD Analyzer -->
     <a class="card" id="jd-analyzer" href="https://luis-figueroa-ops.github.io/jd-analyzer/">
-      <div class="card-tag">Career Tools</div>
+      <div class="card-tag"><span class="card-tag-icon magnify-icon" aria-hidden="true">🔍</span>Career Tools</div>
       <div class="card-title">JD Analyzer</div>
       <div class="card-desc">
         Is this job worth applying to? Paste any job description and get an honest ops read — what the role actually is, who it's really for, green flags, red flags, and the questions to ask before you commit. Then go deeper on the competency themes to understand what they're really evaluating.
