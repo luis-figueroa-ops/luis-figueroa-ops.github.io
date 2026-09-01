@@ -218,19 +218,30 @@ h1 span { color: var(--gold); }
   65%, 100% { transform: perspective(200px) rotateY(360deg); }
 }
 
-/* Custom SVG — DODGE */
+/* Custom SVG — DODGE (green alien) */
 .card-tag-icon.dodge-icon { animation: none; }
-.card-tag-icon.dodge-icon svg { display: block; width: 15px; height: 15px; }
-.card-tag-icon.dodge-icon .dodge-bar { fill: var(--muted); }
-.card-tag-icon.dodge-icon .dodge-dot {
-  fill: var(--gold);
-  transform-origin: center;
-  animation: dodge-bob 1.5s ease-in-out infinite;
+.card-tag-icon.dodge-icon svg { display: block; width: 15px; height: 15px; overflow: visible; }
+.card-tag-icon.dodge-icon .alien-face { fill: #35c46a; }
+.card-tag-icon.dodge-icon .alien-eye { fill: #0d0d18; }
+.card-tag-icon.dodge-icon .alien-mouth { fill: none; stroke: #0d0d18; stroke-width: 0.7; stroke-linecap: round; }
+.card-tag-icon.dodge-icon .alien-head {
+  transform-origin: 8px 12px;
+  animation: alien-sway 2.2s ease-in-out infinite;
+}
+.card-tag-icon.dodge-icon .alien-tongue {
+  fill: #ff5c8a;
+  transform-origin: 8px 10.3px;
+  animation: alien-tongue 2.2s ease-in-out infinite;
 }
 
-@keyframes dodge-bob {
-  0%, 100% { transform: translateX(-2.5px); }
-  50% { transform: translateX(2.5px); }
+@keyframes alien-sway {
+  0%, 100% { transform: rotate(-11deg); }
+  50% { transform: rotate(11deg); }
+}
+
+@keyframes alien-tongue {
+  0%, 100% { transform: scaleY(0.08); }
+  38%, 62% { transform: scaleY(1); }
 }
 
 /* Lightning flicker — ZAP! */
@@ -607,7 +618,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     <!-- ── SIDE BUILDS ── -->
 
     <a class="card" id="dodge" href="./games/dodge/index.html">
-      <div class="card-tag"><span class="card-tag-icon dodge-icon" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect class="dodge-bar" x="1.5" y="2.5" width="1.8" height="11" rx="0.6"/><rect class="dodge-bar" x="12.7" y="2.5" width="1.8" height="11" rx="0.6"/><rect class="dodge-dot" x="6" y="6" width="4" height="4" rx="0.8"/></svg></span>Games</div>
+      <div class="card-tag"><span class="card-tag-icon dodge-icon" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g class="alien-head"><ellipse class="alien-face" cx="8" cy="7" rx="4.3" ry="5"/><ellipse class="alien-eye" cx="6.15" cy="6.4" rx="1.15" ry="1.75" transform="rotate(22 6.15 6.4)"/><ellipse class="alien-eye" cx="9.85" cy="6.4" rx="1.15" ry="1.75" transform="rotate(-22 9.85 6.4)"/><path class="alien-mouth" d="M6.7 10.1 Q8 11 9.3 10.1"/><rect class="alien-tongue" x="7.3" y="10.3" width="1.4" height="2.7" rx="0.7"/></g></svg></span>Games</div>
       <div class="card-title">DODGE</div>
       <div class="card-desc">
         A fast-paced arcade stress-break built entirely in one session with Claude.
