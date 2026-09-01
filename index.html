@@ -170,6 +170,83 @@ h1 span { color: var(--gold); }
   50% { transform: translate(2px, 2px) rotate(12deg) scale(1); opacity: 0.85; }
   75% { transform: translate(-2px, -1px) rotate(-10deg) scale(1.15); opacity: 1; }
 }
+
+/* Clock — 15-Minute Course Blueprint */
+.card-tag-icon.clock-icon { animation: clock-tick 3.6s ease-in-out infinite; }
+
+@keyframes clock-tick {
+  0%, 100% { transform: rotate(-9deg); }
+  50% { transform: rotate(9deg); }
+}
+
+/* Speech bubble + sparkle overlay — Prompt Coach */
+.card-tag-icon.prompt-icon { position: relative; animation: none; }
+.card-tag-icon.prompt-icon .prompt-sparkle {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0;
+  animation: sparkle-fade 2.6s ease-in-out infinite;
+}
+
+@keyframes sparkle-fade {
+  0%, 100% { opacity: 0; transform: scale(0.6); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ID card — AI Role Revealer */
+.card-tag-icon.id-icon { animation: card-flip 4.5s ease-in-out infinite; }
+
+@keyframes card-flip {
+  0%, 35% { transform: perspective(200px) rotateY(0deg); }
+  65%, 100% { transform: perspective(200px) rotateY(360deg); }
+}
+
+/* Custom SVG — DODGE */
+.card-tag-icon.dodge-icon { animation: none; }
+.card-tag-icon.dodge-icon svg { display: block; width: 15px; height: 15px; }
+.card-tag-icon.dodge-icon .dodge-bar { fill: var(--muted); }
+.card-tag-icon.dodge-icon .dodge-dot {
+  fill: var(--gold);
+  transform-origin: center;
+  animation: dodge-bob 1.5s ease-in-out infinite;
+}
+
+@keyframes dodge-bob {
+  0%, 100% { transform: translateX(-2.5px); }
+  50% { transform: translateX(2.5px); }
+}
+
+/* Lightning flicker — ZAP! */
+.card-tag-icon.zap-icon { animation: zap-flicker 2.5s ease-in-out infinite; }
+
+@keyframes zap-flicker {
+  0%, 30%, 100% { opacity: 0.55; filter: brightness(1); }
+  8% { opacity: 1; filter: brightness(1.6); }
+  14% { opacity: 0.6; filter: brightness(1); }
+  20% { opacity: 1; filter: brightness(1.4); }
+  26% { opacity: 0.7; filter: brightness(1); }
+}
+
+/* Glow pulse — WordSense */
+.card-tag-icon.book-icon { animation: book-glow 3.6s ease-in-out infinite; }
+
+@keyframes book-glow {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(184,150,62,0)); }
+  50% { filter: drop-shadow(0 0 4px rgba(184,150,62,0.85)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-tag-icon,
+  .card-tag-icon *,
+  .card-tag-icon.dodge-icon .dodge-dot {
+    animation: none !important;
+  }
+  .card-tag-icon.prompt-icon .prompt-sparkle { opacity: 0.85; }
+}
+
 .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; line-height: 1; color: var(--white); transition: color 0.2s; }
 .card-title span { color: var(--gold); }
 .card:hover .card-title { color: var(--gold-light); }
@@ -430,7 +507,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     <!-- ── LEARNING TOOLS ── -->
 
     <a class="card" id="course-blueprint" href="./learning-tools/course-blueprint/">
-      <div class="card-tag">Learning Tools</div>
+      <div class="card-tag"><span class="card-tag-icon clock-icon" aria-hidden="true">🕐</span>Learning Tools</div>
       <div class="card-title">15-Minute Course Blueprint</div>
       <div class="card-desc">
         Fill in four fields. Your AI builds your full course roadmap, then teaches you one 15-minute session at a time - any topic, any AI, at your own pace.
@@ -442,7 +519,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     </a>
 
     <a class="card" id="prompt-coach" href="https://luis-figueroa-ops.github.io/prompt-coach/">
-      <div class="card-tag">Learning Tools</div>
+      <div class="card-tag"><span class="card-tag-icon prompt-icon" aria-hidden="true">💬<span class="prompt-sparkle" aria-hidden="true">✨</span></span>Learning Tools</div>
       <div class="card-title">Prompt Coach</div>
       <div class="card-desc">
         Type a rough prompt and get a score, a diagnosis, and a coached version — grounded in real prompt engineering research.
@@ -456,7 +533,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 
     <!-- AI Role Revealer -->
     <a class="card" id="ai-role-revealer" href="https://luis-figueroa-ops.github.io/ai-role-revealer/">
-      <div class="card-tag">Interactive Tool</div>
+      <div class="card-tag"><span class="card-tag-icon id-icon" aria-hidden="true">🪪</span>Interactive Tool</div>
       <div class="card-title">AI Role Revealer</div>
       <div class="card-desc">
         Describe what you actually do — not your title — and get a specific read on what
@@ -516,7 +593,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     <!-- ── SIDE BUILDS ── -->
 
     <a class="card" id="dodge" href="./games/dodge/index.html">
-      <div class="card-tag">Games</div>
+      <div class="card-tag"><span class="card-tag-icon dodge-icon" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect class="dodge-bar" x="1.5" y="2.5" width="1.8" height="11" rx="0.6"/><rect class="dodge-bar" x="12.7" y="2.5" width="1.8" height="11" rx="0.6"/><rect class="dodge-dot" x="6" y="6" width="4" height="4" rx="0.8"/></svg></span>Games</div>
       <div class="card-title">DODGE</div>
       <div class="card-desc">
         A fast-paced arcade stress-break built entirely in one session with Claude.
@@ -529,7 +606,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     </a>
 
     <a class="card" id="zap" href="./games/zap/index.html">
-      <div class="card-tag">Games</div>
+      <div class="card-tag"><span class="card-tag-icon zap-icon" aria-hidden="true">⚡</span>Games</div>
       <div class="card-title">ZAP!</div>
       <div class="card-desc">
         A tap-and-shoot bug zapper built entirely in one session with Claude.
@@ -542,7 +619,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     </a>
 
     <a class="card" id="wordsense" href="./games/wordsense/index.html">
-      <div class="card-tag">Games</div>
+      <div class="card-tag"><span class="card-tag-icon book-icon" aria-hidden="true">📖</span>Games</div>
       <div class="card-title">WordSense</div>
       <div class="card-desc">
         Build vocabulary the way reading does — through context, not memorization. Each round drops you into a real passage with one word highlighted. Figure out what it means from the clues around it. Adaptive difficulty, four levels, and a word bank that tracks what you've earned.
