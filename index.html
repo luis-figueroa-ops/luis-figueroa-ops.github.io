@@ -83,7 +83,8 @@ header {
 h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px, 6vw, 80px); letter-spacing: 3px; line-height: 0.95; color: var(--white); }
 h1 span { color: var(--gold); }
 
-.tagline { margin-top: 14px; font-size: 19px; font-weight: 400; color: var(--white); letter-spacing: 1px; max-width: 600px; line-height: 1.6; opacity: 0.8; white-space: nowrap; }
+.tagline { margin-top: 14px; font-size: 17px; font-weight: 400; color: var(--gold-light); letter-spacing: 1px; max-width: 640px; line-height: 1.6; opacity: 0.9; }
+.proof-line { margin-top: 12px; font-size: 16px; font-weight: 400; color: var(--white); letter-spacing: 0.3px; max-width: 560px; line-height: 1.65; opacity: 0.72; }
 
 .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; padding-bottom: 6px; }
 
@@ -445,6 +446,34 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 .footer-links a:hover { opacity: 1; color: var(--gold); }
 .gold-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); margin-right: 8px; vertical-align: middle; }
 
+/* Beyond the Resume — card-tag icon bob */
+.card-tag-icon.br-icon { animation: br-bob 3s ease-in-out infinite; }
+@keyframes br-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(-2px); opacity: 1; }
+}
+
+/* Beyond the Resume — Card 1 inverted color treatment (primary card in the row) */
+.card.card-inverted {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  border-color: var(--gold-light);
+  color: var(--navy-deep);
+}
+.card.card-inverted .card-tag,
+.card.card-inverted .card-cta { color: var(--navy-deep); }
+.card.card-inverted .card-title { color: var(--navy-deep); }
+.card.card-inverted .card-desc { color: var(--navy-deep); opacity: 0.88; }
+.card.card-inverted .card-footer { border-top-color: rgba(17,29,51,0.22); }
+.card.card-inverted .card-type { color: rgba(17,29,51,0.65); }
+.card.card-inverted::before { background: var(--navy-deep); }
+.card.card-inverted::after { background: linear-gradient(135deg, rgba(17,29,51,0.12) 0%, transparent 60%); }
+.card.card-inverted:hover { border-color: var(--navy-deep); box-shadow: 0 12px 40px rgba(184,150,62,0.35); }
+.card.card-inverted:hover .card-title { color: var(--navy); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-tag-icon.br-icon { animation: none !important; opacity: 0.9; }
+}
+
 @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 700px) {
@@ -476,15 +505,14 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     <img class="header-logo" src="https://luis-figueroa-ops.github.io/images/Untitled%20design.png" alt="Luis Figueroa - Technology & Operations logo" />
     <div>
       <div class="eyebrow">Luis Figueroa</div>
-      <h1>Operations, <span>Augmented</span></h1>
-      <p class="tagline">Augmenting Human Potential, One Workflow at a Time</p>
+      <h1>Sales Operations &amp; <span>Enablement</span> Professional</h1>
+      <p class="tagline">Operations, Augmented &mdash; Augmenting Human Potential, One Workflow at a Time</p>
+      <p class="proof-line">16 years at Verizon Business (Nov 2009&ndash;Dec 2025), most recently building the operational infrastructure behind an 8,000-agent sales channel.</p>
     </div>
   </div>
   <div class="header-right">
     <nav class="header-links">
       <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>
-      <div class="divider"></div>
-      <a href="https://www.luis-portfolio.com" target="_blank">Portfolio</a>
     </nav>
     <div class="header-qr">
       <img src="https://luis-figueroa-ops.github.io/images/luis_portfolio_qr_v4.png" alt="QR code - scan to visit luis-figueroa-ops.github.io" />
@@ -516,10 +544,57 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
   <div class="why-built">
     <div class="why-label">Why I Built This</div>
     <p class="why-text">
-      Every tool here started as a personal pain point during my own career transition after a layoff. I built micro-learning courses to sharpen skills I kept seeing in job descriptions - change management and project coordination, SQL and Power BI alongside Excel I already knew, and Python basics to hold my own in conversations where some experience was expected. Separately, I used AI to help me document years of work I had never formally written down - feeding it the history of what I actually did so it could help me articulate the business process areas I operated in: process management and improvement, change management and adoption, channel and partner operations, and budget and financial operations support - and ultimately the commercial value those contributions created. Because it is almost impossible to pull years of experience out of your head on the fly in a way that lands with a hiring manager unless you have documented it as you went. From those sessions I produced real artifacts - presentations that walk through my work story and completed Power BI dashboards. If you want to see the outcomes and the work behind them, visit my <a href="https://www.luis-portfolio.com" target="_blank">Operations &amp; Technology portfolio</a>. <span class="why-highlight">I also earned the Google AI Professional Certificate along the way, and its AI for App Building course, vibe coding and AI-driven debugging, is exactly how these tools went from idea to something live.</span> These tools are the result of that same process: think-tanks designed to kick-start ideas and help you see angles you had not considered, not final answers. I share them on <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>, including my featured section, because problem-solving should not stop when your employment status does.
+      Every tool here started as a personal pain point during my own career transition after a layoff. I built micro-learning courses to sharpen skills I kept seeing in job descriptions - change management and project coordination, SQL and Power BI alongside Excel I already knew, and Python basics to hold my own in conversations where some experience was expected. Separately, I used AI to help me document years of work I had never formally written down - feeding it the history of what I actually did so it could help me articulate the business process areas I operated in: process management and improvement, change management and adoption, channel and partner operations, and budget and financial operations support - and ultimately the commercial value those contributions created. Because it is almost impossible to pull years of experience out of your head on the fly in a way that lands with a hiring manager unless you have documented it as you went. From those sessions I produced real artifacts - presentations that walk through my work story and completed Power BI dashboards. If you want to see the outcomes and the work behind them, see the <a href="#beyond-the-resume">Beyond the Resume</a> section below. <span class="why-highlight">I also earned the Google AI Professional Certificate along the way, and its AI for App Building course, vibe coding and AI-driven debugging, is exactly how these tools went from idea to something live.</span> These tools are the result of that same process: think-tanks designed to kick-start ideas and help you see angles you had not considered, not final answers. I share them on <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>, including my featured section, because problem-solving should not stop when your employment status does.
     </p>
   </div>
 </div>
+
+<section class="section" id="beyond-the-resume" style="border-bottom: 1px solid var(--border); padding-bottom: 48px;">
+  <div class="section-header">
+    <span class="section-label">Beyond the Resume</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="cards">
+
+    <a class="card card-inverted" id="i2b-channel-buildout" href="https://luis-figueroa-ops.github.io/i2b-channel-buildout/">
+      <div class="card-tag"><span class="card-tag-icon br-icon" aria-hidden="true">🏗️</span>Operations Impact</div>
+      <div class="card-title">I2B Channel Buildout</div>
+      <div class="card-desc">
+        Verizon Business's indirect retail channel ran on manual tick-mark accounting with no formal infrastructure. I built the systems, governance, and AI-enabled workflows that scaled it into a fully operational channel reaching 8,000+ external agents, then owned the day-to-day training, issue resolution, and budget decisions that kept it running.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Read the Full Story</span>
+        <span class="card-type">Verizon Business</span>
+      </div>
+    </a>
+
+    <a class="card" id="about-me" href="https://luis-figueroa-ops.github.io/about-me/">
+      <div class="card-tag"><span class="card-tag-icon br-icon" aria-hidden="true">🧭</span>How I Operate</div>
+      <div class="card-title">The Approach Behind the Work</div>
+      <div class="card-desc">
+        I connect the dots between strategy, systems, and execution, understanding how a process actually runs before I try to improve it. That means prioritizing solutions that are usable over ones that are just technically impressive, and continuously building my own analytical and AI skills so I can apply them in practical, real-world ways.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">Read More</span>
+        <span class="card-type">About Me</span>
+      </div>
+    </a>
+
+    <a class="card" id="operations-augmented" href="https://luis-figueroa-ops.github.io/operations-augmented/">
+      <div class="card-tag"><span class="card-tag-icon br-icon" aria-hidden="true">🎯</span>Thought Leadership</div>
+      <div class="card-title">Operations, Augmented</div>
+      <div class="card-desc">
+        I apply sales operations principles to real AI-era problems: process auditing, governance gaps, change management, and organizational readiness. A series of presentations breaks down how operations thinking translates directly into deploying AI safely and effectively.
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">See the Series</span>
+        <span class="card-type">Operations, Augmented</span>
+      </div>
+    </a>
+
+  </div>
+</section>
 
 <section class="section" style="border-bottom: 1px solid var(--border); padding-bottom: 48px;">
   <div class="section-header">
@@ -795,7 +870,6 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
   <span class="footer-brand"><span class="gold-dot"></span>Operations, Augmented — Luis Figueroa</span>
   <div class="footer-links">
     <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a>
-    <a href="https://www.luis-portfolio.com" target="_blank">Portfolio</a>
   </div>
   <p style="margin-top:12px;font-size:0.72rem;opacity:0.5;letter-spacing:0.04em;font-family:'Share Tech Mono',monospace;">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
 </footer>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operations, Augmented — Luis Figueroa</title>
+<meta name="description" content="A thought leadership series applying sales operations principles to AI-era problems: process auditing, governance gaps, change management, and organizational readiness. Six presentations." />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #1B2A4A;
+  --navy-deep: #111d33;
+  --navy-light: #243558;
+  --gold: #B8963E;
+  --gold-light: #d4ae60;
+  --teal: #43e8c8;
+  --white: #F4F1EC;
+  --muted: #8a9bb5;
+  --border: rgba(184,150,62,0.2);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy-deep);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 60px;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.4;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: -20%; left: -10%;
+  width: 55%; height: 140%;
+  background: linear-gradient(135deg, rgba(27,42,74,0.9) 0%, rgba(17,29,51,0) 70%);
+  pointer-events: none; z-index: 0;
+}
+
+.topbar-back {
+  position: relative; z-index: 20;
+  display: inline-block;
+  margin: 24px 0 0 64px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.topbar-back:hover { color: var(--gold); }
+
+.hero {
+  position: relative; z-index: 10;
+  padding: 32px 64px 40px;
+  border-bottom: 1px solid var(--border);
+  max-width: 900px;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 6vw, 66px);
+  letter-spacing: 2px;
+  line-height: 1.02;
+  color: var(--white);
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  margin-top: 16px;
+  font-size: 18px;
+  color: var(--white);
+  opacity: 0.82;
+  line-height: 1.7;
+  max-width: 660px;
+}
+
+.main {
+  position: relative; z-index: 10;
+  padding: 40px 64px 0;
+  max-width: 900px;
+}
+
+.deck {
+  display: flex;
+  gap: 28px;
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
+  align-items: flex-start;
+}
+.deck:first-child { border-top: none; }
+
+.deck-num {
+  flex-shrink: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--gold);
+  width: 34px;
+  text-align: right;
+  padding-top: 2px;
+}
+
+.deck-thumb {
+  flex-shrink: 0;
+  width: 190px;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--border);
+  background: rgba(27,42,74,0.5);
+  padding: 6px;
+  display: block;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.deck-thumb:hover { border-color: rgba(184,150,62,0.6); transform: translateY(-2px); }
+.deck-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+.deck-body { flex: 1; min-width: 0; }
+.deck-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 1px;
+  color: var(--white);
+  line-height: 1.12;
+  margin-bottom: 10px;
+}
+.deck-desc {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--white);
+  opacity: 0.8;
+  max-width: 560px;
+  margin-bottom: 14px;
+}
+.deck-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.deck-links a {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: var(--gold-light);
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(184,150,62,0.4);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.deck-links a:hover { color: var(--gold); border-color: var(--gold); }
+
+.more-note {
+  margin-top: 8px;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--border);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.site-footer {
+  position: relative; z-index: 10;
+  max-width: 900px;
+  margin: 48px auto 0;
+  padding: 24px 64px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.site-footer-built {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.site-footer-built a { color: var(--gold); text-decoration: none; }
+.site-footer-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.site-footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+@media (max-width: 760px) {
+  .topbar-back { margin-left: 24px; }
+  .hero, .main, .site-footer { padding-left: 24px; padding-right: 24px; }
+  .deck { flex-wrap: wrap; gap: 16px; }
+  .deck-num { width: auto; text-align: left; }
+  .deck-thumb { width: 100%; max-width: 260px; }
+}
+</style>
+</head>
+<body>
+
+<a class="topbar-back" href="https://luis-figueroa-ops.github.io/#operations-augmented">&#8592; Back to Home</a>
+
+<div class="hero">
+  <div class="hero-eyebrow">Beyond the Resume &middot; Thought Leadership</div>
+  <h1>Operations, <span>Augmented</span></h1>
+  <p class="hero-sub">
+    I apply sales operations principles to real AI-era problems: process auditing, governance gaps, change management, and organizational readiness. The presentations below break down how operations thinking translates directly into deploying AI safely and effectively.
+  </p>
+</div>
+
+<div class="main">
+
+  <div class="deck">
+    <div class="deck-num">01</div>
+    <a class="deck-thumb" href="/assets/thought-leadership/discovery-is-the-floor.pdf" target="_blank">
+      <img src="/assets/thought-leadership/discovery-is-the-floor-thumb.png" alt="Discovery Is the Floor, Not the Finish Line — presentation cover">
+    </a>
+    <div class="deck-body">
+      <div class="deck-title">Discovery Is the Floor, Not the Finish Line</div>
+      <div class="deck-desc">A four-month account of going from confused and overwhelmed with AI to shipping a self-configuring job search agent, a full analytics project, and a custom AI tool &mdash; proof that a first step matters more than a perfect plan.</div>
+      <div class="deck-links">
+        <a href="/assets/thought-leadership/discovery-is-the-floor.pdf" target="_blank">View Presentation (PDF)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="deck-num">02</div>
+    <a class="deck-thumb" href="/assets/thought-leadership/diagnose-before-you-automate.pdf" target="_blank">
+      <img src="/assets/thought-leadership/diagnose-before-you-automate-thumb.png" alt="Diagnose Before You Automate — presentation cover">
+    </a>
+    <div class="deck-body">
+      <div class="deck-title">Diagnose Before You Automate</div>
+      <div class="deck-desc">Most AI failures aren't technology problems, they're operations problems. Uses three verified 2025 case studies to show what happens when companies skip diagnosis before automating.</div>
+      <div class="deck-links">
+        <a href="/assets/thought-leadership/diagnose-before-you-automate.pdf" target="_blank">View Presentation (PDF)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="deck-num">03</div>
+    <a class="deck-thumb" href="/assets/thought-leadership/inheriting-broken-processes.pdf" target="_blank">
+      <img src="/assets/thought-leadership/inheriting-broken-processes-thumb.png" alt="Inheriting Broken Processes — presentation cover">
+    </a>
+    <div class="deck-body">
+      <div class="deck-title">Inheriting Broken Processes</div>
+      <div class="deck-desc">The most common, and riskiest, operational handoff: inheriting a process with no manual. Walks through auditing before optimizing, and using AI to turn raw audit notes into a structured process map the same day.</div>
+      <div class="deck-links">
+        <a href="/assets/thought-leadership/inheriting-broken-processes.pdf" target="_blank">View Presentation (PDF)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="deck-num">04</div>
+    <a class="deck-thumb" href="/assets/thought-leadership/ai-governance-risks-and-adoption.pdf" target="_blank">
+      <img src="/assets/thought-leadership/ai-governance-risks-and-adoption-thumb.png" alt="AI Governance, Risks, and Adoption — presentation cover">
+    </a>
+    <div class="deck-body">
+      <div class="deck-title">AI Governance, Risks, and Adoption</div>
+      <div class="deck-desc">Only 9% of enterprises describe their AI governance as mature. Covers what changes when AI ships inside an already-approved tool, and why legal, compliance, and access concerns have to come before scaling adoption.</div>
+      <div class="deck-links">
+        <a href="/assets/thought-leadership/ai-governance-risks-and-adoption.pdf" target="_blank">View Presentation (PDF)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="deck-num">05</div>
+    <a class="deck-thumb" href="/assets/thought-leadership/the-ops-advantage.pdf" target="_blank">
+      <img src="/assets/thought-leadership/the-ops-advantage-thumb.png" alt="The Ops Advantage — presentation cover">
+    </a>
+    <div class="deck-body">
+      <div class="deck-title">The Ops Advantage</div>
+      <div class="deck-desc">The difference was never who got the technology first, it was who was ready to absorb it. Makes the case for operations professionals as the most underestimated asset heading into the AI era.</div>
+      <div class="deck-links">
+        <a href="/assets/thought-leadership/the-ops-advantage.pdf" target="_blank">View Presentation (PDF)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="deck-num">06</div>
+    <a class="deck-thumb" href="/assets/thought-leadership/vsl-process-mapping.pdf" target="_blank">
+      <img src="/assets/thought-leadership/vsl-process-mapping-thumb.png" alt="VSL Process Mapping: L1, L2, L3 Documentation — presentation cover">
+    </a>
+    <div class="deck-body">
+      <div class="deck-title">VSL Process Mapping: L1 &middot; L2 &middot; L3 Documentation</div>
+      <div class="deck-desc">Most operational failures are people failures, not process failures. Documents a real cross-functional escalation process built across four organizations, with every handoff and every person accounted for.</div>
+      <div class="deck-links">
+        <a href="/assets/thought-leadership/vsl-process-mapping.pdf" target="_blank">View Presentation (PDF)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="deck-num">07</div>
+    <a class="deck-thumb" href="https://youtu.be/WTeAPqCey7I" target="_blank" rel="noopener">
+      <img src="/assets/thought-leadership/ai-skill-and-productivity-thumb.png" alt="AI Skill and Productivity — video presentation cover">
+    </a>
+    <div class="deck-body">
+      <div class="deck-title">AI Skill and Productivity</div>
+      <div class="deck-desc">A recorded walkthrough of turning an unstructured brain dump into a prioritized weekly work plan with AI &mdash; capturing everything loose first, then letting the model cluster, sequence, and time-box it into something executable.</div>
+      <div class="deck-links">
+        <a href="https://youtu.be/WTeAPqCey7I" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="more-note">More in this series coming soon.</div>
+
+</div>
+
+<div class="site-footer">
+  <div class="site-footer-built">
+    Built by <a href="https://luis-figueroa-ops.github.io/" target="_blank">Luis Figueroa</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
+  </div>
+  <div class="site-footer-tagline">Augmenting Human Potential, One Workflow at a Time</div>
+  <div class="site-footer-copy">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+</div>
+
+</body>
+</html>

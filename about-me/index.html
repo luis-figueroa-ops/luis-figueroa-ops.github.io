@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Me — Luis Figueroa</title>
+<meta name="description" content="The approach behind the work: how I connect strategy, systems, and execution, why I prioritize usable solutions over impressive ones, and what I'm building now in analytics and AI." />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #1B2A4A;
+  --navy-deep: #111d33;
+  --navy-light: #243558;
+  --gold: #B8963E;
+  --gold-light: #d4ae60;
+  --teal: #43e8c8;
+  --white: #F4F1EC;
+  --muted: #8a9bb5;
+  --border: rgba(184,150,62,0.2);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy-deep);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 60px;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.4;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: -20%; left: -10%;
+  width: 55%; height: 140%;
+  background: linear-gradient(135deg, rgba(27,42,74,0.9) 0%, rgba(17,29,51,0) 70%);
+  pointer-events: none; z-index: 0;
+}
+
+.topbar-back {
+  position: relative; z-index: 20;
+  display: inline-block;
+  margin: 24px 0 0 64px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.topbar-back:hover { color: var(--gold); }
+
+.hero {
+  position: relative; z-index: 10;
+  padding: 32px 64px 40px;
+  border-bottom: 1px solid var(--border);
+  max-width: 860px;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 6vw, 66px);
+  letter-spacing: 2px;
+  line-height: 1.02;
+  color: var(--white);
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  margin-top: 16px;
+  font-size: 18px;
+  color: var(--white);
+  opacity: 0.82;
+  line-height: 1.7;
+  max-width: 660px;
+}
+
+.main {
+  position: relative; z-index: 10;
+  padding: 48px 64px 0;
+  max-width: 860px;
+}
+
+.chapter {
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+}
+.chapter:first-child { border-top: none; padding-top: 8px; }
+.chapter h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(26px, 3.4vw, 36px);
+  letter-spacing: 1.5px;
+  line-height: 1.1;
+  color: var(--white);
+  margin-bottom: 20px;
+}
+.chapter h2 span { color: var(--gold); }
+.chapter p {
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--white);
+  opacity: 0.84;
+  margin-bottom: 16px;
+  max-width: 680px;
+}
+.chapter p:last-child { margin-bottom: 0; }
+
+.principles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 26px;
+}
+.principle {
+  background: rgba(27,42,74,0.5);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  padding: 20px 24px;
+}
+.principle-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+.principle-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 1px;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.principle p {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--white);
+  opacity: 0.82;
+  margin-bottom: 0;
+}
+
+.site-footer {
+  position: relative; z-index: 10;
+  max-width: 860px;
+  margin: 48px auto 0;
+  padding: 24px 64px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.site-footer-built {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.site-footer-built a { color: var(--gold); text-decoration: none; }
+.site-footer-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.site-footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+@media (max-width: 700px) {
+  .topbar-back { margin-left: 24px; }
+  .hero, .main, .site-footer { padding-left: 24px; padding-right: 24px; }
+  .chapter p { font-size: 16px; }
+  .principle { padding: 18px 20px; }
+}
+</style>
+</head>
+<body>
+
+<a class="topbar-back" href="https://luis-figueroa-ops.github.io/#about-me">&#8592; Back to Home</a>
+
+<div class="hero">
+  <div class="hero-eyebrow">Beyond the Resume &middot; How I Operate</div>
+  <h1>About <span>Me</span></h1>
+  <p class="hero-sub">
+    I connect the dots between strategy, systems, and execution, understanding how a process actually runs before I try to improve it. That means prioritizing solutions that are usable over ones that are just technically impressive, and continuously building my own analytical and AI skills so I can apply them in practical, real-world ways.
+  </p>
+</div>
+
+<div class="main">
+
+  <div class="chapter">
+    <h2>How I Approach <span>My Work</span></h2>
+    <p>I focus on understanding how systems and processes affect the people using them. Technology alone doesn't create value &mdash; its impact comes from how well it supports real workflows. I'm naturally drawn to identifying opportunities to improve clarity, reduce friction, and help teams operate more effectively, which includes driving system adoption, improving processes, and ensuring tools align with business needs. I take pride in being someone who connects the dots between strategy, systems, and execution.</p>
+    <div class="principles">
+      <div class="principle">
+        <span class="principle-num">01</span>
+        <div class="principle-title">Understand Before Changing</div>
+        <p>I focus on understanding the real workflow and challenges before recommending improvements.</p>
+      </div>
+      <div class="principle">
+        <span class="principle-num">02</span>
+        <div class="principle-title">Make Technology Practical</div>
+        <p>I prioritize solutions that are usable and helpful &mdash; not just technically impressive.</p>
+      </div>
+      <div class="principle">
+        <span class="principle-num">03</span>
+        <div class="principle-title">Continuously Improve</div>
+        <p>I'm committed to continuously learning and strengthening my skills, especially in analytics and AI.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h2>What I'm <span>Building Now</span></h2>
+    <p>As technology and AI continue to reshape how organizations operate, I've been intentionally expanding my analytical and technical skill set. I'm currently building hands-on experience in Power BI, SQL, and Excel together, Python, and AI tools such as ChatGPT, Claude, and NotebookLM. My goal is to strengthen my ability to analyze data, support smarter decisions, and help organizations apply new technologies in practical, meaningful ways. I approach this learning through consistent micro-learning and real-world application, focusing on depth rather than chasing every new tool.</p>
+  </div>
+
+  <div class="chapter">
+    <h2>Why This Work <span>Matters to Me</span></h2>
+    <p>What motivates me most is helping make complex things easier for others. I've seen how the right support, the right systems, and the right clarity can transform how teams work and perform. Being part of that process &mdash; helping bridge gaps and improve how things function &mdash; is what makes this work meaningful to me. I'm committed to continuing to grow, adapt, and contribute in ways that help organizations operate more effectively in an increasingly technology-driven world.</p>
+  </div>
+
+</div>
+
+<div class="site-footer">
+  <div class="site-footer-built">
+    Built by <a href="https://luis-figueroa-ops.github.io/" target="_blank">Luis Figueroa</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
+  </div>
+  <div class="site-footer-tagline">Augmenting Human Potential, One Workflow at a Time</div>
+  <div class="site-footer-copy">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+</div>
+
+</body>
+</html>
