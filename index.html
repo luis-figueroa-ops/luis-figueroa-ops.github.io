@@ -171,12 +171,26 @@ h1 span { color: var(--gold); }
   75% { transform: translate(-2px, -1px) rotate(-10deg) scale(1.15); opacity: 1; }
 }
 
-/* Clock — 15-Minute Course Blueprint */
-.card-tag-icon.clock-icon { animation: clock-tick 3.6s ease-in-out infinite; }
+/* Clock — 15-Minute Course Blueprint (minute hand sweeps 12:00 <-> 12:15) */
+.card-tag-icon.clock-icon { animation: none; }
+.card-tag-icon.clock-icon svg { display: block; width: 15px; height: 15px; overflow: visible; }
+.card-tag-icon.clock-icon .clock-face { fill: none; stroke: var(--muted); stroke-width: 1.1; }
+.card-tag-icon.clock-icon .clock-hand-hour,
+.card-tag-icon.clock-icon .clock-hand-min {
+  stroke: var(--gold);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+.card-tag-icon.clock-icon .clock-pivot { fill: var(--gold); }
+.card-tag-icon.clock-icon .clock-hand-min {
+  transform-box: view-box;
+  transform-origin: 8px 8px;
+  animation: clock-15 3.4s ease-in-out infinite;
+}
 
-@keyframes clock-tick {
-  0%, 100% { transform: rotate(-9deg); }
-  50% { transform: rotate(9deg); }
+@keyframes clock-15 {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
 }
 
 /* Speech bubble + sparkle overlay — Prompt Coach */
@@ -507,7 +521,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     <!-- ── LEARNING TOOLS ── -->
 
     <a class="card" id="course-blueprint" href="./learning-tools/course-blueprint/">
-      <div class="card-tag"><span class="card-tag-icon clock-icon" aria-hidden="true">🕐</span>Learning Tools</div>
+      <div class="card-tag"><span class="card-tag-icon clock-icon" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle class="clock-face" cx="8" cy="8" r="6.4"/><line class="clock-hand-hour" x1="8" y1="8" x2="8" y2="4.3"/><line class="clock-hand-min" x1="8" y1="8" x2="8" y2="2.7"/><circle class="clock-pivot" cx="8" cy="8" r="1"/></svg></span>Learning Tools</div>
       <div class="card-title">15-Minute Course Blueprint</div>
       <div class="card-desc">
         Fill in four fields. Your AI builds your full course roadmap, then teaches you one 15-minute session at a time - any topic, any AI, at your own pace.
