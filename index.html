@@ -271,6 +271,7 @@ h1 span { color: var(--gold); }
     animation: none !important;
   }
   .card-tag-icon.prompt-icon .prompt-sparkle { opacity: 0.85; }
+  .card-tag-icon.brain-icon .brain-spark { opacity: 0; }
 }
 
 .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; line-height: 1; color: var(--white); transition: color 0.2s; }
@@ -453,6 +454,43 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
   50% { transform: translateY(-2px); opacity: 1; }
 }
 
+/* Animated brain — Operations, Augmented (Thought Leadership) */
+.card-tag-icon.brain-icon { animation: none; }
+.card-tag-icon.brain-icon svg {
+  display: block; width: 15px; height: 15px; overflow: visible;
+  transform-origin: center;
+  animation: brain-think 3.2s ease-in-out infinite;
+}
+.card-tag-icon.brain-icon .brain-shape {
+  fill: rgba(184,150,62,0.16);
+  stroke: var(--gold);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.card-tag-icon.brain-icon .brain-stem,
+.card-tag-icon.brain-icon .brain-fold {
+  fill: none;
+  stroke: var(--gold);
+  stroke-linecap: round;
+}
+.card-tag-icon.brain-icon .brain-stem { stroke-width: 0.9; }
+.card-tag-icon.brain-icon .brain-fold { stroke-width: 0.8; opacity: 0.7; }
+.card-tag-icon.brain-icon .brain-spark {
+  fill: var(--gold-light);
+  transform-origin: 8px 6.4px;
+  transform-box: fill-box;
+  animation: brain-spark 2.4s ease-in-out infinite;
+}
+
+@keyframes brain-think {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 1px rgba(184,150,62,0.3)); opacity: 0.8; }
+  50% { transform: scale(1.12); filter: drop-shadow(0 0 5px rgba(212,174,96,0.9)); opacity: 1; }
+}
+@keyframes brain-spark {
+  0%, 100% { opacity: 0; transform: scale(0.35); }
+  45%, 55% { opacity: 1; transform: scale(1); }
+}
+
 /* Beyond the Resume — Card 1 inverted color treatment (primary card in the row) */
 .card.card-inverted {
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
@@ -582,7 +620,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     </a>
 
     <a class="card" id="operations-augmented" href="https://luis-figueroa-ops.github.io/operations-augmented/">
-      <div class="card-tag"><span class="card-tag-icon br-icon" aria-hidden="true">🎯</span>Thought Leadership</div>
+      <div class="card-tag"><span class="card-tag-icon brain-icon" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path class="brain-shape" d="M8 3.4C7.2 2.4 5.5 2.4 4.8 3.4 3.5 3.2 2.5 4.2 2.9 5.4 1.9 6 1.9 7.4 2.9 8 2.6 9 3.3 10 4.5 9.9 4.7 11 6 11.5 7 10.9 7.5 11.4 8.5 11.4 9 10.9 10 11.5 11.3 11 11.5 9.9 12.7 10 13.4 9 13.1 8 14.1 7.4 14.1 6 13.1 5.4 13.5 4.2 12.5 3.2 11.2 3.4 10.5 2.4 8.8 2.4 8 3.4Z"/><line class="brain-stem" x1="8" y1="3.8" x2="8" y2="11.1"/><path class="brain-fold" d="M4.3 5C5.3 5.2 5.6 5.9 5.2 6.6"/><path class="brain-fold" d="M3.7 7.6C4.7 7.5 5.4 8 5.3 8.9"/><path class="brain-fold" d="M11.7 5C10.7 5.2 10.4 5.9 10.8 6.6"/><path class="brain-fold" d="M12.3 7.6C11.3 7.5 10.6 8 10.7 8.9"/><circle class="brain-spark" cx="8" cy="6.4" r="1"/></svg></span>Thought Leadership</div>
       <div class="card-title">Operations, Augmented</div>
       <div class="card-desc">
         I apply sales operations principles to real AI-era problems: process auditing, governance gaps, change management, and organizational readiness. A series of presentations breaks down how operations thinking translates directly into deploying AI safely and effectively.
