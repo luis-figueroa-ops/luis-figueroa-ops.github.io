@@ -230,7 +230,7 @@ body::after {
   <div class="hero-eyebrow">Beyond the Resume &middot; Operations Impact</div>
   <h1>I2B Channel <span>Buildout</span></h1>
   <p class="hero-sub">
-    Verizon Business's indirect retail channel ran on manual tick-mark accounting with no formal infrastructure. I built the systems, governance, and AI-enabled workflows that scaled it into a fully operational channel reaching 8,000+ external agents, then owned the day-to-day training, issue resolution, and budget decisions that kept it running.
+    Verizon Business's indirect retail channel, also known as Indirect-to-Business (I2B), had no formal infrastructure or commission structure and used what's called "shadow accounting" tick marks. I built the systems, governance, and AI-enabled workflows that scaled it into a fully operational channel reaching 8,000+ external agents, then owned the day-to-day training, issue resolution, and budget decisions that kept it running.
   </p>
   <div class="hero-context">Verizon Business</div>
 </div>
@@ -253,7 +253,7 @@ body::after {
     <h2>Driving AI Adoption <span>Across the Channel</span></h2>
     <p>Being selected as a High-Potential employee for Verizon's AI Automation and Adoption Pillar meant exploring what AI could realistically do for the business, not just what was possible in theory. Part of that work involved benchmarking AI capabilities across top tech companies to generate ideas for Verizon's internal AI roadmap, then figuring out which of those ideas could actually move the needle inside sales operations.</p>
     <p>Working with IT, I helped expand Salesforce's Velocity AI so it could interpret billing data and surface upsell opportunities and customer trends reps would otherwise have had to dig for manually. It also gave reps a single place to see consolidated customer insights, business profile data, web research, reviews, industry context, and let them run mock customer Q&amp;A and pushback simulations to prepare for objections before a call instead of during one. I also helped shape AI-driven email prioritization, so reps could surface urgent, business-critical messages instead of digging through a flooded inbox.</p>
-    <p>On the enablement side, I trained Sr. Managers on integrating Gemini GEM and NotebookLM into live project workflows, showing them how to automate meeting summaries and generate concise All-Hands recaps for field teams. I also converted my 70+ page "Where Do I Go?" sales playbook into an AI-assisted workflow, so reps could query guidance directly instead of manually searching through decks and documents.</p>
+    <p>On the enablement side, I trained Sr. Managers on integrating Gemini GEM and NotebookLM into live project workflows, showing them how to automate meeting summaries and generate concise All-Hands recaps for field teams. I also partnered with IT to convert my 70+ page "Where Do I Go?" sales playbook into an AI-queryable workflow, driving the initiative and defining requirements so reps could query guidance directly instead of manually searching through decks and documents.</p>
     <div class="kr">
       <span class="kr-label">Key Results</span>
       <ul>
@@ -263,13 +263,24 @@ body::after {
   </div>
 
   <div class="chapter">
-    <h2>Scaling Enablement to <span>8,000+ Agents</span></h2>
-    <p>New system launches only work if the people using them actually understand what changed and why. For B360 POS and Salesforce's Artemis List Builder, I partnered directly with the product grooming and design teams during development, representing the indirect channel's perspective and validating proposed functionality against how the field actually worked. That meant advocating for accurate Jira user story requirements so releases didn't ship with gaps that conflicted with what the channel needed, and verifying training materials before launch so frontline sellers had what they needed from day one.</p>
-    <p>When post-launch challenges surfaced anyway &mdash; user confusion, underutilized features &mdash; I built playbooks and simplified reference guides to close those gaps. Those materials ended up getting used well beyond the original training sessions. The 70+ slide "Where Do I Go?" guide I built independently, centralizing process ownership, escalation paths, and troubleshooting steps, later got rebuilt inside Salesforce with Velocity AI, turning a static reference document into interactive, in-platform guidance reps could query directly.</p>
+    <h2>Securing Artemis <span>List Builder Access</span></h2>
+    <p>Verizon's standard is tool parity between internal and channel users, but the indirect channel had no access to Artemis List Builder, a Salesforce-integrated prospecting tool internal teams already used. Closing that gap wasn't a simple request: because external, third-party agents would be using it alongside internal account managers, it required navigating legal review, compliance review, and do-not-call constraints before anyone could touch it.</p>
+    <p>I proactively built the business case for channel access and owned the legal and compliance resolution end to end. Once access was secured, I coordinated field enablement with L&amp;D, validating that training materials reflected the approved version of the tool, and distributed training codes through agent partner POCs. Since this wasn't a mandatory company-wide rollout, I tracked adoption through reporting rather than enforcement.</p>
     <div class="kr">
       <span class="kr-label">Key Results</span>
       <ul>
         <li>Led a cross-functional channel initiative to enable a Salesforce prospecting tool to 8,000+ Indirect partner sellers, resolving the legal and compliance barriers to drive a 20% gain in sales productivity.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h2>Coordinating the <span>B360 POS Migration</span></h2>
+    <p>When Verizon migrated its POS platform from a legacy system to one designed to cut clicks, accelerate revenue capture, and improve the customer experience, IT and design teams ran into a wall: the 8,000+ external agent partners in the channel were third-party, with no direct way to reach them. I became the sole conduit, working through contacts at each agent company who then looped in their own sales reps.</p>
+    <p>I coordinated structured testing calls where agent POCs brought their reps in to test the new system, surface friction points, and give direct feedback. Design teams took that feedback and made corrections before go-live. Both systems stayed accessible in parallel during the transition, the goal was getting agents onto the new platform before the legacy system went dark, not forcing a hard cutover.</p>
+    <div class="kr">
+      <span class="kr-label">Key Results</span>
+      <ul>
         <li>Coordinated POS testing calls with design teams and front-line sellers across the 8,000+ Indirect agent partner channel, surfacing field feedback to refine the new system ahead of legacy sunset.</li>
       </ul>
     </div>
@@ -288,13 +299,13 @@ body::after {
   </div>
 
   <div class="chapter">
-    <h2>Closing System and <span>Reporting Gaps</span></h2>
-    <p>Not every fix required a full system rebuild &mdash; some just needed a specific gap closed. When a Salesforce lead-to-opportunity routing issue was forcing reps into a manual workaround, I drove the automation enhancement that eliminated it. Separately, I closed an outlet identification gap that had been creating commission delays and inaccurate new location assignments.</p>
+    <h2>Resolving a Salesforce <span>Lead Routing Gap</span></h2>
+    <p>I noticed dot-com leads were falling out of the funnel for the indirect channel because of a systemic Salesforce hierarchy problem: non-standardized agent titles across retailers were breaking the rollup structure. In Verizon's direct channel, leads that fall out of the funnel route automatically up a manager/director hierarchy, but that automated routing wasn't happening for the indirect partner channel because of the inconsistent agent-title data.</p>
+    <p>As an interim fix, I built a recurring manual audit workflow across Salesforce and VLM, cross-referencing store location codes to reroute misdirected leads to the correct agent partners. But the real fix needed to be structural, so I wrote the business case that secured funding for an automated resolution to the underlying hierarchy gap. Once implemented, misrouted leads began routing automatically to the correct agent partner, and up the hierarchy when needed, the same way direct-channel fallout already worked, replacing the manual pull-analyze-assign process the interim workflow had required.</p>
     <div class="kr">
       <span class="kr-label">Key Results</span>
       <ul>
-        <li>Resolved a Salesforce lead-to-opportunity routing gap, driving an automation enhancement that eliminated a manual workaround and protected up to 40 leads per cycle from revenue leakage.</li>
-        <li>Eliminated 7-day commission lag and improved new location assignment accuracy by closing an outlet identification gap with a new reporting process, reducing quota discrepancies by 16%.</li>
+        <li>Diagnosed a systemic Salesforce hierarchy gap causing dot-com lead misrouting, then wrote the business case that secured funding for automated resolution, protecting up to 40 leads per cycle from revenue leakage.</li>
       </ul>
     </div>
   </div>
