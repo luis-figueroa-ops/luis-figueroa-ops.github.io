@@ -128,6 +128,13 @@ body::after {
   padding-top: 2px;
 }
 
+.deck-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .deck-thumb {
   flex-shrink: 0;
   width: 190px;
@@ -147,6 +154,8 @@ body::after {
   object-position: top;
   display: block;
 }
+.deck-thumb-video { aspect-ratio: 4 / 5; }
+.deck-thumb-video img { object-fit: contain; object-position: center; }
 
 .deck-body { flex: 1; min-width: 0; }
 .deck-title {
@@ -247,12 +256,14 @@ body::after {
 
   <div class="deck">
     <div class="deck-num">01</div>
-    <a class="deck-thumb" href="/assets/thought-leadership/discovery-is-the-floor.pdf" target="_blank">
-      <img src="/assets/thought-leadership/discovery-is-the-floor-thumb.png" alt="Discovery Is the Floor, Not the Finish Line — presentation cover">
-    </a>
-    <a class="deck-thumb" href="https://youtube.com/shorts/Rz2g0MMG35s" target="_blank" rel="noopener">
-      <img src="/assets/thought-leadership/using-claude-to-learn-create-and-build-thumb.png" alt="Using Claude to Learn, Create, and Build — companion video cover">
-    </a>
+    <div class="deck-thumbs">
+      <a class="deck-thumb" href="/assets/thought-leadership/discovery-is-the-floor.pdf" target="_blank">
+        <img src="/assets/thought-leadership/discovery-is-the-floor-thumb.png" alt="Discovery Is the Floor, Not the Finish Line — presentation cover">
+      </a>
+      <a class="deck-thumb deck-thumb-video" href="https://youtube.com/shorts/Rz2g0MMG35s" target="_blank" rel="noopener">
+        <img src="/assets/thought-leadership/using-claude-to-learn-create-and-build-thumb.png" alt="Using Claude to Learn, Create, and Build — companion video cover">
+      </a>
+    </div>
     <div class="deck-body">
       <div class="deck-title">Discovery Is the Floor, Not the Finish Line</div>
       <div class="deck-desc">A four-month account of going from confused and overwhelmed with AI to shipping a self-configuring job search agent, a full analytics project, and a custom AI tool &mdash; proof that a first step matters more than a perfect plan.</div>
