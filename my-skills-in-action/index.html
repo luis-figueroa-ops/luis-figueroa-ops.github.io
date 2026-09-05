@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Skills in Action — Luis Figueroa</title>
+<meta name="description" content="Screen-recorded walkthroughs of the reporting and analysis work behind the stories on this portfolio: advanced spreadsheet formulas, a full Tableau dashboard build, each paired with a written breakdown." />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #1B2A4A;
+  --navy-deep: #111d33;
+  --navy-light: #243558;
+  --gold: #B8963E;
+  --gold-light: #d4ae60;
+  --teal: #43e8c8;
+  --white: #F4F1EC;
+  --muted: #8a9bb5;
+  --border: rgba(184,150,62,0.2);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy-deep);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: clip;
+  padding-bottom: 60px;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.4;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: -20%; left: -10%;
+  width: 55%; height: 140%;
+  background: linear-gradient(135deg, rgba(27,42,74,0.9) 0%, rgba(17,29,51,0) 70%);
+  pointer-events: none; z-index: 0;
+}
+
+.topbar-back {
+  position: sticky; top: 12px; z-index: 30;
+  display: inline-block;
+  margin: 24px 0 0 64px;
+  padding: 9px 15px;
+  background: #1c2c4c;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(8,14,26,0.55);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s, border-color 0.2s;
+}
+.topbar-back:hover { color: var(--gold); border-color: var(--gold); }
+
+.hero {
+  position: relative; z-index: 10;
+  padding: 32px 64px 40px;
+  border-bottom: 1px solid var(--border);
+  max-width: 900px;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 6vw, 66px);
+  letter-spacing: 2px;
+  line-height: 1.02;
+  color: var(--white);
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  margin-top: 16px;
+  font-size: 18px;
+  color: var(--white);
+  opacity: 0.82;
+  line-height: 1.7;
+  max-width: 660px;
+}
+
+.main {
+  position: relative; z-index: 10;
+  padding: 40px 64px 0;
+  max-width: 900px;
+}
+
+/* Entry — a titled "X to Y" grouping; add more <div class="entry"> blocks below as the series grows */
+.entry {
+  padding: 8px 0 4px;
+  border-top: 1px solid var(--border);
+}
+.entry:first-child { border-top: none; }
+.entry-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  display: block;
+  margin: 24px 0 8px;
+}
+.entry-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 3.6vw, 40px);
+  letter-spacing: 1.5px;
+  line-height: 1.08;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.entry-title span { color: var(--gold); }
+
+.deck {
+  display: flex;
+  gap: 28px;
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
+  align-items: flex-start;
+}
+.entry .deck:first-of-type { border-top: none; }
+
+.deck-thumb {
+  flex-shrink: 0;
+  width: 190px;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--border);
+  background: rgba(27,42,74,0.5);
+  padding: 6px;
+  display: block;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.deck-thumb:hover { border-color: rgba(184,150,62,0.6); transform: translateY(-2px); }
+.deck-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+.deck-thumb-video img { object-position: center 30%; }
+
+.deck-body { flex: 1; min-width: 0; }
+.deck-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 1px;
+  color: var(--white);
+  line-height: 1.12;
+  margin-bottom: 10px;
+}
+.deck-desc {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--white);
+  opacity: 0.8;
+  max-width: 560px;
+  margin-bottom: 14px;
+}
+.deck-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.deck-links a {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: var(--gold-light);
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(184,150,62,0.4);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.deck-links a:hover { color: var(--gold); border-color: var(--gold); }
+
+.more-note {
+  margin-top: 8px;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--border);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.site-footer {
+  position: relative; z-index: 10;
+  max-width: 900px;
+  margin: 48px auto 0;
+  padding: 24px 64px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.site-footer-built {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.site-footer-built a { color: var(--gold); text-decoration: none; }
+.site-footer-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.site-footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+@media (max-width: 760px) {
+  .topbar-back { margin-left: 24px; }
+  .hero, .main, .site-footer { padding-left: 24px; padding-right: 24px; }
+  .deck { flex-wrap: wrap; gap: 16px; }
+  .deck-thumb { width: 100%; max-width: 260px; }
+}
+</style>
+</head>
+<body>
+
+<a class="topbar-back" href="https://luis-figueroa-ops.github.io/#my-skills-in-action">&#8592; Back to Home</a>
+
+<div class="hero">
+  <div class="hero-eyebrow">Beyond the Resume &middot; Skills in Action</div>
+  <h1>My Skills <span>in Action</span></h1>
+  <p class="hero-sub">
+    Screen-recorded walkthroughs of the reporting and analysis work behind the stories on this page, from advanced formulas to a full dashboard build. Each entry pairs a short video with a written breakdown you can open as a PDF, with more added as I go.
+  </p>
+</div>
+
+<div class="main">
+
+  <div class="entry">
+    <span class="entry-label">Entry 01</span>
+    <h2 class="entry-title">From Spreadsheet <span>to Story</span></h2>
+
+    <div class="deck">
+      <a class="deck-thumb" href="https://youtu.be/I2Zo3DyQVpw" target="_blank" rel="noopener">
+        <img src="/assets/skills-in-action/unique-sort-dynamic-arrays-thumb.png" alt="UNIQUE and SORT dynamic arrays walkthrough — video cover">
+      </a>
+      <div class="deck-body">
+        <div class="deck-title">The Spreadsheet: UNIQUE &amp; SORT Dynamic Arrays</div>
+        <div class="deck-desc">Two functions &mdash; UNIQUE and SORT &mdash; turning a 200,000-row column of sales records into a clean, always-sorted list of stores, the kind of dependable foundation a dashboard filter is built on. The breakdown walks through why UNIQUE alone leaves the order to chance and how wrapping it in SORT makes the result predictable.</div>
+        <div class="deck-links">
+          <a href="https://youtu.be/I2Zo3DyQVpw" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
+          <a href="/assets/skills-in-action/unique-sort-breakdown.pdf" target="_blank">View Breakdown (PDF)</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck">
+      <a class="deck-thumb" href="https://youtu.be/AwXkYCPhhYQ" target="_blank" rel="noopener">
+        <img src="/assets/skills-in-action/crm-sales-dashboard-thumb.png" alt="CRM Sales Performance Dashboard in Tableau — video cover">
+      </a>
+      <div class="deck-body">
+        <div class="deck-title">The Story: CRM Sales Performance Dashboard</div>
+        <div class="deck-desc">A Tableau dashboard built from CRM pipeline data and structured around four questions sales and operations leaders actually ask: is a region underperforming, is one slower to close, is the business growing, and where is the client base concentrated. The breakdown covers the checks &mdash; product mix, account difficulty, deal volume &mdash; I run before calling any region behind.</div>
+        <div class="deck-links">
+          <a href="https://youtu.be/AwXkYCPhhYQ" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
+          <a href="/assets/skills-in-action/crm-sales-dashboard.pdf" target="_blank">View Breakdown (PDF)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="more-note">More walkthroughs added as I go &mdash; each its own entry.</div>
+
+</div>
+
+<div class="site-footer">
+  <div class="site-footer-built">
+    Built by <a href="https://luis-figueroa-ops.github.io/" target="_blank">Luis Figueroa</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
+  </div>
+  <div class="site-footer-tagline">Augmenting Human Potential, One Workflow at a Time</div>
+  <div class="site-footer-copy">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+</div>
+
+</body>
+</html>
