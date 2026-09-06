@@ -123,6 +123,34 @@ h1 span { color: var(--gold); }
 .section-label { font-family: 'Share Tech Mono', monospace; font-size: 15px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; }
 .section-line { flex: 1; height: 1px; background: var(--border); }
 
+.section-label-beyond {
+  font-size: 22px;
+  letter-spacing: 6px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.section-label-beyond .letter {
+  display: inline-block;
+  color: rgba(184,150,62,0.35);
+  text-shadow: none;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+.section-label-beyond .letter.lit {
+  color: var(--gold-light);
+  text-shadow: 0 0 6px rgba(212,174,96,0.85), 0 0 16px rgba(184,150,62,0.6);
+}
+.section-label-beyond.pulse .letter.lit {
+  animation: beyondPulse 0.9s ease-in-out;
+}
+@keyframes beyondPulse {
+  0%, 100% { color: var(--gold-light); text-shadow: 0 0 6px rgba(212,174,96,0.85), 0 0 16px rgba(184,150,62,0.6); }
+  50% { color: #fff3d6; text-shadow: 0 0 12px rgba(255,243,214,0.95), 0 0 30px rgba(212,174,96,0.9), 0 0 46px rgba(184,150,62,0.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-label-beyond .letter { color: var(--gold); transition: none; }
+  .section-label-beyond.pulse .letter.lit { animation: none; }
+}
+
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; }
 
 .card {
@@ -641,7 +669,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 
 <section class="section" id="beyond-the-resume" style="border-bottom: 1px solid var(--border); padding-bottom: 48px;">
   <div class="section-header">
-    <span class="section-label">Beyond the Resume</span>
+    <span class="section-label section-label-beyond" id="beyond-resume-title" aria-label="Beyond the Resume"><span class="letter" aria-hidden="true">B</span><span class="letter" aria-hidden="true">e</span><span class="letter" aria-hidden="true">y</span><span class="letter" aria-hidden="true">o</span><span class="letter" aria-hidden="true">n</span><span class="letter" aria-hidden="true">d</span><span class="letter letter-space" aria-hidden="true">&nbsp;</span><span class="letter" aria-hidden="true">t</span><span class="letter" aria-hidden="true">h</span><span class="letter" aria-hidden="true">e</span><span class="letter letter-space" aria-hidden="true">&nbsp;</span><span class="letter" aria-hidden="true">R</span><span class="letter" aria-hidden="true">e</span><span class="letter" aria-hidden="true">s</span><span class="letter" aria-hidden="true">u</span><span class="letter" aria-hidden="true">m</span><span class="letter" aria-hidden="true">e</span></span>
     <div class="section-line"></div>
   </div>
 
@@ -977,6 +1005,37 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
   </div>
   <p style="margin-top:12px;font-size:0.72rem;opacity:0.5;letter-spacing:0.04em;font-family:'Share Tech Mono',monospace;">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
 </footer>
+
+<script>
+(function () {
+  var title = document.getElementById('beyond-resume-title');
+  if (!title) return;
+
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return;
+
+  var letters = Array.prototype.slice.call(title.querySelectorAll('.letter'));
+  var LETTER_DELAY = 70;
+  var PULSE_DURATION = 900;
+  var PAUSE_BEFORE_REPEAT = 900;
+
+  function lightUp(index) {
+    if (index >= letters.length) {
+      title.classList.add('pulse');
+      setTimeout(function () {
+        title.classList.remove('pulse');
+        letters.forEach(function (letter) { letter.classList.remove('lit'); });
+        setTimeout(function () { lightUp(0); }, PAUSE_BEFORE_REPEAT);
+      }, PULSE_DURATION);
+      return;
+    }
+    letters[index].classList.add('lit');
+    setTimeout(function () { lightUp(index + 1); }, LETTER_DELAY);
+  }
+
+  lightUp(0);
+})();
+</script>
 
 </body>
 </html>
