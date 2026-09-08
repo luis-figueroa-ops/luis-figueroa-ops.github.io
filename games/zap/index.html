@@ -164,8 +164,7 @@
     <button class="btn" id="startBtn">START GAME</button>
     <div class="controls-hint">
       ⬅️➡️ MOVE &nbsp;·&nbsp; ⬆️ ROTATE &nbsp;·&nbsp; ⬇️ SOFT DROP<br>
-      SPACE HARD DROP &nbsp;·&nbsp; C HOLD &nbsp;·&nbsp; P PAUSE<br>
-      🎵 Music toggle in top-right corner
+      SPACE HARD DROP &nbsp;·&nbsp; C HOLD &nbsp;·&nbsp; P PAUSE
     </div>
   </div>
 
@@ -242,15 +241,6 @@ function getAudio() {
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
-let _noiseBuf = null;
-function getNoiseBuf() {
-  if (_noiseBuf) return _noiseBuf;
-  const ac = getAudio();
-  _noiseBuf = ac.createBuffer(1, ac.sampleRate * 0.3, ac.sampleRate);
-  const d = _noiseBuf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  return _noiseBuf;
-}
 function playNote(freq, type, startTime, duration, vol = 0.12) {
   const ac = getAudio(), osc = ac.createOscillator(), gain = ac.createGain();
   osc.type = type; osc.frequency.value = freq;
@@ -291,51 +281,6 @@ function soundLevelUp() {
 function soundGameOver() {
   const ac = getAudio(), now = ac.currentTime;
   [392, 349, 330, 262].forEach((f, i) => playNote(f, 'triangle', now + i * 0.22, 0.42, 0.3));
-}
-
-// ─── Music ───────────────────────────────────────────────────────────────────
-let musicOn = true, musicRunning = false, musicStopFlag = false, musicTimeout = null, nextBarStart = 0;
-const BPM = 118, BEAT = 60 / BPM;
-const BASS_NOTES   = [98.0,98.0,116.5,98.0,110.0,98.0,87.3,98.0];
-const MELODY_NOTES = [392.0,466.2,523.3,466.2,440.0,392.0,349.2,392.0];
-const HIHAT_PAT    = [1,0,1,0,1,0,1,1];
-function scheduleBar(t0) {
-  if (musicStopFlag) return;
-  const ac = getAudio();
-  for (let i = 0; i < 8; i++) {
-    const t = t0 + i * BEAT;
-    playNote(BASS_NOTES[i], 'square', t, BEAT * 0.55, 0.02);
-    if (i % 2 === 0) playNote(MELODY_NOTES[i >> 1], 'triangle', t + BEAT * 0.12, BEAT * 0.75, 0.015);
-    if (HIHAT_PAT[i]) {
-      const src = ac.createBufferSource(); src.buffer = getNoiseBuf();
-      const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
-      const g = ac.createGain(); g.gain.setValueAtTime(0.007, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
-      src.connect(hp); hp.connect(g); g.connect(ac.destination); src.start(t);
-    }
-  }
-}
-function musicTick() {
-  if (musicStopFlag || !musicOn) return;
-  const ac = getAudio(), now = ac.currentTime;
-  if (nextBarStart < now + 0.35) {
-    scheduleBar(Math.max(nextBarStart, now + 0.01));
-    nextBarStart = Math.max(nextBarStart, now + 0.01) + 8 * BEAT;
-  }
-  musicTimeout = setTimeout(musicTick, 150);
-}
-function startMusic() {
-  if (musicRunning) return;
-  musicRunning = true; musicStopFlag = false;
-  nextBarStart = getAudio().currentTime; musicTick();
-}
-function stopMusic() {
-  musicStopFlag = true; musicRunning = false;
-  if (musicTimeout) clearTimeout(musicTimeout);
-}
-function toggleMusic() {
-  musicOn = !musicOn;
-  if (musicOn) { musicStopFlag = false; musicRunning = false; startMusic(); }
-  else stopMusic();
 }
 
 // ─── Game state ─────────────────────────────────────────────────────────────
@@ -486,7 +431,7 @@ function lockPiece() {
 }
 
 function gameOver() {
-  state = 'gameover'; soundGameOver(); stopMusic();
+  state = 'gameover'; soundGameOver();
   if (score > hiScore) { hiScore = score; saveHi(hiScore); }
   document.getElementById('finalScore').textContent = score.toLocaleString();
   document.getElementById('finalLevel').textContent = level;
@@ -498,7 +443,6 @@ function gameOver() {
 function togglePause() {
   if (state !== 'playing') return;
   paused = !paused;
-  if (paused) stopMusic(); else if (musicOn) startMusic();
 }
 
 // ─── Input ──────────────────────────────────────────────────────────────────
@@ -544,9 +488,6 @@ document.addEventListener('keydown', e => {
     case 'p': case 'P': case 'Escape':
       e.preventDefault();
       togglePause();
-      break;
-    case 'm': case 'M':
-      toggleMusic();
       break;
   }
 });
@@ -598,8 +539,6 @@ function handleCanvasTap(e) {
   const pos = getEventPos(e);
   const pr = getPauseRect();
   if (hitRect(pos, pr)) { togglePause(); return; }
-  const mr = getMuteRect();
-  if (hitRect(pos, mr)) { toggleMusic(); return; }
 }
 if (isTouchDevice) canvas.addEventListener('touchstart', handleCanvasTap, { passive: false });
 else canvas.addEventListener('click', handleCanvasTap, { passive: false });
@@ -614,10 +553,10 @@ function showScreen(id) {
 }
 
 document.getElementById('startBtn').addEventListener('click', () => {
-  getAudio(); showScreen(null); initGame(); state = 'playing'; paused = false; startMusic();
+  getAudio(); showScreen(null); initGame(); state = 'playing'; paused = false;
 });
 document.getElementById('restartBtn').addEventListener('click', () => {
-  showScreen(null); initGame(); state = 'playing'; paused = false; startMusic();
+  showScreen(null); initGame(); state = 'playing'; paused = false;
 });
 
 showScreen('startScreen');
@@ -735,8 +674,7 @@ function drawPanelBox(b, label) {
   ctx.restore();
 }
 
-function getMuteRect() { const s = uiScale(), sz = Math.round(30 * s); return { x: W - 14 - sz, y: 14, w: sz, h: sz }; }
-function getPauseRect() { const s = uiScale(), sz = Math.round(30 * s), mr = getMuteRect(); return { x: mr.x - sz - 10, y: 14, w: sz, h: sz }; }
+function getPauseRect() { const s = uiScale(), sz = Math.round(30 * s); return { x: W - 14 - sz, y: 14, w: sz, h: sz }; }
 
 function drawHUD(layout) {
   const pad = 14;
@@ -751,7 +689,7 @@ function drawHUD(layout) {
   drawPanelBox(holdBox, 'HOLD');
   drawMiniPiece(holdType, holdBox.x, holdBox.y, holdBox.w, holdBox.h);
 
-  const reserveRight = 104;
+  const reserveRight = 58;
   const nextCount = W < 500 ? 1 : 3;
   const nextGap = 8;
   let nx = W - reserveRight - pad;
@@ -785,16 +723,6 @@ function drawToasts() {
   }
 }
 
-function drawMuteBtn() {
-  const mr = getMuteRect();
-  ctx.save();
-  ctx.fillStyle = 'rgba(0,20,30,0.7)'; ctx.strokeStyle = '#00ffe755'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.roundRect(mr.x, mr.y, mr.w, mr.h, 6); ctx.fill(); ctx.stroke();
-  ctx.font = `${Math.round(mr.w * 0.65)}px serif`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(musicOn ? '🔊' : '🔇', mr.x + mr.w / 2, mr.y + mr.h / 2 + 1);
-  ctx.restore();
-}
 function drawPauseBtn() {
   const pr = getPauseRect();
   ctx.save();
@@ -837,7 +765,7 @@ function draw(dt) {
     drawPiece(layout, current, 1, false);
     drawHUD(layout);
     drawToasts();
-    drawMuteBtn(); drawPauseBtn();
+    drawPauseBtn();
     if (paused) drawPauseOverlay();
   }
 }
