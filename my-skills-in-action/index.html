@@ -140,6 +140,22 @@ body::after {
 }
 .entry-title span { color: var(--gold); }
 
+.section-desc {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.82;
+  max-width: 640px;
+  margin-bottom: 4px;
+}
+
+.section-divider {
+  height: 8px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 2px;
+  margin: 48px 0 8px;
+}
+
 .deck {
   display: flex;
   gap: 28px;
@@ -270,21 +286,9 @@ body::after {
 <div class="main">
 
   <div class="entry">
-    <h2 class="entry-title">From Spreadsheet <span>to Story</span></h2>
-
-    <div class="deck">
-      <a class="deck-thumb" href="https://youtu.be/I2Zo3DyQVpw" target="_blank" rel="noopener">
-        <img src="/assets/skills-in-action/unique-sort-dynamic-arrays-thumb.png" alt="UNIQUE and SORT dynamic arrays walkthrough — video cover">
-      </a>
-      <div class="deck-body">
-        <div class="deck-title">The Spreadsheet: UNIQUE &amp; SORT Dynamic Arrays</div>
-        <div class="deck-desc">Take a column list with a bunch of repeats in it, keep only one of each thing, and put them in order. Two functions &mdash; UNIQUE and SORT &mdash; turning a 200,000-row column of sales records into a clean, always-sorted list of stores, the kind of dependable foundation a dashboard filter is built on. The video walks through why UNIQUE alone leaves the order to chance and how wrapping it in SORT makes the result predictable.</div>
-        <div class="deck-links">
-          <a href="https://youtu.be/I2Zo3DyQVpw" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
-          <a href="/assets/skills-in-action/unique-sort-breakdown.pdf" target="_blank">View Breakdown (PDF)</a>
-        </div>
-      </div>
-    </div>
+    <span class="entry-label">Section 1</span>
+    <h2 class="entry-title">Data <span>Visualization</span></h2>
+    <p class="section-desc">Turning raw data into interactive charts, graphs, and dashboards.</p>
 
     <div class="deck">
       <a class="deck-thumb" href="https://youtu.be/3IGSI6IdYqg" target="_blank" rel="noopener">
@@ -296,6 +300,28 @@ body::after {
         <div class="deck-links">
           <a href="https://youtu.be/3IGSI6IdYqg" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
           <a href="/assets/skills-in-action/crm-sales-dashboard.pdf" target="_blank">View Dashboard (PDF)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="entry">
+    <span class="entry-label">Section 2</span>
+    <h2 class="entry-title">Advanced <span>Formulas</span></h2>
+    <p class="section-desc">Turning messy, scattered data into clean, reliable, and actionable answers.</p>
+
+    <div class="deck">
+      <a class="deck-thumb" href="https://youtu.be/I2Zo3DyQVpw" target="_blank" rel="noopener">
+        <img src="/assets/skills-in-action/unique-sort-dynamic-arrays-thumb.png" alt="UNIQUE and SORT dynamic arrays walkthrough — video cover">
+      </a>
+      <div class="deck-body">
+        <div class="deck-title">The Spreadsheet: UNIQUE &amp; SORT Dynamic Arrays</div>
+        <div class="deck-desc">Take a column list with a bunch of repeats in it, keep only one of each thing, and put them in order. Two functions &mdash; UNIQUE and SORT &mdash; turning a 200,000-row column of sales records into a clean, always-sorted list of stores, the kind of dependable foundation a dashboard filter is built on. The video walks through why UNIQUE alone leaves the order to chance and how wrapping it in SORT makes the result predictable.</div>
+        <div class="deck-links">
+          <a href="https://youtu.be/I2Zo3DyQVpw" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
+          <a href="/assets/skills-in-action/unique-sort-breakdown.pdf" target="_blank">View Breakdown (PDF)</a>
         </div>
       </div>
     </div>
