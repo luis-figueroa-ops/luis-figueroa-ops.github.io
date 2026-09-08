@@ -276,17 +276,6 @@ h1 span { color: var(--gold); }
   38%, 62% { transform: scaleY(1); }
 }
 
-/* Lightning flicker — ZAP! */
-.card-tag-icon.zap-icon { animation: zap-flicker 2.5s ease-in-out infinite; }
-
-@keyframes zap-flicker {
-  0%, 30%, 100% { opacity: 0.55; filter: brightness(1); }
-  8% { opacity: 1; filter: brightness(1.6); }
-  14% { opacity: 0.6; filter: brightness(1); }
-  20% { opacity: 1; filter: brightness(1.4); }
-  26% { opacity: 0.7; filter: brightness(1); }
-}
-
 /* Glow pulse — WordSense */
 .card-tag-icon.book-icon { animation: book-glow 3.6s ease-in-out infinite; }
 
@@ -842,11 +831,11 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     </a>
 
     <a class="card" id="zap" href="./games/zap/index.html">
-      <div class="card-tag"><span class="card-tag-icon zap-icon" aria-hidden="true">⚡</span>Games</div>
-      <div class="card-title">ZAP!</div>
+      <div class="card-tag"><span class="card-tag-icon" aria-hidden="true">🧱</span>Games</div>
+      <div class="card-title">STACKED!</div>
       <div class="card-desc">
-        A tap-and-shoot bug zapper built entirely in one session with Claude.
-        Click to zap bugs before they escape, survive increasingly frantic waves, and chase a high score.
+        A block-stacking arcade drop built entirely in one session with Claude.
+        Rotate and clear lines as the pace ramps up level after level, and chase a high score.
       </div>
       <div class="card-footer">
         <span class="card-cta">Play Now</span>
