@@ -162,7 +162,7 @@
       Speed ramps up every level. How high can you stack your score before the board fills?
     </p>
     <button class="btn" id="startBtn">START GAME</button>
-    <div class="controls-hint">
+    <div class="controls-hint" id="controlsHint">
       ⬅️➡️ MOVE &nbsp;·&nbsp; ⬆️ ROTATE &nbsp;·&nbsp; ⬇️ SOFT DROP<br>
       SPACE HARD DROP &nbsp;·&nbsp; C HOLD &nbsp;·&nbsp; P PAUSE
     </div>
@@ -559,6 +559,11 @@ document.getElementById('restartBtn').addEventListener('click', () => {
   showScreen(null); initGame(); state = 'playing'; paused = false;
 });
 
+if (isTouchDevice) {
+  document.getElementById('controlsHint').innerHTML =
+    'USE THE ON-SCREEN BUTTONS BELOW TO MOVE, ROTATE, DROP &amp; HOLD<br>' +
+    '⏸️ TAP THE PAUSE ICON (TOP RIGHT) TO PAUSE';
+}
 showScreen('startScreen');
 
 // ─── Update ─────────────────────────────────────────────────────────────────
