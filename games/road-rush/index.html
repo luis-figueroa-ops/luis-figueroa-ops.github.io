@@ -261,6 +261,23 @@ function playLevelUp() {
   playTone(880, 'square', 0.18, 0.08, null, 0.2);
 }
 function playWiper() { playTone(700, 'triangle', 0.08, 0.03, 500); }
+function playRainDrop() {
+  try {
+    const ac = getAudio();
+    const len = Math.floor(ac.sampleRate * 0.035);
+    const buffer = ac.createBuffer(1, len, ac.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (Math.random()*2-1) * (1 - i/len);
+    const src = ac.createBufferSource();
+    src.buffer = buffer;
+    const filt = ac.createBiquadFilter();
+    filt.type = 'bandpass'; filt.frequency.value = 2200 + Math.random()*2200; filt.Q.value = 1.8;
+    const g = ac.createGain();
+    g.gain.value = 0.05 + Math.random()*0.05;
+    src.connect(filt); filt.connect(g); g.connect(ac.destination);
+    src.start();
+  } catch(e) {}
+}
 function playEngineRev() {
   try {
     const ac = getAudio(), t0 = ac.currentTime;
@@ -294,20 +311,21 @@ let selectedVehicle = null;
 
 // ---------- Weather ----------
 const WEATHER = {
-  clear: { label:'☀ CLEAR', sky1:'#1b2740', sky2:'#3d5a86', fogNear:false, rain:0, snow:0, tint:'rgba(0,0,0,0)' },
-  rain:  { label:'🌧 RAIN', sky1:'#131a26', sky2:'#2a3a4d', fogNear:false, rain:0.55, snow:0, tint:'rgba(40,60,90,0.10)' },
-  storm: { label:'⛈ STORM', sky1:'#0b0e14', sky2:'#1c222e', fogNear:false, rain:1.0, snow:0, tint:'rgba(20,25,40,0.22)', thunder:true },
-  snow:  { label:'❄ SNOW', sky1:'#232a38', sky2:'#4a5568', fogNear:false, rain:0, snow:0.7, tint:'rgba(200,210,230,0.08)' },
-  fog:   { label:'🌫 FOG', sky1:'#3a3f47', sky2:'#5b6068', fogNear:true, rain:0, snow:0, tint:'rgba(150,155,165,0.18)' },
+  clear: { label:'☀ CLEAR', sky1:'#1b2740', sky2:'#3d5a86', fogNear:false, rain:0, snow:0, wind:0, tint:'rgba(0,0,0,0)' },
+  rain:  { label:'🌧 RAIN', sky1:'#131a26', sky2:'#2a3a4d', fogNear:false, rain:0.55, snow:0, wind:0, tint:'rgba(40,60,90,0.10)' },
+  storm: { label:'⛈ STORM', sky1:'#0b0e14', sky2:'#1c222e', fogNear:false, rain:1.0, snow:0, wind:0.4, tint:'rgba(20,25,40,0.22)' },
+  snow:  { label:'❄ SNOW', sky1:'#232a38', sky2:'#4a5568', fogNear:false, rain:0, snow:0.7, wind:0, tint:'rgba(200,210,230,0.08)' },
+  fog:   { label:'🌫 FOG', sky1:'#3a3f47', sky2:'#5b6068', fogNear:true, rain:0, snow:0, wind:0, tint:'rgba(150,155,165,0.18)' },
+  windy: { label:'💨 WINDY', sky1:'#2b3550', sky2:'#5c6d8f', fogNear:false, rain:0, snow:0, wind:1, tint:'rgba(0,0,0,0)' },
 };
 let weatherKey = 'clear';
 let weatherTimer = 0;
 
 // ---------- Road / track ----------
-const ROAD_HALF = 1.0;
+const ROAD_HALF = 1.7;
 const CAMERA_DEPTH = 0.84;
 const DRAW_DIST = 140;
-const LANE_OFFSETS = [-0.55, 0, 0.55];
+const LANE_OFFSETS = [-ROAD_HALF*0.5, 0, ROAD_HALF*0.5];
 
 let segments = [];
 let sectionQueue = [];
@@ -410,6 +428,8 @@ let offRoadTime = 0;
 let rainDrops = []; // ambient falling streaks (screen space)
 let snowFlakes = [];
 let windshieldDrops = []; // accumulated droplets
+let splashes = []; // brief impact ripples on the glass
+let windDebris = []; // leaves/debris blown across the ground
 let lightningFlash = 0;
 let nextThunder = 0;
 
@@ -423,7 +443,8 @@ function resetGame() {
   player.x = 0; player.wheelAngle = 0; player.invuln = 0;
   wipersOn = false; wiperPhase = 0; hornFlash = 0; crashFlash = 0; offRoadTime = 0;
   weatherKey = 'clear'; weatherTimer = 14;
-  rainDrops = []; snowFlakes = []; windshieldDrops = []; lightningFlash = 0; nextThunder = 6;
+  rainDrops = []; snowFlakes = []; windshieldDrops = []; splashes = []; windDebris = [];
+  lightningFlash = 0; nextThunder = 6;
   ensureSegments(DRAW_DIST + 10, level);
   renderLivesPips();
 }
@@ -624,11 +645,13 @@ function pickWeather(level) {
   const rainChance = Math.min(0.35, 0.08 + level * 0.03);
   const snowChance = Math.min(0.22, level * 0.02);
   const fogChance = Math.min(0.2, level * 0.018);
+  const windyChance = Math.min(0.22, 0.06 + level * 0.02);
   let acc = 0;
   if (roll < (acc += stormChance)) return 'storm';
   if (roll < (acc += rainChance)) return 'rain';
   if (roll < (acc += snowChance)) return 'snow';
   if (roll < (acc += fogChance)) return 'fog';
+  if (roll < (acc += windyChance)) return 'windy';
   return 'clear';
 }
 function updateWeather(dt) {
@@ -639,9 +662,9 @@ function updateWeather(dt) {
     document.getElementById('weather-val').textContent = WEATHER[weatherKey].label;
   }
   const w = WEATHER[weatherKey];
-  if (w.thunder) {
+  if (w.rain > 0) {
     nextThunder -= dt;
-    if (nextThunder <= 0) { playThunder(); lightningFlash = 0.35; nextThunder = 5 + Math.random()*8; }
+    if (nextThunder <= 0) { playThunder(); lightningFlash = 0.35; nextThunder = (9 - w.rain*5) + Math.random()*8; }
   }
   if (lightningFlash > 0) lightningFlash = Math.max(0, lightningFlash - dt*1.4);
 
@@ -653,15 +676,32 @@ function updateWeather(dt) {
   while (snowFlakes.length < targetSnowCount) snowFlakes.push({ x: Math.random()*GW, y: Math.random()*GH, r: 1.5+Math.random()*2.5, spd: 40+Math.random()*60, drift: Math.random()*2-1, ph: Math.random()*10 });
   if (snowFlakes.length > targetSnowCount) snowFlakes.length = targetSnowCount;
 
-  if (w.rain > 0 && !wipersOn && Math.random() < w.rain * dt * 1.6 && windshieldDrops.length < 70) {
-    windshieldDrops.push({ x: Math.random()*GW, y: GH*0.15 + Math.random()*GH*0.7, r: 4+Math.random()*10 });
+  const targetWindCount = Math.floor((w.wind||0) * 26);
+  while (windDebris.length < targetWindCount) {
+    const dir = Math.random() < 0.5 ? -1 : 1;
+    windDebris.push({
+      x: dir === 1 ? -20 - Math.random()*GW : GW + 20 + Math.random()*GW,
+      y: HORIZON_Y + Math.random()*(GH-HORIZON_Y),
+      spd: (220 + Math.random()*260) * dir, size: 3+Math.random()*5,
+      spin: Math.random()*8-4, rot: Math.random()*Math.PI*2,
+    });
   }
+  if (windDebris.length > targetWindCount) windDebris.length = targetWindCount;
+
+  if (w.rain > 0 && !wipersOn && Math.random() < w.rain * dt * 1.6 && windshieldDrops.length < 70) {
+    const x = Math.random()*GW, y = GH*0.15 + Math.random()*GH*0.7;
+    windshieldDrops.push({ x, y, r: 4+Math.random()*10 });
+    splashes.push({ x, y, age: 0 });
+    if (Math.random() < 0.6) playRainDrop();
+  }
+  splashes.forEach(s => s.age += dt);
+  splashes = splashes.filter(s => s.age < 0.35);
+
   if (wipersOn) {
     wiperPhase += dt * 3.2;
+    const sweepX = GW*0.5 + Math.sin(wiperAngle()) * wiperArmLength();
     windshieldDrops = windshieldDrops.filter(d => {
-      const sweepFrac = (Math.sin(wiperPhase) + 1) / 2;
-      const sweepX = GW*0.5 + Math.cos(sweepFrac*Math.PI - Math.PI/2) * GW*0.55;
-      return Math.abs(d.x - sweepX) > 55 || Math.random() < 0.4;
+      return Math.abs(d.x - sweepX) > 60 || Math.random() < 0.4;
     });
   } else {
     wiperPhase *= 0.9;
@@ -691,14 +731,18 @@ function update(dt) {
 
   const baseIdx = Math.floor(position);
   const curSeg = getSegment(baseIdx);
-  const driftForce = curSeg.curve * (speed/maxSpeed) * 0.25 * selectedVehicle.driftRes * dt;
+  const driftForce = curSeg.curve * (speed/maxSpeed) * 0.08 * selectedVehicle.driftRes * dt;
   player.x += driftForce;
 
-  const offset = player.x - curSeg.x;
+  let offset = player.x - curSeg.x;
   if (Math.abs(offset) > ROAD_HALF) {
-    const overshoot = Math.min(Math.abs(offset) - ROAD_HALF, 1.5);
-    player.x -= Math.sign(offset) * overshoot * 0.5 * dt;
+    const overshoot = Math.abs(offset) - ROAD_HALF;
+    player.x -= Math.sign(offset) * overshoot * 2.2 * dt;
   }
+  const HARD_LIMIT = ROAD_HALF + 3;
+  if (player.x - curSeg.x > HARD_LIMIT) player.x = curSeg.x + HARD_LIMIT;
+  if (player.x - curSeg.x < -HARD_LIMIT) player.x = curSeg.x - HARD_LIMIT;
+  offset = player.x - curSeg.x;
   if (Math.abs(offset) > ROAD_HALF * 1.02) {
     offRoadTime = Math.min(1, offRoadTime + dt*2);
   } else {
@@ -898,7 +942,27 @@ function drawWeatherParticles(dt) {
     if (f.y > GH) { f.y = -8; f.x = Math.random()*GW; }
     ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI*2); ctx.fill();
   });
+  windDebris.forEach(deb => {
+    deb.x += deb.spd * dt; deb.rot += deb.spin * dt;
+    if (deb.spd > 0 && deb.x > GW + 20) deb.x = -20;
+    if (deb.spd < 0 && deb.x < -20) deb.x = GW + 20;
+    ctx.save();
+    ctx.translate(deb.x, deb.y);
+    ctx.rotate(deb.rot);
+    ctx.fillStyle = 'rgba(150,120,70,0.75)';
+    ctx.beginPath(); ctx.ellipse(0, 0, deb.size, deb.size*0.5, 0, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
   if (w.tint) { ctx.fillStyle = w.tint; ctx.fillRect(0,0,GW,GH); }
+}
+
+function drawSplashes() {
+  splashes.forEach(s => {
+    const t = s.age / 0.35;
+    ctx.strokeStyle = `rgba(255,255,255,${(1-t)*0.5})`;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 3 + t*16, 0, Math.PI*2); ctx.stroke();
+  });
 }
 
 function drawWindshieldDrops() {
@@ -912,18 +976,19 @@ function drawWindshieldDrops() {
   });
 }
 
+const WIPER_MAX_ANGLE = 1.22;
+function wiperArmLength() { return Math.max(GW, GH) * 0.62; }
+function wiperAngle() { return Math.sin(wiperPhase) * WIPER_MAX_ANGLE; }
 function drawWiperArms() {
   if (wiperPhase === 0 && !wipersOn) return;
-  const sweep = (Math.sin(wiperPhase) + 1) / 2;
-  const angle = -Math.PI*0.08 - sweep * (Math.PI*0.72);
-  [ {baseX: GW*0.5, dir:1}, ].forEach(({baseX,dir}) => {
-    ctx.save();
-    ctx.translate(baseX, GH*0.98);
-    ctx.rotate(angle*dir);
-    ctx.fillStyle = 'rgba(15,17,22,0.92)';
-    ctx.fillRect(-4, -GH*0.62, 8, GH*0.62);
-    ctx.restore();
-  });
+  const armLen = wiperArmLength();
+  ctx.save();
+  ctx.translate(GW*0.5, GH*0.99);
+  ctx.rotate(wiperAngle());
+  ctx.fillStyle = 'rgba(15,17,22,0.92)';
+  ctx.fillRect(-4, -armLen, 8, armLen);
+  ctx.fillRect(-armLen*0.12, -armLen*0.98, armLen*0.24, armLen*0.05);
+  ctx.restore();
 }
 
 function drawDashboard() {
@@ -995,6 +1060,7 @@ function render(dt) {
   drawObstacles();
   drawWeatherParticles(dt);
   drawWindshieldDrops();
+  drawSplashes();
   drawWiperArms();
   drawDashboard();
   drawFlashes();
