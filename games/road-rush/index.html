@@ -322,7 +322,7 @@ let weatherKey = 'clear';
 let weatherTimer = 0;
 
 // ---------- Road / track ----------
-const ROAD_HALF = 1.7;
+const ROAD_HALF = 2.2;
 const CAMERA_DEPTH = 0.84;
 const DRAW_DIST = 140;
 const LANE_OFFSETS = [-ROAD_HALF*0.5, 0, ROAD_HALF*0.5];
@@ -424,7 +424,6 @@ let wipersOn = false;
 let wiperPhase = 0;
 let hornFlash = 0;
 let crashFlash = 0;
-let offRoadTime = 0;
 let rainDrops = []; // ambient falling streaks (screen space)
 let snowFlakes = [];
 let windshieldDrops = []; // accumulated droplets
@@ -441,7 +440,7 @@ function resetGame() {
   position = 0; speed = 8; level = 1; score = 0; distanceThisLevel = 0;
   lives = selectedVehicle.lives;
   player.x = 0; player.wheelAngle = 0; player.invuln = 0;
-  wipersOn = false; wiperPhase = 0; hornFlash = 0; crashFlash = 0; offRoadTime = 0;
+  wipersOn = false; wiperPhase = 0; hornFlash = 0; crashFlash = 0;
   weatherKey = 'clear'; weatherTimer = 14;
   rainDrops = []; snowFlakes = []; windshieldDrops = []; splashes = []; windDebris = [];
   lightningFlash = 0; nextThunder = 6;
@@ -699,7 +698,7 @@ function updateWeather(dt) {
 
   if (wipersOn) {
     wiperPhase += dt * 3.2;
-    const sweepX = GW*0.5 + Math.sin(wiperAngle()) * wiperArmLength();
+    const sweepX = wiperBladeX();
     windshieldDrops = windshieldDrops.filter(d => {
       return Math.abs(d.x - sweepX) > 60 || Math.random() < 0.4;
     });
@@ -718,8 +717,7 @@ function update(dt) {
   const gripPenalty = wSpec.rain > 0 ? 1 - wSpec.rain*0.28 : wSpec.snow > 0 ? 1 - wSpec.snow*0.4 : 1;
 
   const maxSpeed = vehicleMaxSpeed();
-  const targetSpeed = maxSpeed * (offRoadTime > 0 ? 0.4 : 1);
-  speed += (targetSpeed - speed) * dt * 0.9;
+  speed += (maxSpeed - speed) * dt * 0.9;
   speed = Math.max(4, speed);
 
   if (isMobile && !touchSteering) player.wheelAngle *= Math.pow(0.02, dt);
@@ -734,20 +732,11 @@ function update(dt) {
   const driftForce = curSeg.curve * (speed/maxSpeed) * 0.08 * selectedVehicle.driftRes * dt;
   player.x += driftForce;
 
-  let offset = player.x - curSeg.x;
-  if (Math.abs(offset) > ROAD_HALF) {
-    const overshoot = Math.abs(offset) - ROAD_HALF;
-    player.x -= Math.sign(offset) * overshoot * 2.2 * dt;
-  }
-  const HARD_LIMIT = ROAD_HALF + 3;
-  if (player.x - curSeg.x > HARD_LIMIT) player.x = curSeg.x + HARD_LIMIT;
-  if (player.x - curSeg.x < -HARD_LIMIT) player.x = curSeg.x - HARD_LIMIT;
-  offset = player.x - curSeg.x;
-  if (Math.abs(offset) > ROAD_HALF * 1.02) {
-    offRoadTime = Math.min(1, offRoadTime + dt*2);
-  } else {
-    offRoadTime = Math.max(0, offRoadTime - dt*2);
-  }
+  // The car is never allowed off the paved road — it can reach the edge
+  // rumble strip but not drift into the grass, however hard it drifts.
+  const edge = ROAD_HALF * 0.94;
+  if (player.x - curSeg.x > edge) player.x = curSeg.x + edge;
+  if (player.x - curSeg.x < -edge) player.x = curSeg.x - edge;
 
   position += speed * dt;
   score = Math.floor(position * 3.2);
@@ -976,18 +965,26 @@ function drawWindshieldDrops() {
   });
 }
 
-const WIPER_MAX_ANGLE = 1.22;
-function wiperArmLength() { return Math.max(GW, GH) * 0.62; }
-function wiperAngle() { return Math.sin(wiperPhase) * WIPER_MAX_ANGLE; }
+// The blade sweeps side to side along a shallow arc that always stays
+// well below the horizon, rather than pivoting from the floor (which
+// either misses the corners or swings up into the sky).
+function wiperSweepT() { return (Math.sin(wiperPhase) + 1) / 2; } // 0..1
+function wiperBladeX() { return GW*0.5 + (wiperSweepT() - 0.5) * GW * 0.82; }
+function wiperBladeY() { return GH*0.60 - Math.sin(wiperSweepT() * Math.PI) * GH*0.05; }
 function drawWiperArms() {
   if (wiperPhase === 0 && !wipersOn) return;
-  const armLen = wiperArmLength();
+  const pivotX = GW*0.5, pivotY = GH*0.99;
+  const bx = wiperBladeX(), by = wiperBladeY();
+  const ang = Math.atan2(by - pivotY, bx - pivotX);
+  ctx.strokeStyle = 'rgba(60,64,72,0.95)';
+  ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(pivotX, pivotY); ctx.lineTo(bx, by); ctx.stroke();
   ctx.save();
-  ctx.translate(GW*0.5, GH*0.99);
-  ctx.rotate(wiperAngle());
-  ctx.fillStyle = 'rgba(15,17,22,0.92)';
-  ctx.fillRect(-4, -armLen, 8, armLen);
-  ctx.fillRect(-armLen*0.12, -armLen*0.98, armLen*0.24, armLen*0.05);
+  ctx.translate(bx, by);
+  ctx.rotate(ang + Math.PI/2);
+  ctx.fillStyle = 'rgba(12,13,16,0.95)';
+  const bladeLen = GW*0.055;
+  ctx.fillRect(-bladeLen, -3.5, bladeLen*2, 7);
   ctx.restore();
 }
 
@@ -1045,12 +1042,6 @@ function drawDashboard() {
 
 function drawFlashes() {
   if (crashFlash > 0) { ctx.fillStyle = `rgba(255,40,40,${crashFlash*0.45})`; ctx.fillRect(0,0,GW,GH); }
-  if (offRoadTime > 0) {
-    const shake = offRoadTime * 4;
-    ctx.fillStyle = `rgba(255,180,32,${offRoadTime*0.10})`;
-    ctx.fillRect(0,0,GW,GH);
-    void shake;
-  }
 }
 
 function render(dt) {
