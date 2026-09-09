@@ -1033,6 +1033,12 @@ function drawDashboard() {
     const a = i*(Math.PI*2/3) + Math.PI/2;
     ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*hubR, Math.sin(a)*hubR); ctx.stroke();
   }
+  // A single off-center marker on the rim so a turn is always visible at a
+  // glance — three evenly-spaced spokes alone look identical every 120 deg.
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(0, -hubR, hubR*0.12, 0, Math.PI*2); ctx.fill(); ctx.stroke();
   ctx.fillStyle = '#1c1f28';
   ctx.beginPath(); ctx.arc(0,0,hubR*0.28,0,Math.PI*2); ctx.fill();
   ctx.fillStyle = hornFlash > 0 ? '#ff5a5a' : '#3a3f4c';
