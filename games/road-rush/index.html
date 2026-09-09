@@ -192,7 +192,6 @@
 
 let GW = 900, GH = 560;
 let HORIZON_Y, ROAD_Y_SCALE, ROAD_X_SCALE, STEER_RADIUS_PX, HUB_X, HUB_Y, WHEEL_TOUCH_R;
-const isMobile = window.matchMedia('(pointer: coarse)').matches;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const wrapper = document.getElementById('game-wrapper');
@@ -468,26 +467,27 @@ function setWheelFromClientX(clientX) {
   player.wheelAngle = norm * MAX_WHEEL_RAD;
 }
 
-if (!isMobile) {
-  canvas.addEventListener('mousemove', (e) => { if (state === 'playing') setWheelFromClientX(e.clientX); });
-  canvas.addEventListener('mouseleave', () => { /* lerp handled in update */ });
-} else {
-  canvas.addEventListener('touchstart', (e) => {
-    if (state !== 'playing') return;
-    const t = e.changedTouches[0];
-    const p = screenToGame(t.clientX, t.clientY);
-    const d = Math.hypot(p.x - HUB_X, p.y - HUB_Y);
-    if (d < WHEEL_TOUCH_R * 1.7) { touchSteering = true; setWheelFromClientX(t.clientX); e.preventDefault(); }
-  }, { passive:false });
-  canvas.addEventListener('touchmove', (e) => {
-    if (!touchSteering) return;
-    const t = e.changedTouches[0];
-    setWheelFromClientX(t.clientX);
-    e.preventDefault();
-  }, { passive:false });
-  canvas.addEventListener('touchend', () => { touchSteering = false; });
-  canvas.addEventListener('touchcancel', () => { touchSteering = false; });
-}
+// Both control schemes are always attached rather than picked once via a
+// pointer:coarse media-query guess — that guess can be wrong on some
+// devices/browsers and silently leave touch totally unhandled.
+let usingTouch = false;
+canvas.addEventListener('mousemove', (e) => { if (state === 'playing') setWheelFromClientX(e.clientX); });
+canvas.addEventListener('touchstart', (e) => {
+  if (state !== 'playing') return;
+  usingTouch = true;
+  const t = e.changedTouches[0];
+  const p = screenToGame(t.clientX, t.clientY);
+  const d = Math.hypot(p.x - HUB_X, p.y - HUB_Y);
+  if (d < WHEEL_TOUCH_R * 1.7) { touchSteering = true; setWheelFromClientX(t.clientX); e.preventDefault(); }
+}, { passive:false });
+canvas.addEventListener('touchmove', (e) => {
+  if (!touchSteering) return;
+  const t = e.changedTouches[0];
+  setWheelFromClientX(t.clientX);
+  e.preventDefault();
+}, { passive:false });
+canvas.addEventListener('touchend', () => { touchSteering = false; });
+canvas.addEventListener('touchcancel', () => { touchSteering = false; });
 
 // ---------- Input: wipers / horn / pause ----------
 const wiperBtn = document.getElementById('wiper-btn');
@@ -720,7 +720,7 @@ function update(dt) {
   speed += (maxSpeed - speed) * dt * 0.9;
   speed = Math.max(4, speed);
 
-  if (isMobile && !touchSteering) player.wheelAngle *= Math.pow(0.02, dt);
+  if (usingTouch && !touchSteering) player.wheelAngle *= Math.pow(0.02, dt);
 
   const speedFactor = 0.7 + 0.3 * (speed / maxSpeed);
   const steerInput = (player.wheelAngle / MAX_WHEEL_RAD);
