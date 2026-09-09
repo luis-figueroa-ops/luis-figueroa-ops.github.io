@@ -20,7 +20,7 @@
     font-family: 'Share Tech Mono', monospace;
     overflow: hidden; user-select: none; touch-action: none; position: fixed;
   }
-  body { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 34px; }
   #game-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .back-nav { position: fixed; left: 14px; top: 14px; z-index: 50; font-size: 14px; letter-spacing: 1px; }
   .back-nav a { color: #9aa4bb; text-decoration: none; transition: color 0.2s; }
@@ -56,8 +56,9 @@
   #pause-btn { right: 12px; top: 12px; width: 36px; height: 36px; font-size: 14px; color: #cfd6e6; }
   #overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 12px;
     background: rgba(5,7,12,0.97); backdrop-filter: blur(4px); z-index: 30; padding: 14px; overflow-y: auto;
+    touch-action: pan-y;
   }
   #overlay.hidden { display: none; }
   .overlay-title {
@@ -103,19 +104,13 @@
   .controls-hint { font-size: 10px; color: #6b7488; text-align: center; max-width: 460px; line-height: 1.6; }
   .weather-tag { display: inline-block; padding: 1px 6px; border: 1px solid #2a3040; border-radius: 3px; margin: 0 2px; }
   #pause-panel { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-  #rotate-prompt {
-    display: none; position: fixed; inset: 0; z-index: 100; background: #05070c;
-    flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; padding: 20px;
-  }
-  #rotate-prompt.show { display: flex; }
+  #overlay { padding-top: 24px; padding-bottom: 24px; }
   @media (max-height: 500px) {
     .copyright { display: none; }
     .back-nav { font-size: 10px; top: 3px; left: 6px; }
     #game-wrapper { margin-top: 20px; margin-bottom: auto; }
   }
-  .rotate-icon { font-size: 48px; animation: rotate-hint 1.8s ease-in-out infinite; }
-  .rotate-text { font-family: 'Orbitron', sans-serif; font-size: 13px; letter-spacing: 1px; color: var(--accent); line-height: 1.7; }
-  @keyframes rotate-hint { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
+  .dash-icon { width: 60%; height: 60%; }
 </style>
 </head>
 <body>
@@ -141,9 +136,26 @@
   <div id="canvas-wrap">
     <canvas id="canvas"></canvas>
     <div id="lives-display" style="position:absolute; left:14px; top:12px; z-index:20;"></div>
-    <div class="dash-btn" id="wiper-btn" title="Wipers (W)">🌀</div>
-    <div class="dash-btn" id="horn-btn" title="Horn (H)">📯</div>
-    <div class="dash-btn" id="pause-btn" title="Pause (P)">❚❚</div>
+    <div class="dash-btn" id="wiper-btn" title="Wipers (W)">
+      <svg class="dash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="12" cy="20" r="1.5" fill="currentColor" stroke="none"/>
+        <path d="M12 19.5 C 12.5 11, 7 9.5, 5.5 3.5"/>
+        <line x1="2.8" y1="2.8" x2="8" y2="4.8"/>
+      </svg>
+    </div>
+    <div class="dash-btn" id="horn-btn" title="Horn (H)">
+      <svg class="dash-icon" viewBox="0 0 24 24">
+        <path d="M4 9v6h3.2l6.3 4.2V4.8L7.2 9H4z" fill="currentColor"/>
+        <path d="M16.5 8.2a5.4 5.4 0 0 1 0 7.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M19.3 5.4a9.4 9.4 0 0 1 0 13.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="dash-btn" id="pause-btn" title="Pause (P)">
+      <svg class="dash-icon" viewBox="0 0 24 24">
+        <rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/>
+        <rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
 
     <div id="overlay">
       <div class="overlay-title">ROAD RUSH</div>
@@ -174,32 +186,35 @@
 
 <div class="copyright">&copy; 2026 Luis Figueroa — Built with Claude Code</div>
 
-<div id="rotate-prompt">
-  <div class="rotate-icon">📱</div>
-  <div class="rotate-text">Rotate your device to landscape<br>to get behind the wheel</div>
-</div>
-
 <script>
 (function(){
 'use strict';
 
-const GW = 900, GH = 560;
+let GW = 900, GH = 560;
+let HORIZON_Y, ROAD_Y_SCALE, ROAD_X_SCALE, STEER_RADIUS_PX, HUB_X, HUB_Y, WHEEL_TOUCH_R;
 const isMobile = window.matchMedia('(pointer: coarse)').matches;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const wrapper = document.getElementById('game-wrapper');
 const hudEl = document.getElementById('hud');
 const backNav = document.getElementById('back-nav');
-canvas.width = GW; canvas.height = GH;
 let cssToGame = 1;
-const rotatePrompt = document.getElementById('rotate-prompt');
-function checkOrientation() {
-  const portrait = isMobile && window.innerHeight > window.innerWidth;
-  rotatePrompt.classList.toggle('show', portrait);
-  return portrait;
+function pickDimensions() {
+  if (window.innerHeight > window.innerWidth) { GW = 480; GH = 780; }
+  else { GW = 900; GH = 560; }
+}
+function updateLayoutConstants() {
+  HORIZON_Y = GH * 0.42;
+  ROAD_Y_SCALE = GH * 0.70;
+  ROAD_X_SCALE = GW * 0.58;
+  STEER_RADIUS_PX = GW * 0.36;
+  HUB_X = GW / 2; HUB_Y = GH * 0.845;
+  WHEEL_TOUCH_R = GW * 0.30;
 }
 function resize() {
-  checkOrientation();
+  pickDimensions();
+  canvas.width = GW; canvas.height = GH;
+  updateLayoutConstants();
   const availW = window.innerWidth - 4, availH = window.innerHeight - 4;
   const fitScale = Math.min(availW / GW, (availH - 56) / GH, 1);
   const cw = Math.floor(GW * fitScale), ch = Math.floor(GH * fitScale);
@@ -246,6 +261,21 @@ function playLevelUp() {
   playTone(880, 'square', 0.18, 0.08, null, 0.2);
 }
 function playWiper() { playTone(700, 'triangle', 0.08, 0.03, 500); }
+function playEngineRev() {
+  try {
+    const ac = getAudio(), t0 = ac.currentTime;
+    const osc = ac.createOscillator(), g = ac.createGain();
+    osc.type = 'sawtooth';
+    osc.connect(g); g.connect(ac.destination);
+    osc.frequency.setValueAtTime(70, t0);
+    osc.frequency.linearRampToValueAtTime(340, t0 + 0.22);
+    osc.frequency.linearRampToValueAtTime(150, t0 + 0.55);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.15, t0 + 0.08);
+    g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.6);
+    osc.start(t0); osc.stop(t0 + 0.65);
+  } catch(e) {}
+}
 
 // ---------- Vehicles ----------
 const VEHICLES = [
@@ -277,9 +307,6 @@ let weatherTimer = 0;
 const ROAD_HALF = 1.0;
 const CAMERA_DEPTH = 0.84;
 const DRAW_DIST = 140;
-const HORIZON_Y = GH * 0.42;
-const ROAD_Y_SCALE = GH * 0.70;
-const ROAD_X_SCALE = GW * 0.58;
 const LANE_OFFSETS = [-0.55, 0, 0.55];
 
 let segments = [];
@@ -412,10 +439,7 @@ function renderLivesPips() {
 }
 
 // ---------- Input: steering ----------
-let mouseSteerX = GW/2;
-const STEER_RADIUS_PX = GW * 0.36;
 const MAX_WHEEL_RAD = 2.35;
-const HUB_X = GW/2, HUB_Y = GH*0.845, WHEEL_TOUCH_R = GW*0.30;
 let touchSteering = false;
 
 function setWheelFromClientX(clientX) {
@@ -585,6 +609,7 @@ startBtn.addEventListener('click', () => {
 function startGame() {
   if (!selectedVehicle) return;
   resetGame();
+  playEngineRev();
   state = 'playing';
   overlay.classList.add('hidden');
   backNav.classList.add('hidden');
@@ -659,17 +684,21 @@ function update(dt) {
 
   if (isMobile && !touchSteering) player.wheelAngle *= Math.pow(0.02, dt);
 
-  const speedFactor = 0.55 + 0.45 * (speed / maxSpeed);
+  const speedFactor = 0.7 + 0.3 * (speed / maxSpeed);
   const steerInput = (player.wheelAngle / MAX_WHEEL_RAD);
   const steerRate = 1.6 * selectedVehicle.steerMult * speedFactor * gripPenalty;
   player.x += steerInput * steerRate * dt;
 
   const baseIdx = Math.floor(position);
   const curSeg = getSegment(baseIdx);
-  const driftForce = curSeg.curve * (speed/maxSpeed) * 0.014 * selectedVehicle.driftRes;
+  const driftForce = curSeg.curve * (speed/maxSpeed) * 0.25 * selectedVehicle.driftRes * dt;
   player.x += driftForce;
 
   const offset = player.x - curSeg.x;
+  if (Math.abs(offset) > ROAD_HALF) {
+    const overshoot = Math.min(Math.abs(offset) - ROAD_HALF, 1.5);
+    player.x -= Math.sign(offset) * overshoot * 0.5 * dt;
+  }
   if (Math.abs(offset) > ROAD_HALF * 1.02) {
     offRoadTime = Math.min(1, offRoadTime + dt*2);
   } else {
@@ -975,9 +1004,7 @@ function render(dt) {
 function loop(t) {
   const dt = Math.min(0.05, (t - lastT) / 1000);
   lastT = t;
-  if (state === 'playing' && rotatePrompt.classList.contains('show')) {
-    render(0);
-  } else if (state === 'playing') {
+  if (state === 'playing') {
     update(dt);
     render(dt);
   } else if (state === 'paused') {
