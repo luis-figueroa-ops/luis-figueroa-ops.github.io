@@ -28,20 +28,32 @@ Four self-contained HTML pages — all styles and scripts are inline within each
 
 ## Claude API Usage Patterns
 
-Both AI tools call `https://api.anthropic.com/v1/messages` directly from the browser using a user-supplied API key. The key is never stored — it lives only in the browser session.
+> **Note:** this section is partly out of date. The AI tools (JD Analyzer, AI
+> Role Revealer, Prompt Coach, Course Blueprint, WordSense) are now published
+> **Claude Artifacts** — the pages under `jd-analyzer/`, `ai-role-revealer/`
+> etc. are just landing pages that link to `claude.ai/public/artifacts/...`.
+> The artifact source lives in this repo only for WordSense
+> (`games/wordsense/wordsense-artifact.html`).
 
-Required headers for direct browser access:
-```js
-'anthropic-dangerous-direct-browser-access': 'true'
-'anthropic-version': '2023-06-01'
-'x-api-key': userApiKey
-```
+**Preferred pattern for a new AI tool** — call `window.claude.complete(prompt)`
+inside the artifact. It runs on the *viewer's* own Claude account (they click
+"Allow" once), needs no API key, and lets the artifact be shared **publicly**.
+This works ONLY for artifacts published from a **claude.ai chat**
+(`claude.ai/public/artifacts/...`) — WordSense, JD Analyzer, AI Role Revealer,
+and Prompt Coach all use it. To update one: open a claude.ai chat, paste the
+source, ask for a single self-contained HTML artifact that keeps the
+`window.claude.complete()` calls, then publish and set "Anyone with the link".
 
-**JD Analyzer** — uses streaming (`stream: true`), model `claude-opus-4-5`, max_tokens 1500. Maintains `conversationHistory` array for multi-turn chat.
+`window.claude.complete()` is NOT available in artifacts published via the
+Claude Code Artifact tool (`claude.ai/code/artifact/...`); that runtime only
+offers the capability model, and declaring `sample` there blocks public
+sharing. Tested 2026-09 — don't retry it.
 
-**AI Role Revealer** — non-streaming, two separate calls:
-- Step 1 (role analysis): `claude-sonnet-4-6`, max_tokens 1000, expects raw JSON with `{"insights": [{title, body}]}`
-- Step 2 (prompt builder): `claude-sonnet-4-6`, max_tokens 1000, returns plain text prompt
+**Legacy pattern (avoid)** — direct browser calls to
+`https://api.anthropic.com/v1/messages` with a user-supplied `x-api-key` plus
+`anthropic-dangerous-direct-browser-access: true` and
+`anthropic-version: 2023-06-01`. Forces every visitor to bring their own paid
+API key.
 
 ## Design System
 
