@@ -72,6 +72,24 @@
     }
     .btn:hover, .btn:active { background: #00ffe722; box-shadow: 0 0 32px #00ffe7aa; transform: scale(1.04); }
     .controls-hint { margin-top: 18px; color: #a0a0cc; font-size: 0.70rem; letter-spacing: 1.5px; line-height: 1.8; }
+    /* Desktop "How to play" legend (mobile replaces this block's contents). */
+    .howto-title {
+      color: #00ffe7;
+      font-weight: bold;
+      letter-spacing: 5px;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+      text-shadow: 0 0 14px #00ffe7cc;
+    }
+    .controls-hint .sep { color: #6b6b8f; }
+    .controls-hint .k { font-weight: bold; }
+    .k-move  { color: #22ffe9; text-shadow: 0 0 10px #00ffe7; }
+    .k-rot   { color: #c39bff; text-shadow: 0 0 10px #a080ff; }
+    .k-soft  { color: #3cf08a; text-shadow: 0 0 10px #35c46a; }
+    .k-hard  { color: #ffdc4a; text-shadow: 0 0 10px #ffd700; }
+    .k-pause { color: #ff9d4d; text-shadow: 0 0 10px #ff8a2a; }
+    .k-music { color: #5cb4ff; text-shadow: 0 0 10px #3f9bff; }
+    .k-hold  { color: #ff8ad6; text-shadow: 0 0 10px #ff5fc4; }
     #startScreen, #gameoverScreen { display: none; }
     #startScreen.active, #gameoverScreen.active { display: block; }
 
@@ -106,9 +124,12 @@
       .controls-hint {
         font-size: 0.88rem;
         letter-spacing: 1px;
-        margin-top: 24px;
-        line-height: 2;
+        margin-top: 26px;
+        padding-top: 18px;
+        border-top: 1px solid #ffffff1f;
+        line-height: 2.1;
       }
+      .howto-title { font-size: 0.92rem; letter-spacing: 6px; }
     }
 
     .back-nav {
@@ -163,9 +184,10 @@
     </p>
     <button class="btn" id="startBtn">START GAME</button>
     <div class="controls-hint" id="controlsHint">
-      &larr;&nbsp;&rarr;&nbsp;MOVE &middot;&nbsp;&uarr;&nbsp;ROTATE &middot;&nbsp;&darr;&nbsp;SOFT&nbsp;DROP<br>
-      SPACE&nbsp;HARD&nbsp;DROP &middot;&nbsp;P&nbsp;PAUSE &middot;&nbsp;M&nbsp;MUSIC<br>
-      CLICK&nbsp;THE&nbsp;HOLD&nbsp;SLOT&nbsp;(TOP-LEFT)&nbsp;TO&nbsp;HOLD&nbsp;A&nbsp;PIECE
+      <div class="howto-title">HOW TO PLAY</div>
+      <span class="k k-move">&larr;&nbsp;&rarr;&nbsp;MOVE</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-rot">&uarr;&nbsp;ROTATE</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-soft">&darr;&nbsp;SOFT&nbsp;DROP</span><br>
+      <span class="k k-hard">SPACE&nbsp;HARD&nbsp;DROP</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-pause">P&nbsp;PAUSE</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-music">M&nbsp;MUSIC</span><br>
+      <span class="k k-hold">CLICK THE HOLD SLOT (TOP-LEFT) TO HOLD A PIECE</span>
     </div>
   </div>
 
