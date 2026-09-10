@@ -61,7 +61,7 @@
   .k {
     font-family:'Bebas Neue',sans-serif; letter-spacing:1px; font-size:15px;
     border:2px solid rgba(255,255,255,.32); color:#fff; background:rgba(0,0,0,.34);
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; cursor:pointer;
     width:74px; height:44px; border-radius:10px; -webkit-tap-highlight-color:transparent;
   }
   .k.wide { width:100%; }
@@ -69,6 +69,16 @@
   .k.on { background:rgba(90,160,255,.55); border-color:#bcd4ff; }
   #jumpBtn { grid-column:1 / -1; }
   .pad.hidden { display:none; }
+  .kh { display:none; }
+  .fine-only { display:none; }
+  /* keyboard / mouse (desktop): show key hints and the re-square button, and enlarge the pads */
+  @media (pointer:fine){
+    .kh { display:block; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--gold); opacity:.8; }
+    .fine-only { display:flex; }
+    .k { width:96px; height:50px; font-size:16px; }
+    #movePad, #defPad { gap:8px; }
+    #movePad { min-width:120px; }
+  }
   @media (max-width:520px){ .k { width:64px; height:40px; font-size:13px; } }
 
   #overlay {
@@ -119,14 +129,15 @@
   <div id="stage">
     <canvas id="game"></canvas>
     <div id="movePad" class="pad hidden">
-      <div class="k wide" id="inBtn">STEP IN</div>
-      <div class="k wide" id="outBtn">STEP OUT</div>
+      <div class="k wide" id="inBtn">STEP IN<span class="kh">W</span></div>
+      <div class="k wide" id="outBtn">STEP OUT<span class="kh">S</span></div>
+      <div class="k wide fine-only" id="turnBtn">RE&#8209;SQUARE<span class="kh">A / D</span></div>
     </div>
     <div id="defPad" class="pad hidden">
-      <div class="k" id="slipBtn">SLIP</div>
-      <div class="k" id="weaveBtn">WEAVE</div>
-      <div class="k" id="blockBtn">BLOCK</div>
-      <div class="k" id="jumpBtn">JUMP</div>
+      <div class="k" id="slipBtn">SLIP<span class="kh">J</span></div>
+      <div class="k" id="weaveBtn">WEAVE<span class="kh">K</span></div>
+      <div class="k" id="blockBtn">BLOCK<span class="kh">SPACE</span></div>
+      <div class="k" id="jumpBtn">JUMP<span class="kh">&uarr;</span></div>
     </div>
     <div id="overlay" class="solid">
       <div class="o-title">GLASS<br>JAW</div>
@@ -375,8 +386,8 @@ function startGame(){
   opp = makeOpp(1);
   updateHUD(); hideOverlay();
   backNav.classList.add('hidden');
-  movePad.classList.toggle('hidden', !isCoarse);
-  defPad.classList.toggle('hidden', !isCoarse);
+  movePad.classList.remove('hidden');
+  defPad.classList.remove('hidden');
   startCrowd();
   state='transition'; transT=0;
   loop();
@@ -1401,6 +1412,7 @@ bindTap(document.getElementById('outBtn'), stepOut);
 bindTap(document.getElementById('slipBtn'), doSlip);
 bindTap(document.getElementById('weaveBtn'), doWeave);
 bindTap(document.getElementById('jumpBtn'), doJump);
+bindTap(document.getElementById('turnBtn'), () => { if (state==='playing' && !paused) reSquare(); });
 document.getElementById('blockBtn').addEventListener('pointerdown', e=>{e.preventDefault(); blockOn();}, {passive:false});
 window.addEventListener('pointerup', blockOff);
 window.addEventListener('pointercancel', blockOff);
