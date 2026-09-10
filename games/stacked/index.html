@@ -312,9 +312,11 @@ function soundGameOver() {
 // ─── Background music ───────────────────────────────────────────────────────
 // Original driving arcade chiptune, step-sequenced with Web Audio (no files).
 // Bass + arpeggio + lead + drums over an Am–F–C–G loop. Toggle with M.
+// Tempo tracks the game level: slower early, faster and more intense as levels climb.
 let musicOn = true, musicGain = null, musicHandle = null, musicNextT = 0, musicStep = 0, musicNoise = null;
-const M_BPM = 130;
-const M_STEP = 15 / M_BPM;   // 16th-note length in seconds (= 60 / BPM / 4)
+const M_BPM_MIN = 116, M_BPM_PER_LEVEL = 7, M_BPM_MAX = 185;
+function mBpm() { return Math.min(M_BPM_MAX, M_BPM_MIN + ((level || 1) - 1) * M_BPM_PER_LEVEL); }
+function mStep() { return 15 / mBpm(); }   // current 16th-note length in seconds
 const M_LOOP = 64;           // 4 bars × 16 steps
 
 const M_FREQ = {};
@@ -417,15 +419,16 @@ function musicTick() {
   if (!musicOn || !musicHandle) return;
   const ac = getAudio();
   while (musicNextT < ac.currentTime + 0.35) {
+    const s = mStep();
     const i = musicStep % M_LOOP, t = musicNextT;
-    if (M_BASS[i] !== '.') mTone(M_FREQ[M_BASS[i]], t, M_STEP * 2.1, 0.13, 'square');
-    if (M_ARP[i]  !== '.') mTone(M_FREQ[M_ARP[i]],  t, M_STEP * 0.95, 0.042, 'square');
-    if (M_LEAD[i] !== '.') mTone(M_FREQ[M_LEAD[i]], t, M_STEP * 1.9, 0.06, 'square');
+    if (M_BASS[i] !== '.') mTone(M_FREQ[M_BASS[i]], t, s * 2.1, 0.13, 'square');
+    if (M_ARP[i]  !== '.') mTone(M_FREQ[M_ARP[i]],  t, s * 0.95, 0.042, 'square');
+    if (M_LEAD[i] !== '.') mTone(M_FREQ[M_LEAD[i]], t, s * 1.9, 0.06, 'square');
     if (M_KICK[i]  === 'x') mKick(t);
     if (M_SNARE[i] === 'x') mSnare(t);
     if (M_HAT[i]   === 'x') mNoiseHit(t, 0.026, 8000, 0.04);
     else if (M_HAT[i] === 'O') mNoiseHit(t, 0.06, 8000, 0.075);
-    musicNextT += M_STEP;
+    musicNextT += s;
     musicStep++;
   }
 }
