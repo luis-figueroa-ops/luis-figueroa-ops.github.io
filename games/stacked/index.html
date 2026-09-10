@@ -90,6 +90,8 @@
     .k-pause { color: #ff9d4d; text-shadow: 0 0 10px #ff8a2a; }
     .k-music { color: #5cb4ff; text-shadow: 0 0 10px #3f9bff; }
     .k-hold  { color: #ff8ad6; text-shadow: 0 0 10px #ff5fc4; }
+    /* Mobile "how to play" text (touch build only) — brighter than the desktop legend. */
+    .controls-hint.is-touch { color: #22ffe9; text-shadow: 0 0 10px #00ffe788; }
     #startScreen, #gameoverScreen { display: none; }
     #startScreen.active, #gameoverScreen.active { display: block; }
 
@@ -662,7 +664,9 @@ document.getElementById('startBtn').addEventListener('click', beginGame);
 document.getElementById('restartBtn').addEventListener('click', beginGame);
 
 if (isTouchDevice) {
-  document.getElementById('controlsHint').innerHTML =
+  const hint = document.getElementById('controlsHint');
+  hint.classList.add('is-touch');
+  hint.innerHTML =
     'USE THE ON-SCREEN BUTTONS BELOW TO MOVE, ROTATE, DROP &amp; HOLD<br>' +
     '⏸️ TAP THE PAUSE ICON (TOP RIGHT) TO PAUSE';
 }
