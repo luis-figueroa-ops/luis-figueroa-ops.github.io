@@ -186,7 +186,7 @@
   <button class="tbtn tbtn-sm" id="btnDrop">⤓</button>
 </div>
 <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
-<div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/#zap">← Back to Tools</a></div>
+<div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/#stacked">← Back to Tools</a></div>
 
 <script>
 // STACKED! — Block Drop Arcade (Tetris-like)
@@ -210,7 +210,6 @@ resize();
 function uiScale() { return Math.min(1, W / 500); }
 function getTouchBarH() { return isTouchDevice ? 84 : 0; }
 
-const DELTA_CAP = 0.05;
 const DAS = 0.15, ARR = 0.04, SOFT_DROP_MS = 50, LOCK_DELAY = 500;
 
 // ─── Piece definitions ─────────────────────────────────────────────────────
@@ -775,13 +774,33 @@ function draw(dt) {
   }
 }
 
-let lastTime = null;
+// Fixed-timestep loop: advance the sim by real elapsed time so gameplay speed
+// never depends on the frame rate. Browsers throttle requestAnimationFrame hard
+// for background / occluded tabs (common on desktop), which would otherwise make
+// the game crawl or look frozen.
+const SIM_STEP = 1 / 120;   // seconds of game time per simulation step
+const MAX_CATCHUP = 1;      // absorb at most 1s of missed time in one frame
+const MAX_STEPS = 240;
+let lastTime = null, simAccum = 0;
 function loop(ts) {
+  requestAnimationFrame(loop);
   if (lastTime === null) lastTime = ts;
-  let dt = (ts - lastTime) / 1000; lastTime = ts; dt = Math.min(dt, DELTA_CAP);
-  update(dt); draw(dt); requestAnimationFrame(loop);
+  let frame = (ts - lastTime) / 1000;
+  lastTime = ts;
+  if (frame > MAX_CATCHUP) frame = MAX_CATCHUP;
+  simAccum += frame;
+  let steps = 0;
+  while (simAccum >= SIM_STEP && steps < MAX_STEPS) { update(SIM_STEP); simAccum -= SIM_STEP; steps++; }
+  if (steps >= MAX_STEPS) simAccum = 0;
+  draw(frame);
 }
 requestAnimationFrame(loop);
+
+// Returning to a backgrounded tab: resync the clock so no time is fast-forwarded
+// — the board stays exactly where the player left it.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) { lastTime = null; simAccum = 0; }
+});
 </script>
 </body>
 </html>
