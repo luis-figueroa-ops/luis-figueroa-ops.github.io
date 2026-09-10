@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WordSense</title>
-<link rel="canonical" href="https://claude.ai/code/artifact/73cd7525-995a-4cbf-b3ec-5453bc854cfa">
-<meta http-equiv="refresh" content="0; url=https://claude.ai/code/artifact/73cd7525-995a-4cbf-b3ec-5453bc854cfa">
+<title>WordSense — Games, Operations Augmented</title>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
 <script>
@@ -15,61 +13,73 @@
   gtag('config', 'G-YCMXSWXHTN');
 </script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root { color-scheme: light; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  background: #f5f4f0;
-  color: #1a1a18;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 1.25rem;
-  line-height: 1.6;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f4f0; --card: #ffffff; --border: #e0ddd6;
+  --text: #1a1a18; --text-soft: #666660; --text-muted: #999992;
+  --blue: #3a6fd8; --gold: #b8860b; --gold-bg: #fdf6e3; --gold-border: #e6c84a;
 }
-.card {
-  background: #ffffff;
-  border: 0.5px solid #e0ddd6;
-  border-radius: 12px;
-  padding: 2.5rem 2rem;
-  max-width: 440px;
-  width: 100%;
-  text-align: center;
-}
-.title { font-size: 34px; font-weight: 700; letter-spacing: -1px; }
-.tagline { font-size: 15px; color: #666660; font-style: italic; margin-top: 0.25rem; }
-p { font-size: 14px; color: #666660; margin-top: 1.5rem; }
-.go {
-  display: inline-block;
-  margin-top: 1.5rem;
-  padding: 0.85rem 1.6rem;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 8px;
-  background: #3a6fd8;
-  color: #fff;
-  text-decoration: none;
-}
-.go:hover { opacity: 0.88; }
-.note { font-size: 12px; color: #999992; margin-top: 1.25rem; }
-a.back { color: #999992; font-size: 12px; text-decoration: none; display: inline-block; margin-top: 1.5rem; }
-a.back:hover { color: #3a6fd8; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; min-height: 100vh; line-height: 1.6; }
+.back-link { position: fixed; left: 14px; top: 14px; z-index: 200; font-size: 13px; letter-spacing: 1px; color: var(--text-muted); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+.back-link:hover { color: var(--blue); }
+.page-wrap { max-width: 640px; margin: 0 auto; padding: 76px 24px 60px; }
+.eyebrow { font-size: 13px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; font-weight: 600; }
+h1 { font-size: clamp(36px, 6vw, 48px); font-weight: 700; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; }
+.tagline { font-size: 16px; color: var(--text-soft); font-style: italic; margin-bottom: 18px; }
+.subtitle { font-size: 15px; color: var(--text-soft); max-width: 560px; line-height: 1.7; margin-bottom: 32px; }
+.cta-card { background: var(--gold-bg); border: 0.5px solid var(--gold-border); border-left: 4px solid var(--gold); border-radius: 12px; padding: 1.75rem 1.75rem; margin-bottom: 32px; }
+.cta-label { font-size: 12px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
+.cta-card p { color: var(--text-soft); font-size: 14px; line-height: 1.7; margin-bottom: 18px; }
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--blue); color: #fff; font-size: 15px; font-weight: 600; padding: 0.85rem 1.6rem; border-radius: 8px; text-decoration: none; transition: opacity 0.15s; }
+.btn-primary:hover { opacity: 0.88; }
+.cta-note { font-size: 12px; color: var(--text-muted); margin-top: 16px; margin-bottom: 0; font-style: italic; }
+.section { margin-bottom: 28px; }
+.section-label { font-size: 13px; letter-spacing: 1px; color: var(--text); text-transform: uppercase; font-weight: 700; margin-bottom: 14px; }
+ul.feature-list { list-style: none; }
+ul.feature-list li { padding: 12px 0; padding-left: 24px; position: relative; color: var(--text-soft); font-size: 14px; line-height: 1.65; border-bottom: 0.5px solid var(--border); }
+ul.feature-list li:last-child { border-bottom: none; }
+ul.feature-list li::before { content: '\2192'; position: absolute; left: 0; color: var(--gold); }
+ul.feature-list li strong { color: var(--text); }
+.footer { margin-top: 30px; padding-top: 20px; border-top: 0.5px solid var(--border); font-size: 13px; color: var(--text-muted); }
+.footer a { color: var(--blue); text-decoration: none; }
+@media (max-width: 520px) { .page-wrap { padding: 60px 16px 50px; } .cta-card { padding: 1.5rem 1.25rem; } .btn-primary { width: 100%; justify-content: center; } }
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="title">WordSense</div>
-    <div class="tagline">Your brain on words.</div>
-    <p>WordSense now runs as a Claude Artifact. It writes each passage using your own free Claude account &mdash; no API key, nothing to install. Redirecting you now&hellip;</p>
-    <a class="go" href="https://claude.ai/code/artifact/73cd7525-995a-4cbf-b3ec-5453bc854cfa">Open WordSense &rarr;</a>
-    <div class="note">Sign in to claude.ai and choose &ldquo;Allow&rdquo; the first time it asks to use Claude.</div>
-    <a class="back" href="https://luis-figueroa-ops.github.io/#wordsense">&larr; Back to Tools</a>
+<a class="back-link" href="https://luis-figueroa-ops.github.io/#wordsense">&#8592; Back to Tools</a>
+<div class="page-wrap">
+  <div class="eyebrow">Games</div>
+  <h1>WordSense</h1>
+  <div class="tagline">Your brain on words.</div>
+  <p class="subtitle">Build vocabulary the way reading does — through context, not memorization. Each round drops you into a real passage with one word highlighted, and you figure out what it means from the clues around it. Adaptive difficulty, four levels, and a word bank that tracks what you've earned.</p>
+
+  <div class="cta-card">
+    <div class="cta-label">Open This Tool</div>
+    <p>This runs as a live, interactive experience inside Claude, not a page on this site. Click below and it opens directly.</p>
+    <a class="btn-primary" href="https://claude.ai/code/artifact/73cd7525-995a-4cbf-b3ec-5453bc854cfa" target="_blank">Open in Claude &#8594;</a>
+    <p class="cta-note">Free to use, on your own Claude account. WordSense writes every passage live, so open it while signed in to claude.ai and choose "Allow" the first time it asks to use Claude.</p>
   </div>
-  <script>
-    setTimeout(function () {
-      window.location.replace("https://claude.ai/code/artifact/73cd7525-995a-4cbf-b3ec-5453bc854cfa");
-    }, 1200);
-  </script>
+
+  <div class="section">
+    <div class="section-label">What It Does</div>
+    <ul class="feature-list">
+      <li><strong>Fresh passages every round</strong>, written live by Claude, no static question bank</li>
+      <li>No flashcards, no definitions handed to you — the meaning has to be deduced from context, the way real reading works</li>
+      <li>Four difficulty levels, from direct clues to figurative use, that adapt to your streak</li>
+      <li>Progress, word bank, and milestone badges saved automatically to your browser</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-label">How It Works</div>
+    <ul class="feature-list">
+      <li>Click "Open in Claude" above and sign in to your free Claude account</li>
+      <li>Read each passage and choose what the highlighted word means from the clues around it</li>
+      <li>Get three right in a row and the difficulty goes up; miss two and it steps back to reinforce the basics</li>
+    </ul>
+  </div>
+
+  <div class="footer">Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a> &middot; <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>Augmenting Human Potential, One Workflow at a Time</div>
+</div>
 </body>
 </html>
