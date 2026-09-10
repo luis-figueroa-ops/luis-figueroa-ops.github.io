@@ -28,20 +28,25 @@ Four self-contained HTML pages — all styles and scripts are inline within each
 
 ## Claude API Usage Patterns
 
-Both AI tools call `https://api.anthropic.com/v1/messages` directly from the browser using a user-supplied API key. The key is never stored — it lives only in the browser session.
+> **Note:** this section is partly out of date. The AI tools (JD Analyzer, AI
+> Role Revealer, Prompt Coach, Course Blueprint, WordSense) are now published
+> **Claude Artifacts** — the pages under `jd-analyzer/`, `ai-role-revealer/`
+> etc. are just landing pages that link to `claude.ai/public/artifacts/...`.
+> The artifact source lives in this repo only for WordSense
+> (`games/wordsense/wordsense-artifact.html`).
 
-Required headers for direct browser access:
-```js
-'anthropic-dangerous-direct-browser-access': 'true'
-'anthropic-version': '2023-06-01'
-'x-api-key': userApiKey
-```
+**Preferred pattern for a new AI tool** — call `window.claude.complete(prompt)`
+inside the artifact. It runs on the *viewer's* own Claude account (they click
+"Allow" once), needs no API key, and — crucially — lets the artifact be shared
+**publicly**. Declaring the `sample` capability (`claude.use("sample")`) is more
+powerful but restricts sharing to named people only, so avoid it for anything
+that needs to be public. Republish artifacts with capabilities cleared (`{}`).
 
-**JD Analyzer** — uses streaming (`stream: true`), model `claude-opus-4-5`, max_tokens 1500. Maintains `conversationHistory` array for multi-turn chat.
-
-**AI Role Revealer** — non-streaming, two separate calls:
-- Step 1 (role analysis): `claude-sonnet-4-6`, max_tokens 1000, expects raw JSON with `{"insights": [{title, body}]}`
-- Step 2 (prompt builder): `claude-sonnet-4-6`, max_tokens 1000, returns plain text prompt
+**Legacy pattern (still in older tools)** — direct browser calls to
+`https://api.anthropic.com/v1/messages` with a user-supplied `x-api-key` plus
+`anthropic-dangerous-direct-browser-access: true` and
+`anthropic-version: 2023-06-01`. Avoid for new work; it forces every visitor to
+bring their own paid API key.
 
 ## Design System
 

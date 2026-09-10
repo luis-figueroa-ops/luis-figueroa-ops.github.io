@@ -5,16 +5,17 @@
   It is intentionally missing <!doctype>/<html>/<head>/<body> — the Artifact
   platform wraps it at publish time. games/wordsense/index.html links to it.
 
-  This artifact declares NO runtime capabilities (no "sample"). It asks the
-  player for their own Anthropic API key and calls api.anthropic.com
-  directly from the browser, the same pattern documented in CLAUDE.md for
-  JD Analyzer and AI Role Revealer. That's intentional: an artifact that
-  declares "sample" can only be shared with named people, not published
-  publicly, and this game needs to be playable by any site visitor.
-  The key is held in a JS variable only — never persisted to storage.
+  This artifact declares NO runtime capabilities. It writes passages by
+  calling window.claude.complete() — the artifact AI API that runs on the
+  viewer's own Claude account — the same approach as JD Analyzer, AI Role
+  Revealer, and Prompt Coach. That's what lets the artifact be published
+  publicly: declaring the "sample" capability instead would restrict it to
+  named people only. No API key, no card — the viewer just needs to be
+  signed in to claude.ai and click "Allow" the first time it asks.
 
   To update the live game: edit this file, then republish it to the same
-  artifact URL with capabilities cleared ({}).
+  artifact URL with capabilities cleared ({}). After republishing, make it
+  public from the Share menu.
 -->
 <title>WordSense</title>
 <style>
@@ -60,42 +61,6 @@ body {
 /* ── SCREENS ── */
 .screen { display: none; }
 .screen.active { display: block; }
-
-/* ── SETUP ── */
-.setup-card {
-  background: var(--card);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2rem 1.5rem;
-  margin-top: 1rem;
-}
-.setup-card h2 { font-size: 15px; font-weight: 600; margin-bottom: 0.4rem; }
-.setup-card p { font-size: 13px; color: var(--text-soft); line-height: 1.6; margin-bottom: 1rem; }
-
-.btn-primary {
-  width: 100%; padding: 0.8rem;
-  font-size: 15px; font-weight: 500;
-  cursor: pointer; border-radius: var(--radius-sm);
-  background: var(--blue); border: none;
-  font-family: inherit; color: #fff;
-  transition: opacity 0.15s;
-}
-.btn-primary:hover { opacity: 0.88; }
-.btn-primary:disabled { opacity: 0.5; cursor: default; }
-
-.key-input {
-  width: 100%; padding: 0.75rem 0.9rem;
-  font-size: 14px; font-family: inherit;
-  border: 0.5px solid var(--border); border-radius: var(--radius-sm);
-  background: var(--bg); color: var(--text);
-  margin-bottom: 1rem;
-}
-.key-input:focus { outline: none; border-color: var(--blue); }
-.key-note {
-  font-size: 12px; color: var(--text-muted);
-  line-height: 1.6; margin-top: 1rem;
-}
-.key-note a { color: var(--blue); }
 
 /* ── MAIN SCREEN ── */
 .main-hero { text-align: center; padding: 2.5rem 1rem 2rem; }
@@ -447,7 +412,7 @@ body {
       <p>Each round shows you a short passage with one word highlighted. Read the passage, then choose what you think the highlighted word means. The answer is always somewhere in the passage - you just have to find it. Get three right in a row and the difficulty goes up. Miss two and it steps back. Your progress saves automatically so you can pick up exactly where you left off.</p>
       <div class="need-callout">
         <h3>What you need</h3>
-        <p>Just your own free Anthropic API key. WordSense uses it only in your browser, for this session, to write each passage - it's never stored or sent anywhere else. No card required to create one.</p>
+        <p>Just a free Claude account. WordSense asks Claude to write its passages using your own account - open this page while signed in to claude.ai and choose "Allow" the first time it asks. Nothing to install, no API key, no card.</p>
       </div>
     </div>
 
@@ -455,21 +420,6 @@ body {
       <button class="btn-play" id="play-btn" onclick="handlePlay()">Play</button>
     </div>
     <div class="storage-note">Progress saves automatically to this browser. Clearing your browser data or switching browsers will reset it.</div>
-  </div>
-
-  <!-- ══ API KEY SETUP SCREEN ══ -->
-  <div class="screen" id="screen-apikey">
-    <div class="setup-card">
-      <h2>Add your Anthropic API key</h2>
-      <p>WordSense writes each passage live using your own Anthropic API key. It's kept in memory for this browser tab only - never saved to disk, never sent anywhere but api.anthropic.com.</p>
-      <input class="key-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter') submitApiKey();">
-      <button class="btn-primary" id="api-key-submit" onclick="submitApiKey()">Continue</button>
-      <div class="key-note">Don't have one? Create a free key at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>.</div>
-      <div class="pool-err" id="pool-err-apikey" style="display:none;">
-        <div class="err-box" id="pool-err-apikey-msg"></div>
-      </div>
-      <div class="storage-note"><a href="#" onclick="goHome(); return false;" style="color:inherit;">&larr; Back</a></div>
-    </div>
   </div>
 
   <!-- ══ POOL LOADING SCREEN ══ -->
@@ -638,9 +588,8 @@ const BADGES = [
 ];
 
 const POOL_ERR_MESSAGES = {
-  no_key: "Add your Anthropic API key first, then try again.",
-  invalid_key: "That API key was rejected. Double-check it at console.anthropic.com and try again.",
-  rate_limited: "You've hit your API usage limit for the moment. Wait a bit, then try again.",
+  unavailable: "WordSense runs on your own Claude account. Open this page while signed in to claude.ai and choose “Allow” when it asks to use Claude, then try again.",
+  rate_limited: "Claude is busy right now, or you’ve hit your usage limit for the moment. Wait a minute, then try again.",
   unknown: "Something went wrong while writing the passages. Give it another try in a moment."
 };
 
@@ -674,62 +623,32 @@ let state = freshState();
 let lastPoolWasTransition = false;
 
 // ═══════════════════════════════════════════
-// CLAUDE API ACCESS (user-supplied key, direct fetch)
+// CLAUDE ACCESS — window.claude.complete(), the artifact AI API.
+// Runs on the viewer's own Claude account. No API key, no capability
+// declaration (declaring "sample" would bar public sharing).
 // ═══════════════════════════════════════════
-let apiKey = '';
-let pendingAfterKey = null;
-
-function hasApiKey() { return !!apiKey; }
-
-function requireApiKey(afterFn) {
-  if (hasApiKey()) { afterFn(); return; }
-  pendingAfterKey = afterFn;
-  document.getElementById('pool-err-apikey').style.display = 'none';
-  document.getElementById('api-key-input').value = '';
-  showScreen('screen-apikey');
-  setTimeout(() => document.getElementById('api-key-input').focus(), 50);
-}
-
-function submitApiKey() {
-  const val = document.getElementById('api-key-input').value.trim();
-  if (!val) return;
-  apiKey = val;
-  const fn = pendingAfterKey;
-  pendingAfterKey = null;
-  if (fn) fn();
+function claudeAvailable() {
+  return typeof window !== 'undefined'
+    && window.claude
+    && typeof window.claude.complete === 'function';
 }
 
 async function callClaude(prompt) {
-  let resp;
-  try {
-    resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true',
-        'anthropic-version': '2023-06-01',
-        'x-api-key': apiKey
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-  } catch (e) {
-    const err = new Error('network'); err.code = 'unknown'; throw err;
+  if (!claudeAvailable()) {
+    const err = new Error('claude unavailable'); err.code = 'unavailable'; throw err;
   }
-
-  if (!resp.ok) {
-    const err = new Error('api_error');
-    if (resp.status === 401) err.code = 'invalid_key';
-    else if (resp.status === 429) err.code = 'rate_limited';
+  let text;
+  try {
+    text = await window.claude.complete(prompt);
+  } catch (e) {
+    const raw = ((e && (e.message || e.code || e.toString())) || '').toString().toLowerCase();
+    const err = new Error('claude call failed');
+    if (raw.includes('rate') || raw.includes('limit') || raw.includes('429')) err.code = 'rate_limited';
+    else if (raw.includes('allow') || raw.includes('permission') || raw.includes('denied') || raw.includes('sign')) err.code = 'unavailable';
     else err.code = 'unknown';
     throw err;
   }
-
-  const data = await resp.json();
-  return (data.content && data.content[0] && data.content[0].text) || '';
+  return (text || '').toString();
 }
 
 function parseJsonLoose(text) {
@@ -859,14 +778,6 @@ function setPoolProgress(pct, label) {
 }
 
 function showPoolError(kind) {
-  if (kind === 'invalid_key' || kind === 'no_key') {
-    apiKey = '';
-    requireApiKey(() => retryPool());
-    document.getElementById('pool-err-apikey-msg').textContent =
-      POOL_ERR_MESSAGES[kind] || POOL_ERR_MESSAGES.unknown;
-    document.getElementById('pool-err-apikey').style.display = 'block';
-    return;
-  }
   const which = poolWhich();
   document.getElementById('pool-progress-' + which).style.display = 'none';
   document.getElementById('pool-err-' + which + '-msg').textContent =
@@ -886,8 +797,6 @@ function retryPool() {
 }
 
 async function generatePool(isTransition) {
-  if (!hasApiKey()) { requireApiKey(() => generatePool(isTransition)); return; }
-
   lastPoolWasTransition = isTransition;
   showScreen(isTransition ? 'screen-pool-transition' : 'screen-loading');
   hidePoolError();
@@ -942,8 +851,6 @@ async function generatePool(isTransition) {
 }
 
 async function generateBatch(words) {
-  if (!hasApiKey()) { const err = new Error('no key'); err.code = 'no_key'; throw err; }
-
   const levelInstruction = getLevelInstruction();
   const prompt = `You are generating questions for a vocabulary game called WordSense at difficulty level ${state.level} (1=easiest, 4=hardest).
 
