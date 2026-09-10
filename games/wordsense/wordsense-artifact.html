@@ -128,6 +128,16 @@ body {
 .info-card p:last-child { margin-bottom: 0; }
 .info-divider { border: none; border-top: 0.5px solid var(--border-soft); margin: 1rem 0; }
 
+.need-callout {
+  background: var(--gold-bg);
+  border: 0.5px solid var(--gold-border);
+  border-radius: var(--radius-sm);
+  padding: 1.1rem 1.25rem;
+  margin-top: 1.25rem;
+}
+.need-callout h3 { color: var(--gold); }
+.need-callout p { color: #7a5a10; margin-bottom: 0; }
+
 .play-btn-wrap { margin: 1.5rem 0 0.5rem; }
 .btn-play {
   width: 100%; padding: 1rem;
@@ -413,9 +423,10 @@ body {
       <hr class="info-divider">
       <h3>How to play</h3>
       <p>Each round shows you a short passage with one word highlighted. Read the passage, then choose what you think the highlighted word means. The answer is always somewhere in the passage - you just have to find it. Get three right in a row and the difficulty goes up. Miss two and it steps back. Your progress saves automatically so you can pick up exactly where you left off.</p>
-      <hr class="info-divider">
-      <h3>What you need</h3>
-      <p>Just a free Claude account. WordSense asks Claude to write its passages using your own account - open this page while signed in to claude.ai and choose "Allow" the first time it asks. Nothing to install, no API key, no card.</p>
+      <div class="need-callout">
+        <h3>What you need</h3>
+        <p>Just a free Claude account. WordSense asks Claude to write its passages using your own account - open this page while signed in to claude.ai and choose "Allow" the first time it asks. Nothing to install, no API key, no card.</p>
+      </div>
     </div>
 
     <div class="play-btn-wrap">
