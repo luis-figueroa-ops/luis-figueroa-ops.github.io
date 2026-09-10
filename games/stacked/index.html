@@ -104,8 +104,8 @@
         padding: 16px 52px;
       }
       .controls-hint {
-        font-size: 0.90rem;
-        letter-spacing: 2px;
+        font-size: 0.88rem;
+        letter-spacing: 1px;
         margin-top: 24px;
         line-height: 2;
       }
@@ -163,8 +163,8 @@
     </p>
     <button class="btn" id="startBtn">START GAME</button>
     <div class="controls-hint" id="controlsHint">
-      ⬅️➡️ MOVE &nbsp;·&nbsp; ⬆️ ROTATE &nbsp;·&nbsp; ⬇️ SOFT DROP<br>
-      SPACE HARD DROP &nbsp;·&nbsp; C HOLD &nbsp;·&nbsp; P PAUSE &nbsp;·&nbsp; M MUSIC
+      &larr;&nbsp;&rarr;&nbsp;MOVE &middot;&nbsp;&uarr;&nbsp;ROTATE &middot;&nbsp;&darr;&nbsp;SOFT&nbsp;DROP<br>
+      SPACE&nbsp;HARD&nbsp;DROP &middot;&nbsp;C&nbsp;HOLD &middot;&nbsp;P&nbsp;PAUSE &middot;&nbsp;M&nbsp;MUSIC
     </div>
   </div>
 
@@ -604,8 +604,8 @@ function handleCanvasTap(e) {
   if (state !== 'playing') return;
   e.preventDefault();
   const pos = getEventPos(e);
-  const pr = getPauseRect();
-  if (hitRect(pos, pr)) { togglePause(); return; }
+  if (hitRect(pos, getMusicRect())) { toggleMusic(); return; }
+  if (hitRect(pos, getPauseRect())) { togglePause(); return; }
 }
 if (isTouchDevice) canvas.addEventListener('touchstart', handleCanvasTap, { passive: false });
 else canvas.addEventListener('click', handleCanvasTap, { passive: false });
@@ -748,6 +748,7 @@ function drawPanelBox(b, label) {
 }
 
 function getPauseRect() { const s = uiScale(), sz = Math.round(30 * s); return { x: W - 14 - sz, y: 14, w: sz, h: sz }; }
+function getMusicRect() { const pr = getPauseRect(), gap = Math.round(10 * uiScale()); return { x: pr.x - gap - pr.w, y: pr.y, w: pr.w, h: pr.h }; }
 
 function drawHUD(layout) {
   const pad = 14;
@@ -762,7 +763,7 @@ function drawHUD(layout) {
   drawPanelBox(holdBox, 'HOLD');
   drawMiniPiece(holdType, holdBox.x, holdBox.y, holdBox.w, holdBox.h);
 
-  const reserveRight = 58;
+  const reserveRight = 96;
   const nextCount = W < 500 ? 1 : 3;
   const nextGap = 8;
   let nx = W - reserveRight - pad;
@@ -812,6 +813,22 @@ function drawPauseBtn() {
   }
   ctx.restore();
 }
+function drawMusicBtn() {
+  const r = getMusicRect();
+  ctx.save();
+  ctx.fillStyle = musicOn ? 'rgba(0,20,30,0.7)' : 'rgba(0,20,30,0.4)';
+  ctx.strokeStyle = '#00ffe755'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(r.x, r.y, r.w, r.h, 6); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = musicOn ? '#00ffe7' : '#4a6b73';
+  ctx.font = `${Math.round(r.h * 0.6)}px 'Courier New', monospace`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('♫', r.x + r.w / 2, r.y + r.h * 0.56);
+  if (!musicOn) {
+    ctx.strokeStyle = '#ff6b8a'; ctx.lineWidth = Math.max(2, r.h * 0.08); ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(r.x + r.w * 0.22, r.y + r.h * 0.22); ctx.lineTo(r.x + r.w * 0.78, r.y + r.h * 0.78); ctx.stroke();
+  }
+  ctx.restore();
+}
 function drawPauseOverlay() {
   const s = uiScale();
   ctx.save(); ctx.fillStyle = 'rgba(5,5,20,0.78)'; ctx.fillRect(0, 0, W, H);
@@ -838,6 +855,7 @@ function draw(dt) {
     drawPiece(layout, current, 1, false);
     drawHUD(layout);
     drawToasts();
+    drawMusicBtn();
     drawPauseBtn();
     if (paused) drawPauseOverlay();
   }
