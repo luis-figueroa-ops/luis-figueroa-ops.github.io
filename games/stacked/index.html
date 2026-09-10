@@ -308,52 +308,130 @@ function soundGameOver() {
 }
 
 // ─── Background music ───────────────────────────────────────────────────────
-// Light, slow-looping pad, generated with Web Audio (no audio files). Toggle M.
-let musicOn = true, musicGain = null, musicHandle = null, musicNextT = 0, musicBar = 0;
-const MUSIC_BARS = [
-  [110.00, [220.00, 261.63, 329.63]], // Am
-  [ 98.00, [196.00, 246.94, 293.66]], // G
-  [ 87.31, [174.61, 220.00, 261.63]], // F
-  [ 82.41, [164.81, 196.00, 246.94]], // Em
-];
-const MUSIC_PATTERN = [0, 1, 2, 1, 2, 1];
-const MUSIC_BAR_LEN = 2.4;
-function getMusicGain() {
+// Original driving arcade chiptune, step-sequenced with Web Audio (no files).
+// Bass + arpeggio + lead + drums over an Am–F–C–G loop. Toggle with M.
+let musicOn = true, musicGain = null, musicHandle = null, musicNextT = 0, musicStep = 0, musicNoise = null;
+const M_BPM = 150;
+const M_STEP = 15 / M_BPM;   // 16th-note length in seconds (= 60 / BPM / 4)
+const M_LOOP = 64;           // 4 bars × 16 steps
+
+const M_FREQ = {};
+(function () {
+  const n = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  for (let o = 2; o <= 6; o++) for (let i = 0; i < 12; i++)
+    M_FREQ[n[i] + o] = 440 * Math.pow(2, (o * 12 + i - 57) / 12);
+})();
+const mSeq = s => s.trim().split(/\s+/);
+const M_BASS = mSeq(`
+  A2 . A2 . A2 . E3 . A2 . A2 . A2 . E3 .
+  F2 . F2 . F2 . C3 . F2 . F2 . F2 . C3 .
+  C3 . C3 . C3 . G3 . C3 . C3 . C3 . G3 .
+  G2 . G2 . G2 . D3 . G2 . G2 . D3 . F3 .`);
+const M_ARP = mSeq(`
+  A3 C4 E4 A4 A3 C4 E4 A4 A3 C4 E4 A4 A3 C4 E4 A4
+  F3 A3 C4 F4 F3 A3 C4 F4 F3 A3 C4 F4 F3 A3 C4 F4
+  C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5
+  G3 B3 D4 G4 G3 B3 D4 G4 G3 B3 D4 G4 G3 B3 D4 F4`);
+const M_LEAD = mSeq(`
+  E5 . A5 . . G5 E5 . D5 . C5 . E5 . . .
+  F5 . A5 . . G5 F5 . E5 . C5 . F5 . . .
+  G5 . C6 . . B5 G5 . E5 . G5 . C6 . . .
+  D5 . G5 . F5 . E5 . D5 . B4 . D5 F5 G5 .`);
+// drum lanes (layered): x = hit, O = accent hat, . = rest
+const M_KICK = mSeq(`
+  x . . . x . . x x . . . x . . .
+  x . . . x . . x x . . . x . . .
+  x . . . x . . x x . . . x . . .
+  x . . . x . . x x . x . x . x .`);
+const M_SNARE = mSeq(`
+  . . . . x . . . . . . . x . . .
+  . . . . x . . . . . . . x . . .
+  . . . . x . . . . . . . x . . .
+  . . . . x . . . . . x . x . x .`);
+const M_HAT = mSeq(`
+  x . x . x . x . x . x . x . x O
+  x . x . x . x . x . x . x . x O
+  x . x . x . x . x . x . x . x O
+  x . x . x . x . x . x x x x O O`);
+
+function mBus() {
   if (!musicGain) {
     const ac = getAudio();
-    musicGain = ac.createGain();
-    musicGain.gain.value = 1;
-    musicGain.connect(ac.destination);
+    musicGain = ac.createGain(); musicGain.gain.value = 0.85;
+    const comp = ac.createDynamicsCompressor();
+    comp.threshold.value = -10; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.15;
+    musicGain.connect(comp); comp.connect(ac.destination);
   }
   return musicGain;
 }
-function musicVoice(freq, start, dur, vol) {
-  const ac = getAudio(), osc = ac.createOscillator(), g = ac.createGain();
-  osc.type = 'triangle'; osc.frequency.value = freq;
-  g.gain.setValueAtTime(0.0001, start);
-  g.gain.exponentialRampToValueAtTime(vol, start + 0.35);
-  g.gain.setValueAtTime(vol, start + dur * 0.55);
-  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
-  osc.connect(g); g.connect(getMusicGain());
-  osc.start(start); osc.stop(start + dur + 0.05);
+function mNoiseBuf() {
+  if (!musicNoise) {
+    const ac = getAudio();
+    musicNoise = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.4), ac.sampleRate);
+    const d = musicNoise.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  return musicNoise;
+}
+function mTone(freq, t, dur, vol, type) {
+  const ac = getAudio(), o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.006);
+  g.gain.exponentialRampToValueAtTime(vol * 0.55, t + dur * 0.5);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(mBus());
+  o.start(t); o.stop(t + dur + 0.02);
+}
+function mKick(t) {
+  const ac = getAudio(), o = ac.createOscillator(), g = ac.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(150, t);
+  o.frequency.exponentialRampToValueAtTime(45, t + 0.11);
+  g.gain.setValueAtTime(0.55, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.17);
+  o.connect(g); g.connect(mBus());
+  o.start(t); o.stop(t + 0.19);
+}
+function mSnare(t) {
+  const ac = getAudio();
+  mNoiseHit(t, 0.14, 1700, 0.15);
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = 'triangle'; o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(120, t + 0.09);
+  g.gain.setValueAtTime(0.12, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+  o.connect(g); g.connect(mBus());
+  o.start(t); o.stop(t + 0.12);
+}
+function mNoiseHit(t, dur, hp, vol) {
+  const ac = getAudio(), s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  s.buffer = mNoiseBuf();
+  f.type = 'highpass'; f.frequency.value = hp;
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(mBus());
+  s.start(t); s.stop(t + dur + 0.02);
 }
 function musicTick() {
   if (!musicOn || !musicHandle) return;
   const ac = getAudio();
-  while (musicNextT < ac.currentTime + 0.5) {
-    const [bass, triad] = MUSIC_BARS[musicBar % MUSIC_BARS.length];
-    musicVoice(bass, musicNextT, MUSIC_BAR_LEN * 0.98, 0.045);
-    const step = MUSIC_BAR_LEN / MUSIC_PATTERN.length;
-    MUSIC_PATTERN.forEach((ti, i) => musicVoice(triad[ti], musicNextT + i * step, step * 0.9, 0.017));
-    musicNextT += MUSIC_BAR_LEN;
-    musicBar++;
+  while (musicNextT < ac.currentTime + 0.35) {
+    const i = musicStep % M_LOOP, t = musicNextT;
+    if (M_BASS[i] !== '.') mTone(M_FREQ[M_BASS[i]], t, M_STEP * 2.1, 0.13, 'square');
+    if (M_ARP[i]  !== '.') mTone(M_FREQ[M_ARP[i]],  t, M_STEP * 0.95, 0.042, 'square');
+    if (M_LEAD[i] !== '.') mTone(M_FREQ[M_LEAD[i]], t, M_STEP * 1.9, 0.06, 'square');
+    if (M_KICK[i]  === 'x') mKick(t);
+    if (M_SNARE[i] === 'x') mSnare(t);
+    if (M_HAT[i]   === 'x') mNoiseHit(t, 0.026, 8000, 0.04);
+    else if (M_HAT[i] === 'O') mNoiseHit(t, 0.06, 8000, 0.075);
+    musicNextT += M_STEP;
+    musicStep++;
   }
 }
 function startMusic() {
   if (musicHandle || !musicOn) return;
-  musicNextT = getAudio().currentTime + 0.15;
-  musicBar = 0;
-  musicHandle = setInterval(musicTick, 140);
+  musicNextT = getAudio().currentTime + 0.12;
+  musicStep = 0;
+  musicHandle = setInterval(musicTick, 45);
   musicTick();
 }
 function stopMusic() {
