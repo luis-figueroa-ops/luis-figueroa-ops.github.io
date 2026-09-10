@@ -16,7 +16,7 @@
       font-family: 'Courier New', monospace;
       touch-action: none;
     }
-    canvas { display: block; image-rendering: pixelated; }
+    canvas { display: block; image-rendering: pixelated; outline: none; }
     #overlay {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
@@ -152,7 +152,7 @@
   </script>
 </head>
 <body>
-<canvas id="c"></canvas>
+<canvas id="c" tabindex="0"></canvas>
 <div id="overlay">
   <div class="screen" id="startScreen">
     <h1>STACKED!</h1>
@@ -164,7 +164,7 @@
     <button class="btn" id="startBtn">START GAME</button>
     <div class="controls-hint" id="controlsHint">
       ⬅️➡️ MOVE &nbsp;·&nbsp; ⬆️ ROTATE &nbsp;·&nbsp; ⬇️ SOFT DROP<br>
-      SPACE HARD DROP &nbsp;·&nbsp; C HOLD &nbsp;·&nbsp; P PAUSE
+      SPACE HARD DROP &nbsp;·&nbsp; C HOLD &nbsp;·&nbsp; P PAUSE &nbsp;·&nbsp; M MUSIC
     </div>
   </div>
 
@@ -280,6 +280,64 @@ function soundLevelUp() {
 function soundGameOver() {
   const ac = getAudio(), now = ac.currentTime;
   [392, 349, 330, 262].forEach((f, i) => playNote(f, 'triangle', now + i * 0.22, 0.42, 0.3));
+}
+
+// ─── Background music ───────────────────────────────────────────────────────
+// Light, slow-looping pad, generated with Web Audio (no audio files). Toggle M.
+let musicOn = true, musicGain = null, musicHandle = null, musicNextT = 0, musicBar = 0;
+const MUSIC_BARS = [
+  [110.00, [220.00, 261.63, 329.63]], // Am
+  [ 98.00, [196.00, 246.94, 293.66]], // G
+  [ 87.31, [174.61, 220.00, 261.63]], // F
+  [ 82.41, [164.81, 196.00, 246.94]], // Em
+];
+const MUSIC_PATTERN = [0, 1, 2, 1, 2, 1];
+const MUSIC_BAR_LEN = 2.4;
+function getMusicGain() {
+  if (!musicGain) {
+    const ac = getAudio();
+    musicGain = ac.createGain();
+    musicGain.gain.value = 1;
+    musicGain.connect(ac.destination);
+  }
+  return musicGain;
+}
+function musicVoice(freq, start, dur, vol) {
+  const ac = getAudio(), osc = ac.createOscillator(), g = ac.createGain();
+  osc.type = 'triangle'; osc.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(vol, start + 0.35);
+  g.gain.setValueAtTime(vol, start + dur * 0.55);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  osc.connect(g); g.connect(getMusicGain());
+  osc.start(start); osc.stop(start + dur + 0.05);
+}
+function musicTick() {
+  if (!musicOn || !musicHandle) return;
+  const ac = getAudio();
+  while (musicNextT < ac.currentTime + 0.5) {
+    const [bass, triad] = MUSIC_BARS[musicBar % MUSIC_BARS.length];
+    musicVoice(bass, musicNextT, MUSIC_BAR_LEN * 0.98, 0.045);
+    const step = MUSIC_BAR_LEN / MUSIC_PATTERN.length;
+    MUSIC_PATTERN.forEach((ti, i) => musicVoice(triad[ti], musicNextT + i * step, step * 0.9, 0.017));
+    musicNextT += MUSIC_BAR_LEN;
+    musicBar++;
+  }
+}
+function startMusic() {
+  if (musicHandle || !musicOn) return;
+  musicNextT = getAudio().currentTime + 0.15;
+  musicBar = 0;
+  musicHandle = setInterval(musicTick, 140);
+  musicTick();
+}
+function stopMusic() {
+  if (musicHandle) { clearInterval(musicHandle); musicHandle = null; }
+}
+function toggleMusic() {
+  musicOn = !musicOn;
+  if (musicOn && state === 'playing' && !paused) startMusic();
+  else stopMusic();
 }
 
 // ─── Game state ─────────────────────────────────────────────────────────────
@@ -430,7 +488,7 @@ function lockPiece() {
 }
 
 function gameOver() {
-  state = 'gameover'; soundGameOver();
+  state = 'gameover'; stopMusic(); soundGameOver();
   if (score > hiScore) { hiScore = score; saveHi(hiScore); }
   document.getElementById('finalScore').textContent = score.toLocaleString();
   document.getElementById('finalLevel').textContent = level;
@@ -442,12 +500,13 @@ function gameOver() {
 function togglePause() {
   if (state !== 'playing') return;
   paused = !paused;
+  if (paused) stopMusic(); else startMusic();
 }
 
 // ─── Input ──────────────────────────────────────────────────────────────────
 function playable() { return state === 'playing' && !paused; }
 
-document.addEventListener('keydown', e => {
+function onKeyDown(e) {
   switch (e.key) {
     case 'ArrowLeft':
       e.preventDefault();
@@ -484,17 +543,26 @@ document.addEventListener('keydown', e => {
       if (e.repeat || !playable()) return;
       hold();
       break;
+    case 'm': case 'M':
+      e.preventDefault();
+      if (e.repeat) return;
+      toggleMusic();
+      break;
     case 'p': case 'P': case 'Escape':
       e.preventDefault();
       togglePause();
       break;
   }
-});
-document.addEventListener('keyup', e => {
+}
+function onKeyUp(e) {
   if (e.key === 'ArrowLeft' && moveDir === -1) moveDir = 0;
   if (e.key === 'ArrowRight' && moveDir === 1) moveDir = 0;
   if (e.key === 'ArrowDown') softDown = false;
-});
+}
+// Listen on window in the capture phase: nothing downstream can swallow a
+// gameplay key, and it works no matter which element (if any) has focus.
+window.addEventListener('keydown', onKeyDown, true);
+window.addEventListener('keyup', onKeyUp, true);
 
 function bindHold(el, onDown, onUp) {
   const start = e => { e.preventDefault(); onDown(); };
@@ -551,12 +619,13 @@ function showScreen(id) {
   if (id) document.getElementById(id).classList.add('active');
 }
 
-document.getElementById('startBtn').addEventListener('click', () => {
+function beginGame() {
   getAudio(); showScreen(null); initGame(); state = 'playing'; paused = false;
-});
-document.getElementById('restartBtn').addEventListener('click', () => {
-  showScreen(null); initGame(); state = 'playing'; paused = false;
-});
+  try { canvas.focus(); } catch (_) {}
+  startMusic();
+}
+document.getElementById('startBtn').addEventListener('click', beginGame);
+document.getElementById('restartBtn').addEventListener('click', beginGame);
 
 if (isTouchDevice) {
   document.getElementById('controlsHint').innerHTML =
@@ -799,7 +868,12 @@ requestAnimationFrame(loop);
 // Returning to a backgrounded tab: resync the clock so no time is fast-forwarded
 // — the board stays exactly where the player left it.
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) { lastTime = null; simAccum = 0; }
+  if (document.hidden) {
+    stopMusic();
+  } else {
+    lastTime = null; simAccum = 0;
+    if (state === 'playing' && !paused) startMusic();
+  }
 });
 </script>
 </body>
