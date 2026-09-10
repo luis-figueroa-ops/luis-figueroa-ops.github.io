@@ -83,6 +83,8 @@
     }
     .controls-hint .sep { color: #6b6b8f; }
     .controls-hint .k { font-weight: bold; }
+    /* Match the in-game HUD buttons: same glyphs, same cyan. */
+    .controls-hint .ico { font-size: 1.15em; letter-spacing: 0; color: #00ffe7; text-shadow: 0 0 9px #00ffe7; }
     .k-move  { color: #22ffe9; text-shadow: 0 0 10px #00ffe7; }
     .k-rot   { color: #c39bff; text-shadow: 0 0 10px #a080ff; }
     .k-soft  { color: #3cf08a; text-shadow: 0 0 10px #35c46a; }
@@ -188,8 +190,8 @@
     <div class="controls-hint" id="controlsHint">
       <div class="howto-title">HOW TO PLAY</div>
       <span class="k k-move">&larr;&nbsp;&rarr;&nbsp;MOVE</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-rot">&uarr;&nbsp;ROTATE</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-soft">&darr;&nbsp;SOFT&nbsp;DROP</span><br>
-      <span class="k k-hard">SPACE&nbsp;HARD&nbsp;DROP</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-pause">P&nbsp;PAUSE</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-music">M&nbsp;MUSIC</span><br>
-      <span class="k k-hold">CLICK THE HOLD SLOT (TOP-LEFT) TO HOLD A PIECE</span>
+      <span class="k k-hard">SPACE&nbsp;HARD&nbsp;DROP</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-pause"><span class="ico">&#x275A;&#x275A;</span>&nbsp;PAUSE</span> <span class="sep">&middot;</span>&nbsp;<span class="k k-music"><span class="ico">&#x266B;</span>&nbsp;MUSIC</span><br>
+      <span class="k k-hold"><span class="ico">&#x21C4;</span>&nbsp;HOLD</span> <span class="sep">(CLICK THE SLOT, TOP-LEFT)</span>
     </div>
   </div>
 
@@ -357,7 +359,7 @@ const M_HAT = mSeq(`
 function mBus() {
   if (!musicGain) {
     const ac = getAudio();
-    musicGain = ac.createGain(); musicGain.gain.value = 0.85;
+    musicGain = ac.createGain(); musicGain.gain.value = 0.42;
     const comp = ac.createDynamicsCompressor();
     comp.threshold.value = -10; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.15;
     musicGain.connect(comp); comp.connect(ac.destination);
