@@ -359,7 +359,7 @@ const M_HAT = mSeq(`
 function mBus() {
   if (!musicGain) {
     const ac = getAudio();
-    musicGain = ac.createGain(); musicGain.gain.value = 0.42;
+    musicGain = ac.createGain(); musicGain.gain.value = 0.21;
     const comp = ac.createDynamicsCompressor();
     comp.threshold.value = -10; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.15;
     musicGain.connect(comp); comp.connect(ac.destination);
