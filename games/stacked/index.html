@@ -868,7 +868,7 @@ function getLayout() {
   const landscapeTouch = isTouchDevice && isLandscape;
   const hudH = landscapeTouch ? 0 : Math.round(W < 600 ? 96 : 110);
   const barH = getTouchBarH();
-  const topPad = landscapeTouch ? 46 : hudH + 10;
+  const topPad = landscapeTouch ? 10 : hudH + 10;
   const bottomPad = barH + 10, sidePad = 10 + getTouchSideW();
   const availW = W - sidePad * 2, availH = H - topPad - bottomPad;
   const cell = Math.max(10, Math.floor(Math.min(availW / COLS, availH / ROWS)));
@@ -1018,27 +1018,36 @@ function drawHUD(layout) {
   ctx.restore();
 }
 
-// Landscape: no full-width bar — just a thin score line up top, HOLD tucked
-// into the left gutter and NEXT into the right gutter, above the thumb clusters.
+// Landscape: no top bar at all — the board owns the full height. HUD lives
+// entirely in the gutters: HOLD + score under it on the left, NEXT + level/
+// lines/hi under it on the right, both above their thumb clusters.
 function drawHUDLandscape() {
-  ctx.save();
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  ctx.font = `bold ${Math.round(18 * uiScale())}px 'Courier New', monospace`;
-  ctx.fillStyle = '#ffe156'; ctx.shadowColor = '#ffe156'; ctx.shadowBlur = 10;
-  ctx.fillText(score.toLocaleString(), W / 2, 8);
-  ctx.shadowBlur = 0;
-  ctx.font = `${Math.round(9 * uiScale())}px 'Courier New', monospace`;
-  ctx.fillStyle = '#a0a0cc';
-  ctx.fillText(`LV ${level} · LINES ${lines} · HI ${hiScore.toLocaleString()}`, W / 2, 30);
-  ctx.restore();
+  const sideW = getTouchSideW(), midX = sideW / 2;
 
   const holdBox = getHoldRect();
   drawPanelBox(holdBox, 'HOLD');
   drawMiniPiece(holdType, holdBox.x, holdBox.y, holdBox.w, holdBox.h);
 
+  ctx.save();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.font = `bold ${Math.round(15 * uiScale())}px 'Courier New', monospace`;
+  ctx.fillStyle = '#ffe156'; ctx.shadowColor = '#ffe156'; ctx.shadowBlur = 8;
+  ctx.fillText(score.toLocaleString(), midX, holdBox.y + holdBox.h + 10);
+  ctx.restore();
+
   const nextBox = getNextRectLandscape();
   drawPanelBox(nextBox, 'NEXT');
   drawMiniPiece(nextQueue[0], nextBox.x, nextBox.y, nextBox.w, nextBox.h);
+
+  ctx.save();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.font = `${Math.round(9 * uiScale())}px 'Courier New', monospace`;
+  ctx.fillStyle = '#a0a0cc';
+  const rMidX = W - sideW / 2, rTextY = nextBox.y + nextBox.h + 8;
+  ctx.fillText(`LV ${level}`, rMidX, rTextY);
+  ctx.fillText(`LINES ${lines}`, rMidX, rTextY + 13);
+  ctx.fillText(`HI ${hiScore.toLocaleString()}`, rMidX, rTextY + 26);
+  ctx.restore();
 }
 
 function drawToasts() {
