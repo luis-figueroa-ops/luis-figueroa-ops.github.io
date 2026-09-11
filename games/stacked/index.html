@@ -167,6 +167,35 @@
     }
     .tbtn:active { background: #00ffe733; }
     .tbtn-sm { font-size: 0.8rem; letter-spacing: 1px; }
+
+    /* Landscape mobile: two thumb clusters, one per side, instead of the bottom bar. */
+    #touchLandscape {
+      display: none;
+      position: fixed; inset: 0; z-index: 60;
+      pointer-events: none;
+    }
+    #touchLandscape.active { display: block; }
+    .land-cluster {
+      position: absolute; bottom: 0;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom));
+      pointer-events: auto;
+    }
+    .land-left  { left: 0; padding-left: calc(10px + env(safe-area-inset-left)); }
+    .land-right { right: 0; padding-right: calc(10px + env(safe-area-inset-right)); }
+    .land-row { display: flex; gap: 8px; }
+    .land-btn {
+      flex: none;
+      width: 54px; height: 54px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; padding: 0;
+    }
+    .land-drop { width: 60px; height: 60px; font-size: 1.5rem; }
+    .land-hold {
+      flex: none;
+      font-size: 0.7rem; letter-spacing: 1px;
+      padding: 6px 14px;
+    }
   </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
   <script>
@@ -212,6 +241,23 @@
   <button class="tbtn" id="btnRight">▶</button>
   <button class="tbtn tbtn-sm" id="btnDrop">⤓</button>
 </div>
+<div id="touchLandscape">
+  <div class="land-cluster land-left">
+    <button class="tbtn land-hold" id="lHold">HOLD</button>
+    <div class="land-row">
+      <button class="tbtn land-btn" id="lLeft">◀</button>
+      <button class="tbtn land-btn" id="lDown">▼</button>
+      <button class="tbtn land-btn" id="lRight">▶</button>
+    </div>
+  </div>
+  <div class="land-cluster land-right">
+    <div class="land-row">
+      <button class="tbtn land-btn" id="lRotL">⟲</button>
+      <button class="tbtn land-btn land-drop" id="lDrop">⤓</button>
+      <button class="tbtn land-btn" id="lRotR">⟳</button>
+    </div>
+  </div>
+</div>
 <div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
 <div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/#stacked">← Back to Tools</a></div>
 
@@ -224,18 +270,24 @@ const ctx    = canvas.getContext('2d');
 const isTouchDevice = 'ontouchstart' in window;
 
 let W = 0, H = 0;
+let isLandscape = window.innerWidth > window.innerHeight;
+let touchUIActive = false;
 function resize() {
   const dpr = window.devicePixelRatio || 1;
   W = window.innerWidth; H = window.innerHeight;
+  isLandscape = W > H;
   canvas.width = W * dpr; canvas.height = H * dpr;
   canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  applyTouchUI();
 }
 window.addEventListener('resize', resize);
 resize();
 
 function uiScale() { return Math.min(1, W / 500); }
-function getTouchBarH() { return isTouchDevice ? 84 : 0; }
+// Portrait reserves a bottom bar; landscape swaps to two side clusters instead.
+function getTouchBarH() { return (isTouchDevice && !isLandscape) ? 84 : 0; }
+function getTouchSideW() { return (isTouchDevice && isLandscape) ? 116 : 0; }
 
 const DAS = 0.15, ARR = 0.04, SOFT_DROP_MS = 50, LOCK_DELAY = 500;
 
@@ -688,19 +740,28 @@ function bindTap(el, fn) {
   el.addEventListener('click', h);
 }
 
-bindHold(document.getElementById('btnLeft'),
+function bindHoldAll(ids, onDown, onUp) {
+  ids.forEach(id => { const el = document.getElementById(id); if (el) bindHold(el, onDown, onUp); });
+}
+function bindTapAll(ids, fn) {
+  ids.forEach(id => { const el = document.getElementById(id); if (el) bindTap(el, fn); });
+}
+
+// Each action binds both its portrait bottom-bar button and its landscape
+// side-cluster button (only one set is visible/active at a time).
+bindHoldAll(['btnLeft', 'lLeft'],
   () => { if (!playable()) return; moveDir = -1; move(-1, 0); dasTimer = 0; arrTimer = 0; },
   () => { if (moveDir === -1) moveDir = 0; });
-bindHold(document.getElementById('btnRight'),
+bindHoldAll(['btnRight', 'lRight'],
   () => { if (!playable()) return; moveDir = 1; move(1, 0); dasTimer = 0; arrTimer = 0; },
   () => { if (moveDir === 1) moveDir = 0; });
-bindHold(document.getElementById('btnDown'),
+bindHoldAll(['btnDown', 'lDown'],
   () => { softDown = true; },
   () => { softDown = false; });
-bindTap(document.getElementById('btnRotateL'), () => rotate(-1));
-bindTap(document.getElementById('btnRotateR'), () => rotate(1));
-bindTap(document.getElementById('btnDrop'), hardDrop);
-bindTap(document.getElementById('btnHold'), hold);
+bindTapAll(['btnRotateL', 'lRotL'], () => rotate(-1));
+bindTapAll(['btnRotateR', 'lRotR'], () => rotate(1));
+bindTapAll(['btnDrop', 'lDrop'], hardDrop);
+bindTapAll(['btnHold', 'lHold'], hold);
 
 function getEventPos(e) {
   const rect = canvas.getBoundingClientRect(), src = e.touches ? e.touches[0] : e;
@@ -729,12 +790,20 @@ if (isTouchDevice) {
   });
 }
 
+// Swaps between the portrait bottom bar and the landscape side clusters
+// (whichever matches the current orientation); called on screen changes and
+// again on every resize/orientation change so rotating mid-game updates it.
+function applyTouchUI() {
+  document.getElementById('touchControls').classList.toggle('active', touchUIActive && !isLandscape);
+  document.getElementById('touchLandscape').classList.toggle('active', touchUIActive && isLandscape);
+}
+
 function showScreen(id) {
   ['startScreen', 'gameoverScreen'].forEach(s => document.getElementById(s).classList.remove('active'));
   document.getElementById('backNav').style.display = (id === null) ? 'none' : 'block';
-  const touchActive = isTouchDevice && id === null;
-  document.getElementById('touchControls').classList.toggle('active', touchActive);
-  document.querySelector('.copyright').style.display = touchActive ? 'none' : 'block';
+  touchUIActive = isTouchDevice && id === null;
+  applyTouchUI();
+  document.querySelector('.copyright').style.display = touchUIActive ? 'none' : 'block';
   if (id) document.getElementById(id).classList.add('active');
 }
 
@@ -795,7 +864,7 @@ function update(dt) {
 function getLayout() {
   const hudH = Math.round(W < 600 ? 96 : 110);
   const barH = getTouchBarH();
-  const topPad = hudH + 10, bottomPad = barH + 10, sidePad = 10;
+  const topPad = hudH + 10, bottomPad = barH + 10, sidePad = 10 + getTouchSideW();
   const availW = W - sidePad * 2, availH = H - topPad - bottomPad;
   const cell = Math.max(10, Math.floor(Math.min(availW / COLS, availH / ROWS)));
   const boardPxW = cell * COLS, boardPxH = cell * ROWS;
