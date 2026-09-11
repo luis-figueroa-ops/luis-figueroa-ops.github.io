@@ -871,49 +871,58 @@ function getLayout() {
   const topPad = landscapeTouch ? 10 : hudH + 10;
   const bottomPad = barH + 10, sidePad = 10 + getTouchSideW();
   const availW = W - sidePad * 2, availH = H - topPad - bottomPad;
-  const cell = Math.max(10, Math.floor(Math.min(availW / COLS, availH / ROWS)));
-  const boardPxW = cell * COLS, boardPxH = cell * ROWS;
+  let cellW, cellH;
+  if (landscapeTouch) {
+    // A 10x20 board is always height-bound on a short landscape screen, which
+    // leaves most of the wide viewport empty. Let cells run a bit wider than
+    // tall (capped at 1.3x, so pieces stay recognizable) to reclaim that width.
+    cellH = Math.max(10, Math.floor(availH / ROWS));
+    cellW = Math.max(10, Math.min(Math.floor(availW / COLS), Math.round(cellH * 1.3)));
+  } else {
+    cellH = cellW = Math.max(10, Math.floor(Math.min(availW / COLS, availH / ROWS)));
+  }
+  const boardPxW = cellW * COLS, boardPxH = cellH * ROWS;
   const boardX = Math.round((W - boardPxW) / 2);
   const boardY = topPad + Math.round((availH - boardPxH) / 2);
-  return { hudH, cell, boardX, boardY, boardPxW, boardPxH, landscapeTouch };
+  return { hudH, cellW, cellH, boardX, boardY, boardPxW, boardPxH, landscapeTouch };
 }
 
-function drawCell(px, py, size, color, alpha = 1) {
+function drawCell(px, py, w, h, color, alpha = 1) {
   ctx.save(); ctx.globalAlpha = alpha;
-  ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = size * 0.35;
-  ctx.fillRect(px + 1, py + 1, size - 2, size - 2);
+  ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = Math.min(w, h) * 0.35;
+  ctx.fillRect(px + 1, py + 1, w - 2, h - 2);
   ctx.shadowBlur = 0;
   ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1;
-  ctx.strokeRect(px + 1.5, py + 1.5, size - 3, size - 3);
+  ctx.strokeRect(px + 1.5, py + 1.5, w - 3, h - 3);
   ctx.restore();
 }
 
 function drawBoard(layout) {
-  const { boardX, boardY, cell, boardPxW, boardPxH } = layout;
+  const { boardX, boardY, cellW, cellH, boardPxW, boardPxH } = layout;
   ctx.save();
   ctx.fillStyle = 'rgba(0,0,0,0.35)';
   ctx.fillRect(boardX, boardY, boardPxW, boardPxH);
   ctx.strokeStyle = '#00ffe744'; ctx.lineWidth = 2;
   ctx.strokeRect(boardX, boardY, boardPxW, boardPxH);
   ctx.strokeStyle = 'rgba(160,160,204,0.08)'; ctx.lineWidth = 1;
-  for (let x = 1; x < COLS; x++) { ctx.beginPath(); ctx.moveTo(boardX + x * cell, boardY); ctx.lineTo(boardX + x * cell, boardY + boardPxH); ctx.stroke(); }
-  for (let y = 1; y < ROWS; y++) { ctx.beginPath(); ctx.moveTo(boardX, boardY + y * cell); ctx.lineTo(boardX + boardPxW, boardY + y * cell); ctx.stroke(); }
-  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { const c = board[y][x]; if (c) drawCell(boardX + x * cell, boardY + y * cell, cell, c); }
+  for (let x = 1; x < COLS; x++) { ctx.beginPath(); ctx.moveTo(boardX + x * cellW, boardY); ctx.lineTo(boardX + x * cellW, boardY + boardPxH); ctx.stroke(); }
+  for (let y = 1; y < ROWS; y++) { ctx.beginPath(); ctx.moveTo(boardX, boardY + y * cellH); ctx.lineTo(boardX + boardPxW, boardY + y * cellH); ctx.stroke(); }
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { const c = board[y][x]; if (c) drawCell(boardX + x * cellW, boardY + y * cellH, cellW, cellH, c); }
   if (boardFlash > 0) { ctx.fillStyle = `rgba(255,255,255,${boardFlash / 0.15 * 0.5})`; ctx.fillRect(boardX, boardY, boardPxW, boardPxH); }
   ctx.restore();
 }
 
 function drawPiece(layout, piece, alpha, outlineOnly) {
-  const { boardX, boardY, cell } = layout;
+  const { boardX, boardY, cellW, cellH } = layout;
   for (const [dx, dy] of piece.cells) {
     const bx = piece.x + dx, by = piece.y + dy;
     if (by < 0) continue;
-    const px = boardX + bx * cell, py = boardY + by * cell;
+    const px = boardX + bx * cellW, py = boardY + by * cellH;
     if (outlineOnly) {
       ctx.save(); ctx.strokeStyle = piece.color; ctx.lineWidth = 2; ctx.globalAlpha = alpha;
-      ctx.strokeRect(px + 2, py + 2, cell - 4, cell - 4);
+      ctx.strokeRect(px + 2, py + 2, cellW - 4, cellH - 4);
       ctx.restore();
-    } else drawCell(px, py, cell, piece.color, alpha);
+    } else drawCell(px, py, cellW, cellH, piece.color, alpha);
   }
 }
 
