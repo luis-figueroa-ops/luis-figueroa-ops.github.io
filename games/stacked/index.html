@@ -861,16 +861,21 @@ function update(dt) {
 }
 
 // ─── Draw ───────────────────────────────────────────────────────────────────
+// Landscape phones are short on height, so the HUD (hold/next/score) moves into
+// the left/right gutters there instead of a full-width bar, freeing up the
+// vertical space the board needs — see drawHUDLandscape/getHoldRect/getNextRect.
 function getLayout() {
-  const hudH = Math.round(W < 600 ? 96 : 110);
+  const landscapeTouch = isTouchDevice && isLandscape;
+  const hudH = landscapeTouch ? 0 : Math.round(W < 600 ? 96 : 110);
   const barH = getTouchBarH();
-  const topPad = hudH + 10, bottomPad = barH + 10, sidePad = 10 + getTouchSideW();
+  const topPad = landscapeTouch ? 46 : hudH + 10;
+  const bottomPad = barH + 10, sidePad = 10 + getTouchSideW();
   const availW = W - sidePad * 2, availH = H - topPad - bottomPad;
   const cell = Math.max(10, Math.floor(Math.min(availW / COLS, availH / ROWS)));
   const boardPxW = cell * COLS, boardPxH = cell * ROWS;
   const boardX = Math.round((W - boardPxW) / 2);
   const boardY = topPad + Math.round((availH - boardPxH) / 2);
-  return { hudH, cell, boardX, boardY, boardPxW, boardPxH };
+  return { hudH, cell, boardX, boardY, boardPxW, boardPxH, landscapeTouch };
 }
 
 function drawCell(px, py, size, color, alpha = 1) {
@@ -940,8 +945,18 @@ function drawPanelBox(b, label) {
 function getPauseRect() { const s = uiScale(), sz = Math.round(30 * s); return { x: W - 14 - sz, y: 14, w: sz, h: sz }; }
 function getMusicRect() { const pr = getPauseRect(), gap = Math.round(10 * uiScale()); return { x: pr.x - gap - pr.w, y: pr.y, w: pr.w, h: pr.h }; }
 function getHoldRect() {
+  if (isTouchDevice && isLandscape) {
+    const sideW = getTouchSideW(), boxSize = Math.min(sideW - 28, 60);
+    return { x: Math.round((sideW - boxSize) / 2), y: 50, w: boxSize, h: boxSize };
+  }
   const hudH = getLayout().hudH, boxSize = Math.round(hudH * 0.6);
   return { x: 14, y: Math.round((hudH - boxSize) / 2), w: boxSize, h: boxSize };
+}
+// Landscape shows a single upcoming piece (right gutter) instead of the
+// portrait row of three — there's width to spare but not much height.
+function getNextRectLandscape() {
+  const sideW = getTouchSideW(), boxSize = Math.min(sideW - 28, 60);
+  return { x: W - Math.round((sideW + boxSize) / 2), y: 50, w: boxSize, h: boxSize };
 }
 // Double-arrow "swap" glyph, drawn as paths so it renders identically everywhere.
 function drawSwapIcon(cx, cy, s, color) {
@@ -958,6 +973,7 @@ function drawSwapIcon(cx, cy, s, color) {
 }
 
 function drawHUD(layout) {
+  if (layout.landscapeTouch) { drawHUDLandscape(); return; }
   const pad = 14;
   ctx.save();
   ctx.fillStyle = 'rgba(5,5,20,0.75)';
@@ -1000,6 +1016,29 @@ function drawHUD(layout) {
   ctx.fillStyle = '#a0a0cc';
   ctx.fillText(`LV ${level}  ·  LINES ${lines}  ·  HI ${hiScore.toLocaleString()}`, centerX, layout.hudH - 24);
   ctx.restore();
+}
+
+// Landscape: no full-width bar — just a thin score line up top, HOLD tucked
+// into the left gutter and NEXT into the right gutter, above the thumb clusters.
+function drawHUDLandscape() {
+  ctx.save();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.font = `bold ${Math.round(18 * uiScale())}px 'Courier New', monospace`;
+  ctx.fillStyle = '#ffe156'; ctx.shadowColor = '#ffe156'; ctx.shadowBlur = 10;
+  ctx.fillText(score.toLocaleString(), W / 2, 8);
+  ctx.shadowBlur = 0;
+  ctx.font = `${Math.round(9 * uiScale())}px 'Courier New', monospace`;
+  ctx.fillStyle = '#a0a0cc';
+  ctx.fillText(`LV ${level} · LINES ${lines} · HI ${hiScore.toLocaleString()}`, W / 2, 30);
+  ctx.restore();
+
+  const holdBox = getHoldRect();
+  drawPanelBox(holdBox, 'HOLD');
+  drawMiniPiece(holdType, holdBox.x, holdBox.y, holdBox.w, holdBox.h);
+
+  const nextBox = getNextRectLandscape();
+  drawPanelBox(nextBox, 'NEXT');
+  drawMiniPiece(nextQueue[0], nextBox.x, nextBox.y, nextBox.w, nextBox.h);
 }
 
 function drawToasts() {
