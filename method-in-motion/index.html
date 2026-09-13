@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Method in Motion — Luis Figueroa</title>
+<meta name="description" content="Screen-recorded walkthroughs of the reporting and analysis work behind the stories on this portfolio: advanced spreadsheet formulas, a full Tableau dashboard build, each paired with a written breakdown." />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #1B2A4A;
+  --navy-deep: #111d33;
+  --navy-light: #243558;
+  --gold: #B8963E;
+  --gold-light: #d4ae60;
+  --teal: #43e8c8;
+  --white: #F4F1EC;
+  --muted: #8a9bb5;
+  --border: rgba(184,150,62,0.2);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy-deep);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: clip;
+  padding-bottom: 60px;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.4;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: -20%; left: -10%;
+  width: 55%; height: 140%;
+  background: linear-gradient(135deg, rgba(27,42,74,0.9) 0%, rgba(17,29,51,0) 70%);
+  pointer-events: none; z-index: 0;
+}
+
+.topbar-back {
+  position: sticky; top: 12px; z-index: 30;
+  display: inline-block;
+  margin: 24px 0 0 64px;
+  padding: 9px 15px;
+  background: #1c2c4c;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(8,14,26,0.55);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s, border-color 0.2s;
+}
+.topbar-back:hover { color: var(--gold); border-color: var(--gold); }
+
+.hero {
+  position: relative; z-index: 10;
+  padding: 32px 64px 40px;
+  border-bottom: 1px solid var(--border);
+  max-width: 900px;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 6vw, 66px);
+  letter-spacing: 2px;
+  line-height: 1.02;
+  color: var(--white);
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  margin-top: 16px;
+  font-size: 18px;
+  color: var(--white);
+  opacity: 0.82;
+  line-height: 1.7;
+  max-width: 660px;
+}
+.hero-sub a { color: var(--gold-light); text-decoration: none; border-bottom: 1px solid rgba(184,150,62,0.4); transition: border-color 0.2s, color 0.2s; }
+.hero-sub a:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+.main {
+  position: relative; z-index: 10;
+  padding: 40px 64px 0;
+  max-width: 900px;
+}
+
+/* Entry — a titled "X to Y" grouping; add more <div class="entry"> blocks below as the series grows */
+.entry {
+  padding: 8px 0 4px;
+  border-top: 1px solid var(--border);
+}
+.entry:first-child { border-top: none; }
+.entry-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  display: block;
+  margin: 24px 0 8px;
+}
+.entry-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 3.6vw, 40px);
+  letter-spacing: 1.5px;
+  line-height: 1.08;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.entry-title span { color: var(--gold); }
+
+.section-desc {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.82;
+  max-width: 640px;
+  margin-bottom: 4px;
+}
+
+.section-divider {
+  height: 8px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 2px;
+  margin: 48px 0 8px;
+}
+
+.deck {
+  display: flex;
+  gap: 28px;
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
+  align-items: flex-start;
+}
+.entry .deck:first-of-type { border-top: none; }
+
+.deck-thumb {
+  flex-shrink: 0;
+  width: 190px;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--border);
+  background: rgba(27,42,74,0.5);
+  padding: 6px;
+  display: block;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.deck-thumb:hover { border-color: rgba(184,150,62,0.6); transform: translateY(-2px); }
+.deck-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+.deck-thumb-video img { object-position: center 30%; }
+
+.deck-body { flex: 1; min-width: 0; }
+.deck-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 1px;
+  color: var(--white);
+  line-height: 1.12;
+  margin-bottom: 10px;
+}
+.deck-desc {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--white);
+  opacity: 0.8;
+  max-width: 560px;
+  margin-bottom: 14px;
+}
+.deck-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.deck-links a {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: var(--gold-light);
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(184,150,62,0.4);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.deck-links a:hover { color: var(--gold); border-color: var(--gold); }
+
+.more-note {
+  margin-top: 8px;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--border);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.site-footer {
+  position: relative; z-index: 10;
+  max-width: 900px;
+  margin: 48px auto 0;
+  padding: 24px 64px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.site-footer-built {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.site-footer-built a { color: var(--gold); text-decoration: none; }
+.site-footer-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.site-footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+@media (max-width: 760px) {
+  .topbar-back { margin-left: 24px; }
+  .hero, .main, .site-footer { padding-left: 24px; padding-right: 24px; }
+  .deck { flex-direction: column; align-items: stretch; gap: 16px; }
+  .deck-thumb { width: 100%; max-width: 260px; }
+}
+</style>
+</head>
+<body>
+
+<a class="topbar-back" href="https://luis-figueroa-ops.github.io/#method-in-motion">&#8592; Back to Home</a>
+
+<div class="hero">
+  <div class="hero-eyebrow">Beyond the Resume &middot; Method in Motion</div>
+  <h1>Method <span>in Motion</span></h1>
+  <p class="hero-sub">
+    Method in Motion is where the methodology gets literal. Each entry is a screen-recorded walkthrough, sometimes teaching a spreadsheet formula step by step, sometimes presenting a dashboard build end to end, showing the reporting and analysis work behind the bigger stories on this site.
+  </p>
+  <p class="hero-sub">
+    The same approach that shaped the <a href="https://luis-figueroa-ops.github.io/i2b-channel-buildout/">I2B Channel Buildout</a> and runs through <a href="https://luis-figueroa-ops.github.io/about-me/">About Me</a> shows up here too, just at a smaller scale: a formula, a chart, a dashboard, walked through the same way a larger process would be.
+  </p>
+</div>
+
+<div class="main">
+
+  <div class="entry">
+    <span class="entry-label">Section 1</span>
+    <h2 class="entry-title">Data <span>Visualization</span></h2>
+    <p class="section-desc">Turning raw data into interactive charts, graphs, and dashboards for business leaders to take action.</p>
+
+    <div class="deck">
+      <a class="deck-thumb" href="https://youtu.be/3IGSI6IdYqg" target="_blank" rel="noopener">
+        <img src="/assets/skills-in-action/crm-sales-dashboard-thumb.png" alt="CRM Sales Performance Dashboard in Tableau — video cover">
+      </a>
+      <div class="deck-body">
+        <div class="deck-title">The Story: CRM Sales Performance Dashboard</div>
+        <div class="deck-desc">A Tableau dashboard I built from CRM pipeline data and structured around four questions sales and operations leaders actually ask: is a region underperforming, is one slower to close, is the business growing, and where is the client base concentrated. The breakdown covers the checks &mdash; product mix, account difficulty, deal volume &mdash; approach method I run before calling any region behind.</div>
+        <div class="deck-links">
+          <a href="https://youtu.be/3IGSI6IdYqg" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
+          <a href="/assets/skills-in-action/crm-sales-dashboard.pdf" target="_blank">View Dashboard (PDF)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="entry">
+    <span class="entry-label">Section 2</span>
+    <h2 class="entry-title">Advanced <span>Formulas</span></h2>
+    <p class="section-desc">Turning messy, scattered data into clean, reliable, and actionable answers.</p>
+
+    <div class="deck">
+      <a class="deck-thumb" href="https://youtu.be/I2Zo3DyQVpw" target="_blank" rel="noopener">
+        <img src="/assets/skills-in-action/unique-sort-dynamic-arrays-thumb.png" alt="UNIQUE and SORT dynamic arrays walkthrough — video cover">
+      </a>
+      <div class="deck-body">
+        <div class="deck-title">The Spreadsheet: UNIQUE &amp; SORT Dynamic Arrays</div>
+        <div class="deck-desc">Take a column list with a bunch of repeats in it, keep only one of each thing, and put them in order. Two functions &mdash; UNIQUE and SORT &mdash; turning a 200,000-row column of sales records into a clean, always-sorted list of stores, the kind of dependable foundation a dashboard filter is built on. The video walks through why UNIQUE alone leaves the order to chance and how wrapping it in SORT makes the result predictable.</div>
+        <div class="deck-links">
+          <a href="https://youtu.be/I2Zo3DyQVpw" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
+          <a href="/assets/skills-in-action/unique-sort-breakdown.pdf" target="_blank">View Breakdown (PDF)</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck">
+      <a class="deck-thumb" href="https://youtu.be/V6_JGcbBUgs" target="_blank" rel="noopener">
+        <img src="/assets/skills-in-action/importrange-query-live-pulls-thumb.png" alt="IMPORTRANGE and QUERY live pulls walkthrough — video cover">
+      </a>
+      <div class="deck-body">
+        <div class="deck-title">The Spreadsheet: IMPORTRANGE &amp; QUERY Live Pulls</div>
+        <div class="deck-desc">Importing data you need from another source or master file. A formula that connects live to a spreadsheet another team owns and updates independently, then filters it down to one neighborhood's worth of inventory data automatically. The video walkthrough covers why a manual copy goes stale the moment the source changes, and why IMPORTRANGE &amp; QUERY Live Pulls is the best formula to use.</div>
+        <div class="deck-links">
+          <a href="https://youtu.be/V6_JGcbBUgs" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
+          <a href="/assets/skills-in-action/importrange-query-live-pulls.pdf" target="_blank">View Breakdown (PDF)</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck">
+      <a class="deck-thumb deck-thumb-video" href="https://youtu.be/7bkIPGm-hmU" target="_blank" rel="noopener">
+        <img src="/assets/skills-in-action/xlookup-filter-hstack-thumb.png" alt="XLOOKUP, FILTER and HSTACK walkthrough — video cover">
+      </a>
+      <div class="deck-body">
+        <div class="deck-title">The Spreadsheet: XLOOKUP, FILTER &amp; HSTACK</div>
+        <div class="deck-desc">Filtering a table down to just the rows that matter when the one piece of info that makes it useful &mdash; a supplier, a product name &mdash; sits in a completely different tab. Three functions on a 200,000-row sales dataset: XLOOKUP fetches the connected values from another tab, HSTACK lines the pulled-in columns up side by side, and FILTER narrows the result to every transaction where the product cost more than $5. The video covers why this pattern shows up constantly in sales operations, and why combining all three into one self-updating formula beats filtering one table and cross-referencing the other by hand.</div>
+        <div class="deck-links">
+          <a href="https://youtu.be/7bkIPGm-hmU" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
+          <a href="/assets/skills-in-action/xlookup-filter-hstack-formula-breakdown.pdf" target="_blank">View Formula Breakdown (PDF)</a>
+          <a href="/assets/skills-in-action/xlookup-filter-hstack-function-reference.pdf" target="_blank">View Function Reference (PDF)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="more-note">More walkthroughs added as I go &mdash; each its own entry.</div>
+
+</div>
+
+<div class="site-footer">
+  <div class="site-footer-built">
+    Built by <a href="https://luis-figueroa-ops.github.io/" target="_blank">Luis Figueroa</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/luis-d-figueroa/" target="_blank">LinkedIn</a>
+  </div>
+  <div class="site-footer-tagline">Augmenting Human Potential, One Workflow at a Time</div>
+  <div class="site-footer-copy">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+</div>
+
+</body>
+</html>
