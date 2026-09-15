@@ -385,20 +385,30 @@ h1 span { color: var(--gold); }
   text-transform: uppercase;
 }
 
-.card-qr {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 5;
-  width: 64px;
-  height: 64px;
-  padding: 5px;
+.card-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.card-top-row .card-tag { flex: 1 1 auto; min-width: 0; }
+
+.card-qr { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
+.card-qr img {
+  display: block;
+  width: 92px;
+  height: 92px;
+  padding: 6px;
   background: #fff;
   border: 1px solid rgba(184,150,62,0.4);
   border-radius: 4px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.35);
 }
-.card-qr img { display: block; width: 100%; height: 100%; image-rendering: crisp-edges; }
+.card-qr span {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: center;
+  max-width: 96px;
+}
 
 .card-inprogress-badge {
   position: absolute;
@@ -834,8 +844,10 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     <!-- ── SIDE BUILDS ── -->
 
     <a class="card" id="dodge" href="./games/dodge/index.html">
-      <div class="card-qr"><img src="./images/dodge_qr.png" alt="QR code - scan to play Dodge on your phone" loading="lazy" /></div>
-      <div class="card-tag"><span class="card-tag-icon dodge-icon" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g class="alien-head"><ellipse class="alien-face" cx="8" cy="7" rx="4.3" ry="5"/><ellipse class="alien-eye" cx="6.15" cy="6.4" rx="1.15" ry="1.75" transform="rotate(22 6.15 6.4)"/><ellipse class="alien-eye" cx="9.85" cy="6.4" rx="1.15" ry="1.75" transform="rotate(-22 9.85 6.4)"/><path class="alien-mouth" d="M6.7 10.1 Q8 11 9.3 10.1"/><rect class="alien-tongue" x="7.3" y="10.3" width="1.4" height="2.7" rx="0.7"/></g></svg></span>Games</div>
+      <div class="card-top-row">
+        <div class="card-tag"><span class="card-tag-icon dodge-icon" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g class="alien-head"><ellipse class="alien-face" cx="8" cy="7" rx="4.3" ry="5"/><ellipse class="alien-eye" cx="6.15" cy="6.4" rx="1.15" ry="1.75" transform="rotate(22 6.15 6.4)"/><ellipse class="alien-eye" cx="9.85" cy="6.4" rx="1.15" ry="1.75" transform="rotate(-22 9.85 6.4)"/><path class="alien-mouth" d="M6.7 10.1 Q8 11 9.3 10.1"/><rect class="alien-tongue" x="7.3" y="10.3" width="1.4" height="2.7" rx="0.7"/></g></svg></span>Games</div>
+        <div class="card-qr"><img src="./images/dodge_qr.png" alt="QR code linking to the Dodge game page" loading="lazy" /><span>Scan to play on your phone</span></div>
+      </div>
       <div class="card-title">DODGE</div>
       <div class="card-desc">
         A fast-paced arcade stress-break. Fly a spaceship through a gauntlet of asteroids,
@@ -850,8 +862,10 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     </a>
 
     <a class="card" id="stacked" href="./games/stacked/index.html">
-      <div class="card-qr"><img src="./images/stacked_qr.png" alt="QR code - scan to play Stacked! on your phone" loading="lazy" /></div>
-      <div class="card-tag"><span class="card-tag-icon" aria-hidden="true">🧱</span>Games</div>
+      <div class="card-top-row">
+        <div class="card-tag"><span class="card-tag-icon" aria-hidden="true">🧱</span>Games</div>
+        <div class="card-qr"><img src="./images/stacked_qr.png" alt="QR code linking to the Stacked! game page" loading="lazy" /><span>Scan to play on your phone</span></div>
+      </div>
       <div class="card-title">STACKED!</div>
       <div class="card-desc">
         A block-stacking arcade drop. Rotate and clear lines as the pace ramps up
@@ -864,8 +878,10 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     </a>
 
     <a class="card" id="boxing" href="./games/boxing/index.html">
-      <div class="card-qr"><img src="./images/boxing_qr.png" alt="QR code - scan to play Glass Jaw on your phone" loading="lazy" /></div>
-      <div class="card-tag"><span class="card-tag-icon br-icon" aria-hidden="true">🥊</span>Games</div>
+      <div class="card-top-row">
+        <div class="card-tag"><span class="card-tag-icon br-icon" aria-hidden="true">🥊</span>Games</div>
+        <div class="card-qr"><img src="./images/boxing_qr.png" alt="QR code linking to the Glass Jaw game page" loading="lazy" /><span>Scan to play on your phone</span></div>
+      </div>
       <div class="card-title">GLASS JAW</div>
       <div class="card-desc">
         A first-person boxing game. Twenty fighters across five real styles &mdash; out-boxers,
