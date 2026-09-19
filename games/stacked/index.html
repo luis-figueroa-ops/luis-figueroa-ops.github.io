@@ -185,6 +185,7 @@
     .land-right { right: 0; padding-right: calc(10px + env(safe-area-inset-right)); }
     .land-row { display: flex; gap: 8px; }
     .land-row-gap { gap: 40px; }
+    .land-gap-r { margin-right: 40px; }
     .land-btn {
       flex: none;
       width: 54px; height: 54px;
@@ -243,16 +244,16 @@
 </div>
 <div id="touchLandscape">
   <div class="land-cluster land-left">
-    <button class="tbtn land-hold" id="lHold">HOLD</button>
     <div class="land-row">
+      <button class="tbtn land-btn land-gap-r" id="lLeft">◀</button>
       <button class="tbtn land-btn land-btn-lg" id="lRotL">⟲</button>
-      <button class="tbtn land-btn" id="lDown">▼</button>
-      <button class="tbtn land-btn land-btn-lg" id="lRotR">⟳</button>
+      <button class="tbtn land-hold" id="lHold">HOLD</button>
     </div>
   </div>
   <div class="land-cluster land-right">
-    <div class="land-row land-row-gap">
-      <button class="tbtn land-btn" id="lLeft">◀</button>
+    <div class="land-row">
+      <button class="tbtn land-btn" id="lDown">▼</button>
+      <button class="tbtn land-btn land-btn-lg" id="lRotR">⟳</button>
       <button class="tbtn land-btn" id="lRight">▶</button>
     </div>
   </div>
