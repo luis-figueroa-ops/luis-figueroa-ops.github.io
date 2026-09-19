@@ -635,7 +635,7 @@ function lockPiece() {
     const table = [0, 100, 300, 500, 800];
     score += table[cleared] * level;
     boardFlash = 0.15;
-    if (cleared === 4) { soundTetris(); spawnToast('TETRIS!', '#ffd700'); }
+    if (cleared === 4) { soundTetris(); spawnToast('STACKED!', '#ffd700'); }
     else spawnToast(cleared === 1 ? 'LINE!' : cleared === 2 ? 'DOUBLE!' : 'TRIPLE!', '#00ffe7');
     const newLevel = Math.floor(lines / 10) + 1;
     if (newLevel > level) {
