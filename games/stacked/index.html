@@ -263,7 +263,7 @@
 <div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/#stacked">← Back to Tools</a></div>
 
 <script>
-// STACKED! — Block Drop Arcade (Tetris-like)
+// STACKED! — Block Drop Arcade
 
 const COLS = 10, ROWS = 20;
 const canvas = document.getElementById('c');
@@ -349,7 +349,7 @@ function soundLineClear(n) {
   const notes = [523, 659, 784, 1047].slice(0, Math.max(2, n));
   notes.forEach((f, i) => playNote(f, 'sine', now + i * 0.07, 0.22, 0.2));
 }
-function soundTetris() {
+function soundStacked() {
   const ac = getAudio(), now = ac.currentTime;
   [523, 659, 784, 1047, 1319].forEach((f, i) => playNote(f, 'triangle', now + i * 0.06, 0.3, 0.24));
 }
@@ -635,7 +635,7 @@ function lockPiece() {
     const table = [0, 100, 300, 500, 800];
     score += table[cleared] * level;
     boardFlash = 0.15;
-    if (cleared === 4) { soundTetris(); spawnToast('STACKED!', '#ffd700'); }
+    if (cleared === 4) { soundStacked(); spawnToast('STACKED!', '#ffd700'); }
     else spawnToast(cleared === 1 ? 'LINE!' : cleared === 2 ? 'DOUBLE!' : 'TRIPLE!', '#00ffe7');
     const newLevel = Math.floor(lines / 10) + 1;
     if (newLevel > level) {
