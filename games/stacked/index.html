@@ -192,11 +192,12 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.3rem; padding: 0;
     }
-    .land-btn-lg { width: 60px; height: 60px; font-size: 1.5rem; }
     .land-hold {
       flex: none;
-      font-size: 0.7rem; letter-spacing: 1px;
-      padding: 6px 14px;
+      width: 54px; height: 54px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.62rem; letter-spacing: 0.5px;
+      padding: 0;
     }
   </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
@@ -246,14 +247,14 @@
   <div class="land-cluster land-left">
     <div class="land-row">
       <button class="tbtn land-btn land-gap-r" id="lLeft">◀</button>
-      <button class="tbtn land-btn land-btn-lg" id="lRotL">⟲</button>
+      <button class="tbtn land-btn" id="lRotL">⟲</button>
       <button class="tbtn land-hold" id="lHold">HOLD</button>
     </div>
   </div>
   <div class="land-cluster land-right">
     <div class="land-row">
       <button class="tbtn land-btn" id="lDown">▼</button>
-      <button class="tbtn land-btn land-btn-lg land-gap-r" id="lRotR">⟳</button>
+      <button class="tbtn land-btn land-gap-r" id="lRotR">⟳</button>
       <button class="tbtn land-btn" id="lRight">▶</button>
     </div>
   </div>
@@ -875,7 +876,9 @@ function getLayout() {
     // A 10x20 board is always height-bound on a short landscape screen, which
     // leaves most of the wide viewport empty. Let cells run a bit wider than
     // tall (capped at 1.3x, so pieces stay recognizable) to reclaim that width.
-    cellH = Math.max(10, Math.floor(availH / ROWS));
+    // Height stays unfloored so the board fills the available height exactly,
+    // instead of losing up to a whole row's worth of pixels to rounding.
+    cellH = Math.max(10, availH / ROWS);
     cellW = Math.max(10, Math.min(Math.floor(availW / COLS), Math.round(cellH * 1.3)));
   } else {
     cellH = cellW = Math.max(10, Math.floor(Math.min(availW / COLS, availH / ROWS)));
