@@ -209,6 +209,23 @@ body::after {
   margin-top: 1px;
 }
 
+.chapter-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.chapter-link:hover { color: var(--gold-light); border-color: var(--gold-light); }
+
 .site-footer {
   position: relative; z-index: 10;
   max-width: 860px;
@@ -376,6 +393,21 @@ body::after {
         <li>Partnered with IT on enterprise AI initiative, converting a 70-page Indirect channel playbook into an AI queryable workflow and defining field-ready use cases, briefing AVP leadership for 90+ account managers.</li>
       </ul>
     </div>
+  </div>
+
+  <div class="chapter">
+    <h2>Automating Quota Relief <span>for Weather-Closed Stores</span></h2>
+    <p>When a store closed due to severe weather, the sales reps assigned to it needed quota relief so they weren&rsquo;t penalized for numbers a closure made impossible to hit. That adjustment didn&rsquo;t live in any system.</p>
+    <p>It lived in a manual process: pull the relevant reports out of Tableau, export them to Excel, run VLOOKUPs and pivot tables to isolate the affected reps and territories, calculate the relief percentage by hand, then get the number to Finance before the adjustment deadline. Miss a step, and an account manager absorbed a penalty a store closure caused, not their own performance.</p>
+    <p>Before bringing this to IT, I mapped the process end to end: every report pulled, every calculation, every handoff between systems and teams. Not just to hand it off, but to understand the logic well enough to translate it into requirements IT could actually build from. That&rsquo;s requirements gathering, even without the title: sitting at the intersection of sales, finance, and IT, and turning a manual process into logic a system could run on its own.</p>
+    <p>I partnered with IT to build that logic into an automated workflow that delivered the relief percentage straight to Finance without anyone needing to remember to run it. Quota relief accuracy improved 29%, and 90+ account managers stopped absorbing penalties for closures outside their control.</p>
+    <div class="kr">
+      <span class="kr-label">Key Results</span>
+      <ul>
+        <li>Documented a manual quota relief calculation (Tableau, Excel VLOOKUP, pivots) for weather closures, translating it into automation requirements that improved accuracy 29% and protected 90+ managers.</li>
+      </ul>
+    </div>
+    <a class="chapter-link" href="/assets/i2b-channel-buildout/quota-relief-automation.pdf" target="_blank">&#8594; View Presentation (PDF)</a>
   </div>
 
 </div>
