@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>STACKED! — Block Drop</title>
+  <title>STACKED! - Block Drop</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -92,7 +92,7 @@
     .k-pause { color: #ff9d4d; text-shadow: 0 0 10px #ff8a2a; }
     .k-music { color: #5cb4ff; text-shadow: 0 0 10px #3f9bff; }
     .k-hold  { color: #ff8ad6; text-shadow: 0 0 10px #ff5fc4; }
-    /* Mobile "how to play" text (touch build only) — brighter than the desktop legend. */
+    /* Mobile "how to play" text (touch build only) - brighter than the desktop legend. */
     .controls-hint.is-touch { color: #22ffe9; text-shadow: 0 0 10px #00ffe788; }
     #startScreen, #gameoverScreen { display: none; }
     #startScreen.active, #gameoverScreen.active { display: block; }
@@ -259,11 +259,11 @@
     </div>
   </div>
 </div>
-<div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+<div class="copyright">Copyright &copy; 2026 Luis Figueroa - All Rights Reserved</div>
 <div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/#stacked">← Back to Tools</a></div>
 
 <script>
-// STACKED! — Block Drop Arcade
+// STACKED! - Block Drop Arcade
 
 const COLS = 10, ROWS = 20;
 const canvas = document.getElementById('c');
@@ -863,7 +863,7 @@ function update(dt) {
 // ─── Draw ───────────────────────────────────────────────────────────────────
 // Landscape phones are short on height, so the HUD (hold/next/score) moves into
 // the left/right gutters there instead of a full-width bar, freeing up the
-// vertical space the board needs — see drawHUDLandscape/getHoldRect/getNextRect.
+// vertical space the board needs - see drawHUDLandscape/getHoldRect/getNextRect.
 function getLayout() {
   const landscapeTouch = isTouchDevice && isLandscape;
   const hudH = landscapeTouch ? 0 : Math.round(W < 600 ? 96 : 110);
@@ -964,7 +964,7 @@ function getHoldRect() {
   return { x: 14, y: Math.round((hudH - boxSize) / 2), w: boxSize, h: boxSize };
 }
 // Landscape shows a single upcoming piece (right gutter) instead of the
-// portrait row of three — there's width to spare but not much height.
+// portrait row of three - there's width to spare but not much height.
 function getNextRectLandscape() {
   const sideW = getTouchSideW(), boxSize = Math.min(sideW - 28, 60);
   return { x: W - Math.round((sideW + boxSize) / 2), y: 50, w: boxSize, h: boxSize };
@@ -1029,7 +1029,7 @@ function drawHUD(layout) {
   ctx.restore();
 }
 
-// Landscape: no top bar at all — the board owns the full height. HUD lives
+// Landscape: no top bar at all - the board owns the full height. HUD lives
 // entirely in the gutters: HOLD + score under it on the left, NEXT + level/
 // lines/hi under it on the right, both above their thumb clusters.
 function drawHUDLandscape() {
@@ -1158,7 +1158,7 @@ function loop(ts) {
 requestAnimationFrame(loop);
 
 // Returning to a backgrounded tab: resync the clock so no time is fast-forwarded
-// — the board stays exactly where the player left it.
+// - the board stays exactly where the player left it.
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     stopMusic();

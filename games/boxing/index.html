@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GLASS JAW — 20-Round Boxing</title>
+<title>GLASS JAW - 20-Round Boxing</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -110,7 +110,7 @@
 </head>
 <body>
 <div class="back-nav" id="backNav"><a href="https://luis-figueroa-ops.github.io/#boxing">&larr; Back to Tools</a></div>
-<div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+<div class="copyright">Copyright &copy; 2026 Luis Figueroa - All Rights Reserved</div>
 
 <div id="wrap">
   <div id="hud">
@@ -123,7 +123,7 @@
     </div>
     <div class="row opp"><div class="tag oc">OPP</div><div class="bar"><div id="oHP" class="fill hpO" style="width:100%"></div></div></div>
     <div class="row opp"><div class="tag oc" style="font-size:9px;opacity:.7">GAS</div><div class="bar sm"><div id="oST" class="fill stO" style="width:100%"></div></div></div>
-    <div id="info"><span id="rangeTag">&mdash;</span> &nbsp;&middot;&nbsp; SCORE <b id="scoreVal">0</b> &nbsp;&middot;&nbsp; <span id="oppName">&mdash;</span></div>
+    <div id="info"><span id="rangeTag">-</span> &nbsp;&middot;&nbsp; SCORE <b id="scoreVal">0</b> &nbsp;&middot;&nbsp; <span id="oppName">-</span></div>
   </div>
 
   <div id="stage">
@@ -141,14 +141,14 @@
     </div>
     <div id="overlay" class="solid">
       <div class="o-title">GLASS<br>JAW</div>
-      <div class="o-sub">20 rounds against 20 fighters who circle, feint, and hit back. Control the distance. Read the punch. Make him miss &mdash; make him pay.</div>
+      <div class="o-sub">20 rounds against 20 fighters who circle, feint, and hit back. Control the distance. Read the punch. Make him miss - make him pay.</div>
       <div id="nameWrap">
         <label>NAME FOR THE FIGHT CARD</label>
         <input id="playerName" maxlength="12" placeholder="CHALLENGER" autocomplete="off" spellcheck="false"/>
       </div>
       <div id="lb" style="display:none"><div id="lb-title">TOP KNOCKOUTS</div><div id="lb-rows"></div></div>
       <button class="btn" id="startBtn">FIGHT</button>
-      <div id="hint"><b>STEP IN</b> to get in range, <b>STEP OUT</b> to escape. Tap his head or body to punch &mdash; the punch depends on your range. <b>SLIP</b> straights, <b>WEAVE</b> hooks, <b>BLOCK</b> everything (costs gas), <b>JUMP</b> for tall fighters. Land a shot right after a slip or as he winds up = COUNTER. Desktop: W/S range, A/D re-square, J slip, K weave, Space block, &uarr; jump, click to punch.</div>
+      <div id="hint"><b>STEP IN</b> to get in range, <b>STEP OUT</b> to escape. Tap his head or body to punch - the punch depends on your range. <b>SLIP</b> straights, <b>WEAVE</b> hooks, <b>BLOCK</b> everything (costs gas), <b>JUMP</b> for tall fighters. Land a shot right after a slip or as he winds up = COUNTER. Desktop: W/S range, A/D re-square, J slip, K weave, Space block, &uarr; jump, click to punch.</div>
     </div>
   </div>
 </div>
@@ -354,7 +354,7 @@ function burst(x,y,color,n){ n=n||14; for(let i=0;i<n;i++){ const a=Math.random(
 
 // ---------------- range helpers ----------------
 function zoneOf(g){ if(g>0.70) return 'out'; if(g>0.44) return 'long'; if(g>0.22) return 'mid'; return 'close'; }
-function zoneLabel(z){ return z==='out'?'OUT OF RANGE':z==='long'?'LONG RANGE':z==='mid'?'MID RANGE — DANGER':'IN THE POCKET'; }
+function zoneLabel(z){ return z==='out'?'OUT OF RANGE':z==='long'?'LONG RANGE':z==='mid'?'MID RANGE - DANGER':'IN THE POCKET'; }
 function offAngle(){ return Math.abs(opp.angle - viewAngle); }
 function oppReach(){ if(!opp) return 0.46; return 0.44 + opp.reachBonus + (opp.style==='out'?0.11:opp.style==='ctr'?0.04:0); }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
@@ -363,7 +363,7 @@ function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function updateHUD(){
   elLevel.textContent = 'ROUND '+level+' / 20';
   elScore.textContent = Math.floor(score);
-  elOppName.textContent = opp ? opp.name : '—';
+  elOppName.textContent = opp ? opp.name : '-';
   elPHP.style.width = Math.max(0, you.hp/you.maxHp*100)+'%';
   elPST.style.width = Math.max(0, you.stamina*100)+'%';
   elOHP.style.width = opp ? Math.max(0, opp.hp/opp.maxHp*100)+'%' : '100%';
@@ -371,7 +371,7 @@ function updateHUD(){
   const s = Math.ceil(roundTime);
   elTimer.textContent = s;
   elTimer.classList.toggle('low', s<=10 && state==='playing');
-  elRange.textContent = state==='playing' ? zoneLabel(zoneOf(gap)) : '—';
+  elRange.textContent = state==='playing' ? zoneLabel(zoneOf(gap)) : '-';
 }
 
 // ---------------- flow ----------------
@@ -576,14 +576,14 @@ function resolvePlayerPunch(){
   if (info.type==='uppercut' && zoneOf(gap)!=='close'){ addFloat('TOO FAR', px, py, '#9a8'); you.recovery=180; you.stamina-=0.03; return; }
   // head reach for tall guys
   if (info.target==='head' && !headReachable()){
-    addFloat('TOO HIGH — JUMP!', px, py-8, '#ffd36b', true); SFX.whiff(); you.recovery=170; return;
+    addFloat('TOO HIGH - JUMP!', px, py-8, '#ffd36b', true); SFX.whiff(); you.recovery=170; return;
   }
   // blind side
   const off = offAngle() > 0.30;
   if (off && Math.random() < 0.5){
     addFloat('OFF BALANCE', px, py, '#ff8f6b'); you.recovery=200; you.stamina-=0.03; reSquare(); return;
   }
-  // he moved — your shot was aimed where he WAS. Catch him when he's set (winding up), not when he's juking.
+  // he moved - your shot was aimed where he WAS. Catch him when he's set (winding up), not when he's juking.
   const now = oppScreen();
   const tgtC = info.target==='head' ? now.headY : now.bodyY + now.bodyH*0.4;
   const tgtR = info.target==='head' ? now.headR*1.5 : now.bodyW*0.6;
@@ -594,7 +594,7 @@ function resolvePlayerPunch(){
     if (Math.random() < opp.counterRate) startOppAttack(true);
     return;
   }
-  // a shot landing while he's committed to his own punch still gets through (a trade) — no defense
+  // a shot landing while he's committed to his own punch still gets through (a trade) - no defense
   const heCommitted = (opp.intent==='windup' && opp.st < opp.telegraph*0.6) || opp.intent==='punch';
   const openLine = (info.target==='head' && opp.guard!=='high') || (info.target==='body' && opp.guard!=='low');
 
@@ -602,7 +602,7 @@ function resolvePlayerPunch(){
   const canReact = !opp.down && opp.stagger<=0 && !heCommitted;
   if (canReact){
     const dr = Math.random();
-    // he blocks the line he's guarding — you have to go where he ISN'T
+    // he blocks the line he's guarding - you have to go where he ISN'T
     if (!openLine && dr < 0.82){
       addFloat('BLOCKED', s2x(px), py, '#bcd4ff'); SFX.block();
       opp.hp -= 2.5*staF; burst(s2x(px), py, '#bcd4ff', 8);
@@ -782,7 +782,7 @@ function update(dt){
   if (you.jumpT>0) you.jumpT -= dt;
   if (you.recovery>0) you.recovery -= dt;
   if (you.counterWindow>0) you.counterWindow -= dt;
-  // you drift to keep him in front, but slowly — if he circles hard you fall behind until you re-square
+  // you drift to keep him in front, but slowly - if he circles hard you fall behind until you re-square
   viewAngle += (opp.angle - viewAngle) * Math.min(1, 0.55*dts);
   if (you.squareT>0){ you.squareT -= dt; viewAngle += (opp.angle - viewAngle) * Math.min(1, dt/140); }
   if (you.stanceT>0){ you.stanceT -= dt; if (you.stanceT<=0) you.stance='neutral'; }
@@ -836,7 +836,7 @@ function oppAI(dt, dts, z){
     if (o.intent!=='windup' && o.intent!=='punch') return;
   }
 
-  // continuous circling — he swings wide around you; you have to keep turning to face him
+  // continuous circling - he swings wide around you; you have to keep turning to face him
   o.circleT -= dt;
   if (o.circleT <= 0){
     if (Math.random() < 0.45) o.circleDir *= -1;
@@ -848,14 +848,14 @@ function oppAI(dt, dts, z){
   o.angle *= (1 - 0.35*dts);
   if (o.angle > 0.9){ o.angle = 0.9; o.circleDir = -1; }
   if (o.angle < -0.9){ o.angle = -0.9; o.circleDir = 1; }
-  // visible in-front juking — bobs left/right where he stands, so a shot at where he WAS misses
+  // visible in-front juking - bobs left/right where he stands, so a shot at where he WAS misses
   o.jukePhase += dts * o.speed * (squaringUp ? 2 : 5.5);
   o.juke += ((Math.sin(o.jukePhase) * o.jitterAmt * LW * (squaringUp?0.35:1)) - o.juke) * Math.min(1, dt/90);
 
   // stamina
   o.stamina = clamp(o.stamina + (zoneOf(gap)==='out'?0.16:0.045)*dts - (o.intent==='windup'||o.intent==='punch'?0.10*o.P.gasRate*dts:0), 0, 1);
 
-  // guard cycling — he covers up between exchanges and shells up under fire
+  // guard cycling - he covers up between exchanges and shells up under fire
   o.guardT -= dt;
   if (o.guardT<=0 && (o.intent==='circle'||o.intent==='closeIn'||o.intent==='backOut'||o.intent==='recover')){
     const r = Math.random();
@@ -865,7 +865,7 @@ function oppAI(dt, dts, z){
   }
   if (combo >= 3 && Math.random() < 0.5*dts*10) o.guard = 'high';   // shells up when you string shots together
 
-  // "counter before" — punish your punch / recovery / catch you flat-footed in range; the heart of a real fight
+  // "counter before" - punish your punch / recovery / catch you flat-footed in range; the heart of a real fight
   if ((o.intent==='circle'||o.intent==='recover') && zoneOf(gap)!=='out' && o.stagger<=0){
     const openToCounter = you.recovery>0 || you.punching;
     const flatFooted = gap <= oppReach() && you.stance==='neutral' && !you.block && you.gapVel<0.3;
@@ -882,7 +882,7 @@ function oppAI(dt, dts, z){
       if (Math.abs(gap - want) > 0.04){
         gap = clamp(gap + Math.sign(want - gap) * o.P.footSpeed * 0.7 * dts, 0, 1);
       }
-      // cut the ring — walk the fight toward the ropes behind you
+      // cut the ring - walk the fight toward the ropes behind you
       if (Math.random() < o.cutRing * dts * 1.1 && gap < 0.62){
         ringX = clamp(ringX - 0.06 * o.P.footSpeed, -1, 1);
       }
@@ -1193,14 +1193,14 @@ function drawHUDOverlays(){
   if (you.stamina < 0.2){
     ctx.save(); ctx.globalAlpha = 0.5 + 0.3*Math.sin(performance.now()/120);
     ctx.fillStyle='#ff8f6b'; ctx.font=`${Math.round(LW*0.03)}px 'Share Tech Mono', monospace`;
-    ctx.textAlign='center'; ctx.fillText('GASSED — GET OUT AND BREATHE', L.cx, LH*0.9);
+    ctx.textAlign='center'; ctx.fillText('GASSED - GET OUT AND BREATHE', L.cx, LH*0.9);
     ctx.restore();
   }
   // opponent tired tell
   if (opp.stamina < 0.3 && state==='playing' && !opp.down){
     ctx.save(); ctx.globalAlpha=0.7; ctx.fillStyle='#7ee07e';
     ctx.font=`${Math.round(LW*0.026)}px 'Share Tech Mono', monospace`; ctx.textAlign='center';
-    ctx.fillText("HE'S TIRING — PRESS HIM", L.cx, LH*0.1);
+    ctx.fillText("HE'S TIRING - PRESS HIM", L.cx, LH*0.1);
     ctx.restore();
   }
 }
@@ -1394,7 +1394,7 @@ function renderFightIntro(){
   ctx.fillStyle='rgba(12,6,8,0.7)'; ctx.fillRect(0, LH*0.38, LW, LH*0.24);
   ctx.fillStyle='#f5c542'; ctx.textAlign='center';
   ctx.font=`${Math.round(LW*0.04)}px 'Bebas Neue', sans-serif`;
-  ctx.fillText('ROUND '+level + (opp.boss?'  —  BOSS':'') + '   ·   '+opp.style.toUpperCase()+'-FIGHTER', LW/2, LH*0.45);
+  ctx.fillText('ROUND '+level + (opp.boss?'  -  BOSS':'') + '   ·   '+opp.style.toUpperCase()+'-FIGHTER', LW/2, LH*0.45);
   ctx.fillStyle='#fff'; ctx.font=`${Math.round(LW*0.058)}px 'Bebas Neue', sans-serif`;
   ctx.fillText(opp.name.toUpperCase(), LW/2, LH*0.54);
   ctx.globalAlpha = 1;

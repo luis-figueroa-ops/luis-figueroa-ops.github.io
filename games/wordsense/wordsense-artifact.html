@@ -1,11 +1,11 @@
 <!--
-  WordSense — Claude Artifact source (reference copy).
+  WordSense - Claude Artifact source (reference copy).
   Live public artifact:
     https://claude.ai/public/artifacts/c01aafa3-d1fd-4568-b6a3-fa1acb427aaf
   games/wordsense/index.html links to it.
 
-  It writes passages by calling window.claude.complete() — the artifact AI
-  API that runs on the viewer's own Claude account — the same approach as
+  It writes passages by calling window.claude.complete() - the artifact AI
+  API that runs on the viewer's own Claude account - the same approach as
   JD Analyzer, AI Role Revealer, and Prompt Coach. No API key, no card; the
   viewer just needs to be signed in to claude.ai and click "Allow" the
   first time it asks.
@@ -13,7 +13,7 @@
   IMPORTANT: window.claude.complete() only works in artifacts published
   from a claude.ai CHAT (claude.ai/public/artifacts/...). It is NOT
   available in artifacts published via the Claude Code Artifact tool
-  (claude.ai/code/artifact/...) — that runtime only offers the capability
+  (claude.ai/code/artifact/...) - that runtime only offers the capability
   model, and declaring the "sample" capability there blocks public sharing.
   So to update the live game: open a claude.ai chat, paste this file, and
   ask for it as a single self-contained HTML artifact that keeps the
@@ -553,7 +553,7 @@ body {
     </div>
   </div>
 
-  <p style="text-align:center;font-size:11px;color:#999992;margin-top:1.5rem;padding-bottom:1rem;">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</p>
+  <p style="text-align:center;font-size:11px;color:#999992;margin-top:1.5rem;padding-bottom:1rem;">Copyright &copy; 2026 Luis Figueroa - All Rights Reserved</p>
 
 </div><!-- end wrap -->
 
@@ -625,7 +625,7 @@ let state = freshState();
 let lastPoolWasTransition = false;
 
 // ═══════════════════════════════════════════
-// CLAUDE ACCESS — window.claude.complete(), the artifact AI API.
+// CLAUDE ACCESS - window.claude.complete(), the artifact AI API.
 // Runs on the viewer's own Claude account. No API key, no capability
 // declaration (declaring "sample" would bar public sharing).
 // ═══════════════════════════════════════════

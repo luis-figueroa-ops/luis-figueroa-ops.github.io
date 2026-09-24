@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ROAD RUSH — First-Person Drive</title>
+<title>ROAD RUSH - First-Person Drive</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -184,7 +184,7 @@
   </div>
 </div>
 
-<div class="copyright">&copy; 2026 Luis Figueroa — Built with Claude Code</div>
+<div class="copyright">&copy; 2026 Luis Figueroa - Built with Claude Code</div>
 
 <script>
 (function(){
@@ -468,7 +468,7 @@ function setWheelFromClientX(clientX) {
 }
 
 // Both control schemes are always attached rather than picked once via a
-// pointer:coarse media-query guess — that guess can be wrong on some
+// pointer:coarse media-query guess - that guess can be wrong on some
 // devices/browsers and silently leave touch totally unhandled.
 let usingTouch = false;
 canvas.addEventListener('mousemove', (e) => { if (state === 'playing') setWheelFromClientX(e.clientX); });
@@ -732,7 +732,7 @@ function update(dt) {
   const driftForce = curSeg.curve * (speed/maxSpeed) * 0.08 * selectedVehicle.driftRes * dt;
   player.x += driftForce;
 
-  // The car is never allowed off the paved road — it can reach the edge
+  // The car is never allowed off the paved road - it can reach the edge
   // rumble strip but not drift into the grass, however hard it drifts.
   const edge = ROAD_HALF * 0.94;
   if (player.x - curSeg.x > edge) player.x = curSeg.x + edge;
@@ -994,7 +994,7 @@ function drawDashboard() {
   ctx.fillStyle = '#05070c';
   poly(0,0, GW*0.05,0, 0,GH*0.5);
   poly(GW,0, GW*0.95,0, GW,GH*0.5);
-  // hood — the vehicle's own color, dominant across the lower dashboard
+  // hood - the vehicle's own color, dominant across the lower dashboard
   const hoodY = GH*0.80;
   ctx.fillStyle = v.body;
   poly(0,GH, GW,GH, GW*0.90,hoodY, GW*0.10,hoodY);
@@ -1034,7 +1034,7 @@ function drawDashboard() {
     ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*hubR, Math.sin(a)*hubR); ctx.stroke();
   }
   // A single off-center marker on the rim so a turn is always visible at a
-  // glance — three evenly-spaced spokes alone look identical every 120 deg.
+  // glance - three evenly-spaced spokes alone look identical every 120 deg.
   ctx.fillStyle = '#ffffff';
   ctx.strokeStyle = 'rgba(0,0,0,0.35)';
   ctx.lineWidth = 1.5;

@@ -124,7 +124,7 @@ function playSound(type) {
         break;
       }
       case 'hit': {
-        // Loud metallic sword-impact clang — high attack, quick decay
+        // Loud metallic sword-impact clang - high attack, quick decay
         const o1=AC.createOscillator(), o2=AC.createOscillator(), g=AC.createGain();
         o1.type='triangle'; o1.frequency.setValueAtTime(1400,now); o1.frequency.exponentialRampToValueAtTime(280,now+0.18);
         o2.type='sawtooth';  o2.frequency.setValueAtTime(900, now); o2.frequency.exponentialRampToValueAtTime(180,now+0.08);
@@ -591,7 +591,7 @@ function updateDemons(dt) {
         if(d.x>W-d.sz){ d.x=W-d.sz; d.vx=-Math.abs(d.vx); }
         break;
     }
-    // Hard clamp — keeps all types fully on screen
+    // Hard clamp - keeps all types fully on screen
     d.x=Math.max(d.sz, Math.min(W-d.sz, d.x));
     if(d.y>H*0.8){ playerHit(); d.hp=-1; }
   });
@@ -1188,6 +1188,6 @@ requestAnimationFrame(ts=>{ GS.lastTime=ts; requestAnimationFrame(loop); });
 </script>
 
 <div class="back-nav"><a href="https://luis-figueroa-ops.github.io/">← Back to Tools</a></div>
-<div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+<div class="copyright">Copyright &copy; 2026 Luis Figueroa - All Rights Reserved</div>
 </body>
 </html>

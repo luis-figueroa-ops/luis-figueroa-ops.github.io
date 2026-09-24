@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DODGE — Stress Break</title>
+<title>DODGE - Stress Break</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -145,7 +145,7 @@
 </style>
 </head>
 <body>
-<div class="copyright">Copyright &copy; 2026 Luis Figueroa &mdash; All Rights Reserved</div>
+<div class="copyright">Copyright &copy; 2026 Luis Figueroa - All Rights Reserved</div>
 <div id="game-wrapper">
   <div class="back-nav" id="back-nav"><a href="https://luis-figueroa-ops.github.io/#dodge">&larr; Back to Tools</a></div>
   <div id="hud">
@@ -178,7 +178,7 @@
     <canvas id="canvas"></canvas>
     <div id="overlay">
       <div class="overlay-title" id="overlay-title">DODGE</div>
-      <div class="overlay-sub" id="overlay-sub">SURVIVE THE GRID &mdash; 20 LEVELS</div>
+      <div class="overlay-sub" id="overlay-sub">SURVIVE THE GRID - 20 LEVELS</div>
       <div class="overlay-score-label" id="overlay-score-label" style="display:none">FINAL SCORE</div>
       <div class="overlay-score-val" id="overlay-score-val" style="display:none">0</div>
       <div id="name-input-wrap">
@@ -190,12 +190,12 @@
         <div id="lb-rows"></div>
       </div>
       <button id="start-btn">PLAY</button>
-      <div id="tip">MOUSE, ARROW KEYS, or DRAG to move &mdash; TAP/CLICK to shoot</div>
+      <div id="tip">MOUSE, ARROW KEYS, or DRAG to move - TAP/CLICK to shoot</div>
       <div id="tip2">&#128737; SHIELD - blocks one hit &nbsp;|&nbsp; &#9201; SLOW-MO - halves speed</div>
     </div>
     <div id="win-overlay">
       <div id="win-title">MISSION COMPLETE</div>
-      <div id="win-sub">ALL 20 LEVELS CLEARED &mdash; YOU ARE ELITE</div>
+      <div id="win-sub">ALL 20 LEVELS CLEARED - YOU ARE ELITE</div>
       <canvas id="badge-canvas" width="200" height="200"></canvas>
       <div id="win-score-label">FINAL SCORE</div>
       <div id="win-score-val">0</div>
@@ -740,7 +740,7 @@ function handlePlayerHit() {
   if(shieldActive){
     shieldHits--; SFX.shield(); spawnParticles(P.x,P.y,shieldIsEarned?'#ffcc00':'#4488ff',20);
     if(shieldHits<=0){ shieldActive=false; shieldTimer=0; shieldIsEarned=false; }
-    else if(shieldIsEarned) showLevelFlash(`SHIELD HIT — ${shieldHits} LEFT`,'#ffcc00');
+    else if(shieldIsEarned) showLevelFlash(`SHIELD HIT - ${shieldHits} LEFT`,'#ffcc00');
     updatePowerupUI();
     return;
   }
@@ -845,11 +845,11 @@ function loop(ts) {
   });
   if(bossActive&&boss) drawBoss();
 
-  // ── Random powerup orbs — redesigned to be visually unmissable ─────────────
+  // ── Random powerup orbs - redesigned to be visually unmissable ─────────────
   powerups=powerups.filter(pu=>{
     pu.y+=pu.vy; pu.life--; pu.pulse+=0.1;
     const isShield = pu.type==='shield';
-    // Blue for shield, purple for slow-mo — both clearly different from gold earned shield
+    // Blue for shield, purple for slow-mo - both clearly different from gold earned shield
     const col    = isShield ? '#00aaff' : '#cc44ff';
     const colR   = isShield ? '0,170,255' : '204,68,255';
     const fade   = Math.min(1, pu.life / 60);
