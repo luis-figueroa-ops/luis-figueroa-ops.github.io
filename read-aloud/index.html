@@ -5,173 +5,287 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Read Aloud</title>
 <meta name="description" content="Paste text or open a .txt, .md, or .docx file and have it read aloud. Free and private.">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-YCMXSWXHTN');
-</script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 56'%3E%3Cpath d='M4 23h6l8-7v24l-8-7H4z' fill='%23d4a53a'/%3E%3Cpath d='M23 23a7 7 0 0 1 0 10' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M28 19a12 12 0 0 1 0 18' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M33 15a17 17 0 0 1 0 26' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M47 24c0-6 4-10 9.5-10S66 18 66 24c0 4-3 6-4 9s-1 6-5 7c-3 1-5-1-5-3' stroke='%23e8e4d8' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M52 24c0-3 2-5 4.5-5s4.5 2 4.5 5c0 2-2 3-3 4' stroke='%23e8e4d8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 56'%3E%3Cpath d='M4 23h6l8-7v24l-8-7H4z' fill='%23d4a53a'/%3E%3Cpath d='M23 23a7 7 0 0 1 0 10' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M28 19a12 12 0 0 1 0 18' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M33 15a17 17 0 0 1 0 26' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
   :root {
-    --bg: #f6f5f1;
-    --surface: #ffffff;
-    --text: #1d1d1b;
-    --muted: #6b6a66;
-    --border: #e2e0da;
-    --accent: #2f5d50;
-    --accent-text: #ffffff;
-    --highlight: #ffe9a8;
-    --highlight-text: #1d1d1b;
-    --error: #a33a2a;
-    --radius: 14px;
+    --desk: #1f2a44;
+    --desk-edge: #172036;
+    --gold: #d4a53a;
+    --gold-soft: #e9cf8a;
+    --cream: #f3ead3;
+    --paper: #fbf6e9;
+    --paper-2: #f4ecd8;
+    --edge-1: #ece2c8;
+    --edge-2: #ddd0b0;
+    --edge-3: #cdbd98;
+    --ink: #2b2418;
+    --ink-soft: #6e6250;
+    --rule: rgba(43, 36, 24, 0.16);
+    --highlight: #f3dc8b;
+    --highlight-text: #2b2418;
+    --button: #1f2a44;
+    --button-text: #f3dcA0;
+    --error: #9b3322;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #151614;
-      --surface: #1f201e;
-      --text: #ecebe6;
-      --muted: #9d9b95;
-      --border: #33342f;
-      --accent: #7fc4ae;
-      --accent-text: #0f1a16;
-      --highlight: #5a4a14;
-      --highlight-text: #fff6d6;
-      --error: #f08a78;
+      --desk: #0f1522;
+      --desk-edge: #0a0f19;
+      --paper: #2a2620;
+      --paper-2: #24211c;
+      --edge-1: #221f1a;
+      --edge-2: #1c1a16;
+      --edge-3: #161411;
+      --ink: #efe4cc;
+      --ink-soft: #b3a78f;
+      --rule: rgba(239, 228, 204, 0.16);
+      --highlight: #6b5520;
+      --highlight-text: #fff3d0;
+      --button: #d4a53a;
+      --button-text: #1b1508;
+      --error: #f0957d;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #151614;
-    --surface: #1f201e;
-    --text: #ecebe6;
-    --muted: #9d9b95;
-    --border: #33342f;
-    --accent: #7fc4ae;
-    --accent-text: #0f1a16;
-    --highlight: #5a4a14;
-    --highlight-text: #fff6d6;
-    --error: #f08a78;
+    --desk: #0f1522;
+    --desk-edge: #0a0f19;
+    --paper: #2a2620;
+    --paper-2: #24211c;
+    --edge-1: #221f1a;
+    --edge-2: #1c1a16;
+    --edge-3: #161411;
+    --ink: #efe4cc;
+    --ink-soft: #b3a78f;
+    --rule: rgba(239, 228, 204, 0.16);
+    --highlight: #6b5520;
+    --highlight-text: #fff3d0;
+    --button: #d4a53a;
+    --button-text: #1b1508;
+    --error: #f0957d;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at top, var(--desk) 0%, var(--desk-edge) 100%);
+    background-color: var(--desk);
+    color: var(--ink);
+    font-family: var(--serif);
+    line-height: 1.55;
   }
-  .back-link { position: fixed; left: 14px; top: 14px; z-index: 200; font-size: 0.85rem; letter-spacing: 0.02em; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-  .back-link:hover { color: var(--accent); }
   main {
-    max-width: 760px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: 28px 16px 40px;
+    padding: 32px 16px 48px;
   }
-  h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
+
+  /* ---------- cover ---------- */
+  .back-link {
+    display: inline-block;
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+    text-decoration: none;
+    margin-bottom: 16px;
   }
+  .back-link:hover { color: var(--gold-soft); text-decoration: underline; }
+  .cover { text-align: center; margin-bottom: 28px; color: var(--cream); }
+  .cover .rule {
+    height: 7px;
+    border-top: 1px solid var(--gold);
+    border-bottom: 1px solid var(--gold);
+    max-width: 320px;
+    margin: 0 auto;
+    opacity: 0.8;
+  }
+  h1 {
+    font-size: 2.3rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-variant: small-caps;
+    color: var(--gold);
+    margin: 14px 0 8px;
+  }
+  .sub {
+    font-style: italic;
+    color: var(--cream);
+    opacity: 0.88;
+    max-width: 560px;
+    margin: 0 auto 14px;
+    font-size: 1.02rem;
+  }
+
+  /* ---------- page ---------- */
+  .page {
+    position: relative;
+    background: linear-gradient(90deg, var(--paper-2) 0%, var(--paper) 7%, var(--paper) 100%);
+    color: var(--ink);
+    border-radius: 4px 12px 12px 4px;
+    padding: 36px 32px 28px 40px;
+    box-shadow:
+      inset 16px 0 18px -16px rgba(0, 0, 0, 0.35),
+      3px 3px 0 var(--edge-1),
+      6px 6px 0 var(--edge-2),
+      9px 9px 0 var(--edge-3),
+      12px 16px 28px rgba(0, 0, 0, 0.35);
+  }
+  .page.ribbon::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    right: 40px;
+    width: 22px;
+    height: 74px;
+    background: var(--gold);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+  }
+  .chapter {
+    font-variant: small-caps;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin: 0 0 14px;
+    text-align: center;
+  }
+  .chapter::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 8px auto 0;
+  }
+
   textarea, .reader {
     width: 100%;
-    min-height: 240px;
+    min-height: 260px;
     max-height: 55vh;
     overflow-y: auto;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    font: inherit;
-    font-size: 1.05rem;
-    line-height: 1.65;
-    background: var(--bg);
-    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-family: var(--serif);
+    font-size: 1.12rem;
+    line-height: 1.8;
+    background: transparent;
+    color: var(--ink);
     resize: vertical;
   }
-  textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  textarea.dragging { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  textarea::placeholder { color: var(--ink-soft); font-style: italic; }
+  textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  textarea.dragging { outline: 2px dashed var(--gold); outline-offset: 2px; }
   .reader { white-space: pre-wrap; word-wrap: break-word; cursor: pointer; }
-  .reader span { border-radius: 4px; transition: background 0.15s; }
+  .reader span { border-radius: 3px; transition: background 0.15s; }
   .reader span.active { background: var(--highlight); color: var(--highlight-text); }
-  .reader span.done { color: var(--muted); }
+  .reader span.done { color: var(--ink-soft); }
+
   .row {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
-    margin-top: 12px;
+    margin-top: 16px;
   }
-  .meta { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
-  .status { font-size: 0.9rem; margin-top: 10px; min-height: 1.2em; color: var(--muted); }
-  .status.error { color: var(--error); }
+  .meta { color: var(--ink-soft); font-size: 0.9rem; font-style: italic; margin-left: auto; }
+  .status { font-size: 0.95rem; margin-top: 10px; min-height: 1.2em; color: var(--ink-soft); font-style: italic; }
+  .status.error { color: var(--error); font-style: normal; }
+
   button {
-    font: inherit;
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
     font-weight: 600;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    padding: 10px 18px;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink);
+    padding: 9px 18px;
     cursor: pointer;
     min-height: 44px;
   }
-  button:hover { border-color: var(--accent); }
+  button:hover { border-color: var(--gold); }
   button:disabled { opacity: 0.45; cursor: not-allowed; }
   button.primary {
-    background: var(--accent);
-    color: var(--accent-text);
-    border-color: var(--accent);
+    background: var(--button);
+    color: var(--button-text);
+    border-color: var(--button);
     min-width: 120px;
   }
+
   .settings {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 16px;
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
   }
-  label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
   select {
     width: 100%;
-    font: inherit;
+    font-family: var(--serif);
+    font-size: 1rem;
     padding: 10px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink);
     min-height: 44px;
   }
-  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  select option { background: var(--paper); color: var(--ink); }
+  input[type="range"] { width: 100%; accent-color: var(--gold); }
+
   .notice {
     display: none;
     background: var(--highlight);
     color: var(--highlight-text);
     padding: 12px 14px;
-    border-radius: 10px;
+    border-radius: 6px;
     margin-bottom: 14px;
   }
-  details.info {
-    margin-top: 18px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 4px 16px;
-  }
+
+  /* ---------- notes page ---------- */
+  details.info { margin-top: 30px; padding: 6px 32px 6px 40px; }
   details.info summary {
     cursor: pointer;
+    font-variant: small-caps;
+    letter-spacing: 0.1em;
     font-weight: 600;
-    padding: 12px 0;
+    padding: 14px 0;
     min-height: 44px;
   }
-  details.info ul { margin: 0 0 14px; padding-left: 20px; }
-  details.info li { margin-bottom: 10px; }
-  details.info a { color: var(--accent); }
-  footer { color: var(--muted); font-size: 0.85rem; margin-top: 22px; text-align: center; line-height: 1.7; }
-  footer a { color: var(--accent); }
+  details.info ul { margin: 0 0 18px; padding-left: 20px; }
+  details.info li { margin-bottom: 12px; line-height: 1.65; }
+  details.info a { color: var(--ink); }
+
+  footer {
+    color: var(--cream);
+    opacity: 0.75;
+    font-style: italic;
+    font-size: 0.92rem;
+    margin-top: 30px;
+    text-align: center;
+    line-height: 1.7;
+  }
+  footer a { color: var(--gold); }
+  footer .fleuron { display: block; color: var(--gold); font-style: normal; margin-bottom: 6px; letter-spacing: 0.4em; }
+
   .hidden { display: none !important; }
   @media (max-width: 560px) {
+    h1 { font-size: 1.9rem; }
+    .page { padding: 30px 18px 22px 24px; box-shadow: inset 12px 0 14px -12px rgba(0,0,0,.35), 2px 2px 0 var(--edge-1), 4px 4px 0 var(--edge-2), 6px 6px 0 var(--edge-3), 8px 12px 20px rgba(0,0,0,.35); }
+    .page.ribbon::before { right: 20px; width: 18px; height: 56px; }
+    details.info { padding: 4px 18px 4px 24px; }
     .settings { grid-template-columns: 1fr; }
     .meta { width: 100%; margin-left: 0; }
     button { flex: 1 1 auto; }
@@ -179,14 +293,19 @@
 </style>
 </head>
 <body>
-<a class="back-link" href="https://luis-figueroa-ops.github.io/#read-aloud">&#8592; Back to Tools</a>
 <main>
-  <h1>Read Aloud</h1>
-  <p class="sub">Paste text or open a .txt, .md, or .docx file, then press Play. Free, no sign-up, and nothing you add is saved because it's housed in your own browser.</p>
+  <header class="cover">
+    <a class="back-link" href="https://luis-figueroa-ops.github.io/#read-aloud">&#8592; Back to Tools</a>
+    <div class="rule"></div>
+    <h1>Read Aloud</h1>
+    <p class="sub">Paste text or open a .txt, .md, or .docx file, then press Play. Free, no sign-up, and nothing you add is saved because it's housed in your own browser.</p>
+    <div class="rule"></div>
+  </header>
 
   <div class="notice" id="notice">Sorry, this browser does not support text-to-speech. Try the latest Chrome, Edge, Safari, or Firefox.</div>
 
-  <div class="card">
+  <section class="page ribbon">
+    <p class="chapter">Your page</p>
     <textarea id="input" placeholder="Paste or type your text here, or drop a .txt, .md, or .docx file..." aria-label="Text to read aloud"></textarea>
     <div class="reader hidden" id="reader" aria-live="off" title="Tap any sentence to jump there"></div>
 
@@ -212,9 +331,9 @@
         <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
       </div>
     </div>
-  </div>
+  </section>
 
-  <details class="info">
+  <details class="info page">
     <summary>How it works and your privacy</summary>
     <ul>
       <li><strong>Nothing is saved or collected.</strong> This site has no server, database, account, or tracking. The text you paste and the files you open are never uploaded, stored, or sent to me. When you close or reload the page, it's gone. Like any website, GitHub (which hosts this page) may keep standard visit logs, but it never receives your text.</li>
@@ -225,8 +344,7 @@
     </ul>
   </details>
 
-  <footer>
-    Voices sound different on each device and browser. Microsoft Edge usually has the most natural ones.<br>
+  <footer><span class="fleuron" aria-hidden="true">&#10086; &#10086; &#10086;</span>Voices sound different on each device and browser. Microsoft Edge usually has the most natural ones.<br>
     Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a> &middot; <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>
     Augmenting Human Potential, One Workflow at a Time
   </footer>
