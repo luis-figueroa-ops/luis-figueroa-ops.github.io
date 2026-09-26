@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Read Aloud</title>
+<meta name="description" content="Paste text or open a .txt, .md, or .docx file and have it read aloud. Free and private.">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YCMXSWXHTN');
+</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 56'%3E%3Cpath d='M4 23h6l8-7v24l-8-7H4z' fill='%23d4a53a'/%3E%3Cpath d='M23 23a7 7 0 0 1 0 10' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M28 19a12 12 0 0 1 0 18' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M33 15a17 17 0 0 1 0 26' stroke='%23d4a53a' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M47 24c0-6 4-10 9.5-10S66 18 66 24c0 4-3 6-4 9s-1 6-5 7c-3 1-5-1-5-3' stroke='%23e8e4d8' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M52 24c0-3 2-5 4.5-5s4.5 2 4.5 5c0 2-2 3-3 4' stroke='%23e8e4d8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f6f5f1;
+    --surface: #ffffff;
+    --text: #1d1d1b;
+    --muted: #6b6a66;
+    --border: #e2e0da;
+    --accent: #2f5d50;
+    --accent-text: #ffffff;
+    --highlight: #ffe9a8;
+    --highlight-text: #1d1d1b;
+    --error: #a33a2a;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151614;
+      --surface: #1f201e;
+      --text: #ecebe6;
+      --muted: #9d9b95;
+      --border: #33342f;
+      --accent: #7fc4ae;
+      --accent-text: #0f1a16;
+      --highlight: #5a4a14;
+      --highlight-text: #fff6d6;
+      --error: #f08a78;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151614;
+    --surface: #1f201e;
+    --text: #ecebe6;
+    --muted: #9d9b95;
+    --border: #33342f;
+    --accent: #7fc4ae;
+    --accent-text: #0f1a16;
+    --highlight: #5a4a14;
+    --highlight-text: #fff6d6;
+    --error: #f08a78;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  .back-link { position: fixed; left: 14px; top: 14px; z-index: 200; font-size: 0.85rem; letter-spacing: 0.02em; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .back-link:hover { color: var(--accent); }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 16px 40px;
+  }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  textarea, .reader {
+    width: 100%;
+    min-height: 240px;
+    max-height: 55vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font: inherit;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    background: var(--bg);
+    color: var(--text);
+    resize: vertical;
+  }
+  textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  textarea.dragging { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  .reader { white-space: pre-wrap; word-wrap: break-word; cursor: pointer; }
+  .reader span { border-radius: 4px; transition: background 0.15s; }
+  .reader span.active { background: var(--highlight); color: var(--highlight-text); }
+  .reader span.done { color: var(--muted); }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 12px;
+  }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
+  .status { font-size: 0.9rem; margin-top: 10px; min-height: 1.2em; color: var(--muted); }
+  .status.error { color: var(--error); }
+  button {
+    font: inherit;
+    font-weight: 600;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 10px 18px;
+    cursor: pointer;
+    min-height: 44px;
+  }
+  button:hover { border-color: var(--accent); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button.primary {
+    background: var(--accent);
+    color: var(--accent-text);
+    border-color: var(--accent);
+    min-width: 120px;
+  }
+  .settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+  label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  select {
+    width: 100%;
+    font: inherit;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 44px;
+  }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .notice {
+    display: none;
+    background: var(--highlight);
+    color: var(--highlight-text);
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  details.info {
+    margin-top: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px 16px;
+  }
+  details.info summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 12px 0;
+    min-height: 44px;
+  }
+  details.info ul { margin: 0 0 14px; padding-left: 20px; }
+  details.info li { margin-bottom: 10px; }
+  details.info a { color: var(--accent); }
+  footer { color: var(--muted); font-size: 0.85rem; margin-top: 22px; text-align: center; line-height: 1.7; }
+  footer a { color: var(--accent); }
+  .hidden { display: none !important; }
+  @media (max-width: 560px) {
+    .settings { grid-template-columns: 1fr; }
+    .meta { width: 100%; margin-left: 0; }
+    button { flex: 1 1 auto; }
+  }
+</style>
+</head>
+<body>
+<a class="back-link" href="https://luis-figueroa-ops.github.io/#read-aloud">&#8592; Back to Tools</a>
+<main>
+  <h1>Read Aloud</h1>
+  <p class="sub">Paste text or open a .txt, .md, or .docx file, then press Play. Free, no sign-up, and nothing you add is saved because it's housed in your own browser.</p>
+
+  <div class="notice" id="notice">Sorry, this browser does not support text-to-speech. Try the latest Chrome, Edge, Safari, or Firefox.</div>
+
+  <div class="card">
+    <textarea id="input" placeholder="Paste or type your text here, or drop a .txt, .md, or .docx file..." aria-label="Text to read aloud"></textarea>
+    <div class="reader hidden" id="reader" aria-live="off" title="Tap any sentence to jump there"></div>
+
+    <div class="row">
+      <button class="primary" id="playBtn">Play</button>
+      <button id="stopBtn" disabled>Stop</button>
+      <button id="fileBtn">Open file</button>
+      <button id="pasteBtn">Paste</button>
+      <button id="clearBtn">Clear</button>
+      <button id="editBtn" class="hidden">Edit text</button>
+      <span class="meta" id="meta">0 words</span>
+    </div>
+    <input type="file" id="fileInput" class="hidden" accept=".txt,.md,.markdown,.docx,.doc,text/plain,text/markdown,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+    <div class="status" id="status" role="status"></div>
+
+    <div class="settings">
+      <div>
+        <label for="voiceSelect">Voice</label>
+        <select id="voiceSelect"></select>
+      </div>
+      <div>
+        <label for="rate">Speed: <span id="rateVal">1.0x</span></label>
+        <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+      </div>
+    </div>
+  </div>
+
+  <details class="info">
+    <summary>How it works and your privacy</summary>
+    <ul>
+      <li><strong>Nothing is saved or collected.</strong> This site has no server, database, account, or tracking. The text you paste and the files you open are never uploaded, stored, or sent to me. When you close or reload the page, it's gone. Like any website, GitHub (which hosts this page) may keep standard visit logs, but it never receives your text.</li>
+      <li><strong>Your browser opens your files.</strong> Text (.txt) and Markdown (.md) files are read directly by your browser. For Markdown, symbols like # and * and link addresses are removed so they aren't read out loud.</li>
+      <li><strong>Word files (.docx) use a free, open-source library called Mammoth.</strong> The first time you open a Word file, your browser downloads Mammoth's code from jsDelivr, a free public code host. Mammoth then pulls the text out of your document right on your device. Your document itself never leaves your device. A security check confirms the downloaded code hasn't been altered. Older .doc files aren't supported, so re-save them as .docx in Word first.</li>
+      <li><strong>The voices come from your browser and device.</strong> Voices marked "online" in the list are provided by your browser's maker, such as Google or Microsoft, and may send the text to their servers to create the audio. To keep everything on your device, pick a voice without the "online" label.</li>
+      <li><strong>The only thing remembered</strong> is your voice and speed choice, kept in your own browser so it's ready next time.</li>
+    </ul>
+  </details>
+
+  <footer>
+    Voices sound different on each device and browser. Microsoft Edge usually has the most natural ones.<br>
+    Built by <a href="https://www.luis-portfolio.com" target="_blank">Luis Figueroa</a> &middot; <a href="https://www.linkedin.com/in/luis-d-figueroa" target="_blank">LinkedIn</a><br>
+    Augmenting Human Potential, One Workflow at a Time
+  </footer>
+</main>
+
+<script>
+(function () {
+  var MAMMOTH_URL = "https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js";
+  var MAMMOTH_SRI = "sha384-8NWE3bZDrmRI4IePMoQaEoLhAQ1MmRMJkdNgnGiHRFanTqsFKr0TmK6aSZvFJ/PO";
+
+  var supported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  var $ = function (id) { return document.getElementById(id); };
+  var input = $("input"), reader = $("reader"), playBtn = $("playBtn"), stopBtn = $("stopBtn");
+  var pasteBtn = $("pasteBtn"), clearBtn = $("clearBtn"), editBtn = $("editBtn");
+  var fileBtn = $("fileBtn"), fileInput = $("fileInput"), statusEl = $("status");
+  var voiceSelect = $("voiceSelect"), rate = $("rate"), rateVal = $("rateVal"), meta = $("meta");
+
+  if (!supported) {
+    $("notice").style.display = "block";
+    playBtn.disabled = true;
+    return;
+  }
+
+  var synth = window.speechSynthesis;
+  var voices = [];
+  var chunks = [];      // [{text, el}]
+  var idx = 0;
+  var state = "idle";   // idle | playing | paused
+  var runId = 0;
+
+  // ---------- storage helpers (safe if blocked) ----------
+  function save(k, v) { try { localStorage.setItem("readaloud_" + k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem("readaloud_" + k); } catch (e) { return null; } }
+
+  function setStatus(msg, isError) {
+    statusEl.textContent = msg || "";
+    statusEl.classList.toggle("error", !!isError);
+  }
+
+  // ---------- voices ----------
+  function loadVoices() {
+    var list = synth.getVoices();
+    if (!list.length) return;
+    var userLang = (navigator.language || "en").slice(0, 2).toLowerCase();
+    voices = list.slice().sort(function (a, b) {
+      var am = a.lang.toLowerCase().indexOf(userLang) === 0 ? 0 : 1;
+      var bm = b.lang.toLowerCase().indexOf(userLang) === 0 ? 0 : 1;
+      if (am !== bm) return am - bm;
+      return a.name.localeCompare(b.name);
+    });
+    voiceSelect.innerHTML = "";
+    voices.forEach(function (v, i) {
+      var opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = v.name + " (" + v.lang + ")" + (v.localService === false ? " · online" : "");
+      voiceSelect.appendChild(opt);
+    });
+    var saved = load("voice");
+    var pick = -1;
+    if (saved) pick = voices.findIndex(function (v) { return v.name === saved; });
+    if (pick < 0) pick = voices.findIndex(function (v) { return v.default && v.lang.toLowerCase().indexOf(userLang) === 0; });
+    if (pick < 0) pick = 0;
+    voiceSelect.value = pick;
+  }
+  loadVoices();
+  if (typeof synth.onvoiceschanged !== "undefined") synth.onvoiceschanged = loadVoices;
+
+  voiceSelect.addEventListener("change", function () {
+    var v = voices[voiceSelect.value];
+    if (v) save("voice", v.name);
+    if (state === "playing") speakFrom(idx); // apply right away
+  });
+
+  var savedRate = load("rate");
+  if (savedRate) rate.value = savedRate;
+  function showRate() { rateVal.textContent = parseFloat(rate.value).toFixed(1) + "x"; }
+  showRate();
+  rate.addEventListener("input", function () { showRate(); save("rate", rate.value); });
+  rate.addEventListener("change", function () { if (state === "playing") speakFrom(idx); });
+
+  // ---------- text splitting ----------
+  function splitSentences(text) {
+    var parts = [];
+    if (window.Intl && Intl.Segmenter) {
+      var seg = new Intl.Segmenter(undefined, { granularity: "sentence" });
+      for (var s of seg.segment(text)) parts.push(s.segment);
+    } else {
+      parts = (text.match(/[^.!?\n]*(?:[.!?]+["')\]]*|\n+|$)\s*/g) || []).filter(function (p) { return p.length; });
+    }
+    // Break very long sentences so browsers don't cut off mid-read
+    var out = [];
+    var MAX = 220;
+    parts.forEach(function (p) {
+      while (p.length > MAX) {
+        var cut = Math.max(p.lastIndexOf(", ", MAX), p.lastIndexOf("; ", MAX));
+        if (cut < MAX / 3) cut = p.lastIndexOf(" ", MAX);
+        if (cut < 1) cut = MAX;
+        out.push(p.slice(0, cut + 1));
+        p = p.slice(cut + 1);
+      }
+      if (p.length) out.push(p);
+    });
+    return out;
+  }
+
+  function buildReader(text) {
+    reader.innerHTML = "";
+    chunks = [];
+    splitSentences(text).forEach(function (part) {
+      var span = document.createElement("span");
+      span.textContent = part;
+      reader.appendChild(span);
+      if (part.trim().length) {
+        var i = chunks.length;
+        chunks.push({ text: part.trim(), el: span });
+        span.addEventListener("click", function () { speakFrom(i); });
+      }
+    });
+  }
+
+  function markProgress(i) {
+    chunks.forEach(function (c, j) {
+      c.el.classList.toggle("active", j === i);
+      c.el.classList.toggle("done", j < i);
+    });
+    var el = chunks[i] && chunks[i].el;
+    if (el) {
+      var top = el.offsetTop - reader.offsetTop;
+      if (top < reader.scrollTop || top > reader.scrollTop + reader.clientHeight - 60) {
+        reader.scrollTo({ top: Math.max(0, top - 40), behavior: "smooth" });
+      }
+    }
+  }
+
+  // ---------- playback ----------
+  function speakFrom(i) {
+    runId++;
+    var myRun = runId;
+    synth.cancel(); // also clears a known Chrome freeze
+    if (i >= chunks.length) { finish(); return; }
+    idx = i;
+    setState("playing");
+    markProgress(i);
+
+    var u = new SpeechSynthesisUtterance(chunks[i].text);
+    var v = voices[voiceSelect.value];
+    if (v) { u.voice = v; u.lang = v.lang; }
+    u.rate = parseFloat(rate.value);
+    u.onend = function () {
+      if (myRun !== runId || state !== "playing") return;
+      speakFrom(i + 1);
+    };
+    u.onerror = function (e) {
+      if (myRun !== runId) return;
+      if (e.error === "interrupted" || e.error === "canceled") return;
+      speakFrom(i + 1); // skip a bad chunk rather than stall
+    };
+    // small delay helps Safari and Chrome after cancel()
+    setTimeout(function () { if (myRun === runId) synth.speak(u); }, 60);
+  }
+
+  function finish() {
+    runId++;
+    synth.cancel();
+    setState("idle");
+    idx = 0;
+    chunks.forEach(function (c) { c.el.classList.remove("active"); c.el.classList.add("done"); });
+  }
+
+  function setState(s) {
+    state = s;
+    playBtn.textContent = s === "playing" ? "Pause" : (s === "paused" ? "Resume" : "Play");
+    stopBtn.disabled = s === "idle";
+  }
+
+  function showReader(on) {
+    input.classList.toggle("hidden", on);
+    reader.classList.toggle("hidden", !on);
+    editBtn.classList.toggle("hidden", !on);
+  }
+
+  function backToEditing() {
+    runId++;
+    synth.cancel();
+    setState("idle");
+    idx = 0;
+    showReader(false);
+  }
+
+  playBtn.addEventListener("click", function () {
+    if (state === "playing") {
+      // Pause by stopping and remembering the sentence (works on every browser, including Android)
+      runId++;
+      synth.cancel();
+      setState("paused");
+      return;
+    }
+    if (state === "paused") { speakFrom(idx); return; }
+
+    var text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    setStatus("");
+    buildReader(input.value);
+    showReader(true);
+    speakFrom(0);
+  });
+
+  stopBtn.addEventListener("click", function () {
+    runId++;
+    synth.cancel();
+    setState("idle");
+    idx = 0;
+    chunks.forEach(function (c) { c.el.classList.remove("active", "done"); });
+    reader.scrollTop = 0;
+  });
+
+  editBtn.addEventListener("click", function () {
+    backToEditing();
+    input.focus();
+  });
+
+  clearBtn.addEventListener("click", function () {
+    backToEditing();
+    input.value = "";
+    setStatus("");
+    updateMeta();
+    input.focus();
+  });
+
+  pasteBtn.addEventListener("click", function () {
+    if (!navigator.clipboard || !navigator.clipboard.readText) {
+      input.focus();
+      setStatus("Your browser blocked the Paste button. Use Ctrl+V / Cmd+V or long-press to paste instead.", true);
+      return;
+    }
+    navigator.clipboard.readText().then(function (t) {
+      if (input.classList.contains("hidden")) backToEditing();
+      input.value = t;
+      setStatus("");
+      updateMeta();
+    }).catch(function () {
+      input.focus();
+      setStatus("Paste permission was denied. Use Ctrl+V / Cmd+V or long-press to paste instead.", true);
+    });
+  });
+
+  // ---------- files ----------
+  function markdownToText(md) {
+    var t = md.replace(/\r\n?/g, "\n");
+    t = t.replace(/^[ \t]*(```|~~~).*$/gm, "");                       // code fence lines
+    t = t.replace(/<!--[\s\S]*?-->/g, "");                          // HTML comments
+    t = t.replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1");                 // images -> alt text
+    t = t.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");                  // links -> link text
+    t = t.replace(/\[([^\]]+)\]\[[^\]]*\]/g, "$1");                 // reference links
+    t = t.replace(/^[ \t]*\[[^\]]+\]:[ \t]*\S+.*$/gm, "");                // reference definitions
+    t = t.replace(/<(https?:\/\/[^>]+)>/g, "");                     // autolinks
+    t = t.replace(/<\/?[a-zA-Z][^>]*>/g, "");                       // HTML tags
+    t = t.replace(/^[ \t]*([-*_])([ \t]*\1){2,}[ \t]*$/gm, "");              // horizontal rules
+    t = t.replace(/^[ \t]*\|?[ \t]*:?-{2,}:?[ \t]*(\|[ \t]*:?-{2,}:?[ \t]*)*\|?[ \t]*$/gm, ""); // table dividers
+    t = t.replace(/^[ \t]*\|(.*)\|[ \t]*$/gm, function (m, row) {         // table rows
+      return row.split("|").map(function (c) { return c.trim(); }).filter(Boolean).join(", ") + ".";
+    });
+    t = t.replace(/^[ \t]{0,3}#{1,6}[ \t]+(.*?)[ \t]*#*[ \t]*$/gm, "$1");       // headings
+    t = t.replace(/^[ \t]*>[ \t]?/gm, "");                                // blockquotes
+    t = t.replace(/^[ \t]*([-*+]|\d+[.)])[ \t]+(\[[ xX]\][ \t]+)?/gm, "");   // list markers and checkboxes
+    t = t.replace(/(\*\*|__)(.+?)\1/g, "$2");                       // bold
+    t = t.replace(/~~(.+?)~~/g, "$1");                              // strikethrough
+    t = t.replace(/(^|[^\w*])\*(?!\s)([^*\n]+?)\*(?!\w)/g, "$1$2"); // italic *
+    t = t.replace(/(^|[^\w])_(?!\s)([^_\n]+?)_(?!\w)/g, "$1$2");    // italic _
+    t = t.replace(/`([^`]*)`/g, "$1");                              // inline code
+    t = t.replace(/\\([\\`*_{}\[\]()#+\-.!|>~$&])/g, "$1");          // escaped characters
+    t = t.replace(/[ \t]+$/gm, "");
+    t = t.replace(/\n{3,}/g, "\n\n");
+    return t.trim();
+  }
+
+  var mammothPromise = null;
+  function loadMammoth() {
+    if (window.mammoth) return Promise.resolve(window.mammoth);
+    if (mammothPromise) return mammothPromise;
+    mammothPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = MAMMOTH_URL;
+      s.integrity = MAMMOTH_SRI;
+      s.crossOrigin = "anonymous";
+      s.onload = function () { window.mammoth ? resolve(window.mammoth) : reject(new Error("missing")); };
+      s.onerror = function () { mammothPromise = null; reject(new Error("load")); };
+      document.head.appendChild(s);
+    });
+    return mammothPromise;
+  }
+
+  function readFile(file) {
+    var name = (file.name || "").toLowerCase();
+    var ext = name.slice(name.lastIndexOf(".") + 1);
+
+    if (ext === "doc") {
+      return Promise.reject(new Error("Older .doc files aren't supported. In Word, choose File > Save As > Word Document (.docx), then open that file here."));
+    }
+    if (ext === "docx") {
+      setStatus("Opening Word file...");
+      return loadMammoth().catch(function () {
+        throw new Error("Couldn't load the Word reader. Check your internet connection and try again, or copy and paste the text instead.");
+      }).then(function (mammoth) {
+        return file.arrayBuffer().then(function (buf) {
+          return mammoth.extractRawText({ arrayBuffer: buf });
+        }).then(function (result) {
+          return result.value.replace(/\n{3,}/g, "\n\n").trim();
+        }).catch(function () {
+          throw new Error("That Word file couldn't be read. It may be damaged or password protected.");
+        });
+      });
+    }
+    if (ext === "md" || ext === "markdown") {
+      return file.text().then(markdownToText);
+    }
+    if (ext === "txt" || (file.type && file.type.indexOf("text/") === 0)) {
+      return file.text();
+    }
+    return Promise.reject(new Error("That file type isn't supported. Please use a .txt, .md, or .docx file."));
+  }
+
+  function handleFile(file) {
+    if (!file) return;
+    backToEditing();
+    readFile(file).then(function (text) {
+      if (!text || !text.trim()) {
+        setStatus("No readable text was found in " + file.name + ".", true);
+        return;
+      }
+      input.value = text;
+      updateMeta();
+      var words = text.trim().split(/\s+/).length;
+      setStatus("Opened " + file.name + " (" + words.toLocaleString() + " words). Press Play to listen.");
+    }).catch(function (err) {
+      setStatus(err.message, true);
+    });
+  }
+
+  fileBtn.addEventListener("click", function () { fileInput.click(); });
+  fileInput.addEventListener("change", function () {
+    handleFile(fileInput.files[0]);
+    fileInput.value = ""; // allow opening the same file again
+  });
+
+  input.addEventListener("dragover", function (e) { e.preventDefault(); input.classList.add("dragging"); });
+  input.addEventListener("dragleave", function () { input.classList.remove("dragging"); });
+  input.addEventListener("drop", function (e) {
+    input.classList.remove("dragging");
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+      e.preventDefault();
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  // ---------- word count ----------
+  function updateMeta() {
+    var words = input.value.trim() ? input.value.trim().split(/\s+/).length : 0;
+    var mins = words / (150 * parseFloat(rate.value));
+    var time = words ? (mins < 1 ? "under 1 min" : "about " + Math.round(mins) + " min") : "";
+    meta.textContent = words.toLocaleString() + (words === 1 ? " word" : " words") + (time ? " · " + time : "");
+  }
+  input.addEventListener("input", updateMeta);
+  rate.addEventListener("input", updateMeta);
+  updateMeta();
+
+  // Stop speaking if the page is closed or reloaded
+  window.addEventListener("beforeunload", function () { synth.cancel(); });
+})();
+</script>
+</body>
+</html>
