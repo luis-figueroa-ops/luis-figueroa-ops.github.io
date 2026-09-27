@@ -261,6 +261,47 @@
     margin-bottom: 14px;
   }
 
+  /* ---------- library ---------- */
+  .library { margin-top: 30px; }
+  .save-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .save-row input {
+    flex: 1 1 240px;
+    min-width: 0;
+    font-family: var(--serif);
+    font-size: 1rem;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink);
+    min-height: 44px;
+  }
+  .save-row input::placeholder { color: var(--ink-soft); font-style: italic; }
+  .save-row input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .lib-list { list-style: none; margin: 16px 0 0; padding: 0; }
+  .lib-list li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .lib-list li:last-child { border-bottom: 1px solid var(--rule); }
+  .lib-name { flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
+  .lib-name small { display: block; color: var(--ink-soft); font-style: italic; font-size: 0.85rem; }
+  .lib-list button { padding: 6px 14px; }
+  .lib-empty { color: var(--ink-soft); font-style: italic; margin: 14px 0 0; }
+  .disclaimer {
+    margin: 16px 0 0;
+    padding: 10px 12px;
+    border-left: 3px solid var(--gold);
+    background: var(--paper-2);
+    font-size: 0.92rem;
+    color: var(--ink);
+  }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
   /* ---------- notes page ---------- */
   details.info { margin-top: 30px; padding: 6px 32px 6px 40px; }
   details.info summary {
@@ -296,6 +337,7 @@
     .settings { grid-template-columns: 1fr; }
     .meta { width: 100%; margin-left: 0; }
     button { flex: 1 1 auto; }
+    .lib-name { flex-basis: 100%; }
   }
 </style>
 </head>
@@ -305,7 +347,7 @@
     <a class="back-link" href="https://luis-figueroa-ops.github.io/#read-aloud">&#8592; Back to Tools</a>
     <div class="rule"></div>
     <h1>Read Aloud</h1>
-    <p class="sub">Paste text or open a .txt, .md, or .docx file, then press Play. Free, no sign-up, and nothing you add is saved because it's housed in your own browser.</p>
+    <p class="sub">Paste text or open a .txt, .md, or .docx file, then press Play. Free, no sign-up, and nothing you add is uploaded. Save texts to your listening library to replay them later.</p>
     <div class="rule"></div>
   </header>
 
@@ -340,14 +382,27 @@
     </div>
   </section>
 
+  <section class="page library" aria-labelledby="libTitle">
+    <p class="chapter" id="libTitle">Listening library</p>
+    <form class="save-row" id="saveForm">
+      <label for="saveName" class="sr">Name for this text</label>
+      <input type="text" id="saveName" maxlength="80" autocomplete="off" placeholder="Name this text, e.g. Chapter 3 notes">
+      <button type="submit" id="saveBtn">Save to library</button>
+    </form>
+    <div class="status" id="libStatus" role="status"></div>
+    <ul class="lib-list" id="libList"></ul>
+    <p class="lib-empty" id="libEmpty">Nothing saved yet. Add some text above, give it a name, and press Save to library.</p>
+    <p class="disclaimer"><strong>Heads up:</strong> your library is saved only in this browser on this device. Clearing your browser's cache, cookies, or site data will permanently delete it. It won't carry over to other browsers or devices, and anything saved in a private or incognito window is erased when that window closes.</p>
+  </section>
+
   <details class="info page">
     <summary>How it works and your privacy</summary>
     <ul>
-      <li><strong>Nothing is saved or collected.</strong> This site has no server, database, account, or tracking. The text you paste and the files you open are never uploaded, stored, or sent to me. When you close or reload the page, it's gone. Like any website, GitHub (which hosts this page) may keep standard visit logs, but it never receives your text.</li>
+      <li><strong>Nothing is uploaded or collected.</strong> This site has no server, database, account, or tracking. The text you paste and the files you open are never uploaded or sent to me. When you close or reload the page, it's gone unless you save it to your library. Like any website, GitHub (which hosts this page) may keep standard visit logs, but it never receives your text.</li>
       <li><strong>Your browser opens your files.</strong> Text (.txt) and Markdown (.md) files are read directly by your browser. For Markdown, symbols like # and * and link addresses are removed so they aren't read out loud.</li>
       <li><strong>Word files (.docx) use a free, open-source library called Mammoth.</strong> The first time you open a Word file, your browser downloads Mammoth's code from jsDelivr, a free public code host. Mammoth then pulls the text out of your document right on your device. Your document itself never leaves your device. A security check confirms the downloaded code hasn't been altered. Older .doc files aren't supported, so re-save them as .docx in Word first.</li>
       <li><strong>The voices come from your browser and device.</strong> Voices marked "online" in the list are provided by your browser's maker, such as Google or Microsoft, and may send the text to their servers to create the audio. To keep everything on your device, pick a voice without the "online" label.</li>
-      <li><strong>The only thing remembered</strong> is your voice and speed choice, kept in your own browser so it's ready next time.</li>
+      <li><strong>What's remembered stays in your browser.</strong> Your voice and speed choice, plus anything you save to your listening library, are kept in your browser's own storage on this device. It's never sent anywhere. Delete a saved text any time with its Delete button. Clearing your browser's cache, cookies, or site data erases everything saved.</li>
     </ul>
   </details>
 
@@ -618,6 +673,7 @@
   clearBtn.addEventListener("click", function () {
     backToEditing();
     input.value = "";
+    saveName.value = "";
     setStatus("");
     updateMeta();
     input.focus();
@@ -725,6 +781,7 @@
         return;
       }
       input.value = text;
+      saveName.value = file.name.replace(/\.[^.]+$/, "");
       updateMeta();
       var words = text.trim().split(/\s+/).length;
       setStatus("Opened " + file.name + " (" + words.toLocaleString() + " words). Press Play to listen.");
@@ -748,6 +805,117 @@
       handleFile(e.dataTransfer.files[0]);
     }
   });
+
+  // ---------- listening library ----------
+  var LIB_KEY = "readaloud_library";
+  var saveForm = $("saveForm"), saveName = $("saveName"), libList = $("libList");
+  var libEmpty = $("libEmpty"), libStatus = $("libStatus");
+
+  function libSetStatus(msg, isError) {
+    libStatus.textContent = msg || "";
+    libStatus.classList.toggle("error", !!isError);
+  }
+
+  function readLibrary() {
+    try {
+      var list = JSON.parse(localStorage.getItem(LIB_KEY) || "[]");
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  }
+
+  // returns an error message, or "" on success
+  function writeLibrary(list) {
+    try {
+      localStorage.setItem(LIB_KEY, JSON.stringify(list));
+      return "";
+    } catch (e) {
+      if (e && (e.name === "QuotaExceededError" || e.code === 22 || e.code === 1014)) {
+        return "Your browser's storage for this site is full. Delete a saved text to make room.";
+      }
+      return "Your browser blocked saving. Saving may be turned off in this browser or private window.";
+    }
+  }
+
+  function renderLibrary() {
+    var list = readLibrary();
+    libList.innerHTML = "";
+    libEmpty.classList.toggle("hidden", list.length > 0);
+    list.forEach(function (item) {
+      var li = document.createElement("li");
+      var name = document.createElement("div");
+      name.className = "lib-name";
+      name.textContent = item.name;
+      var info = document.createElement("small");
+      var words = item.text.trim() ? item.text.trim().split(/\s+/).length : 0;
+      info.textContent = words.toLocaleString() + (words === 1 ? " word" : " words") +
+        " · saved " + new Date(item.saved).toLocaleDateString();
+      name.appendChild(info);
+
+      var loadBtn = document.createElement("button");
+      loadBtn.type = "button";
+      loadBtn.textContent = "Load";
+      loadBtn.setAttribute("aria-label", "Load " + item.name);
+      loadBtn.addEventListener("click", function () { loadSaved(item.id); });
+
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.textContent = "Delete";
+      delBtn.setAttribute("aria-label", "Delete " + item.name);
+      delBtn.addEventListener("click", function () { deleteSaved(item.id); });
+
+      li.appendChild(name);
+      li.appendChild(loadBtn);
+      li.appendChild(delBtn);
+      libList.appendChild(li);
+    });
+  }
+
+  function loadSaved(id) {
+    var item = readLibrary().filter(function (x) { return x.id === id; })[0];
+    if (!item) { renderLibrary(); return; }
+    backToEditing();
+    input.value = item.text;
+    saveName.value = item.name;
+    updateMeta();
+    libSetStatus("");
+    setStatus("Loaded \u201c" + item.name + "\u201d from your library. Press Play to listen.");
+    input.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function deleteSaved(id) {
+    var list = readLibrary();
+    var item = list.filter(function (x) { return x.id === id; })[0];
+    if (!item) { renderLibrary(); return; }
+    if (!confirm("Delete \u201c" + item.name + "\u201d from your library? This can't be undone.")) return;
+    var err = writeLibrary(list.filter(function (x) { return x.id !== id; }));
+    if (err) { libSetStatus(err, true); return; }
+    renderLibrary();
+    libSetStatus("Deleted \u201c" + item.name + "\u201d.");
+  }
+
+  saveForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = input.value;
+    var name = saveName.value.trim();
+    if (!text.trim()) { libSetStatus("There's no text to save yet. Paste, type, or open a file first.", true); return; }
+    if (!name) { libSetStatus("Give this text a name first.", true); saveName.focus(); return; }
+
+    var list = readLibrary();
+    var existing = list.filter(function (x) { return x.name.toLowerCase() === name.toLowerCase(); })[0];
+    if (existing && !confirm("You already have \u201c" + existing.name + "\u201d in your library. Replace it with this text?")) return;
+
+    var entry = { id: existing ? existing.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name: name, text: text, saved: Date.now() };
+    list = list.filter(function (x) { return !existing || x.id !== existing.id; });
+    list.unshift(entry); // newest first
+    var err = writeLibrary(list);
+    if (err) { libSetStatus(err, true); return; }
+    renderLibrary();
+    libSetStatus((existing ? "Updated" : "Saved") + " \u201c" + name + "\u201d to your library.");
+  });
+
+  // keep the list in sync if the page is open in another tab
+  window.addEventListener("storage", function (e) { if (e.key === LIB_KEY || e.key === null) renderLibrary(); });
+  renderLibrary();
 
   // ---------- word count ----------
   function updateMeta() {
