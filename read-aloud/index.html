@@ -422,6 +422,7 @@
   voiceSelect.addEventListener("change", function () {
     var v = voices[voiceSelect.value];
     if (v) save("voice", v.name);
+    spokenWords = 0; spokenMin1x = 0; // new voice, new pace to learn
     if (state === "playing") speakFrom(idx); // apply right away
   });
 
@@ -460,13 +461,14 @@
   function buildReader(text) {
     reader.innerHTML = "";
     chunks = [];
+    spokenWords = 0; spokenMin1x = 0; // new text, fresh speed measurement
     splitSentences(text).forEach(function (part) {
       var span = document.createElement("span");
       span.textContent = part;
       reader.appendChild(span);
       if (part.trim().length) {
         var i = chunks.length;
-        chunks.push({ text: part.trim(), el: span });
+        chunks.push({ text: part.trim(), el: span, words: countWords(part) });
         span.addEventListener("click", function () { speakFrom(i); });
       }
     });
@@ -486,6 +488,57 @@
     }
   }
 
+  // ---------- countdown ----------
+  // Starts from an estimate of 150 words per minute at 1.0x, then learns the
+  // real pace of the chosen voice as sentences finish, so the time left gets
+  // more accurate the longer it plays.
+  var BASE_WPM = 150;
+  var spokenWords = 0, spokenMin1x = 0; // measured pace, normalized to 1.0x
+  var secsLeft = 0, tickTimer = null, chunkStartedAt = 0;
+
+  function countWords(t) { t = t.trim(); return t ? t.split(/\s+/).length : 0; }
+
+  function currentWpm() {
+    var r = parseFloat(rate.value);
+    if (spokenWords >= 40 && spokenMin1x > 0) return (spokenWords / spokenMin1x) * r;
+    return BASE_WPM * r;
+  }
+
+  function wordsFrom(i) {
+    var n = 0;
+    for (var j = i; j < chunks.length; j++) n += chunks[j].words;
+    return n;
+  }
+
+  function fmtTime(s) {
+    s = Math.max(0, Math.round(s));
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    var mm = h ? String(m).padStart(2, "0") : String(m);
+    return (h ? h + ":" : "") + mm + ":" + String(sec).padStart(2, "0");
+  }
+
+  function renderCountdown() {
+    meta.textContent = fmtTime(secsLeft) + " left" + (state === "paused" ? " · paused" : "");
+  }
+
+  function syncCountdown(i) {
+    secsLeft = wordsFrom(i) / currentWpm() * 60;
+    renderCountdown();
+  }
+
+  function startTicking() {
+    stopTicking();
+    tickTimer = setInterval(function () {
+      if (state !== "playing") return;
+      if (secsLeft > 1) secsLeft -= 1;
+      renderCountdown();
+    }, 1000);
+  }
+
+  function stopTicking() {
+    if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+  }
+
   // ---------- playback ----------
   function speakFrom(i) {
     runId++;
@@ -500,8 +553,19 @@
     var v = voices[voiceSelect.value];
     if (v) { u.voice = v; u.lang = v.lang; }
     u.rate = parseFloat(rate.value);
+    syncCountdown(i);
+    startTicking();
+    u.onstart = function () { chunkStartedAt = Date.now(); };
     u.onend = function () {
       if (myRun !== runId || state !== "playing") return;
+      if (chunkStartedAt) {
+        var mins = (Date.now() - chunkStartedAt) / 60000;
+        if (mins > 0.005) { // ignore bogus instant "ends" some browsers fire
+          spokenWords += chunks[i].words;
+          spokenMin1x += mins * u.rate;
+        }
+        chunkStartedAt = 0;
+      }
       speakFrom(i + 1);
     };
     u.onerror = function (e) {
@@ -525,6 +589,8 @@
     state = s;
     playBtn.textContent = s === "playing" ? "Pause" : (s === "paused" ? "Resume" : "Play");
     stopBtn.disabled = s === "idle";
+    if (s === "paused") { stopTicking(); chunkStartedAt = 0; renderCountdown(); }
+    if (s === "idle") { stopTicking(); chunkStartedAt = 0; updateMeta(); }
   }
 
   function showReader(on) {
@@ -709,6 +775,10 @@
 
   // ---------- word count ----------
   function updateMeta() {
+    if (state !== "idle") { // while reading, the meta line shows the countdown
+      if (chunks.length) syncCountdown(idx);
+      return;
+    }
     var words = input.value.trim() ? input.value.trim().split(/\s+/).length : 0;
     var mins = words / (150 * parseFloat(rate.value));
     var time = words ? (mins < 1 ? "under 1 min" : "about " + Math.round(mins) + " min") : "";
