@@ -185,6 +185,8 @@ body::after {
   display: block;
 }
 .deck-thumb-video img { object-position: center 30%; }
+/* Remote YouTube hqdefault covers are 4:3 with letterbox bars, so center the crop */
+.deck-thumb-yt img { object-position: center; }
 
 .deck-body { flex: 1; min-width: 0; }
 .deck-title {
@@ -202,6 +204,15 @@ body::after {
   opacity: 0.8;
   max-width: 560px;
   margin-bottom: 14px;
+}
+.deck-desc p + p { margin-top: 12px; }
+.deck-subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin: -4px 0 12px;
 }
 .deck-links { display: flex; gap: 20px; flex-wrap: wrap; }
 .deck-links a {
@@ -315,6 +326,24 @@ body::after {
           <a href="https://youtu.be/O1TgBZBPOW4" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
           <a href="/assets/skills-in-action/power-bi-sales-dashboard.pdf" target="_blank">View Dashboard (PDF)</a>
           <a href="/assets/skills-in-action/power-bi-sales-dashboard-build-recap.pdf" target="_blank">View Build Recap (PDF)</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck">
+      <a class="deck-thumb deck-thumb-yt" href="https://youtu.be/ZLt0O6H79fU" target="_blank" rel="noopener">
+        <img src="https://img.youtube.com/vi/ZLt0O6H79fU/hqdefault.jpg" alt="From Pivot Table to Dashboard, budget variance in Google Sheets and Tableau - video cover" loading="lazy">
+      </a>
+      <div class="deck-body">
+        <div class="deck-title">From Pivot Table to Dashboard</div>
+        <div class="deck-subtitle">Budget Variance in Google Sheets and Tableau</div>
+        <div class="deck-desc">
+          <p>Business question: "We're $76K (8.9%) over budget through June. Where is the overspend coming from, and what's driving it?"</p>
+          <p>This video compares two ways to answer it using the same data. A Google Sheets pivot table checks the numbers, with every total tying out. A Tableau dashboard visualizes them, with KPI tiles, a month filter, a department drill-down, and a monthly trend.</p>
+          <p>Tools: Google Sheets, Tableau<br>Data: Fictional sample data from XelPlus (Los Pollos Hermanos is not a real company).</p>
+        </div>
+        <div class="deck-links">
+          <a href="https://youtu.be/ZLt0O6H79fU" target="_blank" rel="noopener">&#9654;&nbsp; Watch on YouTube</a>
         </div>
       </div>
     </div>
