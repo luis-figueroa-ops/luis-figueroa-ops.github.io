@@ -113,6 +113,16 @@ h1 span { color: var(--gold); }
 .intro-bar { width: 3px; align-self: stretch; background: linear-gradient(to bottom, var(--gold), rgba(184,150,62,0.15)); flex-shrink: 0; }
 .intro-text { font-size: 20px; font-weight: 400; color: var(--gold-light); line-height: 1.7; max-width: 560px; }
 .intro-text strong { color: var(--white); font-weight: 500; }
+.intro-glow { animation: introGlow 5s ease-in-out infinite; }
+.intro-glow:nth-of-type(2) { animation-delay: 1s; }
+.intro-glow:nth-of-type(3) { animation-delay: 2s; }
+.intro-glow:nth-of-type(4) { animation-delay: 3s; }
+.intro-glow:nth-of-type(5) { animation-delay: 4s; }
+@keyframes introGlow {
+  0%, 24%, 100% { color: var(--gold-light); text-shadow: none; }
+  6%, 16% { color: #fff4d6; text-shadow: 0 0 8px rgba(212,174,96,0.9), 0 0 18px rgba(212,174,96,0.6); }
+}
+@media (prefers-reduced-motion: reduce) { .intro-glow { animation: none; } }
 
 .why-built { border-top: 1px solid var(--border); padding-top: 28px; }
 .why-label { font-family: 'Share Tech Mono', monospace; font-size: 26px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
@@ -686,7 +696,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
       <div class="intro-bar"></div>
       <p class="intro-text">
         Sales Operations professional who translates strategy into scalable processes, clear workflows, and stronger cross-functional execution.
-        This portfolio is where I build in public - learning by creating, testing, fixing, and iterating with AI
+        This portfolio is where I build in public - <span class="intro-glow">learning</span> by <span class="intro-glow">creating</span>, <span class="intro-glow">testing</span>, <span class="intro-glow">fixing</span>, and <span class="intro-glow">iterating</span> with AI
         to turn ideas into usable tools and document what's possible when operations thinking meets modern AI.
       </p>
     </div>
