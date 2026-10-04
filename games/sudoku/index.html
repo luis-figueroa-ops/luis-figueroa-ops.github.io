@@ -43,8 +43,8 @@
     }
     .wrap { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
 
-    header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .back { color: var(--muted); text-decoration: none; font-size: 0.85rem; }
+    header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+    .back { color: var(--muted); text-decoration: none; font-size: 0.85rem; justify-self: start; white-space: nowrap; }
     .back:hover { color: var(--gold-bright); }
     h1 {
       font-family: 'Bebas Neue', sans-serif;
@@ -54,7 +54,6 @@
       color: var(--gold-bright);
       line-height: 1;
     }
-    .spacer { width: 60px; }
 
     .status {
       display: flex; justify-content: space-between; align-items: center;
@@ -179,7 +178,7 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="back" href="../../index.html">&larr; Home</a>
+      <a class="back" href="https://luis-figueroa-ops.github.io/#sudoku">&larr; Back to Tools</a>
       <h1>GRIDLOCK</h1>
       <div class="spacer"></div>
     </header>
