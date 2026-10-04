@@ -1,4 +1,4 @@
-# Last updated June 2026
+# Last updated October 2026
 
 # CLAUDE.md
 
@@ -19,12 +19,31 @@ No build, lint, or test commands exist. Changes go live by pushing to `main`.
 
 ## Architecture
 
-Four self-contained HTML pages - all styles and scripts are inline within each file:
+Self-contained HTML pages - all styles and scripts are inline within each file:
 
 - `index.html` - Landing/portfolio page linking to all tools
 - `jd-analyzer/index.html` - Job description analyzer; streams Claude responses, supports follow-up chat
 - `ai-role-revealer/index.html` - Two-step tool: generates AI insights for a role, then builds copy-ready prompts
 - `games/dodge.html` - Canvas-based arcade game; no API key required
+- `games/sudoku/index.html` - GRIDLOCK, a sudoku game; no API key required. Generates a new puzzle
+  in the browser each game (random solved grid, then removes clues while a solver confirms the
+  solution stays unique). Easy/Medium/Hard/Expert = 40/32/27/~24 clues. How to Play screen on every
+  visit, notes, hints, undo, 3-mistake limit, timer. Progress and best times are kept in
+  `localStorage` (`gridlock-sudoku-save`, `gridlock-sudoku-best`). Landing page card id: `#sudoku`
+
+### Game page conventions
+
+New games should match the existing ones (Dodge, Stacked, Glass Jaw, GRIDLOCK):
+
+- Back link reads `← Back to Tools` and points to `https://luis-figueroa-ops.github.io/#<card-id>`
+  so the landing page scrolls back to that game's card
+- Landing page card uses `card-top-row` with a `card-qr` image at `images/<game>_qr.png`
+  (shown on desktop, hidden on mobile). QR images are 410x410, navy `#1B2A4A` on white,
+  error correction M, 10px modules, 4-module margin
+- Game folder includes `icon.svg`, `favicon-32.png`, `apple-touch-icon.png` (180),
+  `icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, and `manifest.webmanifest` listing
+  the three PNG icons. Keep maskable art inside the center 80% circle
+- Include the Google Analytics tag (see Analytics below)
 
 ## Claude API Usage Patterns
 
@@ -62,6 +81,7 @@ Each tool has its own visual style - do not assume shared CSS variables across f
 - **Landing page & JD Analyzer**: Navy/gold (`#1B2A4A` / `#B8963E`); fonts: Bebas Neue, DM Sans, Share Tech Mono
 - **AI Role Revealer**: Dark purple/tech (`#0a0a0f` bg, `#6c63ff` accent, `#43e8c8` secondary); fonts: IBM Plex Mono, Outfit
 - **Dodge**: Cyberpunk dark (`#0d0d18` bg, `#00ffe7` accent); fonts: Orbitron, Share Tech Mono
+- **GRIDLOCK**: Navy/gold like the landing page (`#1B2A4A` / `#B8963E`, bright gold `#D4A53A`); fonts: Bebas Neue, DM Sans, Share Tech Mono
 
 ## Analytics
 
