@@ -233,7 +233,6 @@
         <option value="hard">Hard</option>
         <option value="expert">Expert</option>
       </select>
-      <span><b id="timer">00:00</b></span>
     </div>
 
     <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
@@ -303,11 +302,11 @@
 
       <h3>Good to Know</h3>
       <ul>
-        <li>The <b>timer</b> pauses while this screen is open or you switch apps. Beat your <b>best time</b> on each difficulty.</li>
+        <li>There's <b>no timer</b>. Play at your own pace.</li>
         <li>Your game <b>saves automatically</b>. Leave anytime and pick up where you left off.</li>
-        <li><b>Heads up:</b> your game and best times are saved in this browser on this device only.
-          <b>Clearing your browser's cache, history, or site data will erase your saved game and best
-          times.</b> A private/incognito window doesn't keep them after you close it.</li>
+        <li><b>Heads up:</b> your game is saved in this browser on this device only.
+          <b>Clearing your browser's cache, history, or site data will erase your saved game.</b>
+          A private/incognito window doesn't keep it after you close it.</li>
         <li class="keys">Keyboard: <span class="kbd">1-9</span> place &middot; <span class="kbd">arrows</span> move &middot;
           <span class="kbd">N</span> notes &middot; <span class="kbd">H</span> hint &middot; <span class="kbd">Backspace</span> erase &middot; <span class="kbd">Ctrl+Z</span> undo</li>
       </ul>
@@ -437,14 +436,11 @@
   // ---------- Game state ----------
   const MAX_HINTS = 3;
   const SAVE_KEY = 'gridlock-sudoku-save';
-  const BEST_KEY = 'gridlock-sudoku-best';
 
-  let S = null;          // { difficulty, puzzle, solution, values, notes, hinted, hints, seconds, over }
+  let S = null;          // { difficulty, puzzle, solution, values, notes, hinted, hints, over }
   let selected = -1;
   let notesMode = false;
   let history = [];
-  let tick = null;
-  let paused = false;
   let introLevel = 'medium';
 
   const $ = id => document.getElementById(id);
@@ -472,7 +468,7 @@
       difficulty, puzzle, solution,
       values: puzzle.slice(),
       notes: Array.from({ length: 81 }, () => new Set()),
-      hinted: [], hints: MAX_HINTS, seconds: 0, over: false
+      hinted: [], hints: MAX_HINTS, over: false
     };
     startRound();
   }
@@ -484,24 +480,7 @@
     hideModal();
     save();
     render();
-    startTimer();
     if (typeof gtag === 'function') gtag('event', 'sudoku_start', { difficulty: S.difficulty });
-  }
-
-  // ---------- Timer ----------
-  function fmt(sec) {
-    const m = Math.floor(sec / 60), s = sec % 60;
-    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-  }
-  function startTimer() {
-    clearInterval(tick);
-    $('timer').textContent = fmt(S.seconds);
-    tick = setInterval(() => {
-      if (S.over || paused || document.hidden) return;
-      S.seconds++;
-      $('timer').textContent = fmt(S.seconds);
-      if (S.seconds % 5 === 0) save();
-    }, 1000);
   }
 
   // ---------- Moves ----------
@@ -613,15 +592,9 @@
 
   function finish() {
     S.over = true;
-    clearInterval(tick);
     render();
-    const best = load(BEST_KEY) || {};
-    const prev = best[S.difficulty];
-    const isBest = !prev || S.seconds < prev;
-    if (isBest) { best[S.difficulty] = S.seconds; store(BEST_KEY, best); }
-    const text = `${cap(S.difficulty)} in <b>${fmt(S.seconds)}</b>.<br>` +
-      (isBest ? '<b>New best time!</b>' : `Best: <b>${fmt(prev)}</b>`);
-    if (typeof gtag === 'function') gtag('event', 'sudoku_win', { difficulty: S.difficulty, seconds: S.seconds });
+    const text = `You solved ${/^[ae]/.test(S.difficulty) ? 'an' : 'a'} <b>${cap(S.difficulty)}</b> puzzle.`;
+    if (typeof gtag === 'function') gtag('event', 'sudoku_win', { difficulty: S.difficulty });
     store(SAVE_KEY, null);
     showModal('SOLVED', text);
   }
@@ -763,7 +736,6 @@
     for (const b of $('levels').children) b.classList.toggle('on', b.dataset.level === level);
   }
   function openIntro() {
-    paused = true;
     setLevel(S ? S.difficulty : 'medium');
     $('resumeBtn').style.display = hasActiveGame() ? '' : 'none';
     $('intro').classList.add('show');
@@ -771,7 +743,6 @@
   }
   function closeIntro() {
     $('intro').classList.remove('show');
-    paused = false;
   }
 
   for (const b of $('levels').children) b.addEventListener('click', () => setLevel(b.dataset.level));
@@ -786,14 +757,14 @@
   // ---------- Boot ----------
   buildBoard();
   if (restore()) {
-    history = []; render(); startTimer();
+    history = []; render();
   } else {
     // Empty board behind the How to Play screen until a game starts.
     const blank = new Array(81).fill(0);
     S = {
       difficulty: 'medium', puzzle: blank, solution: blank, values: blank.slice(),
       notes: Array.from({ length: 81 }, () => new Set()),
-      hinted: [], hints: MAX_HINTS, seconds: 0, over: true
+      hinted: [], hints: MAX_HINTS, over: true
     };
     render();
   }
