@@ -1,0 +1,12 @@
+{
+  "name": "GRIDLOCK - Sudoku",
+  "short_name": "GRIDLOCK",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1B2A4A",
+  "theme_color": "#1B2A4A",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

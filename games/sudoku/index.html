@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>GRIDLOCK - Sudoku</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <meta name="theme-color" content="#1B2A4A">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1B2A4A;
+      --navy-deep: #111c33;
+      --navy-light: #24365c;
+      --gold: #B8963E;
+      --gold-bright: #D4A53A;
+      --ink: #eef1f7;
+      --muted: #8f9bb5;
+      --given: #ffffff;
+      --entry: #e8c46a;
+      --error: #ff6b6b;
+      --cell: #1f3054;
+      --cell-peer: #273b63;
+      --cell-same: #3a4a6e;
+      --cell-sel: #4a5a3a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      background: radial-gradient(ellipse at top, #22355d 0%, var(--navy-deep) 70%);
+      color: var(--ink);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 16px 20px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
+
+    header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .back { color: var(--muted); text-decoration: none; font-size: 0.85rem; }
+    .back:hover { color: var(--gold-bright); }
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
+      font-size: 2.2rem;
+      letter-spacing: 4px;
+      color: var(--gold-bright);
+      line-height: 1;
+    }
+    .spacer { width: 60px; }
+
+    .status {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem; color: var(--muted);
+    }
+    .status b { color: var(--ink); font-weight: 400; }
+    select {
+      background: var(--navy-light); color: var(--ink);
+      border: 1px solid #3a4f7a; border-radius: 6px;
+      padding: 4px 6px; font-family: inherit; font-size: 0.9rem;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      aspect-ratio: 1;
+      width: 100%;
+      border: 3px solid var(--gold);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--gold);
+      gap: 1px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+    }
+    .cell {
+      position: relative;
+      background: var(--cell);
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(1.1rem, 6vw, 1.9rem);
+      font-weight: 500;
+      color: var(--entry);
+      cursor: pointer;
+      transition: background 0.08s;
+    }
+    .cell.given { color: var(--given); font-weight: 700; }
+    .cell.peer { background: var(--cell-peer); }
+    .cell.same { background: var(--cell-same); }
+    .cell.sel { background: #5b4a1e; box-shadow: inset 0 0 0 2px var(--gold-bright); }
+    .cell.bad { color: var(--error); }
+    .cell.flash { animation: flash 0.6s ease; }
+    @keyframes flash { 0% { background: #7a6420; } 100% { } }
+    /* thicker 3x3 box separators */
+    .cell.c3, .cell.c6 { border-left: 2px solid var(--gold); }
+    .cell.r3, .cell.r6 { border-top: 2px solid var(--gold); }
+    .notes {
+      position: absolute; inset: 2px;
+      display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+      font-size: clamp(0.5rem, 2.3vw, 0.72rem);
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .notes span { display: flex; align-items: center; justify-content: center; }
+    .notes span.hl { color: var(--gold-bright); font-weight: 700; }
+
+    .tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .tool {
+      background: transparent; border: none; color: var(--muted);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      font-family: inherit; font-size: 0.72rem; cursor: pointer; padding: 4px 0;
+    }
+    .tool svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .tool:hover { color: var(--ink); }
+    .tool.on { color: var(--gold-bright); }
+    .tool .badge { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; }
+
+    .pad { display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; }
+    .num {
+      background: var(--navy-light);
+      border: 1px solid #34497a;
+      color: var(--ink);
+      border-radius: 8px;
+      font-family: inherit; font-size: clamp(1.2rem, 6vw, 1.7rem); font-weight: 500;
+      padding: 8px 0 2px;
+      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .num small { font-size: 0.6rem; color: var(--muted); font-family: 'Share Tech Mono', monospace; }
+    .num:active { background: var(--gold); color: var(--navy); }
+    .num.done { opacity: 0.25; pointer-events: none; }
+    .notes-mode .num { color: var(--gold-bright); }
+
+    .newgame {
+      background: var(--gold); color: var(--navy);
+      border: none; border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px;
+      padding: 8px; cursor: pointer;
+    }
+    .newgame:hover { background: var(--gold-bright); }
+
+    .modal {
+      position: fixed; inset: 0; background: rgba(8, 12, 24, 0.8);
+      display: none; align-items: center; justify-content: center; padding: 16px; z-index: 10;
+    }
+    .modal.show { display: flex; }
+    .card {
+      background: var(--navy); border: 2px solid var(--gold); border-radius: 12px;
+      padding: 28px 24px; text-align: center; max-width: 340px; width: 100%;
+    }
+    .card h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 2.6rem; letter-spacing: 3px; color: var(--gold-bright); }
+    .card p { color: var(--muted); margin: 8px 0 18px; line-height: 1.6; font-size: 0.95rem; }
+    .card p b { color: var(--ink); }
+    .card .row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .card button {
+      background: var(--navy-light); color: var(--ink); border: 1px solid var(--gold);
+      border-radius: 8px; padding: 8px 14px; font-family: inherit; font-size: 0.9rem; cursor: pointer;
+    }
+    .card button.primary { background: var(--gold); color: var(--navy); font-weight: 700; }
+
+    .help { color: var(--muted); font-size: 0.75rem; text-align: center; line-height: 1.6; }
+    @media (hover: none) { .help { display: none; } }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCMXSWXHTN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YCMXSWXHTN');
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="back" href="../../index.html">&larr; Home</a>
+      <h1>GRIDLOCK</h1>
+      <div class="spacer"></div>
+    </header>
+
+    <div class="status">
+      <select id="difficulty" aria-label="Difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+        <option value="expert">Expert</option>
+      </select>
+      <span>Mistakes <b id="mistakes">0/3</b></span>
+      <span><b id="timer">00:00</b></span>
+    </div>
+
+    <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
+
+    <div class="tools">
+      <button class="tool" id="undoBtn" title="Undo (Ctrl+Z)">
+        <svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Undo
+      </button>
+      <button class="tool" id="eraseBtn" title="Erase (Backspace)">
+        <svg viewBox="0 0 24 24"><path d="M20 20H8l-4-4 10-10 6 6-6 6"/><path d="M9 11l5 5"/></svg>Erase
+      </button>
+      <button class="tool" id="notesBtn" title="Notes (N)">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>Notes <span class="badge" id="notesState">OFF</span></span>
+      </button>
+      <button class="tool" id="hintBtn" title="Hint (H)">
+        <svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg><span>Hint <span class="badge" id="hintsLeft">3</span></span>
+      </button>
+    </div>
+
+    <div class="pad" id="pad"></div>
+
+    <button class="newgame" id="newBtn">New Game</button>
+    <div class="help">Keyboard: 1-9 to fill &middot; arrows to move &middot; N notes &middot; H hint &middot; Backspace erase &middot; Ctrl+Z undo</div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="card">
+      <h2 id="modalTitle">SOLVED</h2>
+      <p id="modalText"></p>
+      <div class="row">
+        <button class="primary" id="modalNew">New Game</button>
+        <button id="modalAlt">Retry</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Puzzle generation ----------
+  // Board is an array of 81 ints, 0 = empty. Bitmask solver for speed.
+  const ROW = [], COL = [], BOX = [];
+  for (let i = 0; i < 81; i++) {
+    ROW[i] = Math.floor(i / 9);
+    COL[i] = i % 9;
+    BOX[i] = Math.floor(ROW[i] / 3) * 3 + Math.floor(COL[i] / 3);
+  }
+  const PEERS = [];
+  for (let i = 0; i < 81; i++) {
+    const s = new Set();
+    for (let j = 0; j < 81; j++) {
+      if (j !== i && (ROW[j] === ROW[i] || COL[j] === COL[i] || BOX[j] === BOX[i])) s.add(j);
+    }
+    PEERS[i] = [...s];
+  }
+
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  const popcount = m => { let c = 0; while (m) { m &= m - 1; c++; } return c; };
+
+  // Counts solutions up to `limit`. If `randomize`, fills `grid` with the first solution found.
+  function solve(grid, limit, randomize) {
+    const rows = new Array(9).fill(0), cols = new Array(9).fill(0), boxes = new Array(9).fill(0);
+    for (let i = 0; i < 81; i++) {
+      const v = grid[i];
+      if (v) {
+        const b = 1 << v;
+        if ((rows[ROW[i]] | cols[COL[i]] | boxes[BOX[i]]) & b) return 0;
+        rows[ROW[i]] |= b; cols[COL[i]] |= b; boxes[BOX[i]] |= b;
+      }
+    }
+    let count = 0;
+    let solution = null;
+    function rec() {
+      // Pick the empty cell with the fewest candidates.
+      let best = -1, bestMask = 0, bestCount = 10;
+      for (let i = 0; i < 81; i++) {
+        if (grid[i]) continue;
+        const mask = ~(rows[ROW[i]] | cols[COL[i]] | boxes[BOX[i]]) & 0x3FE;
+        const c = popcount(mask);
+        if (c < bestCount) { best = i; bestMask = mask; bestCount = c; if (c <= 1) break; }
+      }
+      if (best === -1) {
+        count++;
+        if (!solution) solution = grid.slice();
+        return count >= limit;
+      }
+      if (bestCount === 0) return false;
+      let digits = [];
+      for (let d = 1; d <= 9; d++) if (bestMask & (1 << d)) digits.push(d);
+      if (randomize) shuffle(digits);
+      for (const d of digits) {
+        const b = 1 << d;
+        grid[best] = d;
+        rows[ROW[best]] |= b; cols[COL[best]] |= b; boxes[BOX[best]] |= b;
+        const stop = rec();
+        rows[ROW[best]] &= ~b; cols[COL[best]] &= ~b; boxes[BOX[best]] &= ~b;
+        grid[best] = 0;
+        if (stop) return true;
+      }
+      return false;
+    }
+    rec();
+    if (randomize && solution) for (let i = 0; i < 81; i++) grid[i] = solution[i];
+    return count;
+  }
+
+  const TARGET_CLUES = { easy: 40, medium: 32, hard: 27, expert: 23 };
+
+  function generate(difficulty) {
+    const solution = new Array(81).fill(0);
+    solve(solution, 1, true);
+    const puzzle = solution.slice();
+    const target = TARGET_CLUES[difficulty] || 32;
+    let clues = 81;
+    // Remove cells one at a time, keeping only removals that preserve a unique solution.
+    for (const i of shuffle([...Array(81).keys()])) {
+      if (clues <= target) break;
+      const keep = puzzle[i];
+      puzzle[i] = 0;
+      if (solve(puzzle.slice(), 2, false) !== 1) puzzle[i] = keep;
+      else clues--;
+    }
+    return { puzzle, solution };
+  }
+
+  // ---------- Game state ----------
+  const MAX_MISTAKES = 3;
+  const MAX_HINTS = 3;
+  const SAVE_KEY = 'gridlock-sudoku-save';
+  const BEST_KEY = 'gridlock-sudoku-best';
+
+  let S = null;          // { difficulty, puzzle, solution, values, notes, mistakes, hints, seconds, over }
+  let selected = -1;
+  let notesMode = false;
+  let history = [];
+  let tick = null;
+
+  const $ = id => document.getElementById(id);
+  const boardEl = $('board'), padEl = $('pad');
+  const cells = [];
+
+  function store(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+  function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
+
+  function save() {
+    if (!S) return;
+    store(SAVE_KEY, { ...S, notes: S.notes.map(n => [...n]) });
+  }
+
+  function restore() {
+    const d = load(SAVE_KEY);
+    if (!d || d.over || !Array.isArray(d.values) || d.values.length !== 81) return false;
+    S = { hinted: [], ...d, notes: d.notes.map(n => new Set(n)) };
+    return true;
+  }
+
+  function newGame(difficulty) {
+    const { puzzle, solution } = generate(difficulty);
+    S = {
+      difficulty, puzzle, solution,
+      values: puzzle.slice(),
+      notes: Array.from({ length: 81 }, () => new Set()),
+      hinted: [], mistakes: 0, hints: MAX_HINTS, seconds: 0, over: false
+    };
+    startRound();
+  }
+
+  function restart() {
+    S.values = S.puzzle.slice();
+    S.notes = Array.from({ length: 81 }, () => new Set());
+    S.hinted = []; S.mistakes = 0; S.hints = MAX_HINTS; S.seconds = 0; S.over = false;
+    startRound();
+  }
+
+  function startRound() {
+    history = [];
+    selected = -1;
+    $('difficulty').value = S.difficulty;
+    hideModal();
+    save();
+    render();
+    startTimer();
+    if (typeof gtag === 'function') gtag('event', 'sudoku_start', { difficulty: S.difficulty });
+  }
+
+  // ---------- Timer ----------
+  function fmt(sec) {
+    const m = Math.floor(sec / 60), s = sec % 60;
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+  function startTimer() {
+    clearInterval(tick);
+    $('timer').textContent = fmt(S.seconds);
+    tick = setInterval(() => {
+      if (S.over || document.hidden) return;
+      S.seconds++;
+      $('timer').textContent = fmt(S.seconds);
+      if (S.seconds % 5 === 0) save();
+    }, 1000);
+  }
+
+  // ---------- Moves ----------
+  function snapshot(i) {
+    history.push({ i, value: S.values[i], notes: [...S.notes[i]], peerNotes: null });
+  }
+
+  function place(d) {
+    if (S.over || selected < 0 || locked(selected)) return;
+    const i = selected;
+    if (notesMode) {
+      if (S.values[i]) return;
+      snapshot(i);
+      S.notes[i].has(d) ? S.notes[i].delete(d) : S.notes[i].add(d);
+    } else {
+      if (S.values[i] === d) return;
+      const entry = { i, value: S.values[i], notes: [...S.notes[i]], peerNotes: [] };
+      S.values[i] = d;
+      S.notes[i].clear();
+      if (d !== S.solution[i]) {
+        S.mistakes++;
+        if (S.mistakes >= MAX_MISTAKES) { history.push(entry); return finish(false); }
+      } else {
+        // Clear this digit from notes of peers.
+        for (const p of PEERS[i]) {
+          if (S.notes[p].has(d)) { entry.peerNotes.push(p); S.notes[p].delete(d); }
+        }
+        flashGroups(i);
+      }
+      history.push(entry);
+      if (isSolved()) return finish(true);
+    }
+    save();
+    render();
+  }
+
+  function erase() {
+    if (S.over || selected < 0 || locked(selected)) return;
+    const i = selected;
+    if (!S.values[i] && !S.notes[i].size) return;
+    snapshot(i);
+    S.values[i] = 0;
+    S.notes[i].clear();
+    save();
+    render();
+  }
+
+  function undo() {
+    if (S.over) return;
+    const h = history.pop();
+    if (!h) return;
+    S.values[h.i] = h.value;
+    S.notes[h.i] = new Set(h.notes);
+    if (h.peerNotes) {
+      // Restore the digit we removed from peers when the placement happened.
+      const placed = S.solution[h.i];
+      for (const p of h.peerNotes) S.notes[p].add(placed);
+    }
+    selected = h.i;
+    save();
+    render();
+  }
+
+  function hint() {
+    if (S.over || S.hints <= 0) return;
+    let i = selected;
+    if (i < 0 || S.values[i] === S.solution[i]) {
+      // Pick the empty/wrong cell with the fewest candidates.
+      let best = -1, bestC = 10;
+      for (let j = 0; j < 81; j++) {
+        if (S.values[j] === S.solution[j]) continue;
+        const c = candidates(j).length;
+        if (c < bestC) { best = j; bestC = c; }
+      }
+      i = best;
+    }
+    if (i < 0) return;
+    S.hints--;
+    history = history.filter(h => h.i !== i);
+    S.values[i] = S.solution[i];
+    S.hinted.push(i); // lock the hinted cell
+    S.notes[i].clear();
+    for (const p of PEERS[i]) S.notes[p].delete(S.solution[i]);
+    selected = i;
+    flashGroups(i);
+    if (isSolved()) return finish(true);
+    save();
+    render();
+  }
+
+  const locked = i => !!S.puzzle[i] || S.hinted.includes(i);
+
+  function candidates(i) {
+    const used = new Set(PEERS[i].map(p => S.values[p]));
+    const out = [];
+    for (let d = 1; d <= 9; d++) if (!used.has(d)) out.push(d);
+    return out;
+  }
+
+  function isSolved() {
+    for (let i = 0; i < 81; i++) if (S.values[i] !== S.solution[i]) return false;
+    return true;
+  }
+
+  let flashing = [];
+  function flashGroups(i) {
+    const groups = [ROW, COL, BOX];
+    flashing = [];
+    for (const g of groups) {
+      const members = [];
+      for (let j = 0; j < 81; j++) if (g[j] === g[i]) members.push(j);
+      if (members.every(j => S.values[j] === S.solution[j])) flashing.push(...members);
+    }
+  }
+
+  function finish(won) {
+    S.over = true;
+    clearInterval(tick);
+    render();
+    let text;
+    if (won) {
+      const best = load(BEST_KEY) || {};
+      const prev = best[S.difficulty];
+      const isBest = !prev || S.seconds < prev;
+      if (isBest) { best[S.difficulty] = S.seconds; store(BEST_KEY, best); }
+      text = `${cap(S.difficulty)} in <b>${fmt(S.seconds)}</b> with ${S.mistakes} mistake${S.mistakes === 1 ? '' : 's'}.<br>` +
+        (isBest ? '<b>New best time!</b>' : `Best: <b>${fmt(prev)}</b>`);
+      if (typeof gtag === 'function') gtag('event', 'sudoku_win', { difficulty: S.difficulty, seconds: S.seconds });
+    } else {
+      text = `Three mistakes on ${cap(S.difficulty)}.<br>Try the same puzzle again or start fresh.`;
+    }
+    store(SAVE_KEY, null);
+    showModal(won ? 'SOLVED' : 'GAME OVER', text, won ? 'Harder' : 'Retry');
+  }
+
+  const cap = s => s[0].toUpperCase() + s.slice(1);
+
+  // ---------- Modal ----------
+  function showModal(title, html, altLabel) {
+    $('modalTitle').textContent = title;
+    $('modalText').innerHTML = html;
+    $('modalAlt').textContent = altLabel;
+    $('modalAlt').style.display = (altLabel === 'Harder' && S.difficulty === 'expert') ? 'none' : '';
+    $('modal').classList.add('show');
+  }
+  function hideModal() { $('modal').classList.remove('show'); }
+
+  // ---------- Rendering ----------
+  function buildBoard() {
+    for (let i = 0; i < 81; i++) {
+      const c = document.createElement('div');
+      c.className = 'cell';
+      if (COL[i] === 3 || COL[i] === 6) c.classList.add('c' + COL[i]);
+      if (ROW[i] === 3 || ROW[i] === 6) c.classList.add('r' + ROW[i]);
+      c.setAttribute('role', 'gridcell');
+      c.addEventListener('pointerdown', () => { selected = i; render(); });
+      boardEl.appendChild(c);
+      cells.push(c);
+    }
+    for (let d = 1; d <= 9; d++) {
+      const b = document.createElement('button');
+      b.className = 'num';
+      b.innerHTML = `${d}<small></small>`;
+      b.addEventListener('click', () => place(d));
+      padEl.appendChild(b);
+    }
+  }
+
+  function render() {
+    const selVal = selected >= 0 ? S.values[selected] : 0;
+    const counts = new Array(10).fill(0);
+    for (let i = 0; i < 81; i++) if (S.values[i] === S.solution[i]) counts[S.values[i]]++;
+
+    for (let i = 0; i < 81; i++) {
+      const c = cells[i];
+      const v = S.values[i];
+      const given = locked(i);
+      let cls = 'cell';
+      if (COL[i] === 3 || COL[i] === 6) cls += ' c' + COL[i];
+      if (ROW[i] === 3 || ROW[i] === 6) cls += ' r' + ROW[i];
+      if (given) cls += ' given';
+      if (v && v !== S.solution[i]) cls += ' bad';
+      if (i === selected) cls += ' sel';
+      else if (selVal && v === selVal) cls += ' same';
+      else if (selected >= 0 && (ROW[i] === ROW[selected] || COL[i] === COL[selected] || BOX[i] === BOX[selected])) cls += ' peer';
+      if (flashing.includes(i)) cls += ' flash';
+      c.className = cls;
+      c.setAttribute('aria-label', `Row ${ROW[i] + 1} column ${COL[i] + 1}: ${v || 'empty'}`);
+
+      if (v) {
+        c.textContent = v;
+      } else if (S.notes[i].size) {
+        let h = '<div class="notes">';
+        for (let d = 1; d <= 9; d++) {
+          h += `<span${d === selVal ? ' class="hl"' : ''}>${S.notes[i].has(d) ? d : ''}</span>`;
+        }
+        c.innerHTML = h + '</div>';
+      } else {
+        c.textContent = '';
+      }
+    }
+    flashing = [];
+
+    [...padEl.children].forEach((b, k) => {
+      const d = k + 1, left = 9 - counts[d];
+      b.classList.toggle('done', left === 0);
+      b.querySelector('small').textContent = left;
+    });
+
+    $('mistakes').textContent = `${S.mistakes}/${MAX_MISTAKES}`;
+    $('hintsLeft').textContent = S.hints;
+    $('notesState').textContent = notesMode ? 'ON' : 'OFF';
+    $('notesBtn').classList.toggle('on', notesMode);
+    document.body.classList.toggle('notes-mode', notesMode);
+  }
+
+  // ---------- Input ----------
+  function move(dr, dc) {
+    if (selected < 0) { selected = 40; return render(); }
+    const r = (ROW[selected] + dr + 9) % 9, c = (COL[selected] + dc + 9) % 9;
+    selected = r * 9 + c;
+    render();
+  }
+
+  document.addEventListener('keydown', e => {
+    if ($('modal').classList.contains('show')) return;
+    if (e.target.tagName === 'SELECT') return;
+    const k = e.key;
+    if ((e.ctrlKey || e.metaKey) && k.toLowerCase() === 'z') { e.preventDefault(); return undo(); }
+    if (/^[1-9]$/.test(k)) return place(+k);
+    switch (k) {
+      case 'ArrowUp': case 'w': case 'W': e.preventDefault(); return move(-1, 0);
+      case 'ArrowDown': case 's': case 'S': e.preventDefault(); return move(1, 0);
+      case 'ArrowLeft': case 'a': case 'A': e.preventDefault(); return move(0, -1);
+      case 'ArrowRight': case 'd': case 'D': e.preventDefault(); return move(0, 1);
+      case 'Backspace': case 'Delete': case '0': return erase();
+      case 'n': case 'N': notesMode = !notesMode; return render();
+      case 'h': case 'H': return hint();
+    }
+  });
+
+  $('undoBtn').addEventListener('click', undo);
+  $('eraseBtn').addEventListener('click', erase);
+  $('notesBtn').addEventListener('click', () => { notesMode = !notesMode; render(); });
+  $('hintBtn').addEventListener('click', hint);
+  $('newBtn').addEventListener('click', () => {
+    const inProgress = !S.over && S.values.some((v, i) => v && !S.puzzle[i]);
+    if (inProgress && !confirm('Start a new game? Current progress will be lost.')) return;
+    newGame($('difficulty').value);
+  });
+  $('difficulty').addEventListener('change', e => {
+    const inProgress = !S.over && S.values.some((v, i) => v && !S.puzzle[i]);
+    if (inProgress && !confirm(`Switch to ${cap(e.target.value)}? Current progress will be lost.`)) {
+      e.target.value = S.difficulty;
+      return;
+    }
+    newGame(e.target.value);
+  });
+  $('modalNew').addEventListener('click', () => newGame(S.difficulty));
+  $('modalAlt').addEventListener('click', () => {
+    if ($('modalAlt').textContent === 'Retry') return restart();
+    const order = ['easy', 'medium', 'hard', 'expert'];
+    newGame(order[Math.min(order.indexOf(S.difficulty) + 1, 3)]);
+  });
+  window.addEventListener('pagehide', save);
+
+  // ---------- Boot ----------
+  buildBoard();
+  if (restore()) { history = []; render(); startTimer(); }
+  else newGame('medium');
+})();
+</script>
+</body>
+</html>
