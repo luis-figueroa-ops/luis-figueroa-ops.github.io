@@ -23,7 +23,6 @@
       --muted: #8f9bb5;
       --given: #ffffff;
       --entry: #e8c46a;
-      --error: #ff6b6b;
       --cell: #1f3054;
       --cell-peer: #273b63;
       --cell-same: #3a4a6e;
@@ -101,7 +100,6 @@
     .cell.peer { background: var(--cell-peer); }
     .cell.same { background: var(--cell-same); }
     .cell.sel { background: #5b4a1e; box-shadow: inset 0 0 0 2px var(--gold-bright); }
-    .cell.bad { color: var(--error); }
     .cell.flash { animation: flash 0.6s ease; }
     @keyframes flash { 0% { background: #7a6420; } 100% { } }
     /* thicker 3x3 box separators */
@@ -116,6 +114,13 @@
     }
     .notes span { display: flex; align-items: center; justify-content: center; }
     .notes span.hl { color: var(--gold-bright); font-weight: 700; }
+
+    .board-msg {
+      display: none; text-align: center; font-size: 0.85rem; line-height: 1.5;
+      color: var(--gold-bright); background: var(--navy-light); border: 1px solid #3a4f7a;
+      border-radius: 8px; padding: 8px 12px;
+    }
+    .board-msg.show { display: block; }
 
     .tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .tool {
@@ -141,7 +146,7 @@
     }
     .num small { font-size: 0.6rem; color: var(--muted); font-family: 'Share Tech Mono', monospace; }
     .num:active { background: var(--gold); color: var(--navy); }
-    .num.done { opacity: 0.25; pointer-events: none; }
+    .num.done { opacity: 0.3; }
     .notes-mode .num { color: var(--gold-bright); }
 
     .newgame {
@@ -228,11 +233,12 @@
         <option value="hard">Hard</option>
         <option value="expert">Expert</option>
       </select>
-      <span>Mistakes <b id="mistakes">0/3</b></span>
       <span><b id="timer">00:00</b></span>
     </div>
 
     <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
+    <div class="board-msg" id="boardMsg" role="status">Every square is filled, but something isn't right yet.
+      Take your time, check each row, column, and box, or use a hint.</div>
 
     <div class="tools">
       <button class="tool" id="undoBtn" title="Undo (Ctrl+Z)">
@@ -269,9 +275,11 @@
       <ol>
         <li><b>Tap an empty square</b> to select it. Its row, column, and box light up.</li>
         <li><b>Tap a number</b> on the number pad to place it.</li>
-        <li>A correct number stays <b style="color:var(--entry)">gold</b>. A wrong one turns
-          <b style="color:var(--error)">red</b> and counts as a mistake.</li>
-        <li>Fill the whole board to win. <b>Three mistakes ends the game.</b></li>
+        <li>Your numbers show in <b style="color:var(--entry)">gold</b>. Change one anytime by tapping
+          a different number, or clear it with Erase.</li>
+        <li>Fill the whole board correctly to win. There's <b>no mistake limit and no game over</b>, so
+          take all the time you need.</li>
+        <li>If every square is filled but something is off, a message lets you know so you can keep looking.</li>
       </ol>
 
       <h3>Reading the Board</h3>
@@ -285,11 +293,11 @@
 
       <h3>Tools</h3>
       <ul>
-        <li><b>Undo</b>: takes back your last move. It does not remove a mistake from the count.</li>
+        <li><b>Undo</b>: takes back your last move.</li>
         <li><b>Erase</b>: clears the selected square.</li>
         <li><b>Notes</b>: switch it ON to pencil in small possible numbers. Tap a number again to remove it.
-          Placing a correct number clears it from the notes in its row, column, and box.</li>
-        <li><b>Hint</b>: fills in the selected square, or the easiest square if none is selected. You get 3 per game, and they never count as mistakes.</li>
+          Placing a number clears it from the notes in its row, column, and box.</li>
+        <li><b>Hint</b>: fills in the selected square, or the easiest square if none is selected. You get 3 per game.</li>
         <li><b>New Game</b>: starts a fresh puzzle at the chosen difficulty.</li>
       </ul>
 
@@ -297,6 +305,9 @@
       <ul>
         <li>The <b>timer</b> pauses while this screen is open or you switch apps. Beat your <b>best time</b> on each difficulty.</li>
         <li>Your game <b>saves automatically</b>. Leave anytime and pick up where you left off.</li>
+        <li><b>Heads up:</b> your game and best times are saved in this browser on this device only.
+          <b>Clearing your browser's cache, history, or site data will erase your saved game and best
+          times.</b> A private/incognito window doesn't keep them after you close it.</li>
         <li class="keys">Keyboard: <span class="kbd">1-9</span> place &middot; <span class="kbd">arrows</span> move &middot;
           <span class="kbd">N</span> notes &middot; <span class="kbd">H</span> hint &middot; <span class="kbd">Backspace</span> erase &middot; <span class="kbd">Ctrl+Z</span> undo</li>
       </ul>
@@ -322,7 +333,7 @@
       <p id="modalText"></p>
       <div class="row">
         <button class="primary" id="modalNew">New Game</button>
-        <button id="modalAlt">Retry</button>
+        <button id="modalAlt">Harder</button>
       </div>
     </div>
   </div>
@@ -424,12 +435,11 @@
   }
 
   // ---------- Game state ----------
-  const MAX_MISTAKES = 3;
   const MAX_HINTS = 3;
   const SAVE_KEY = 'gridlock-sudoku-save';
   const BEST_KEY = 'gridlock-sudoku-best';
 
-  let S = null;          // { difficulty, puzzle, solution, values, notes, mistakes, hints, seconds, over }
+  let S = null;          // { difficulty, puzzle, solution, values, notes, hinted, hints, seconds, over }
   let selected = -1;
   let notesMode = false;
   let history = [];
@@ -462,15 +472,8 @@
       difficulty, puzzle, solution,
       values: puzzle.slice(),
       notes: Array.from({ length: 81 }, () => new Set()),
-      hinted: [], mistakes: 0, hints: MAX_HINTS, seconds: 0, over: false
+      hinted: [], hints: MAX_HINTS, seconds: 0, over: false
     };
-    startRound();
-  }
-
-  function restart() {
-    S.values = S.puzzle.slice();
-    S.notes = Array.from({ length: 81 }, () => new Set());
-    S.hinted = []; S.mistakes = 0; S.hints = MAX_HINTS; S.seconds = 0; S.over = false;
     startRound();
   }
 
@@ -515,21 +518,16 @@
       S.notes[i].has(d) ? S.notes[i].delete(d) : S.notes[i].add(d);
     } else {
       if (S.values[i] === d) return;
-      const entry = { i, value: S.values[i], notes: [...S.notes[i]], peerNotes: [] };
+      const entry = { i, value: S.values[i], notes: [...S.notes[i]], placed: d, peerNotes: [] };
       S.values[i] = d;
       S.notes[i].clear();
-      if (d !== S.solution[i]) {
-        S.mistakes++;
-        if (S.mistakes >= MAX_MISTAKES) { history.push(entry); return finish(false); }
-      } else {
-        // Clear this digit from notes of peers.
-        for (const p of PEERS[i]) {
-          if (S.notes[p].has(d)) { entry.peerNotes.push(p); S.notes[p].delete(d); }
-        }
-        flashGroups(i);
+      // Clear this digit from notes of peers.
+      for (const p of PEERS[i]) {
+        if (S.notes[p].has(d)) { entry.peerNotes.push(p); S.notes[p].delete(d); }
       }
+      flashGroups(i);
       history.push(entry);
-      if (isSolved()) return finish(true);
+      if (isSolved()) return finish();
     }
     save();
     render();
@@ -554,8 +552,7 @@
     S.notes[h.i] = new Set(h.notes);
     if (h.peerNotes) {
       // Restore the digit we removed from peers when the placement happened.
-      const placed = S.solution[h.i];
-      for (const p of h.peerNotes) S.notes[p].add(placed);
+      for (const p of h.peerNotes) S.notes[p].add(h.placed);
     }
     selected = h.i;
     save();
@@ -584,7 +581,7 @@
     for (const p of PEERS[i]) S.notes[p].delete(S.solution[i]);
     selected = i;
     flashGroups(i);
-    if (isSolved()) return finish(true);
+    if (isSolved()) return finish();
     save();
     render();
   }
@@ -610,38 +607,32 @@
     for (const g of groups) {
       const members = [];
       for (let j = 0; j < 81; j++) if (g[j] === g[i]) members.push(j);
-      if (members.every(j => S.values[j] === S.solution[j])) flashing.push(...members);
+      if (members.every(j => S.values[j])) flashing.push(...members);
     }
   }
 
-  function finish(won) {
+  function finish() {
     S.over = true;
     clearInterval(tick);
     render();
-    let text;
-    if (won) {
-      const best = load(BEST_KEY) || {};
-      const prev = best[S.difficulty];
-      const isBest = !prev || S.seconds < prev;
-      if (isBest) { best[S.difficulty] = S.seconds; store(BEST_KEY, best); }
-      text = `${cap(S.difficulty)} in <b>${fmt(S.seconds)}</b> with ${S.mistakes} mistake${S.mistakes === 1 ? '' : 's'}.<br>` +
-        (isBest ? '<b>New best time!</b>' : `Best: <b>${fmt(prev)}</b>`);
-      if (typeof gtag === 'function') gtag('event', 'sudoku_win', { difficulty: S.difficulty, seconds: S.seconds });
-    } else {
-      text = `Three mistakes on ${cap(S.difficulty)}.<br>Try the same puzzle again or start fresh.`;
-    }
+    const best = load(BEST_KEY) || {};
+    const prev = best[S.difficulty];
+    const isBest = !prev || S.seconds < prev;
+    if (isBest) { best[S.difficulty] = S.seconds; store(BEST_KEY, best); }
+    const text = `${cap(S.difficulty)} in <b>${fmt(S.seconds)}</b>.<br>` +
+      (isBest ? '<b>New best time!</b>' : `Best: <b>${fmt(prev)}</b>`);
+    if (typeof gtag === 'function') gtag('event', 'sudoku_win', { difficulty: S.difficulty, seconds: S.seconds });
     store(SAVE_KEY, null);
-    showModal(won ? 'SOLVED' : 'GAME OVER', text, won ? 'Harder' : 'Retry');
+    showModal('SOLVED', text);
   }
 
   const cap = s => s[0].toUpperCase() + s.slice(1);
 
   // ---------- Modal ----------
-  function showModal(title, html, altLabel) {
+  function showModal(title, html) {
     $('modalTitle').textContent = title;
     $('modalText').innerHTML = html;
-    $('modalAlt').textContent = altLabel;
-    $('modalAlt').style.display = (altLabel === 'Harder' && S.difficulty === 'expert') ? 'none' : '';
+    $('modalAlt').style.display = S.difficulty === 'expert' ? 'none' : '';
     $('modal').classList.add('show');
   }
   function hideModal() { $('modal').classList.remove('show'); }
@@ -670,7 +661,7 @@
   function render() {
     const selVal = selected >= 0 ? S.values[selected] : 0;
     const counts = new Array(10).fill(0);
-    for (let i = 0; i < 81; i++) if (S.values[i] === S.solution[i]) counts[S.values[i]]++;
+    for (let i = 0; i < 81; i++) if (S.values[i]) counts[S.values[i]]++;
 
     for (let i = 0; i < 81; i++) {
       const c = cells[i];
@@ -680,7 +671,6 @@
       if (COL[i] === 3 || COL[i] === 6) cls += ' c' + COL[i];
       if (ROW[i] === 3 || ROW[i] === 6) cls += ' r' + ROW[i];
       if (given) cls += ' given';
-      if (v && v !== S.solution[i]) cls += ' bad';
       if (i === selected) cls += ' sel';
       else if (selVal && v === selVal) cls += ' same';
       else if (selected >= 0 && (ROW[i] === ROW[selected] || COL[i] === COL[selected] || BOX[i] === BOX[selected])) cls += ' peer';
@@ -703,12 +693,12 @@
     flashing = [];
 
     [...padEl.children].forEach((b, k) => {
-      const d = k + 1, left = 9 - counts[d];
+      const d = k + 1, left = Math.max(0, 9 - counts[d]);
       b.classList.toggle('done', left === 0);
       b.querySelector('small').textContent = left;
     });
 
-    $('mistakes').textContent = `${S.mistakes}/${MAX_MISTAKES}`;
+    $('boardMsg').classList.toggle('show', !S.over && S.values.every(Boolean) && !isSolved());
     $('hintsLeft').textContent = S.hints;
     $('notesState').textContent = notesMode ? 'ON' : 'OFF';
     $('notesBtn').classList.toggle('on', notesMode);
@@ -759,7 +749,6 @@
   });
   $('modalNew').addEventListener('click', () => newGame(S.difficulty));
   $('modalAlt').addEventListener('click', () => {
-    if ($('modalAlt').textContent === 'Retry') return restart();
     const order = ['easy', 'medium', 'hard', 'expert'];
     newGame(order[Math.min(order.indexOf(S.difficulty) + 1, 3)]);
   });
@@ -804,7 +793,7 @@
     S = {
       difficulty: 'medium', puzzle: blank, solution: blank, values: blank.slice(),
       notes: Array.from({ length: 81 }, () => new Set()),
-      hinted: [], mistakes: 0, hints: MAX_HINTS, seconds: 0, over: true
+      hinted: [], hints: MAX_HINTS, seconds: 0, over: true
     };
     render();
   }
