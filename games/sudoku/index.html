@@ -43,7 +43,13 @@
     }
     .wrap { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
 
-    header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+    header {
+      display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 4px 8px;
+      grid-template-areas: "back howto" "title title";
+    }
+    header .back { grid-area: back; }
+    header h1 { grid-area: title; text-align: center; }
+    header .howto-btn { grid-area: howto; }
     .back { color: var(--muted); text-decoration: none; font-size: 0.85rem; justify-self: start; white-space: nowrap; }
     .back:hover { color: var(--gold-bright); }
     h1 {
@@ -163,6 +169,36 @@
     }
     .card button.primary { background: var(--gold); color: var(--navy); font-weight: 700; }
 
+    .howto-btn {
+      justify-self: end; background: transparent; border: 1px solid #3a4f7a; color: var(--muted);
+      border-radius: 999px; padding: 4px 10px; font-family: inherit; font-size: 0.78rem; cursor: pointer; white-space: nowrap;
+    }
+    .howto-btn:hover { color: var(--gold-bright); border-color: var(--gold); }
+
+    .intro .card {
+      max-width: 440px; text-align: left; padding: 22px 20px;
+      max-height: calc(100dvh - 32px); overflow-y: auto;
+    }
+    .intro h2 { text-align: center; font-size: 2.2rem; white-space: nowrap; }
+    .intro .tagline { text-align: center; color: var(--muted); font-size: 0.9rem; margin: 2px 0 14px; }
+    .intro h3 {
+      font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 1.25rem; letter-spacing: 2px;
+      color: var(--gold-bright); margin: 14px 0 4px;
+    }
+    .intro p, .intro li { color: #c9d1e3; font-size: 0.9rem; line-height: 1.55; }
+    .intro p { margin: 0; }
+    .intro ul, .intro ol { padding-left: 20px; }
+    .intro li { margin: 3px 0; }
+    .intro li b, .intro p b { color: var(--ink); }
+    .intro .swatch { display: inline-block; width: 0.85em; height: 0.85em; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+    .intro .kbd { font-family: 'Share Tech Mono', monospace; color: var(--ink); }
+    @media (hover: none) { .intro .keys { display: none; } }
+    .levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+    .card .levels button { padding: 8px 0; font-size: 0.85rem; }
+    .card .levels button.on { background: var(--gold); color: var(--navy); font-weight: 700; }
+    .intro .row { margin-top: 18px; }
+    .intro .row button { flex: 1; padding: 11px 14px; font-size: 1rem; }
+
     .help { color: var(--muted); font-size: 0.75rem; text-align: center; line-height: 1.6; }
     @media (hover: none) { .help { display: none; } }
   </style>
@@ -180,7 +216,7 @@
     <header>
       <a class="back" href="https://luis-figueroa-ops.github.io/#sudoku">&larr; Back to Tools</a>
       <h1>GRIDLOCK</h1>
-      <div class="spacer"></div>
+      <button class="howto-btn" id="howtoBtn" title="How to play">? How to Play</button>
     </header>
 
     <div class="status">
@@ -215,6 +251,67 @@
 
     <button class="newgame" id="newBtn">New Game</button>
     <div class="help">Keyboard: 1-9 to fill &middot; arrows to move &middot; N notes &middot; H hint &middot; Backspace erase &middot; Ctrl+Z undo</div>
+  </div>
+
+  <div class="modal intro show" id="intro" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+    <div class="card">
+      <h2 id="introTitle">HOW TO PLAY</h2>
+      <div class="tagline">Sudoku: no math, just logic.</div>
+
+      <h3>The Goal</h3>
+      <p>Fill every empty square so that each <b>row</b>, each <b>column</b>, and each <b>3&times;3 box</b>
+        (the areas inside the thick gold lines) contains the numbers <b>1 through 9 exactly once</b>.
+        Every puzzle has exactly one solution, so you never need to guess.</p>
+
+      <h3>How to Play</h3>
+      <ol>
+        <li><b>Tap an empty square</b> to select it. Its row, column, and box light up.</li>
+        <li><b>Tap a number</b> on the number pad to place it.</li>
+        <li>A correct number stays <b style="color:var(--entry)">gold</b>. A wrong one turns
+          <b style="color:var(--error)">red</b> and counts as a mistake.</li>
+        <li>Fill the whole board to win. <b>Three mistakes ends the game.</b></li>
+      </ol>
+
+      <h3>Reading the Board</h3>
+      <ul>
+        <li><b>White bold numbers</b> are part of the puzzle and can't be changed.</li>
+        <li><span class="swatch" style="background:#5b4a1e;box-shadow:inset 0 0 0 1px var(--gold-bright)"></span><b>Dark gold square</b>: the square you've selected.</li>
+        <li><span class="swatch" style="background:var(--cell-peer)"></span><b>Lighter squares</b>: the row, column, and box that can't repeat the selected number.</li>
+        <li>Select a square with a number and <b>every matching number lights up</b>.</li>
+        <li>The <b>small number under each digit</b> on the pad is how many are left to place. It fades out once all nine are on the board.</li>
+      </ul>
+
+      <h3>Tools</h3>
+      <ul>
+        <li><b>Undo</b>: takes back your last move. It does not remove a mistake from the count.</li>
+        <li><b>Erase</b>: clears the selected square.</li>
+        <li><b>Notes</b>: switch it ON to pencil in small possible numbers. Tap a number again to remove it.
+          Placing a correct number clears it from the notes in its row, column, and box.</li>
+        <li><b>Hint</b>: fills in the selected square, or the easiest square if none is selected. You get 3 per game, and they never count as mistakes.</li>
+        <li><b>New Game</b>: starts a fresh puzzle at the chosen difficulty.</li>
+      </ul>
+
+      <h3>Good to Know</h3>
+      <ul>
+        <li>The <b>timer</b> pauses while this screen is open or you switch apps. Beat your <b>best time</b> on each difficulty.</li>
+        <li>Your game <b>saves automatically</b>. Leave anytime and pick up where you left off.</li>
+        <li class="keys">Keyboard: <span class="kbd">1-9</span> place &middot; <span class="kbd">arrows</span> move &middot;
+          <span class="kbd">N</span> notes &middot; <span class="kbd">H</span> hint &middot; <span class="kbd">Backspace</span> erase &middot; <span class="kbd">Ctrl+Z</span> undo</li>
+      </ul>
+
+      <h3>Choose a Difficulty</h3>
+      <div class="levels" id="levels">
+        <button data-level="easy">Easy</button>
+        <button data-level="medium">Medium</button>
+        <button data-level="hard">Hard</button>
+        <button data-level="expert">Expert</button>
+      </div>
+
+      <div class="row">
+        <button id="resumeBtn">Resume Game</button>
+        <button class="primary" id="startBtn">Start New Game</button>
+      </div>
+    </div>
   </div>
 
   <div class="modal" id="modal">
@@ -335,6 +432,8 @@
   let notesMode = false;
   let history = [];
   let tick = null;
+  let paused = false;
+  let introLevel = 'medium';
 
   const $ = id => document.getElementById(id);
   const boardEl = $('board'), padEl = $('pad');
@@ -393,7 +492,7 @@
     clearInterval(tick);
     $('timer').textContent = fmt(S.seconds);
     tick = setInterval(() => {
-      if (S.over || document.hidden) return;
+      if (S.over || paused || document.hidden) return;
       S.seconds++;
       $('timer').textContent = fmt(S.seconds);
       if (S.seconds % 5 === 0) save();
@@ -623,7 +722,7 @@
   }
 
   document.addEventListener('keydown', e => {
-    if ($('modal').classList.contains('show')) return;
+    if (document.querySelector('.modal.show')) return;
     if (e.target.tagName === 'SELECT') return;
     const k = e.key;
     if ((e.ctrlKey || e.metaKey) && k.toLowerCase() === 'z') { e.preventDefault(); return undo(); }
@@ -664,10 +763,50 @@
   });
   window.addEventListener('pagehide', save);
 
+  // ---------- How to Play screen ----------
+  const hasActiveGame = () => S && !S.over;
+  const hasProgress = () => hasActiveGame() && S.values.some((v, i) => v && !S.puzzle[i]);
+
+  function setLevel(level) {
+    introLevel = level;
+    for (const b of $('levels').children) b.classList.toggle('on', b.dataset.level === level);
+  }
+  function openIntro() {
+    paused = true;
+    setLevel(S ? S.difficulty : 'medium');
+    $('resumeBtn').style.display = hasActiveGame() ? '' : 'none';
+    $('intro').classList.add('show');
+    $('intro').querySelector('.card').scrollTop = 0;
+  }
+  function closeIntro() {
+    $('intro').classList.remove('show');
+    paused = false;
+  }
+
+  for (const b of $('levels').children) b.addEventListener('click', () => setLevel(b.dataset.level));
+  $('howtoBtn').addEventListener('click', openIntro);
+  $('resumeBtn').addEventListener('click', closeIntro);
+  $('startBtn').addEventListener('click', () => {
+    if (hasProgress() && !confirm('Start a new game? Current progress will be lost.')) return;
+    closeIntro();
+    newGame(introLevel);
+  });
+
   // ---------- Boot ----------
   buildBoard();
-  if (restore()) { history = []; render(); startTimer(); }
-  else newGame('medium');
+  if (restore()) {
+    history = []; render(); startTimer();
+  } else {
+    // Empty board behind the How to Play screen until a game starts.
+    const blank = new Array(81).fill(0);
+    S = {
+      difficulty: 'medium', puzzle: blank, solution: blank, values: blank.slice(),
+      notes: Array.from({ length: 81 }, () => new Set()),
+      hinted: [], mistakes: 0, hints: MAX_HINTS, seconds: 0, over: true
+    };
+    render();
+  }
+  openIntro();
 })();
 </script>
 </body>
