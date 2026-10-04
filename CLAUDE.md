@@ -74,9 +74,6 @@ to a published `claude.ai/public/artifacts/...` (see Claude API Usage Patterns b
   Card `#prompt-coach`
 - `learning-tools/course-blueprint/index.html` - 15-Minute Course Blueprint: builds a course roadmap
   and teaches it in 15-minute sessions. Card `#course-blueprint`
-- `interview-prep/index.html` - Interview Prep: decode the role, build stories, practice answers.
-  **No landing page card** - its back link points to `#interview-prep`, which doesn't exist, so it
-  lands at the top of the landing page
 
 Other tools and projects:
 
@@ -156,7 +153,7 @@ New games should match the existing ones (Dodge, Stacked, Glass Jaw, GRIDLOCK):
 ## Claude API Usage Patterns
 
 > **Note:** this section is partly out of date. The AI tools (JD Analyzer, AI
-> Role Revealer, Prompt Coach, Course Blueprint, Interview Prep, WordSense) are now published
+> Role Revealer, Prompt Coach, Course Blueprint, WordSense) are now published
 > **Claude Artifacts** - the pages under `jd-analyzer/`, `ai-role-revealer/`
 > etc. are just landing pages that link to `claude.ai/public/artifacts/...`.
 > The artifact source lives in this repo only for WordSense
@@ -191,7 +188,6 @@ Each tool has its own visual style - do not assume shared CSS variables across f
 - **Prompt Coach & Build. Use. Break. Fix.**: Near-black/gold (`#0e0e0e` bg, `#C9A84C` gold); fonts: Bebas Neue, DM Sans, Share Tech Mono
 - **AI Automations**: Near-black/teal (`#0e0e0e` bg, `#2DD4BF` accent); fonts: Bebas Neue, DM Sans, Share Tech Mono
 - **Course Blueprint**: GitHub-dark/green (`#0d1117` bg, `#4ade80` accent); fonts: Bebas Neue, DM Sans, Share Tech Mono
-- **Interview Prep**: Dark blue (`#0b0f1a` bg, `#4A9EFF` accent); fonts: Bebas Neue, DM Sans, Share Tech Mono
 - **Read Aloud**: Desk-and-paper look (`#1f2a44` desk, `#d4a53a` gold, `#fbf6e9` paper), light/dark themes; serif system fonts (Iowan Old Style, Palatino, Georgia)
 - **WordSense landing page**: Light (`#f5f4f0` bg, `#b8860b` gold); system sans-serif fonts
 - **AI Role Revealer**: Dark purple/tech (`#0a0a0f` bg, `#6c63ff` accent, `#43e8c8` secondary); fonts: IBM Plex Mono, Outfit
