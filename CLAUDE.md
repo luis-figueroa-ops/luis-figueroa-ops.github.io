@@ -126,11 +126,11 @@ Each game lives in its own folder under `games/`. None need an API key.
 - `games/sudoku/index.html` - GRIDLOCK: sudoku game. Generates a new puzzle
   in the browser each game (random solved grid, then removes clues while a solver confirms the
   solution stays unique). Easy/Medium/Hard/Expert = 40/32/27/~24 clues. How to Play screen on every
-  visit (includes a warning that clearing browser cache/site data erases saves), notes, hints, undo,
-  timer. No mistake tracking by design: wrong numbers look the same as right ones (no red, no
-  mistake count, no game over); a neutral message appears only when the board is full but not
-  solved. Progress and best times are kept in `localStorage` (`gridlock-sudoku-save`,
-  `gridlock-sudoku-best`). Card `#sudoku`
+  visit (includes a warning that clearing browser cache/site data erases saves), notes, hints, undo.
+  Untimed and no mistake tracking by design: no timer or best times, and wrong numbers look the same
+  as right ones (no red, no mistake count, no game over); a neutral message appears only when the
+  board is full but not solved. Progress is kept in `localStorage` (`gridlock-sudoku-save`).
+  Card `#sudoku`
 - `games/wordsense/index.html` - WordSense landing page that opens the published Claude artifact.
   The artifact source is `games/wordsense/wordsense-artifact.html` (not a site page). Card `#wordsense`
 
