@@ -24,12 +24,33 @@ Self-contained HTML pages - all styles and scripts are inline within each file:
 - `index.html` - Landing/portfolio page linking to all tools
 - `jd-analyzer/index.html` - Job description analyzer; streams Claude responses, supports follow-up chat
 - `ai-role-revealer/index.html` - Two-step tool: generates AI insights for a role, then builds copy-ready prompts
-- `games/dodge.html` - Canvas-based arcade game; no API key required
-- `games/sudoku/index.html` - GRIDLOCK, a sudoku game; no API key required. Generates a new puzzle
+
+### Games
+
+Each game lives in its own folder under `games/`. None need an API key. Games with a landing page
+card are linked by the card's `id` (e.g. `index.html#dodge`).
+
+- `games/dodge/index.html` - DODGE: canvas space arcade game - dodge and shoot asteroids, comets,
+  and alien craft across 20 levels with boss waves. Web Audio sound, local leaderboard. Card `#dodge`
+- `games/stacked/index.html` - STACKED!: canvas block-stacking drop game; speed ramps up each level,
+  high score saved locally. Card `#stacked`
+- `games/boxing/index.html` - GLASS JAW: first-person canvas boxing game, twenty fighters across five
+  styles. Web Audio sound, local leaderboard. Card `#boxing`
+- `games/sudoku/index.html` - GRIDLOCK: sudoku game. Generates a new puzzle
   in the browser each game (random solved grid, then removes clues while a solver confirms the
   solution stays unique). Easy/Medium/Hard/Expert = 40/32/27/~24 clues. How to Play screen on every
   visit, notes, hints, undo, 3-mistake limit, timer. Progress and best times are kept in
-  `localStorage` (`gridlock-sudoku-save`, `gridlock-sudoku-best`). Landing page card id: `#sudoku`
+  `localStorage` (`gridlock-sudoku-save`, `gridlock-sudoku-best`). Card `#sudoku`
+- `games/wordsense/index.html` - WordSense landing page that opens the published Claude artifact.
+  The artifact source is `games/wordsense/wordsense-artifact.html` (not a site page). Card `#wordsense`
+
+Not linked from the landing page (no card):
+
+- `games/cross-warriors/index.html` - Cross Warriors: pixel-style canvas game - tap to shoot waves of
+  demons across 12 levels with boss fights. Back link goes to the site root
+- `games/road-rush/index.html` - ROAD RUSH: first-person canvas driving game - dodge traffic, cones,
+  and debris on roads that speed up each level. Local leaderboard. Its back link points to
+  `#road-rush`, which has no card yet, and it has no icon or manifest files
 
 ### Game page conventions
 
@@ -81,6 +102,10 @@ Each tool has its own visual style - do not assume shared CSS variables across f
 - **Landing page & JD Analyzer**: Navy/gold (`#1B2A4A` / `#B8963E`); fonts: Bebas Neue, DM Sans, Share Tech Mono
 - **AI Role Revealer**: Dark purple/tech (`#0a0a0f` bg, `#6c63ff` accent, `#43e8c8` secondary); fonts: IBM Plex Mono, Outfit
 - **Dodge**: Cyberpunk dark (`#0d0d18` bg, `#00ffe7` accent); fonts: Orbitron, Share Tech Mono
+- **Stacked!**: Dark neon (`#050510` bg, `#00ffe7` accent, `#a080ff` secondary); font: Courier New
+- **Glass Jaw**: Dark red/gold (`#140a0c` bg, `#ff3b3b` red, `#f5c542` gold); fonts: Bebas Neue, Share Tech Mono
+- **Road Rush**: Night drive (`#0a0e17` bg, `#ffb020` amber, `#ff6a3d` orange); fonts: Orbitron, Share Tech Mono
+- **Cross Warriors**: Retro pixel (`#000` bg, `#FFD700` gold, `#8B0000` dark red); font: Press Start 2P
 - **GRIDLOCK**: Navy/gold like the landing page (`#1B2A4A` / `#B8963E`, bright gold `#D4A53A`); fonts: Bebas Neue, DM Sans, Share Tech Mono
 
 ## Analytics
