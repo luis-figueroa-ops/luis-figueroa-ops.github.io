@@ -406,6 +406,7 @@
       <li><strong>Your browser opens your files.</strong> Text (.txt) and Markdown (.md) files are read directly by your browser. For Markdown, symbols like # and * and link addresses are removed so they aren't read out loud.</li>
       <li><strong>Word files (.docx) use a free, open-source library called Mammoth.</strong> The first time you open a Word file, your browser downloads Mammoth's code from jsDelivr, a free public code host. Mammoth then pulls the text out of your document right on your device. Your document itself never leaves your device. A security check confirms the downloaded code hasn't been altered. Older .doc files aren't supported, so re-save them as .docx in Word first.</li>
       <li><strong>The voices come from your browser and device.</strong> Voices marked "online" in the list are provided by your browser's maker, such as Google or Microsoft, and may send the text to their servers to create the audio. To keep everything on your device, pick a voice without the "online" label.</li>
+      <li><strong>Your screen stays on while it reads.</strong> Phones can stop the voice when the screen turns off, so the screen stays awake during playback and can sleep again when you pause or stop. If you switch to another app, the reading may stop; when you come back it picks up at the sentence it was on.</li>
       <li><strong>What's remembered stays in your browser.</strong> Your voice and speed choice, plus anything you save to your listening library, are kept in your browser's own storage on this device. It's never sent anywhere. Delete a saved text any time with its Delete button. Clearing your browser's cache, cookies, or site data erases everything saved.</li>
     </ul>
   </details>
@@ -598,7 +599,36 @@
     clearInterval(ticker);
     ticker = s === "playing" ? setInterval(updateMeta, 1000) : null;
     updateMeta();
+    keepAwake(s === "playing");
   }
+
+  // ---------- keep the screen on while reading ----------
+  // Phones may stop speech once the screen turns off, so hold a screen wake lock while playing.
+  var wakeLock = null;
+  function keepAwake(on) {
+    if (!("wakeLock" in navigator)) return;
+    if (!on) {
+      if (wakeLock) { wakeLock.release().catch(function () {}); wakeLock = null; }
+      return;
+    }
+    if (wakeLock || document.visibilityState !== "visible") return;
+    navigator.wakeLock.request("screen").then(function (lock) {
+      if (state !== "playing") { lock.release().catch(function () {}); return; }
+      wakeLock = lock;
+      lock.addEventListener("release", function () { if (wakeLock === lock) wakeLock = null; });
+    }).catch(function () {}); // e.g. battery saver on; reading still works
+  }
+
+  // The browser drops the wake lock when you leave the app. When you come back,
+  // take it again and pick up at the current sentence if the speech was stopped.
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState !== "visible" || state !== "playing") return;
+    keepAwake(true);
+    var myRun = runId;
+    setTimeout(function () {
+      if (myRun === runId && state === "playing" && !synth.speaking && !synth.pending) speakFrom(idx);
+    }, 300);
+  });
 
   // ---------- countdown ----------
   function resetPace() { spokenWords = 0; spokenMs = 0; }
