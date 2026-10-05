@@ -282,6 +282,15 @@
   }
   .save-row input::placeholder { color: var(--ink-soft); font-style: italic; }
   .save-row input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  #saveNewBtn {
+    border-style: dashed;
+    border-width: 2px;
+    border-color: var(--gold);
+    background: transparent;
+    font-style: italic;
+    margin-left: 14px;
+  }
+  #saveNewBtn::before { content: "+ "; font-style: normal; font-weight: 700; color: var(--gold); }
   .lib-list { list-style: none; margin: 16px 0 0; padding: 0; }
   .lib-list li {
     display: flex;
@@ -344,6 +353,7 @@
     .meta { width: 100%; margin-left: 0; }
     button { flex: 1 1 auto; }
     .lib-name { flex-basis: 100%; }
+    #saveNewBtn { margin-left: 0; margin-top: 6px; }
   }
 </style>
 </head>
@@ -855,6 +865,7 @@
   function setEditing(id) {
     editingId = id;
     saveBtn.textContent = id ? "Save changes" : "Save to library";
+    saveBtn.classList.toggle("primary", !!id);
     saveNewBtn.classList.toggle("hidden", !id);
     renderLibrary();
   }
@@ -891,6 +902,7 @@
     if (editingId && !list.some(function (x) { return x.id === editingId; })) {
       editingId = null; // deleted (possibly in another tab)
       saveBtn.textContent = "Save to library";
+      saveBtn.classList.remove("primary");
       saveNewBtn.classList.add("hidden");
     }
     list.forEach(function (item) {
