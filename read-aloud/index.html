@@ -294,6 +294,8 @@
   .lib-list li:last-child { border-bottom: 1px solid var(--rule); }
   .lib-name { flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
   .lib-name small { display: block; color: var(--ink-soft); font-style: italic; font-size: 0.85rem; }
+  .lib-list li.editing .lib-name { font-weight: 600; }
+  .lib-list li.editing .lib-name small::after { content: " · open above"; color: var(--gold); font-style: normal; font-weight: 600; }
   .lib-list button { padding: 6px 14px; }
   .lib-empty { color: var(--ink-soft); font-style: italic; margin: 14px 0 0; }
   .disclaimer {
@@ -392,6 +394,7 @@
       <label for="saveName" class="sr">Name for this text</label>
       <input type="text" id="saveName" maxlength="80" autocomplete="off" placeholder="Name this text, e.g. Chapter 3 notes">
       <button type="submit" id="saveBtn">Save to library</button>
+      <button type="button" id="saveNewBtn" class="hidden">Save as new</button>
     </form>
     <div class="status" id="libStatus" role="status"></div>
     <ul class="lib-list" id="libList"></ul>
@@ -708,6 +711,7 @@
     backToEditing();
     input.value = "";
     saveName.value = "";
+    setEditing(null);
     setStatus("");
     updateMeta();
     input.focus();
@@ -816,6 +820,7 @@
       }
       input.value = text;
       saveName.value = file.name.replace(/\.[^.]+$/, "");
+      setEditing(null);
       updateMeta();
       var words = text.trim().split(/\s+/).length;
       setStatus("Opened " + file.name + " (" + words.toLocaleString() + " words). Press Play to listen.");
@@ -844,6 +849,15 @@
   var LIB_KEY = "readaloud_library";
   var saveForm = $("saveForm"), saveName = $("saveName"), libList = $("libList");
   var libEmpty = $("libEmpty"), libStatus = $("libStatus");
+  var saveBtn = $("saveBtn"), saveNewBtn = $("saveNewBtn");
+  var editingId = null; // id of the library item currently loaded in the text box
+
+  function setEditing(id) {
+    editingId = id;
+    saveBtn.textContent = id ? "Save changes" : "Save to library";
+    saveNewBtn.classList.toggle("hidden", !id);
+    renderLibrary();
+  }
 
   function libSetStatus(msg, isError) {
     libStatus.textContent = msg || "";
@@ -874,8 +888,14 @@
     var list = readLibrary();
     libList.innerHTML = "";
     libEmpty.classList.toggle("hidden", list.length > 0);
+    if (editingId && !list.some(function (x) { return x.id === editingId; })) {
+      editingId = null; // deleted (possibly in another tab)
+      saveBtn.textContent = "Save to library";
+      saveNewBtn.classList.add("hidden");
+    }
     list.forEach(function (item) {
       var li = document.createElement("li");
+      if (item.id === editingId) li.className = "editing";
       var name = document.createElement("div");
       name.className = "lib-name";
       name.textContent = item.name;
@@ -911,8 +931,9 @@
     input.value = item.text;
     saveName.value = item.name;
     updateMeta();
+    setEditing(item.id);
     libSetStatus("");
-    setStatus("Loaded \u201c" + item.name + "\u201d from your library. Press Play to listen.");
+    setStatus("Loaded \u201c" + item.name + "\u201d from your library. Press Play to listen, or edit it and press Save changes.");
     input.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -927,25 +948,37 @@
     libSetStatus("Deleted \u201c" + item.name + "\u201d.");
   }
 
-  saveForm.addEventListener("submit", function (e) {
-    e.preventDefault();
+  // asNew: ignore the loaded item and save a separate copy
+  function saveToLibrary(asNew) {
     var text = input.value;
     var name = saveName.value.trim();
     if (!text.trim()) { libSetStatus("There's no text to save yet. Paste, type, or open a file first.", true); return; }
     if (!name) { libSetStatus("Give this text a name first.", true); saveName.focus(); return; }
 
     var list = readLibrary();
-    var existing = list.filter(function (x) { return x.name.toLowerCase() === name.toLowerCase(); })[0];
+    var current = !asNew && editingId ? list.filter(function (x) { return x.id === editingId; })[0] : null;
+    var existing = list.filter(function (x) {
+      return x.name.toLowerCase() === name.toLowerCase() && (!current || x.id !== current.id);
+    })[0];
+    if (asNew && existing && existing.id === editingId) {
+      libSetStatus("Give the new copy a different name first.", true); saveName.focus(); return;
+    }
     if (existing && !confirm("You already have \u201c" + existing.name + "\u201d in your library. Replace it with this text?")) return;
 
-    var entry = { id: existing ? existing.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name: name, text: text, saved: Date.now() };
-    list = list.filter(function (x) { return !existing || x.id !== existing.id; });
+    var entry = {
+      id: current ? current.id : existing ? existing.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+      name: name, text: text, saved: Date.now()
+    };
+    list = list.filter(function (x) { return x !== current && x !== existing; });
     list.unshift(entry); // newest first
     var err = writeLibrary(list);
     if (err) { libSetStatus(err, true); return; }
-    renderLibrary();
-    libSetStatus((existing ? "Updated" : "Saved") + " \u201c" + name + "\u201d to your library.");
-  });
+    setEditing(entry.id);
+    libSetStatus((current || existing ? "Updated" : "Saved") + " \u201c" + name + "\u201d in your library.");
+  }
+
+  saveForm.addEventListener("submit", function (e) { e.preventDefault(); saveToLibrary(false); });
+  saveNewBtn.addEventListener("click", function () { saveToLibrary(true); });
 
   // keep the list in sync if the page is open in another tab
   window.addEventListener("storage", function (e) { if (e.key === LIB_KEY || e.key === null) renderLibrary(); });
