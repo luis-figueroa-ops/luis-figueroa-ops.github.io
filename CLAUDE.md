@@ -134,11 +134,6 @@ Each game lives in its own folder under `games/`. None need an API key.
 - `games/wordsense/index.html` - WordSense landing page that opens the published Claude artifact.
   The artifact source is `games/wordsense/wordsense-artifact.html` (not a site page). Card `#wordsense`
 
-Intentionally unlisted - do NOT add a landing page card:
-
-- `games/cross-warriors/index.html` - Cross Warriors: pixel-style canvas game - tap to shoot waves of
-  demons across 12 levels with boss fights. Back link goes to the site root
-
 ### Game page conventions
 
 New games should match the existing ones (Dodge, Stacked, Glass Jaw, GRIDLOCK):
@@ -197,7 +192,6 @@ Each tool has its own visual style - do not assume shared CSS variables across f
 - **Dodge**: Cyberpunk dark (`#0d0d18` bg, `#00ffe7` accent); fonts: Orbitron, Share Tech Mono
 - **Stacked!**: Dark neon (`#050510` bg, `#00ffe7` accent, `#a080ff` secondary); font: Courier New
 - **Glass Jaw**: Dark red/gold (`#140a0c` bg, `#ff3b3b` red, `#f5c542` gold); fonts: Bebas Neue, Share Tech Mono
-- **Cross Warriors**: Retro pixel (`#000` bg, `#FFD700` gold, `#8B0000` dark red); font: Press Start 2P
 - **GRIDLOCK**: Navy/gold like the landing page (`#1B2A4A` / `#B8963E`, bright gold `#D4A53A`); fonts: Bebas Neue, DM Sans, Share Tech Mono
 
 ## Analytics
