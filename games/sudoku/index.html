@@ -227,7 +227,7 @@
     </header>
 
     <div class="status">
-      <select id="difficulty" aria-label="Difficulty">
+      <select id="difficulty" aria-label="Difficulty" autocomplete="off">
         <option value="easy">Easy</option>
         <option value="medium" selected>Medium</option>
         <option value="hard">Hard</option>
@@ -757,7 +757,9 @@
   // ---------- Boot ----------
   buildBoard();
   if (restore()) {
-    history = []; render();
+    history = [];
+    $('difficulty').value = S.difficulty; // keep the dropdown in sync with the saved puzzle
+    render();
   } else {
     // Empty board behind the How to Play screen until a game starts.
     const blank = new Array(81).fill(0);
