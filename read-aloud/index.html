@@ -372,7 +372,7 @@
   <section class="page ribbon">
     <p class="chapter">Your page</p>
     <textarea id="input" placeholder="Paste or type your text here, or drop a .txt, .md, or .docx file..." aria-label="Text to read aloud"></textarea>
-    <div class="reader hidden" id="reader" aria-live="off" title="Tap any sentence to jump there"></div>
+    <div class="reader hidden" id="reader" aria-live="off" title="Tap a sentence, then press Play to start reading there"></div>
 
     <div class="row">
       <button class="primary" id="playBtn">Play</button>
@@ -457,6 +457,7 @@
   var chunkStart = 0;   // when the current sentence started speaking
   var spokenWords = 0, spokenMs = 0; // measured pace of the current voice + speed
   var ticker = null;
+  var picked = -1;      // sentence tapped before pressing Play
 
   // ---------- storage helpers (safe if blocked) ----------
   function save(k, v) { try { localStorage.setItem("readaloud_" + k, v); } catch (e) {} }
@@ -537,6 +538,7 @@
   function buildReader(text) {
     reader.innerHTML = "";
     chunks = [];
+    picked = -1;
     splitSentences(text).forEach(function (part) {
       var span = document.createElement("span");
       span.textContent = part;
@@ -544,13 +546,30 @@
       if (part.trim().length) {
         var i = chunks.length;
         chunks.push({ text: part.trim(), el: span, words: part.trim().split(/\s+/).length });
-        span.addEventListener("click", function () { speakFrom(i); });
+        span.addEventListener("click", function () { pickSentence(i); });
       }
     });
     // words left from each sentence to the end, for the countdown
     var left = 0;
     for (var j = chunks.length - 1; j >= 0; j--) { left += chunks[j].words; chunks[j].left = left; }
     resetPace();
+  }
+
+  // Tapping a sentence only marks where to start; reading begins only with the Play button.
+  // If it's reading, a tap pauses there so Resume picks up from that sentence.
+  function pickSentence(i) {
+    if (state === "playing") {
+      runId++;
+      synth.cancel();
+      idx = i;
+      setState("paused");
+    } else if (state === "paused") {
+      idx = i;
+      updateMeta();
+    } else {
+      picked = i;
+    }
+    markProgress(i);
   }
 
   function markProgress(i) {
@@ -697,6 +716,7 @@
     synth.cancel();
     setState("idle");
     idx = 0;
+    picked = -1;
     chunks.forEach(function (c) { c.el.classList.remove("active", "done"); });
   }
 
@@ -718,8 +738,9 @@
     var text = input.value.trim();
     if (!text) { input.focus(); return; }
     setStatus("");
+    var start = picked; // lockText rebuilds the same sentences, so the pick still lines up
     lockText();
-    speakFrom(0);
+    speakFrom(start >= 0 && start < chunks.length ? start : 0);
   });
 
   stopBtn.addEventListener("click", function () {
