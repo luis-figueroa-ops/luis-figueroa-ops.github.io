@@ -186,7 +186,7 @@
   }
   textarea::placeholder { color: var(--ink-soft); font-style: italic; }
   textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
-  textarea.dragging { outline: 2px dashed var(--gold); outline-offset: 2px; }
+  textarea.dragging, .reader.dragging { outline: 2px dashed var(--gold); outline-offset: 2px; }
   .reader { white-space: pre-wrap; word-wrap: break-word; cursor: pointer; }
   .reader span { border-radius: 3px; transition: background 0.15s; }
   .reader span.active { background: var(--highlight); color: var(--highlight-text); }
@@ -671,17 +671,37 @@
     return words / wpm * 60;
   }
 
+  // The text box is only editable after pressing Edit text, so text can't be changed by accident.
+  // While editing, the same button reads Done editing and locks the text again.
   function showReader(on) {
     input.classList.toggle("hidden", on);
     reader.classList.toggle("hidden", !on);
-    editBtn.classList.toggle("hidden", !on);
+    updateEditBtn();
   }
 
-  function backToEditing() {
+  function updateEditBtn() {
+    var editing = reader.classList.contains("hidden");
+    editBtn.textContent = editing ? "Done editing" : "Edit text";
+    editBtn.classList.toggle("hidden", editing && !input.value.trim());
+  }
+
+  function lockText() {
+    if (!input.value.trim()) { showReader(false); return; }
+    buildReader(input.value);
+    showReader(true);
+    reader.scrollTop = 0;
+  }
+
+  function stopPlayback() {
     runId++;
     synth.cancel();
     setState("idle");
     idx = 0;
+    chunks.forEach(function (c) { c.el.classList.remove("active", "done"); });
+  }
+
+  function backToEditing() {
+    stopPlayback();
     showReader(false);
   }
 
@@ -698,21 +718,17 @@
     var text = input.value.trim();
     if (!text) { input.focus(); return; }
     setStatus("");
-    buildReader(input.value);
-    showReader(true);
+    lockText();
     speakFrom(0);
   });
 
   stopBtn.addEventListener("click", function () {
-    runId++;
-    synth.cancel();
-    setState("idle");
-    idx = 0;
-    chunks.forEach(function (c) { c.el.classList.remove("active", "done"); });
+    stopPlayback();
     reader.scrollTop = 0;
   });
 
   editBtn.addEventListener("click", function () {
+    if (reader.classList.contains("hidden")) { lockText(); return; } // Done editing
     backToEditing();
     input.focus();
   });
@@ -724,7 +740,15 @@
     setEditing(null);
     setStatus("");
     updateMeta();
+    updateEditBtn();
     input.focus();
+  });
+
+  input.addEventListener("input", updateEditBtn);
+  // Pasting into an empty box locks the text right away, like the Paste button does
+  input.addEventListener("paste", function () {
+    if (input.value.trim()) return;
+    setTimeout(function () { if (input.value.trim()) lockText(); }, 0);
   });
 
   pasteBtn.addEventListener("click", function () {
@@ -734,10 +758,12 @@
       return;
     }
     navigator.clipboard.readText().then(function (t) {
-      if (input.classList.contains("hidden")) backToEditing();
+      stopPlayback();
       input.value = t;
       setStatus("");
       updateMeta();
+      updateSaveButtons();
+      lockText();
     }).catch(function () {
       input.focus();
       setStatus("Paste permission was denied. Use Ctrl+V / Cmd+V or long-press to paste instead.", true);
@@ -822,7 +848,7 @@
 
   function handleFile(file) {
     if (!file) return;
-    backToEditing();
+    stopPlayback();
     readFile(file).then(function (text) {
       if (!text || !text.trim()) {
         setStatus("No readable text was found in " + file.name + ".", true);
@@ -832,6 +858,7 @@
       saveName.value = file.name.replace(/\.[^.]+$/, "");
       setEditing(null);
       updateMeta();
+      lockText();
       var words = text.trim().split(/\s+/).length;
       setStatus("Opened " + file.name + " (" + words.toLocaleString() + " words). Press Play to listen.");
     }).catch(function (err) {
@@ -845,14 +872,16 @@
     fileInput.value = ""; // allow opening the same file again
   });
 
-  input.addEventListener("dragover", function (e) { e.preventDefault(); input.classList.add("dragging"); });
-  input.addEventListener("dragleave", function () { input.classList.remove("dragging"); });
-  input.addEventListener("drop", function (e) {
-    input.classList.remove("dragging");
-    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
-      e.preventDefault();
-      handleFile(e.dataTransfer.files[0]);
-    }
+  [input, reader].forEach(function (box) {
+    box.addEventListener("dragover", function (e) { e.preventDefault(); box.classList.add("dragging"); });
+    box.addEventListener("dragleave", function () { box.classList.remove("dragging"); });
+    box.addEventListener("drop", function (e) {
+      box.classList.remove("dragging");
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        e.preventDefault();
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
   });
 
   // ---------- listening library ----------
@@ -861,13 +890,27 @@
   var libEmpty = $("libEmpty"), libStatus = $("libStatus");
   var saveBtn = $("saveBtn"), saveNewBtn = $("saveNewBtn");
   var editingId = null; // id of the library item currently loaded in the text box
+  var savedCopy = null; // its saved text and name, to tell when there are unsaved changes
 
   function setEditing(id) {
     editingId = id;
-    saveBtn.textContent = id ? "Save changes" : "Save to library";
-    saveBtn.classList.toggle("primary", !!id);
-    saveNewBtn.classList.toggle("hidden", !id);
+    var item = id ? readLibrary().filter(function (x) { return x.id === id; })[0] : null;
+    savedCopy = item ? { text: item.text, name: item.name } : null;
+    updateSaveButtons();
     renderLibrary();
+  }
+
+  function hasChanges() {
+    return !!savedCopy && (input.value !== savedCopy.text || saveName.value.trim() !== savedCopy.name);
+  }
+
+  // A loaded library item only shows Save changes / Save as new once its text or name is changed
+  function updateSaveButtons() {
+    var changed = hasChanges();
+    saveBtn.textContent = editingId ? "Save changes" : "Save to library";
+    saveBtn.classList.toggle("primary", !!editingId);
+    saveBtn.classList.toggle("hidden", !!editingId && !changed);
+    saveNewBtn.classList.toggle("hidden", !changed);
   }
 
   function libSetStatus(msg, isError) {
@@ -901,9 +944,8 @@
     libEmpty.classList.toggle("hidden", list.length > 0);
     if (editingId && !list.some(function (x) { return x.id === editingId; })) {
       editingId = null; // deleted (possibly in another tab)
-      saveBtn.textContent = "Save to library";
-      saveBtn.classList.remove("primary");
-      saveNewBtn.classList.add("hidden");
+      savedCopy = null;
+      updateSaveButtons();
     }
     list.forEach(function (item) {
       var li = document.createElement("li");
@@ -939,14 +981,15 @@
   function loadSaved(id) {
     var item = readLibrary().filter(function (x) { return x.id === id; })[0];
     if (!item) { renderLibrary(); return; }
-    backToEditing();
+    stopPlayback();
     input.value = item.text;
     saveName.value = item.name;
     updateMeta();
     setEditing(item.id);
+    lockText();
     libSetStatus("");
-    setStatus("Loaded \u201c" + item.name + "\u201d from your library. Press Play to listen, or edit it and press Save changes.");
-    input.scrollIntoView({ behavior: "smooth", block: "center" });
+    setStatus("Loaded \u201c" + item.name + "\u201d from your library. Press Play to listen, or Edit text to make changes.");
+    reader.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function deleteSaved(id) {
@@ -966,6 +1009,7 @@
     var name = saveName.value.trim();
     if (!text.trim()) { libSetStatus("There's no text to save yet. Paste, type, or open a file first.", true); return; }
     if (!name) { libSetStatus("Give this text a name first.", true); saveName.focus(); return; }
+    if (editingId && !hasChanges()) { libSetStatus("No changes to save."); return; }
 
     var list = readLibrary();
     var current = !asNew && editingId ? list.filter(function (x) { return x.id === editingId; })[0] : null;
@@ -986,11 +1030,14 @@
     var err = writeLibrary(list);
     if (err) { libSetStatus(err, true); return; }
     setEditing(entry.id);
+    if (state === "idle") lockText(); // saved, so lock the text again
     libSetStatus((current || existing ? "Updated" : "Saved") + " \u201c" + name + "\u201d in your library.");
   }
 
   saveForm.addEventListener("submit", function (e) { e.preventDefault(); saveToLibrary(false); });
   saveNewBtn.addEventListener("click", function () { saveToLibrary(true); });
+  input.addEventListener("input", updateSaveButtons);
+  saveName.addEventListener("input", updateSaveButtons);
 
   // keep the list in sync if the page is open in another tab
   window.addEventListener("storage", function (e) { if (e.key === LIB_KEY || e.key === null) renderLibrary(); });
