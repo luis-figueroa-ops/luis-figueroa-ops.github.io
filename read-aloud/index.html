@@ -730,7 +730,10 @@
   editBtn.addEventListener("click", function () {
     if (reader.classList.contains("hidden")) { lockText(); return; } // Done editing
     backToEditing();
-    input.focus();
+    // start at the top instead of jumping to the end of the text
+    input.setSelectionRange(0, 0);
+    input.scrollTop = 0;
+    input.focus({ preventScroll: true });
   });
 
   clearBtn.addEventListener("click", function () {
