@@ -112,6 +112,10 @@ Each folder holds an `index.html` plus the certificate files as matching `.pdf` 
   `images/placeholder.txt` is not referenced by any page
 - `videos/placeholder.txt` - empty placeholder folder; no page references it
 - `README.md` - one-line repo description
+- `sitemap.xml` - sitemaps.org list of every public page with `lastmod` dates (excludes the
+  `my-skills-in-action/` redirect and `wordsense-artifact.html`). Add, remove, or update entries
+  when pages change
+- `robots.txt` - allows all crawlers and points to the sitemap
 
 ### Games
 

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://luis-figueroa-ops.github.io/sitemap.xml
