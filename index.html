@@ -338,6 +338,8 @@ h1 span { color: var(--gold); }
   text-transform: uppercase;
   margin-top: -4px;
 }
+/* Cards with a Completed badge but no credit badge row: match the cert cards' title offset so the title clears the badge */
+.card-title-clear-badge { margin-top: 32px; }
 
 .card-construction-badge {
   position: absolute;
@@ -668,6 +670,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
     align-self: flex-end;
     margin-bottom: -8px;
   }
+  .card-title-clear-badge { margin-top: 0; }
 }
 </style>
 </head>
@@ -1042,7 +1045,7 @@ footer { position: relative; z-index: 10; padding: 32px 64px; border-top: 1px so
 <a class="card" id="reskilling-coursework" href="https://luis-figueroa-ops.github.io/credentials/reskilling-coursework/">
   <div class="card-completed-badge"><span>Completed</span></div>
   <div class="card-tag">Reskilling Program</div>
-  <div class="card-title">Reskilling Coursework</div>
+  <div class="card-title card-title-clear-badge">Reskilling Coursework</div>
   <div class="card-desc">
     Four courses completed through Verizon's Skill Forward reskilling program - Power BI, Python fundamentals, business process mapping, and project management, across edX and Udemy Business.
   </div>
